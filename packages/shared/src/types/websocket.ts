@@ -1,7 +1,9 @@
+import type { Token } from './game';
+
 export type WSMessageType =
   | 'ping' | 'pong'
   | 'game:join' | 'game:leave' | 'game:state' | 'game:players' | 'game:player-joined' | 'game:player-left'
-  | 'token:move' | 'token:add' | 'token:remove'
+  | 'token:move' | 'token:add' | 'token:added' | 'token:update' | 'token:updated' | 'token:remove' | 'token:removed'
   | 'dice:roll' | 'dice:result'
   | 'chat:message'
   | 'error';
@@ -41,6 +43,7 @@ export interface GamePlayerLeftPayload {
 }
 
 // Token payloads
+// Note: Token interface is defined in ./game.ts
 export interface TokenMovePayload {
   tokenId: string;
   x: number;
@@ -48,14 +51,34 @@ export interface TokenMovePayload {
 }
 
 export interface TokenAddPayload {
-  tokenId: string;
+  name: string;
   x: number;
   y: number;
-  imageUrl: string;
-  label?: string;
+  width?: number;
+  height?: number;
+  imageUrl?: string | null;
+  visible?: boolean;
+  data?: Record<string, unknown>;
+}
+
+export interface TokenAddedPayload {
+  token: Token;
+}
+
+export interface TokenUpdatePayload {
+  tokenId: string;
+  updates: Partial<Omit<Token, 'id' | 'gameId' | 'createdAt'>>;
+}
+
+export interface TokenUpdatedPayload {
+  token: Token;
 }
 
 export interface TokenRemovePayload {
+  tokenId: string;
+}
+
+export interface TokenRemovedPayload {
   tokenId: string;
 }
 

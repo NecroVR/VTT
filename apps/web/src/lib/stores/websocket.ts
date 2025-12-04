@@ -2,7 +2,14 @@ import { writable, type Writable } from 'svelte/store';
 import type {
   WSMessage,
   WSMessageType,
+  Token,
   TokenMovePayload,
+  TokenAddPayload,
+  TokenAddedPayload,
+  TokenUpdatePayload,
+  TokenUpdatedPayload,
+  TokenRemovePayload,
+  TokenRemovedPayload,
   DiceRollPayload,
   DiceResultPayload,
   GameJoinPayload,
@@ -133,16 +140,43 @@ class WebSocketStore {
   /**
    * Typed helper methods for common message types
    */
+
+  // Token methods
+  sendTokenAdd(payload: TokenAddPayload): void {
+    this.send('token:add', payload);
+  }
+
   sendTokenMove(payload: TokenMovePayload): void {
     this.send('token:move', payload);
   }
 
-  sendDiceRoll(payload: DiceRollPayload): void {
-    this.send('dice:roll', payload);
+  sendTokenUpdate(payload: TokenUpdatePayload): void {
+    this.send('token:update', payload);
+  }
+
+  sendTokenRemove(payload: TokenRemovePayload): void {
+    this.send('token:remove', payload);
+  }
+
+  onTokenAdded(handler: TypedMessageHandler<TokenAddedPayload>): () => void {
+    return this.on('token:added', handler);
   }
 
   onTokenMove(handler: TypedMessageHandler<TokenMovePayload>): () => void {
     return this.on('token:move', handler);
+  }
+
+  onTokenUpdated(handler: TypedMessageHandler<TokenUpdatedPayload>): () => void {
+    return this.on('token:updated', handler);
+  }
+
+  onTokenRemoved(handler: TypedMessageHandler<TokenRemovedPayload>): () => void {
+    return this.on('token:removed', handler);
+  }
+
+  // Dice methods
+  sendDiceRoll(payload: DiceRollPayload): void {
+    this.send('dice:roll', payload);
   }
 
   onDiceResult(handler: TypedMessageHandler<DiceResultPayload>): () => void {

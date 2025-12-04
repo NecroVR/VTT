@@ -16,13 +16,15 @@ export interface Token {
   id: string;
   gameId: string;
   name: string;
-  imageUrl?: string;
+  imageUrl: string | null;
   x: number;
   y: number;
   width: number;
   height: number;
-  ownerId?: string;
+  ownerId: string | null;
   visible: boolean;
+  data: Record<string, unknown>;
+  createdAt: string;
 }
 
 export interface MapLayer {

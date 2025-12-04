@@ -3,7 +3,14 @@ import type { WebSocket } from '@fastify/websocket';
 import type {
   WSMessage,
   WSMessageType,
+  Token,
   TokenMovePayload,
+  TokenAddPayload,
+  TokenAddedPayload,
+  TokenUpdatePayload,
+  TokenUpdatedPayload,
+  TokenRemovePayload,
+  TokenRemovedPayload,
   DiceRollPayload,
   DiceResultPayload,
   GameJoinPayload,
@@ -12,12 +19,12 @@ import type {
   GamePlayerJoinedPayload,
   GamePlayerLeftPayload,
   ChatMessagePayload,
-  ErrorPayload,
-  TokenAddPayload,
-  TokenRemovePayload
+  ErrorPayload
 } from '@vtt/shared';
 import { roomManager } from '../rooms';
 import { validateSession, extractSessionToken } from '../auth';
+import { tokens } from '@vtt/database';
+import { eq } from 'drizzle-orm';
 
 /**
  * Game session WebSocket handler
@@ -33,7 +40,7 @@ export async function handleGameWebSocket(
   request.log.info(`WebSocket client connected: ${clientId}`);
 
   // Handle incoming messages
-  socket.on('message', (rawMessage: Buffer) => {
+  socket.on('message', async (rawMessage: Buffer) => {
     try {
       const message = JSON.parse(rawMessage.toString()) as WSMessage;
 
@@ -46,7 +53,7 @@ export async function handleGameWebSocket(
           break;
 
         case 'game:join':
-          handleGameJoin(socket, message as WSMessage<GameJoinPayload>, request);
+          await handleGameJoin(socket, message as WSMessage<GameJoinPayload>, request);
           break;
 
         case 'game:leave':
@@ -54,15 +61,15 @@ export async function handleGameWebSocket(
           break;
 
         case 'token:move':
-          handleTokenMove(socket, message as WSMessage<TokenMovePayload>, request);
+          await handleTokenMove(socket, message as WSMessage<TokenMovePayload>, request);
           break;
 
         case 'token:add':
-          handleTokenAdd(socket, message as WSMessage<TokenAddPayload>, request);
+          await handleTokenAdd(socket, message as WSMessage<TokenAddPayload>, request);
           break;
 
         case 'token:remove':
-          handleTokenRemove(socket, message as WSMessage<TokenRemovePayload>, request);
+          await handleTokenRemove(socket, message as WSMessage<TokenRemovePayload>, request);
           break;
 
         case 'dice:roll':
@@ -236,11 +243,11 @@ function handleGameLeave(
 /**
  * Handle token move action
  */
-function handleTokenMove(
+async function handleTokenMove(
   socket: WebSocket,
   message: WSMessage<TokenMovePayload>,
   request: FastifyRequest
-): void {
+): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Token move');
 
   const { tokenId, x, y } = message.payload;
@@ -253,52 +260,122 @@ function handleTokenMove(
     return;
   }
 
-  // TODO: Validate token ownership and update database
+  try {
+    // Update token position in database
+    const updatedTokens = await request.server.db
+      .update(tokens)
+      .set({ x, y })
+      .where(eq(tokens.id, tokenId))
+      .returning();
 
-  // Broadcast to all players in the game (including sender for confirmation)
-  roomManager.broadcast(gameId, {
-    type: 'token:move',
-    payload: { tokenId, x, y },
-    timestamp: Date.now(),
-  });
+    if (updatedTokens.length === 0) {
+      sendMessage(socket, 'error', { message: 'Token not found' });
+      return;
+    }
+
+    // Broadcast to all players in the game (including sender for confirmation)
+    roomManager.broadcast(gameId, {
+      type: 'token:move',
+      payload: { tokenId, x, y },
+      timestamp: Date.now(),
+    });
+  } catch (error) {
+    request.log.error({ error, tokenId }, 'Error updating token position');
+    sendMessage(socket, 'error', { message: 'Failed to update token position' });
+  }
 }
 
 /**
  * Handle token add action
  */
-function handleTokenAdd(
+async function handleTokenAdd(
   socket: WebSocket,
   message: WSMessage<TokenAddPayload>,
   request: FastifyRequest
-): void {
+): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Token add');
 
   const gameId = roomManager.getRoomForSocket(socket);
+  const playerInfo = roomManager.getPlayerInfo(socket);
 
-  if (!gameId) {
+  if (!gameId || !playerInfo) {
     sendMessage(socket, 'error', { message: 'Not in a game room' });
     return;
   }
 
-  // TODO: Implement token creation logic and save to database
+  try {
+    const {
+      name,
+      x,
+      y,
+      width = 1,
+      height = 1,
+      imageUrl = null,
+      visible = true,
+      data = {}
+    } = message.payload;
 
-  // Broadcast to all players
-  roomManager.broadcast(gameId, {
-    type: 'token:add',
-    payload: message.payload,
-    timestamp: Date.now(),
-  });
+    // Create token in database
+    const newTokens = await request.server.db
+      .insert(tokens)
+      .values({
+        gameId,
+        name,
+        x,
+        y,
+        width,
+        height,
+        imageUrl,
+        visible,
+        data,
+        ownerId: playerInfo.userId
+      })
+      .returning();
+
+    const newToken = newTokens[0];
+
+    // Convert token to match Token interface
+    const tokenPayload: Token = {
+      id: newToken.id,
+      gameId: newToken.gameId,
+      name: newToken.name,
+      imageUrl: newToken.imageUrl,
+      x: newToken.x,
+      y: newToken.y,
+      width: newToken.width,
+      height: newToken.height,
+      ownerId: newToken.ownerId,
+      visible: newToken.visible,
+      data: newToken.data as Record<string, unknown>,
+      createdAt: newToken.createdAt.toISOString()
+    };
+
+    // Broadcast to all players with full token including ID
+    const addedPayload: TokenAddedPayload = { token: tokenPayload };
+    roomManager.broadcast(gameId, {
+      type: 'token:added',
+      payload: addedPayload,
+      timestamp: Date.now(),
+    });
+
+    request.log.info({ tokenId: newToken.id, gameId }, 'Token created');
+  } catch (error) {
+    request.log.error({ error }, 'Error creating token');
+    sendMessage(socket, 'error', { message: 'Failed to create token' });
+  }
 }
 
 /**
  * Handle token remove action
  */
-function handleTokenRemove(
+async function handleTokenRemove(
   socket: WebSocket,
   message: WSMessage<TokenRemovePayload>,
   request: FastifyRequest
-): void {
+): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Token remove');
+
+  const { tokenId } = message.payload;
 
   const gameId = roomManager.getRoomForSocket(socket);
 
@@ -307,14 +384,31 @@ function handleTokenRemove(
     return;
   }
 
-  // TODO: Implement token removal logic and update database
+  try {
+    // Delete token from database
+    const deletedTokens = await request.server.db
+      .delete(tokens)
+      .where(eq(tokens.id, tokenId))
+      .returning();
 
-  // Broadcast to all players
-  roomManager.broadcast(gameId, {
-    type: 'token:remove',
-    payload: message.payload,
-    timestamp: Date.now(),
-  });
+    if (deletedTokens.length === 0) {
+      sendMessage(socket, 'error', { message: 'Token not found' });
+      return;
+    }
+
+    // Broadcast to all players
+    const removedPayload: TokenRemovedPayload = { tokenId };
+    roomManager.broadcast(gameId, {
+      type: 'token:removed',
+      payload: removedPayload,
+      timestamp: Date.now(),
+    });
+
+    request.log.info({ tokenId, gameId }, 'Token removed');
+  } catch (error) {
+    request.log.error({ error, tokenId }, 'Error removing token');
+    sendMessage(socket, 'error', { message: 'Failed to remove token' });
+  }
 }
 
 /**

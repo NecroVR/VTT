@@ -2,6 +2,7 @@ import type { FastifyPluginAsync } from 'fastify';
 import usersRoute from './users.js';
 import authRoute from './auth.js';
 import gamesRoute from './games.js';
+import tokensRoute from './tokens.js';
 
 /**
  * API v1 routes
@@ -27,6 +28,7 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
   await fastify.register(usersRoute);
   await fastify.register(authRoute);
   await fastify.register(gamesRoute);
+  await fastify.register(tokensRoute);
 };
 
 export default apiV1Routes;
