@@ -9,12 +9,17 @@
   import { wallsStore } from '$lib/stores/walls';
   import SceneCanvas from '$lib/components/SceneCanvas.svelte';
   import SceneControls from '$lib/components/scene/SceneControls.svelte';
+  import ChatPanel from '$lib/components/chat/ChatPanel.svelte';
+  import CombatTracker from '$lib/components/combat/CombatTracker.svelte';
+  import ActorSheet from '$lib/components/actor/ActorSheet.svelte';
   import type { Scene } from '@vtt/shared';
 
   let wsState: { connected: boolean; reconnecting: boolean; error: string | null };
   let isGM = false; // TODO: Get this from game data
   let activeTool = 'select';
   let gridSnap = false;
+  let showActorSheet = false;
+  let selectedActorId: string | null = null;
 
   // Use auto-subscription with $ prefix - Svelte handles cleanup automatically
   $: gameId = $page.params.id;
@@ -93,7 +98,7 @@
     });
 
     // Join game room
-    const token = localStorage.getItem('sessionToken') || sessionStorage.getItem('sessionToken') || '';
+    const token = localStorage.getItem('vtt_session_id') || sessionStorage.getItem('vtt_session_id') || '';
     websocket.joinGame(gameId, token);
 
     // Return cleanup function that will be called when component is destroyed
@@ -152,6 +157,16 @@
 
   function handleWallRemove(wallId: string) {
     websocket.wallRemove({ wallId });
+  }
+
+  function handleOpenActorSheet(actorId: string) {
+    selectedActorId = actorId;
+    showActorSheet = true;
+  }
+
+  function handleCloseActorSheet() {
+    showActorSheet = false;
+    selectedActorId = null;
   }
 </script>
 
@@ -224,17 +239,28 @@
     </div>
 
     <aside class="sidebar">
-      <div class="card">
-        <h2>Players</h2>
-        <p class="placeholder-text">Player list will appear here</p>
+      <div class="sidebar-section">
+        <ChatPanel {gameId} />
       </div>
 
-      <div class="card">
-        <h2>Chat</h2>
-        <p class="placeholder-text">Chat will appear here</p>
+      <div class="sidebar-section">
+        <CombatTracker {gameId} {isGM} />
       </div>
     </aside>
   </div>
+
+  {#if showActorSheet && selectedActorId}
+    <div class="actor-sheet-overlay">
+      <div class="actor-sheet-modal">
+        <ActorSheet
+          actorId={selectedActorId}
+          {gameId}
+          {isGM}
+          onClose={handleCloseActorSheet}
+        />
+      </div>
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -383,6 +409,41 @@
     font-size: var(--font-size-md);
     font-weight: 600;
     margin-bottom: var(--spacing-sm);
+  }
+
+  .sidebar-section {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-section:not(:last-child) {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .actor-sheet-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  .actor-sheet-modal {
+    width: 90%;
+    max-width: 800px;
+    height: 90%;
+    max-height: 800px;
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   }
 
   @media (max-width: 768px) {

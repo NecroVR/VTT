@@ -29,7 +29,7 @@ function createTokensStore() {
       update(state => ({ ...state, loading: true, error: null }));
 
       try {
-        const token = localStorage.getItem('sessionToken') || sessionStorage.getItem('sessionToken');
+        const token = localStorage.getItem('vtt_session_id') || sessionStorage.getItem('vtt_session_id');
 
         if (!token) {
           throw new Error('No authentication token found');
