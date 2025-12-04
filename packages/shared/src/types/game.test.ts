@@ -65,6 +65,7 @@ describe('Game Types', () => {
         id: 'game123',
         name: 'My Campaign',
         ownerId: 'user123',
+        gmUserIds: [],
         createdAt: new Date(),
         settings: {
           gridType: 'square',
@@ -76,6 +77,7 @@ describe('Game Types', () => {
       expect(game.id).toBe('game123');
       expect(game.name).toBe('My Campaign');
       expect(game.ownerId).toBe('user123');
+      expect(game.gmUserIds).toEqual([]);
       expect(game.createdAt).toBeInstanceOf(Date);
       expect(game.settings).toBeDefined();
     });
@@ -85,6 +87,7 @@ describe('Game Types', () => {
         id: '1',
         name: 'Test Campaign: Episode 1',
         ownerId: 'owner1',
+        gmUserIds: [],
         createdAt: new Date(),
         settings: { gridType: 'hex', gridSize: 40, snapToGrid: false },
       };
@@ -602,6 +605,7 @@ describe('Game Types', () => {
           id: 'game123',
           name: 'My Game',
           ownerId: 'user123',
+          gmUserIds: [],
           createdAt: new Date(),
           settings: {
             gridType: 'square',
@@ -632,6 +636,7 @@ describe('Game Types', () => {
             id: 'game1',
             name: 'Campaign 1',
             ownerId: 'user1',
+            gmUserIds: [],
             createdAt: new Date(),
             settings: { gridType: 'square', gridSize: 50, snapToGrid: true },
           },
@@ -639,6 +644,7 @@ describe('Game Types', () => {
             id: 'game2',
             name: 'Campaign 2',
             ownerId: 'user1',
+            gmUserIds: [],
             createdAt: new Date(),
             settings: { gridType: 'hex', gridSize: 60, snapToGrid: false },
           },

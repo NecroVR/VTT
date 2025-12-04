@@ -31,6 +31,7 @@ describe('Index Exports', () => {
         id: 'game1',
         name: 'Test Game',
         ownerId: 'user1',
+        gmUserIds: [],
         createdAt: new Date(),
         settings: { gridType: 'square', gridSize: 50, snapToGrid: true },
       };

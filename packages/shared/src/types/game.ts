@@ -2,6 +2,7 @@ export interface Game {
   id: string;
   name: string;
   ownerId: string;
+  gmUserIds: string[];
   createdAt: Date;
   settings: GameSettings;
 }
@@ -127,4 +128,17 @@ export interface GameResponse {
 
 export interface GamesListResponse {
   games: Game[];
+}
+
+// GM Management API Types
+export interface AddGMRequest {
+  userId: string;
+}
+
+export interface RemoveGMRequest {
+  userId: string;
+}
+
+export interface GMsListResponse {
+  gmUserIds: string[];
 }

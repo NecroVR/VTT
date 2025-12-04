@@ -4,6 +4,7 @@
   import { onMount } from 'svelte';
   import { websocket } from '$stores/websocket';
   import { authStore } from '$lib/stores/auth';
+  import { gamesStore } from '$lib/stores/games';
   import { scenesStore } from '$lib/stores/scenes';
   import { tokensStore } from '$lib/stores/tokens';
   import { wallsStore } from '$lib/stores/walls';
@@ -15,7 +16,6 @@
   import type { Scene } from '@vtt/shared';
 
   let wsState: { connected: boolean; reconnecting: boolean; error: string | null };
-  let isGM = false; // TODO: Get this from game data
   let activeTool = 'select';
   let gridSnap = false;
   let showActorSheet = false;
@@ -23,6 +23,8 @@
 
   // Use auto-subscription with $ prefix - Svelte handles cleanup automatically
   $: gameId = $page.params.id;
+  $: currentGame = $gamesStore.currentGame;
+  $: currentUser = $authStore.user;
   $: scenes = Array.from($scenesStore.scenes.values());
   $: activeScene = $scenesStore.activeSceneId
     ? $scenesStore.scenes.get($scenesStore.activeSceneId)
@@ -34,6 +36,12 @@
     wall => activeScene && wall.sceneId === activeScene.id
   );
 
+  // Determine if current user is GM
+  // User is GM if they are the owner OR in the gmUserIds list
+  $: isGM = currentGame && currentUser
+    ? currentGame.ownerId === currentUser.id || (currentGame.gmUserIds || []).includes(currentUser.id)
+    : false;
+
   onMount(async () => {
     // Check if user is authenticated
     const isAuthenticated = await authStore.checkSession();
@@ -41,6 +49,9 @@
       goto('/login');
       return;
     }
+
+    // Fetch game data to determine GM status
+    await gamesStore.fetchGame(gameId);
 
     // Connect to WebSocket
     const wsUrl = import.meta.env.DEV
@@ -114,6 +125,7 @@
       unsubscribeWallUpdated();
       unsubscribeWallRemoved();
 
+      gamesStore.clearCurrentGame();
       scenesStore.clear();
       tokensStore.clear();
       wallsStore.clear();
