@@ -1,0 +1,29 @@
+{
+  "name": "@vtt/web",
+  "version": "0.0.0",
+  "private": true,
+  "description": "VTT SvelteKit frontend application",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "clean": "rm -rf .svelte-kit node_modules"
+  },
+  "dependencies": {
+    "@vtt/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-auto": "^3.3.1",
+    "@sveltejs/adapter-node": "^5.2.9",
+    "@sveltejs/kit": "^2.9.0",
+    "@sveltejs/vite-plugin-svelte": "^4.0.1",
+    "svelte": "^5.2.11",
+    "vite": "^6.0.3",
+    "vitest": "^2.1.8",
+    "typescript": "^5.7.2"
+  },
+  "type": "module"
+}
