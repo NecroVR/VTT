@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { buildApp } from '../../../app.js';
 import type { FastifyInstance } from 'fastify';
 import { createDb } from '@vtt/database';
-import { users, sessions } from '@vtt/database';
+import { users, sessions, games, scenes, tokens } from '@vtt/database';
 import { eq } from 'drizzle-orm';
 
 describe('Authentication Routes', () => {
@@ -28,7 +28,10 @@ describe('Authentication Routes', () => {
   });
 
   beforeEach(async () => {
-    // Clean up test data before each test
+    // Clean up test data before each test - order matters due to foreign key constraints
+    await db.delete(tokens);
+    await db.delete(scenes);
+    await db.delete(games);
     await db.delete(sessions);
     await db.delete(users);
   });

@@ -88,7 +88,7 @@ describe('Authentication Middleware', () => {
         method: 'GET',
         url: '/api/v1/auth/me',
         headers: {
-          authorization: 'Bearer invalid-session-id',
+          authorization: 'Bearer 00000000-0000-0000-0000-000000000000',
         },
       });
 

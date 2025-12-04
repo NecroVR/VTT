@@ -18,6 +18,12 @@ export const authenticate: preHandlerHookHandler = async (
 
   const sessionId = authHeader.substring(7); // Remove 'Bearer ' prefix
 
+  // Validate UUID format (basic check to avoid database errors)
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(sessionId)) {
+    return reply.status(401).send({ error: 'Invalid session format' });
+  }
+
   try {
     // Find session and validate it's not expired
     const [session] = await request.server.db
