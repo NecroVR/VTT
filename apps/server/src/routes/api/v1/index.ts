@@ -5,8 +5,11 @@ import gamesRoute from './games.js';
 import scenesRoute from './scenes.js';
 import tokensRoute from './tokens.js';
 import actorsRoute from './actors.js';
+import itemsRoute from './items.js';
 import combatsRoute from './combats.js';
 import chatRoute from './chat.js';
+import wallsRoute from './walls.js';
+import lightsRoute from './lights.js';
 
 /**
  * API v1 routes
@@ -26,8 +29,11 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
         games: '/api/v1/games',
         scenes: '/api/v1/scenes',
         actors: '/api/v1/actors',
+        items: '/api/v1/items',
         combats: '/api/v1/combats',
         chat: '/api/v1/games/:gameId/chat',
+        walls: '/api/v1/walls',
+        lights: '/api/v1/lights',
       },
     };
   });
@@ -39,8 +45,11 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
   await fastify.register(scenesRoute);
   await fastify.register(tokensRoute);
   await fastify.register(actorsRoute);
+  await fastify.register(itemsRoute);
   await fastify.register(combatsRoute);
   await fastify.register(chatRoute);
+  await fastify.register(wallsRoute);
+  await fastify.register(lightsRoute);
 };
 
 export default apiV1Routes;
