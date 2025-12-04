@@ -8,10 +8,13 @@
   import { tokensStore } from '$lib/stores/tokens';
   import { wallsStore } from '$lib/stores/walls';
   import SceneCanvas from '$lib/components/SceneCanvas.svelte';
+  import SceneControls from '$lib/components/scene/SceneControls.svelte';
   import type { Scene } from '@vtt/shared';
 
   let wsState: { connected: boolean; reconnecting: boolean; error: string | null };
   let isGM = false; // TODO: Get this from game data
+  let activeTool = 'select';
+  let gridSnap = false;
 
   // Use auto-subscription with $ prefix - Svelte handles cleanup automatically
   $: gameId = $page.params.id;
@@ -125,6 +128,31 @@
     scenesStore.setActiveScene(sceneId);
     websocket.sendSceneSwitch({ sceneId });
   }
+
+  function handleToolChange(tool: string) {
+    activeTool = tool;
+  }
+
+  function handleWallAdd(wall: { x1: number; y1: number; x2: number; y2: number }) {
+    if (!activeScene) return;
+    websocket.wallAdd({
+      sceneId: activeScene.id,
+      x1: wall.x1,
+      y1: wall.y1,
+      x2: wall.x2,
+      y2: wall.y2,
+      wallType: 'wall',
+      move: 'none',
+      sense: 'none',
+      sound: 'none',
+      door: 'none',
+      doorState: 'closed'
+    });
+  }
+
+  function handleWallRemove(wallId: string) {
+    websocket.wallRemove({ wallId });
+  }
 </script>
 
 <svelte:head>
@@ -171,9 +199,22 @@
           {tokens}
           {walls}
           {isGM}
+          {activeTool}
+          {gridSnap}
           onTokenMove={handleTokenMove}
           onTokenSelect={handleTokenSelect}
+          onWallAdd={handleWallAdd}
+          onWallRemove={handleWallRemove}
         />
+        {#if isGM}
+          <div class="scene-controls-overlay">
+            <SceneControls
+              {isGM}
+              {activeTool}
+              onToolChange={handleToolChange}
+            />
+          </div>
+        {/if}
       {:else}
         <div class="placeholder">
           <p>No Scene Available</p>
@@ -294,6 +335,14 @@
     position: relative;
     background-color: var(--color-bg-primary);
     overflow: hidden;
+  }
+
+  .scene-controls-overlay {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 10;
+    pointer-events: auto;
   }
 
   .placeholder {

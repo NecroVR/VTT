@@ -7,8 +7,12 @@
   export let tokens: Token[] = [];
   export let walls: Wall[] = [];
   export let isGM: boolean = false;
+  export let activeTool: string = 'select';
+  export let gridSnap: boolean = false;
   export let onTokenMove: ((tokenId: string, x: number, y: number) => void) | undefined = undefined;
   export let onTokenSelect: ((tokenId: string | null) => void) | undefined = undefined;
+  export let onWallAdd: ((wall: { x1: number; y1: number; x2: number; y2: number }) => void) | undefined = undefined;
+  export let onWallRemove: ((wallId: string) => void) | undefined = undefined;
 
   // Canvas refs
   let canvasContainer: HTMLDivElement;
@@ -39,6 +43,13 @@
   let dragOffsetX = 0;
   let dragOffsetY = 0;
 
+  // Wall drawing state
+  let isDrawingWall = false;
+  let wallStartPoint: { x: number; y: number } | null = null;
+  let wallPreview: { x1: number; y1: number; x2: number; y2: number } | null = null;
+  let selectedWallId: string | null = null;
+  let hoveredWallId: string | null = null;
+
   // Background image state
   let backgroundImage: HTMLImageElement | null = null;
   let imageLoadingState: 'idle' | 'loading' | 'loaded' | 'error' = 'idle';
@@ -62,9 +73,11 @@
     render();
 
     window.addEventListener('resize', resizeCanvases);
+    window.addEventListener('keydown', handleKeyDown);
 
     return () => {
       window.removeEventListener('resize', resizeCanvases);
+      window.removeEventListener('keydown', handleKeyDown);
     };
   });
 
@@ -438,7 +451,26 @@
     wallsCtx.translate(-viewX * scale, -viewY * scale);
     wallsCtx.scale(scale, scale);
 
+    // Render existing walls
     walls.forEach(wall => {
+      const isSelected = wall.id === selectedWallId;
+      const isHovered = wall.id === hoveredWallId;
+
+      // Draw selection/hover glow
+      if (isSelected || isHovered) {
+        wallsCtx.strokeStyle = isSelected ? '#fbbf24' : '#60a5fa';
+        wallsCtx.lineWidth = 6 / scale;
+        wallsCtx.globalAlpha = 0.5;
+
+        wallsCtx.beginPath();
+        wallsCtx.moveTo(wall.x1, wall.y1);
+        wallsCtx.lineTo(wall.x2, wall.y2);
+        wallsCtx.stroke();
+
+        wallsCtx.globalAlpha = 1.0;
+      }
+
+      // Draw wall
       wallsCtx.strokeStyle = wall.wallType === 'door' ? '#fbbf24' : '#ef4444';
       wallsCtx.lineWidth = 3 / scale;
 
@@ -446,7 +478,49 @@
       wallsCtx.moveTo(wall.x1, wall.y1);
       wallsCtx.lineTo(wall.x2, wall.y2);
       wallsCtx.stroke();
+
+      // Draw endpoints for selected wall
+      if (isSelected) {
+        wallsCtx.fillStyle = '#fbbf24';
+        const endpointRadius = 4 / scale;
+
+        wallsCtx.beginPath();
+        wallsCtx.arc(wall.x1, wall.y1, endpointRadius, 0, Math.PI * 2);
+        wallsCtx.fill();
+
+        wallsCtx.beginPath();
+        wallsCtx.arc(wall.x2, wall.y2, endpointRadius, 0, Math.PI * 2);
+        wallsCtx.fill();
+      }
     });
+
+    // Render wall preview
+    if (wallPreview) {
+      wallsCtx.strokeStyle = '#fbbf24';
+      wallsCtx.lineWidth = 3 / scale;
+      wallsCtx.globalAlpha = 0.7;
+      wallsCtx.setLineDash([10 / scale, 5 / scale]);
+
+      wallsCtx.beginPath();
+      wallsCtx.moveTo(wallPreview.x1, wallPreview.y1);
+      wallsCtx.lineTo(wallPreview.x2, wallPreview.y2);
+      wallsCtx.stroke();
+
+      wallsCtx.setLineDash([]);
+      wallsCtx.globalAlpha = 1.0;
+
+      // Draw preview endpoints
+      wallsCtx.fillStyle = '#fbbf24';
+      const endpointRadius = 4 / scale;
+
+      wallsCtx.beginPath();
+      wallsCtx.arc(wallPreview.x1, wallPreview.y1, endpointRadius, 0, Math.PI * 2);
+      wallsCtx.fill();
+
+      wallsCtx.beginPath();
+      wallsCtx.arc(wallPreview.x2, wallPreview.y2, endpointRadius, 0, Math.PI * 2);
+      wallsCtx.fill();
+    }
 
     wallsCtx.restore();
   }
@@ -460,11 +534,51 @@
 
   // Mouse event handlers
   function handleMouseDown(e: MouseEvent) {
+    // Right-click cancels wall drawing
+    if (e.button === 2) {
+      if (isDrawingWall) {
+        cancelWallDrawing();
+        e.preventDefault();
+        return;
+      }
+    }
+
     lastMouseX = e.clientX;
     lastMouseY = e.clientY;
 
-    // Check if clicking on a token
     const worldPos = screenToWorld(e.clientX, e.clientY);
+    const snappedPos = snapToGrid(worldPos.x, worldPos.y);
+
+    // Handle wall tool
+    if (activeTool === 'wall' && isGM) {
+      if (!isDrawingWall) {
+        // Start drawing wall
+        isDrawingWall = true;
+        wallStartPoint = snappedPos;
+        wallPreview = { x1: snappedPos.x, y1: snappedPos.y, x2: snappedPos.x, y2: snappedPos.y };
+        renderWalls();
+      } else {
+        // Complete wall
+        completeWallDrawing(snappedPos);
+      }
+      return;
+    }
+
+    // Handle select tool - check for wall selection
+    if (activeTool === 'select' && isGM) {
+      const wallId = findWallAtPoint(worldPos.x, worldPos.y);
+      if (wallId) {
+        selectedWallId = wallId;
+        selectedTokenId = null;
+        onTokenSelect?.(null);
+        renderWalls();
+        return;
+      } else {
+        selectedWallId = null;
+      }
+    }
+
+    // Check if clicking on a token
     const clickedToken = tokens.find(token => {
       const width = token.width || 50;
       const height = token.height || 50;
@@ -489,9 +603,63 @@
     }
   }
 
+  function completeWallDrawing(endPos: { x: number; y: number }) {
+    if (!wallStartPoint) return;
+
+    // Don't create zero-length walls
+    if (wallStartPoint.x === endPos.x && wallStartPoint.y === endPos.y) {
+      cancelWallDrawing();
+      return;
+    }
+
+    // Create wall via callback
+    onWallAdd?.({
+      x1: wallStartPoint.x,
+      y1: wallStartPoint.y,
+      x2: endPos.x,
+      y2: endPos.y,
+    });
+
+    // Reset drawing state
+    isDrawingWall = false;
+    wallStartPoint = null;
+    wallPreview = null;
+    renderWalls();
+  }
+
+  function cancelWallDrawing() {
+    isDrawingWall = false;
+    wallStartPoint = null;
+    wallPreview = null;
+    renderWalls();
+  }
+
   function handleMouseMove(e: MouseEvent) {
+    const worldPos = screenToWorld(e.clientX, e.clientY);
+
+    // Update wall preview
+    if (isDrawingWall && wallStartPoint) {
+      const snappedPos = snapToGrid(worldPos.x, worldPos.y);
+      wallPreview = {
+        x1: wallStartPoint.x,
+        y1: wallStartPoint.y,
+        x2: snappedPos.x,
+        y2: snappedPos.y,
+      };
+      renderWalls();
+      return;
+    }
+
+    // Update wall hover
+    if (activeTool === 'select' && isGM && !isDraggingToken && !isPanning) {
+      const wallId = findWallAtPoint(worldPos.x, worldPos.y);
+      if (wallId !== hoveredWallId) {
+        hoveredWallId = wallId;
+        renderWalls();
+      }
+    }
+
     if (isDraggingToken && draggedTokenId) {
-      const worldPos = screenToWorld(e.clientX, e.clientY);
       const newX = worldPos.x + dragOffsetX;
       const newY = worldPos.y + dragOffsetY;
 
@@ -566,6 +734,86 @@
       y: (canvasY + viewY * scale) / scale,
     };
   }
+
+  function snapToGrid(x: number, y: number): { x: number; y: number } {
+    if (!gridSnap) return { x, y };
+    const gridSize = scene.gridSize;
+    return {
+      x: Math.round(x / gridSize) * gridSize,
+      y: Math.round(y / gridSize) * gridSize,
+    };
+  }
+
+  function distanceToLineSegment(
+    px: number,
+    py: number,
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number
+  ): number {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const lengthSquared = dx * dx + dy * dy;
+
+    if (lengthSquared === 0) {
+      // Line segment is a point
+      return Math.sqrt((px - x1) * (px - x1) + (py - y1) * (py - y1));
+    }
+
+    // Calculate projection of point onto line segment
+    let t = ((px - x1) * dx + (py - y1) * dy) / lengthSquared;
+    t = Math.max(0, Math.min(1, t));
+
+    const projX = x1 + t * dx;
+    const projY = y1 + t * dy;
+
+    return Math.sqrt((px - projX) * (px - projX) + (py - projY) * (py - projY));
+  }
+
+  function findWallAtPoint(worldX: number, worldY: number): string | null {
+    const threshold = 10 / scale; // 10 pixels in screen space
+
+    for (const wall of walls) {
+      const distance = distanceToLineSegment(worldX, worldY, wall.x1, wall.y1, wall.x2, wall.y2);
+      if (distance <= threshold) {
+        return wall.id;
+      }
+    }
+
+    return null;
+  }
+
+  function handleKeyDown(e: KeyboardEvent) {
+    // Ignore if typing in input/textarea
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+      return;
+    }
+
+    // Escape - cancel wall drawing
+    if (e.key === 'Escape') {
+      if (isDrawingWall) {
+        cancelWallDrawing();
+        e.preventDefault();
+      }
+    }
+
+    // Delete - remove selected wall
+    if (e.key === 'Delete' && selectedWallId && isGM) {
+      onWallRemove?.(selectedWallId);
+      selectedWallId = null;
+      renderWalls();
+      e.preventDefault();
+    }
+  }
+
+  function handleContextMenu(e: MouseEvent) {
+    // Prevent context menu when drawing walls
+    if (isDrawingWall) {
+      e.preventDefault();
+    }
+  }
 </script>
 
 <div class="scene-canvas-container" bind:this={canvasContainer}>
@@ -577,12 +825,15 @@
   {/if}
   <canvas
     class="canvas-layer canvas-interactive"
+    class:cursor-crosshair={activeTool === 'wall'}
+    class:cursor-grab={activeTool === 'select'}
     bind:this={controlsCanvas}
     on:mousedown={handleMouseDown}
     on:mousemove={handleMouseMove}
     on:mouseup={handleMouseUp}
     on:mouseleave={handleMouseUp}
     on:wheel={handleWheel}
+    on:contextmenu={handleContextMenu}
   ></canvas>
 
   <div class="canvas-controls">
@@ -614,6 +865,22 @@
   }
 
   .canvas-interactive:active {
+    cursor: grabbing;
+  }
+
+  .canvas-interactive.cursor-crosshair {
+    cursor: crosshair;
+  }
+
+  .canvas-interactive.cursor-crosshair:active {
+    cursor: crosshair;
+  }
+
+  .canvas-interactive.cursor-grab {
+    cursor: grab;
+  }
+
+  .canvas-interactive.cursor-grab:active {
     cursor: grabbing;
   }
 
