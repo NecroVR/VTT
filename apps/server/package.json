@@ -17,12 +17,14 @@
     "@fastify/websocket": "^11.0.1",
     "@vtt/database": "workspace:*",
     "@vtt/shared": "workspace:*",
+    "bcrypt": "^6.0.0",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.37.0",
     "fastify": "^5.2.0",
     "fastify-plugin": "^5.0.1"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/node": "^22.10.2",
     "@types/ws": "^8.18.1",
     "pino-pretty": "^13.0.0",
