@@ -5,6 +5,8 @@ import gamesRoute from './games.js';
 import scenesRoute from './scenes.js';
 import tokensRoute from './tokens.js';
 import actorsRoute from './actors.js';
+import combatsRoute from './combats.js';
+import chatRoute from './chat.js';
 
 /**
  * API v1 routes
@@ -24,6 +26,8 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
         games: '/api/v1/games',
         scenes: '/api/v1/scenes',
         actors: '/api/v1/actors',
+        combats: '/api/v1/combats',
+        chat: '/api/v1/games/:gameId/chat',
       },
     };
   });
@@ -35,6 +39,8 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
   await fastify.register(scenesRoute);
   await fastify.register(tokensRoute);
   await fastify.register(actorsRoute);
+  await fastify.register(combatsRoute);
+  await fastify.register(chatRoute);
 };
 
 export default apiV1Routes;
