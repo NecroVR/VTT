@@ -48,6 +48,10 @@
   // Image cache (module-level to persist across component instances)
   const imageCache = new Map<string, HTMLImageElement>();
 
+  // Token image cache
+  const tokenImageCache = new Map<string, HTMLImageElement>();
+  const tokenImageLoadingState = new Map<string, 'loading' | 'loaded' | 'error'>();
+
   const MIN_SCALE = 0.25;
   const MAX_SCALE = 4;
 
@@ -169,6 +173,35 @@
         imageErrorMessage = `Failed to load image: ${imageUrl}`;
         renderBackground();
       }
+    };
+
+    img.src = imageUrl;
+  }
+
+  function loadTokenImage(imageUrl: string) {
+    // Skip if no URL
+    if (!imageUrl) return;
+
+    // Check if already loaded or loading
+    if (tokenImageCache.has(imageUrl) || tokenImageLoadingState.get(imageUrl) === 'loading') {
+      return;
+    }
+
+    // Mark as loading
+    tokenImageLoadingState.set(imageUrl, 'loading');
+
+    const img = new Image();
+
+    img.onload = () => {
+      tokenImageCache.set(imageUrl, img);
+      tokenImageLoadingState.set(imageUrl, 'loaded');
+      renderTokens(); // Re-render tokens to show the loaded image
+    };
+
+    img.onerror = (error) => {
+      console.error('Failed to load token image:', imageUrl, error);
+      tokenImageLoadingState.set(imageUrl, 'error');
+      renderTokens(); // Re-render tokens to show error state
     };
 
     img.src = imageUrl;
@@ -320,23 +353,76 @@
       const y = token.y;
       const width = token.width || 50;
       const height = token.height || 50;
+      const centerX = x + width / 2;
+      const centerY = y + height / 2;
+      const radius = width / 2;
 
-      // Draw token circle/rectangle
-      tokensCtx.fillStyle = '#4a90e2';
+      // Load token image if it has one and isn't loaded yet
+      if (token.imageUrl) {
+        loadTokenImage(token.imageUrl);
+      }
+
+      // Get token image if available and loaded
+      const tokenImage = token.imageUrl ? tokenImageCache.get(token.imageUrl) : null;
+      const imageState = token.imageUrl ? tokenImageLoadingState.get(token.imageUrl) : null;
+
+      // Create circular clipping path
+      tokensCtx.save();
+      tokensCtx.beginPath();
+      tokensCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      tokensCtx.clip();
+
+      if (tokenImage && imageState === 'loaded') {
+        // Draw token image (circular clipped)
+        // Calculate aspect ratio to cover the circle
+        const imgAspect = tokenImage.width / tokenImage.height;
+        let drawWidth, drawHeight;
+
+        if (imgAspect > 1) {
+          // Image is wider than tall
+          drawHeight = height;
+          drawWidth = height * imgAspect;
+        } else {
+          // Image is taller than wide
+          drawWidth = width;
+          drawHeight = width / imgAspect;
+        }
+
+        // Center the image
+        const drawX = centerX - drawWidth / 2;
+        const drawY = centerY - drawHeight / 2;
+
+        tokensCtx.drawImage(tokenImage, drawX, drawY, drawWidth, drawHeight);
+      } else {
+        // Fallback to colored circle
+        tokensCtx.fillStyle = imageState === 'error' ? '#ef4444' : '#4a90e2';
+        tokensCtx.fill();
+
+        // Draw token name on colored circle
+        tokensCtx.fillStyle = '#ffffff';
+        tokensCtx.font = `${12 / scale}px sans-serif`;
+        tokensCtx.textAlign = 'center';
+        tokensCtx.textBaseline = 'middle';
+        tokensCtx.fillText(token.name, centerX, centerY);
+      }
+
+      tokensCtx.restore();
+
+      // Draw selection highlight (outside the clip)
       tokensCtx.strokeStyle = selectedTokenId === token.id ? '#fbbf24' : '#ffffff';
       tokensCtx.lineWidth = 2 / scale;
-
       tokensCtx.beginPath();
-      tokensCtx.arc(x + width / 2, y + height / 2, width / 2, 0, Math.PI * 2);
-      tokensCtx.fill();
+      tokensCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
       tokensCtx.stroke();
 
-      // Draw token name
-      tokensCtx.fillStyle = '#ffffff';
-      tokensCtx.font = `${12 / scale}px sans-serif`;
-      tokensCtx.textAlign = 'center';
-      tokensCtx.textBaseline = 'middle';
-      tokensCtx.fillText(token.name, x + width / 2, y + height / 2);
+      // Draw error indicator for failed images
+      if (imageState === 'error') {
+        tokensCtx.fillStyle = '#ef4444';
+        tokensCtx.font = `${10 / scale}px sans-serif`;
+        tokensCtx.textAlign = 'center';
+        tokensCtx.textBaseline = 'top';
+        tokensCtx.fillText('!', centerX, y + height + 2);
+      }
     });
 
     tokensCtx.restore();

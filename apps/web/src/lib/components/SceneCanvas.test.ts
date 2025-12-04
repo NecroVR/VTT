@@ -26,6 +26,7 @@ describe('SceneCanvas component', () => {
       scale: vi.fn(),
       drawImage: vi.fn(),
       closePath: vi.fn(),
+      clip: vi.fn(),
       measureText: vi.fn(() => ({ width: 100 })),
       setTransform: vi.fn(),
       rotate: vi.fn(),
@@ -639,5 +640,156 @@ describe('SceneCanvas component', () => {
 
     // Canvas should be redrawn
     expect(mockContext.clearRect).toHaveBeenCalled();
+  });
+
+  describe('Token Images', () => {
+    it('should render token with image when imageUrl is provided', () => {
+      const tokens: Token[] = [
+        {
+          id: 'token1',
+          name: 'Warrior',
+          x: 100,
+          y: 100,
+          width: 50,
+          height: 50,
+          visible: true,
+          sceneId: 'scene1',
+          imageUrl: 'https://example.com/warrior.png',
+          rotation: 0,
+          ownerId: 'user1',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+
+      render(SceneCanvas, { props: { scene: mockScene, tokens } });
+
+      // Should create circular clipping path
+      expect(mockContext.clip).toHaveBeenCalled();
+      // Should still render token circle
+      expect(mockContext.arc).toHaveBeenCalled();
+    });
+
+    it('should render token with colored circle when no imageUrl', () => {
+      const tokens: Token[] = [
+        {
+          id: 'token1',
+          name: 'Warrior',
+          x: 100,
+          y: 100,
+          width: 50,
+          height: 50,
+          visible: true,
+          sceneId: 'scene1',
+          imageUrl: null,
+          rotation: 0,
+          ownerId: 'user1',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+
+      render(SceneCanvas, { props: { scene: mockScene, tokens } });
+
+      // Should render colored circle
+      expect(mockContext.fill).toHaveBeenCalled();
+      expect(mockContext.fillText).toHaveBeenCalledWith('Warrior', expect.any(Number), expect.any(Number));
+    });
+
+    it('should use circular clipping for token images', () => {
+      const tokens: Token[] = [
+        {
+          id: 'token1',
+          name: 'Warrior',
+          x: 100,
+          y: 100,
+          width: 50,
+          height: 50,
+          visible: true,
+          sceneId: 'scene1',
+          imageUrl: 'https://example.com/warrior.png',
+          rotation: 0,
+          ownerId: 'user1',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+
+      render(SceneCanvas, { props: { scene: mockScene, tokens } });
+
+      // Should save context before clipping
+      expect(mockContext.save).toHaveBeenCalled();
+      // Should create circular clipping path
+      expect(mockContext.clip).toHaveBeenCalled();
+      // Should restore context after clipping
+      expect(mockContext.restore).toHaveBeenCalled();
+    });
+
+    it('should render selection highlight around token with image', () => {
+      const tokens: Token[] = [
+        {
+          id: 'token1',
+          name: 'Warrior',
+          x: 100,
+          y: 100,
+          width: 50,
+          height: 50,
+          visible: true,
+          sceneId: 'scene1',
+          imageUrl: 'https://example.com/warrior.png',
+          rotation: 0,
+          ownerId: 'user1',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+
+      render(SceneCanvas, { props: { scene: mockScene, tokens } });
+
+      // Should still draw selection stroke
+      expect(mockContext.stroke).toHaveBeenCalled();
+    });
+
+    it('should handle multiple tokens with different image states', () => {
+      const tokens: Token[] = [
+        {
+          id: 'token1',
+          name: 'Warrior',
+          x: 100,
+          y: 100,
+          width: 50,
+          height: 50,
+          visible: true,
+          sceneId: 'scene1',
+          imageUrl: 'https://example.com/warrior.png',
+          rotation: 0,
+          ownerId: 'user1',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 'token2',
+          name: 'Wizard',
+          x: 200,
+          y: 200,
+          width: 50,
+          height: 50,
+          visible: true,
+          sceneId: 'scene1',
+          imageUrl: null,
+          rotation: 0,
+          ownerId: 'user1',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+
+      render(SceneCanvas, { props: { scene: mockScene, tokens } });
+
+      // Both tokens should be rendered
+      expect(mockContext.arc).toHaveBeenCalled();
+      // Text should be rendered for token without image
+      expect(mockContext.fillText).toHaveBeenCalledWith('Wizard', expect.any(Number), expect.any(Number));
+    });
   });
 });
