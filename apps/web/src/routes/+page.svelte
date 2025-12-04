@@ -14,6 +14,10 @@
       goto(`/game/${gameId}`);
     }
   }
+
+  function viewMyGames() {
+    goto('/games');
+  }
 </script>
 
 <svelte:head>
@@ -26,6 +30,12 @@
     <p class="subtitle">Virtual Tabletop for RPG Sessions</p>
 
     <div class="actions">
+      <div class="card">
+        <h2>My Games</h2>
+        <p>View and manage your game sessions</p>
+        <button class="btn" on:click={viewMyGames}>View My Games</button>
+      </div>
+
       <div class="card">
         <h2>Create New Game</h2>
         <p>Start a new game session and invite your players</p>

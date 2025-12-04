@@ -33,3 +33,22 @@ export interface MapLayer {
   visible: boolean;
   order: number;
 }
+
+// Game CRUD API Types
+export interface CreateGameRequest {
+  name: string;
+  settings?: Partial<GameSettings>;
+}
+
+export interface UpdateGameRequest {
+  name?: string;
+  settings?: Partial<GameSettings>;
+}
+
+export interface GameResponse {
+  game: Game;
+}
+
+export interface GamesListResponse {
+  games: Game[];
+}
