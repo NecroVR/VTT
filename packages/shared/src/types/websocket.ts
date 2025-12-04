@@ -8,8 +8,12 @@ export type WSMessageType =
   | 'token:move' | 'token:add' | 'token:added' | 'token:update' | 'token:updated' | 'token:remove' | 'token:removed'
   | 'scene:switch' | 'scene:switched' | 'scene:update' | 'scene:updated'
   | 'wall:add' | 'wall:added' | 'wall:update' | 'wall:updated' | 'wall:remove' | 'wall:removed'
+  | 'actor:create' | 'actor:created' | 'actor:update' | 'actor:updated' | 'actor:delete' | 'actor:deleted'
+  | 'combat:start' | 'combat:started' | 'combat:end' | 'combat:ended' | 'combat:update' | 'combat:updated'
+  | 'combatant:add' | 'combatant:added' | 'combatant:update' | 'combatant:updated' | 'combatant:remove' | 'combatant:removed'
+  | 'combat:next-turn' | 'combat:turn-changed'
   | 'dice:roll' | 'dice:result'
-  | 'chat:message'
+  | 'chat:message' | 'chat:delete' | 'chat:deleted' | 'chat:whisper'
   | 'error';
 
 export interface WSMessage<T = unknown> {
@@ -200,4 +204,259 @@ export interface WallRemovedPayload {
 export interface ErrorPayload {
   message: string;
   code?: string;
+}
+
+// Actor payloads
+export interface ActorCreatePayload {
+  gameId: string;
+  name: string;
+  actorType: string;
+  img?: string | null;
+  ownerId?: string | null;
+  attributes?: Record<string, unknown>;
+  abilities?: Record<string, unknown>;
+  folderId?: string | null;
+  sort?: number;
+  data?: Record<string, unknown>;
+}
+
+export interface ActorCreatedPayload {
+  actor: {
+    id: string;
+    gameId: string;
+    name: string;
+    actorType: string;
+    img?: string | null;
+    ownerId?: string | null;
+    attributes: Record<string, unknown>;
+    abilities: Record<string, unknown>;
+    folderId?: string | null;
+    sort: number;
+    data: Record<string, unknown>;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+}
+
+export interface ActorUpdatePayload {
+  actorId: string;
+  updates: {
+    name?: string;
+    actorType?: string;
+    img?: string | null;
+    ownerId?: string | null;
+    attributes?: Record<string, unknown>;
+    abilities?: Record<string, unknown>;
+    folderId?: string | null;
+    sort?: number;
+    data?: Record<string, unknown>;
+  };
+}
+
+export interface ActorUpdatedPayload {
+  actor: {
+    id: string;
+    gameId: string;
+    name: string;
+    actorType: string;
+    img?: string | null;
+    ownerId?: string | null;
+    attributes: Record<string, unknown>;
+    abilities: Record<string, unknown>;
+    folderId?: string | null;
+    sort: number;
+    data: Record<string, unknown>;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+}
+
+export interface ActorDeletePayload {
+  actorId: string;
+}
+
+export interface ActorDeletedPayload {
+  actorId: string;
+}
+
+// Combat payloads
+export interface CombatStartPayload {
+  gameId: string;
+  sceneId?: string | null;
+  combatants?: Array<{
+    actorId?: string | null;
+    tokenId?: string | null;
+    initiative?: number | null;
+    initiativeModifier?: number;
+    hidden?: boolean;
+    defeated?: boolean;
+    data?: Record<string, unknown>;
+  }>;
+}
+
+export interface CombatStartedPayload {
+  combat: {
+    id: string;
+    sceneId?: string | null;
+    gameId: string;
+    active: boolean;
+    round: number;
+    turn: number;
+    sort: number;
+    data: Record<string, unknown>;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+  combatants: Array<{
+    id: string;
+    combatId: string;
+    actorId?: string | null;
+    tokenId?: string | null;
+    initiative?: number | null;
+    initiativeModifier: number;
+    hidden: boolean;
+    defeated: boolean;
+    data: Record<string, unknown>;
+    createdAt: Date;
+  }>;
+}
+
+export interface CombatEndPayload {
+  combatId: string;
+}
+
+export interface CombatEndedPayload {
+  combatId: string;
+}
+
+export interface CombatUpdatePayload {
+  combatId: string;
+  updates: {
+    sceneId?: string | null;
+    active?: boolean;
+    round?: number;
+    turn?: number;
+    sort?: number;
+    data?: Record<string, unknown>;
+  };
+}
+
+export interface CombatUpdatedPayload {
+  combat: {
+    id: string;
+    sceneId?: string | null;
+    gameId: string;
+    active: boolean;
+    round: number;
+    turn: number;
+    sort: number;
+    data: Record<string, unknown>;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+}
+
+export interface CombatantAddPayload {
+  combatId: string;
+  actorId?: string | null;
+  tokenId?: string | null;
+  initiative?: number | null;
+  initiativeModifier?: number;
+  hidden?: boolean;
+  defeated?: boolean;
+  data?: Record<string, unknown>;
+}
+
+export interface CombatantAddedPayload {
+  combatant: {
+    id: string;
+    combatId: string;
+    actorId?: string | null;
+    tokenId?: string | null;
+    initiative?: number | null;
+    initiativeModifier: number;
+    hidden: boolean;
+    defeated: boolean;
+    data: Record<string, unknown>;
+    createdAt: Date;
+  };
+}
+
+export interface CombatantUpdatePayload {
+  combatantId: string;
+  updates: {
+    actorId?: string | null;
+    tokenId?: string | null;
+    initiative?: number | null;
+    initiativeModifier?: number;
+    hidden?: boolean;
+    defeated?: boolean;
+    data?: Record<string, unknown>;
+  };
+}
+
+export interface CombatantUpdatedPayload {
+  combatant: {
+    id: string;
+    combatId: string;
+    actorId?: string | null;
+    tokenId?: string | null;
+    initiative?: number | null;
+    initiativeModifier: number;
+    hidden: boolean;
+    defeated: boolean;
+    data: Record<string, unknown>;
+    createdAt: Date;
+  };
+}
+
+export interface CombatantRemovePayload {
+  combatantId: string;
+}
+
+export interface CombatantRemovedPayload {
+  combatantId: string;
+}
+
+export interface CombatNextTurnPayload {
+  combatId: string;
+}
+
+export interface CombatTurnChangedPayload {
+  combat: {
+    id: string;
+    sceneId?: string | null;
+    gameId: string;
+    active: boolean;
+    round: number;
+    turn: number;
+    sort: number;
+    data: Record<string, unknown>;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+  currentCombatantId?: string | null;
+}
+
+// Chat payloads (extended)
+export interface ChatDeletePayload {
+  messageId: string;
+}
+
+export interface ChatDeletedPayload {
+  messageId: string;
+}
+
+export interface ChatWhisperPayload {
+  text: string;
+  targetUserIds: string[];
+  userId: string;
+  username: string;
+}
+
+export interface ChatWhisperMessage {
+  text: string;
+  userId: string;
+  username: string;
+  targetUserIds: string[];
 }

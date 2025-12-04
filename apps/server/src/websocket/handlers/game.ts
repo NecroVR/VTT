@@ -32,6 +32,18 @@ import type {
   WallUpdatedPayload,
   WallRemovePayload,
   WallRemovedPayload,
+  ActorCreatePayload,
+  ActorUpdatePayload,
+  ActorDeletePayload,
+  CombatStartPayload,
+  CombatEndPayload,
+  CombatUpdatePayload,
+  CombatantAddPayload,
+  CombatantUpdatePayload,
+  CombatantRemovePayload,
+  CombatNextTurnPayload,
+  ChatDeletePayload,
+  ChatWhisperPayload,
   ErrorPayload
 } from '@vtt/shared';
 import { parseDiceNotation, type DiceGroup } from '@vtt/shared/dice';
@@ -39,6 +51,25 @@ import { roomManager } from '../rooms';
 import { validateSession, extractSessionToken } from '../auth';
 import { tokens, scenes, walls } from '@vtt/database';
 import { eq } from 'drizzle-orm';
+import {
+  handleActorCreate,
+  handleActorUpdate,
+  handleActorDelete,
+} from './actors';
+import {
+  handleCombatStart,
+  handleCombatEnd,
+  handleCombatUpdate,
+  handleCombatantAdd,
+  handleCombatantUpdate,
+  handleCombatantRemove,
+  handleCombatNextTurn,
+} from './combat';
+import {
+  handleChatMessage as handleChatMessageHandler,
+  handleChatDelete,
+  handleChatWhisper,
+} from './chat';
 
 /**
  * Game session WebSocket handler
@@ -91,7 +122,55 @@ export async function handleGameWebSocket(
           break;
 
         case 'chat:message':
-          handleChatMessage(socket, message as WSMessage<ChatMessagePayload>, request);
+          await handleChatMessageHandler(socket, message as WSMessage<ChatMessagePayload>, request);
+          break;
+
+        case 'chat:delete':
+          await handleChatDelete(socket, message as WSMessage<ChatDeletePayload>, request);
+          break;
+
+        case 'chat:whisper':
+          await handleChatWhisper(socket, message as WSMessage<ChatWhisperPayload>, request);
+          break;
+
+        case 'actor:create':
+          await handleActorCreate(socket, message as WSMessage<ActorCreatePayload>, request);
+          break;
+
+        case 'actor:update':
+          await handleActorUpdate(socket, message as WSMessage<ActorUpdatePayload>, request);
+          break;
+
+        case 'actor:delete':
+          await handleActorDelete(socket, message as WSMessage<ActorDeletePayload>, request);
+          break;
+
+        case 'combat:start':
+          await handleCombatStart(socket, message as WSMessage<CombatStartPayload>, request);
+          break;
+
+        case 'combat:end':
+          await handleCombatEnd(socket, message as WSMessage<CombatEndPayload>, request);
+          break;
+
+        case 'combat:update':
+          await handleCombatUpdate(socket, message as WSMessage<CombatUpdatePayload>, request);
+          break;
+
+        case 'combatant:add':
+          await handleCombatantAdd(socket, message as WSMessage<CombatantAddPayload>, request);
+          break;
+
+        case 'combatant:update':
+          await handleCombatantUpdate(socket, message as WSMessage<CombatantUpdatePayload>, request);
+          break;
+
+        case 'combatant:remove':
+          await handleCombatantRemove(socket, message as WSMessage<CombatantRemovePayload>, request);
+          break;
+
+        case 'combat:next-turn':
+          await handleCombatNextTurn(socket, message as WSMessage<CombatNextTurnPayload>, request);
           break;
 
         case 'scene:switch':
@@ -575,39 +654,6 @@ function handleDiceRoll(
       message: error instanceof Error ? error.message : 'Invalid dice notation'
     });
   }
-}
-
-/**
- * Handle chat message
- */
-function handleChatMessage(
-  socket: WebSocket,
-  message: WSMessage<ChatMessagePayload>,
-  request: FastifyRequest
-): void {
-  request.log.debug({ payload: message.payload }, 'Chat message');
-
-  const gameId = roomManager.getRoomForSocket(socket);
-  const playerInfo = roomManager.getPlayerInfo(socket);
-
-  if (!gameId || !playerInfo) {
-    sendMessage(socket, 'error', { message: 'Not in a game room' });
-    return;
-  }
-
-  // Ensure the message has the correct user info
-  const chatPayload: ChatMessagePayload = {
-    text: message.payload.text,
-    userId: playerInfo.userId,
-    username: playerInfo.username,
-  };
-
-  // Broadcast to all players
-  roomManager.broadcast(gameId, {
-    type: 'chat:message',
-    payload: chatPayload,
-    timestamp: Date.now(),
-  });
 }
 
 /**
