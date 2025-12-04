@@ -1,9 +1,13 @@
 import type { Token } from './game';
+import type { Scene } from './scene';
+import type { Wall } from './wall';
 
 export type WSMessageType =
   | 'ping' | 'pong'
   | 'game:join' | 'game:leave' | 'game:state' | 'game:players' | 'game:player-joined' | 'game:player-left'
   | 'token:move' | 'token:add' | 'token:added' | 'token:update' | 'token:updated' | 'token:remove' | 'token:removed'
+  | 'scene:switch' | 'scene:switched' | 'scene:update' | 'scene:updated'
+  | 'wall:add' | 'wall:added' | 'wall:update' | 'wall:updated' | 'wall:remove' | 'wall:removed'
   | 'dice:roll' | 'dice:result'
   | 'chat:message'
   | 'error';
@@ -51,6 +55,7 @@ export interface TokenMovePayload {
 }
 
 export interface TokenAddPayload {
+  sceneId: string;
   name: string;
   x: number;
   y: number;
@@ -59,6 +64,17 @@ export interface TokenAddPayload {
   imageUrl?: string | null;
   visible?: boolean;
   data?: Record<string, unknown>;
+  actorId?: string | null;
+  elevation?: number;
+  rotation?: number;
+  locked?: boolean;
+  vision?: boolean;
+  visionRange?: number;
+  bars?: Record<string, unknown>;
+  lightBright?: number;
+  lightDim?: number;
+  lightColor?: string | null;
+  lightAngle?: number;
 }
 
 export interface TokenAddedPayload {
@@ -67,7 +83,7 @@ export interface TokenAddedPayload {
 
 export interface TokenUpdatePayload {
   tokenId: string;
-  updates: Partial<Omit<Token, 'id' | 'gameId' | 'createdAt'>>;
+  updates: Partial<Omit<Token, 'id' | 'sceneId' | 'createdAt' | 'updatedAt'>>;
 }
 
 export interface TokenUpdatedPayload {
@@ -101,6 +117,61 @@ export interface ChatMessagePayload {
   text: string;
   userId: string;
   username: string;
+}
+
+// Scene payloads
+export interface SceneSwitchPayload {
+  sceneId: string;
+}
+
+export interface SceneSwitchedPayload {
+  scene: Scene;
+}
+
+export interface SceneUpdatePayload {
+  sceneId: string;
+  updates: Partial<Omit<Scene, 'id' | 'gameId' | 'createdAt' | 'updatedAt'>>;
+}
+
+export interface SceneUpdatedPayload {
+  scene: Scene;
+}
+
+// Wall payloads
+export interface WallAddPayload {
+  sceneId: string;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  wallType?: string;
+  move?: string;
+  sense?: string;
+  sound?: string;
+  door?: string;
+  doorState?: string;
+  data?: Record<string, unknown>;
+}
+
+export interface WallAddedPayload {
+  wall: Wall;
+}
+
+export interface WallUpdatePayload {
+  wallId: string;
+  updates: Partial<Omit<Wall, 'id' | 'sceneId' | 'createdAt'>>;
+}
+
+export interface WallUpdatedPayload {
+  wall: Wall;
+}
+
+export interface WallRemovePayload {
+  wallId: string;
+}
+
+export interface WallRemovedPayload {
+  wallId: string;
 }
 
 // Error payload

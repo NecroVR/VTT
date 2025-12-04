@@ -4,6 +4,8 @@ import type {
   WSMessage,
   WSMessageType,
   Token,
+  Scene,
+  Wall,
   TokenMovePayload,
   TokenAddPayload,
   TokenAddedPayload,
@@ -19,11 +21,21 @@ import type {
   GamePlayerJoinedPayload,
   GamePlayerLeftPayload,
   ChatMessagePayload,
+  SceneSwitchPayload,
+  SceneSwitchedPayload,
+  SceneUpdatePayload,
+  SceneUpdatedPayload,
+  WallAddPayload,
+  WallAddedPayload,
+  WallUpdatePayload,
+  WallUpdatedPayload,
+  WallRemovePayload,
+  WallRemovedPayload,
   ErrorPayload
 } from '@vtt/shared';
 import { roomManager } from '../rooms';
 import { validateSession, extractSessionToken } from '../auth';
-import { tokens } from '@vtt/database';
+import { tokens, scenes, walls } from '@vtt/database';
 import { eq } from 'drizzle-orm';
 
 /**
@@ -78,6 +90,26 @@ export async function handleGameWebSocket(
 
         case 'chat:message':
           handleChatMessage(socket, message as WSMessage<ChatMessagePayload>, request);
+          break;
+
+        case 'scene:switch':
+          await handleSceneSwitch(socket, message as WSMessage<SceneSwitchPayload>, request);
+          break;
+
+        case 'scene:update':
+          await handleSceneUpdate(socket, message as WSMessage<SceneUpdatePayload>, request);
+          break;
+
+        case 'wall:add':
+          await handleWallAdd(socket, message as WSMessage<WallAddPayload>, request);
+          break;
+
+        case 'wall:update':
+          await handleWallUpdate(socket, message as WSMessage<WallUpdatePayload>, request);
+          break;
+
+        case 'wall:remove':
+          await handleWallRemove(socket, message as WSMessage<WallRemovePayload>, request);
           break;
 
         default:
@@ -312,21 +344,50 @@ async function handleTokenAdd(
       height = 1,
       imageUrl = null,
       visible = true,
-      data = {}
+      data = {},
+      sceneId,
+      actorId = null,
+      elevation = 0,
+      rotation = 0,
+      locked = false,
+      vision = false,
+      visionRange = 0,
+      bars = {},
+      lightBright = 0,
+      lightDim = 0,
+      lightColor = null,
+      lightAngle = 360
     } = message.payload;
+
+    // Validate that sceneId is provided
+    if (!sceneId) {
+      sendMessage(socket, 'error', { message: 'sceneId is required to add a token' });
+      return;
+    }
 
     // Create token in database
     const newTokens = await request.server.db
       .insert(tokens)
       .values({
-        gameId,
+        sceneId,
+        actorId,
         name,
         x,
         y,
         width,
         height,
+        elevation,
+        rotation,
+        locked,
         imageUrl,
         visible,
+        vision,
+        visionRange,
+        bars,
+        lightBright,
+        lightDim,
+        lightColor,
+        lightAngle,
         data,
         ownerId: playerInfo.userId
       })
@@ -337,17 +398,29 @@ async function handleTokenAdd(
     // Convert token to match Token interface
     const tokenPayload: Token = {
       id: newToken.id,
-      gameId: newToken.gameId,
+      sceneId: newToken.sceneId,
+      actorId: newToken.actorId,
       name: newToken.name,
       imageUrl: newToken.imageUrl,
       x: newToken.x,
       y: newToken.y,
       width: newToken.width,
       height: newToken.height,
+      elevation: newToken.elevation,
+      rotation: newToken.rotation,
+      locked: newToken.locked,
       ownerId: newToken.ownerId,
       visible: newToken.visible,
+      vision: newToken.vision,
+      visionRange: newToken.visionRange,
+      bars: newToken.bars as Record<string, unknown>,
+      lightBright: newToken.lightBright,
+      lightDim: newToken.lightDim,
+      lightColor: newToken.lightColor,
+      lightAngle: newToken.lightAngle,
       data: newToken.data as Record<string, unknown>,
-      createdAt: newToken.createdAt.toISOString()
+      createdAt: newToken.createdAt,
+      updatedAt: newToken.updatedAt
     };
 
     // Broadcast to all players with full token including ID
@@ -358,7 +431,7 @@ async function handleTokenAdd(
       timestamp: Date.now(),
     });
 
-    request.log.info({ tokenId: newToken.id, gameId }, 'Token created');
+    request.log.info({ tokenId: newToken.id, sceneId, gameId }, 'Token created');
   } catch (error) {
     request.log.error({ error }, 'Error creating token');
     sendMessage(socket, 'error', { message: 'Failed to create token' });
@@ -480,4 +553,359 @@ function handleChatMessage(
     payload: chatPayload,
     timestamp: Date.now(),
   });
+}
+
+/**
+ * Handle scene switch request
+ */
+async function handleSceneSwitch(
+  socket: WebSocket,
+  message: WSMessage<SceneSwitchPayload>,
+  request: FastifyRequest
+): Promise<void> {
+  request.log.debug({ payload: message.payload }, 'Scene switch');
+
+  const { sceneId } = message.payload;
+
+  const gameId = roomManager.getRoomForSocket(socket);
+
+  if (!gameId) {
+    sendMessage(socket, 'error', { message: 'Not in a game room' });
+    return;
+  }
+
+  try {
+    // Fetch the scene from database
+    const [scene] = await request.server.db
+      .select()
+      .from(scenes)
+      .where(eq(scenes.id, sceneId))
+      .limit(1);
+
+    if (!scene) {
+      sendMessage(socket, 'error', { message: 'Scene not found' });
+      return;
+    }
+
+    // Convert to Scene interface
+    const scenePayload: Scene = {
+      id: scene.id,
+      gameId: scene.gameId,
+      name: scene.name,
+      active: scene.active,
+      backgroundImage: scene.backgroundImage,
+      backgroundWidth: scene.backgroundWidth,
+      backgroundHeight: scene.backgroundHeight,
+      gridType: scene.gridType,
+      gridSize: scene.gridSize,
+      gridColor: scene.gridColor,
+      gridAlpha: scene.gridAlpha,
+      gridDistance: scene.gridDistance,
+      gridUnits: scene.gridUnits,
+      tokenVision: scene.tokenVision,
+      fogExploration: scene.fogExploration,
+      globalLight: scene.globalLight,
+      darkness: scene.darkness,
+      initialX: scene.initialX,
+      initialY: scene.initialY,
+      initialScale: scene.initialScale,
+      navOrder: scene.navOrder,
+      data: scene.data as Record<string, unknown>,
+      createdAt: scene.createdAt,
+      updatedAt: scene.updatedAt,
+    };
+
+    // Broadcast to all players
+    const switchedPayload: SceneSwitchedPayload = { scene: scenePayload };
+    roomManager.broadcast(gameId, {
+      type: 'scene:switched',
+      payload: switchedPayload,
+      timestamp: Date.now(),
+    });
+
+    request.log.info({ sceneId, gameId }, 'Scene switched');
+  } catch (error) {
+    request.log.error({ error, sceneId }, 'Error switching scene');
+    sendMessage(socket, 'error', { message: 'Failed to switch scene' });
+  }
+}
+
+/**
+ * Handle scene update request
+ */
+async function handleSceneUpdate(
+  socket: WebSocket,
+  message: WSMessage<SceneUpdatePayload>,
+  request: FastifyRequest
+): Promise<void> {
+  request.log.debug({ payload: message.payload }, 'Scene update');
+
+  const { sceneId, updates } = message.payload;
+
+  const gameId = roomManager.getRoomForSocket(socket);
+
+  if (!gameId) {
+    sendMessage(socket, 'error', { message: 'Not in a game room' });
+    return;
+  }
+
+  try {
+    // Update scene in database
+    const updatedScenes = await request.server.db
+      .update(scenes)
+      .set({
+        ...updates,
+        updatedAt: new Date(),
+      })
+      .where(eq(scenes.id, sceneId))
+      .returning();
+
+    if (updatedScenes.length === 0) {
+      sendMessage(socket, 'error', { message: 'Scene not found' });
+      return;
+    }
+
+    const updatedScene = updatedScenes[0];
+
+    // Convert to Scene interface
+    const scenePayload: Scene = {
+      id: updatedScene.id,
+      gameId: updatedScene.gameId,
+      name: updatedScene.name,
+      active: updatedScene.active,
+      backgroundImage: updatedScene.backgroundImage,
+      backgroundWidth: updatedScene.backgroundWidth,
+      backgroundHeight: updatedScene.backgroundHeight,
+      gridType: updatedScene.gridType,
+      gridSize: updatedScene.gridSize,
+      gridColor: updatedScene.gridColor,
+      gridAlpha: updatedScene.gridAlpha,
+      gridDistance: updatedScene.gridDistance,
+      gridUnits: updatedScene.gridUnits,
+      tokenVision: updatedScene.tokenVision,
+      fogExploration: updatedScene.fogExploration,
+      globalLight: updatedScene.globalLight,
+      darkness: updatedScene.darkness,
+      initialX: updatedScene.initialX,
+      initialY: updatedScene.initialY,
+      initialScale: updatedScene.initialScale,
+      navOrder: updatedScene.navOrder,
+      data: updatedScene.data as Record<string, unknown>,
+      createdAt: updatedScene.createdAt,
+      updatedAt: updatedScene.updatedAt,
+    };
+
+    // Broadcast to all players
+    const updatedPayload: SceneUpdatedPayload = { scene: scenePayload };
+    roomManager.broadcast(gameId, {
+      type: 'scene:updated',
+      payload: updatedPayload,
+      timestamp: Date.now(),
+    });
+
+    request.log.info({ sceneId, gameId }, 'Scene updated');
+  } catch (error) {
+    request.log.error({ error, sceneId }, 'Error updating scene');
+    sendMessage(socket, 'error', { message: 'Failed to update scene' });
+  }
+}
+
+/**
+ * Handle wall add request
+ */
+async function handleWallAdd(
+  socket: WebSocket,
+  message: WSMessage<WallAddPayload>,
+  request: FastifyRequest
+): Promise<void> {
+  request.log.debug({ payload: message.payload }, 'Wall add');
+
+  const gameId = roomManager.getRoomForSocket(socket);
+
+  if (!gameId) {
+    sendMessage(socket, 'error', { message: 'Not in a game room' });
+    return;
+  }
+
+  try {
+    const {
+      sceneId,
+      x1,
+      y1,
+      x2,
+      y2,
+      wallType = 'wall',
+      move = 'block',
+      sense = 'block',
+      sound = 'block',
+      door = 'none',
+      doorState = 'closed',
+      data = {},
+    } = message.payload;
+
+    // Create wall in database
+    const newWalls = await request.server.db
+      .insert(walls)
+      .values({
+        sceneId,
+        x1,
+        y1,
+        x2,
+        y2,
+        wallType,
+        move,
+        sense,
+        sound,
+        door,
+        doorState,
+        data,
+      })
+      .returning();
+
+    const newWall = newWalls[0];
+
+    // Convert to Wall interface
+    const wallPayload: Wall = {
+      id: newWall.id,
+      sceneId: newWall.sceneId,
+      x1: newWall.x1,
+      y1: newWall.y1,
+      x2: newWall.x2,
+      y2: newWall.y2,
+      wallType: newWall.wallType,
+      move: newWall.move,
+      sense: newWall.sense,
+      sound: newWall.sound,
+      door: newWall.door,
+      doorState: newWall.doorState,
+      data: newWall.data as Record<string, unknown>,
+      createdAt: newWall.createdAt,
+    };
+
+    // Broadcast to all players
+    const addedPayload: WallAddedPayload = { wall: wallPayload };
+    roomManager.broadcast(gameId, {
+      type: 'wall:added',
+      payload: addedPayload,
+      timestamp: Date.now(),
+    });
+
+    request.log.info({ wallId: newWall.id, sceneId, gameId }, 'Wall created');
+  } catch (error) {
+    request.log.error({ error }, 'Error creating wall');
+    sendMessage(socket, 'error', { message: 'Failed to create wall' });
+  }
+}
+
+/**
+ * Handle wall update request
+ */
+async function handleWallUpdate(
+  socket: WebSocket,
+  message: WSMessage<WallUpdatePayload>,
+  request: FastifyRequest
+): Promise<void> {
+  request.log.debug({ payload: message.payload }, 'Wall update');
+
+  const { wallId, updates } = message.payload;
+
+  const gameId = roomManager.getRoomForSocket(socket);
+
+  if (!gameId) {
+    sendMessage(socket, 'error', { message: 'Not in a game room' });
+    return;
+  }
+
+  try {
+    // Update wall in database
+    const updatedWalls = await request.server.db
+      .update(walls)
+      .set(updates)
+      .where(eq(walls.id, wallId))
+      .returning();
+
+    if (updatedWalls.length === 0) {
+      sendMessage(socket, 'error', { message: 'Wall not found' });
+      return;
+    }
+
+    const updatedWall = updatedWalls[0];
+
+    // Convert to Wall interface
+    const wallPayload: Wall = {
+      id: updatedWall.id,
+      sceneId: updatedWall.sceneId,
+      x1: updatedWall.x1,
+      y1: updatedWall.y1,
+      x2: updatedWall.x2,
+      y2: updatedWall.y2,
+      wallType: updatedWall.wallType,
+      move: updatedWall.move,
+      sense: updatedWall.sense,
+      sound: updatedWall.sound,
+      door: updatedWall.door,
+      doorState: updatedWall.doorState,
+      data: updatedWall.data as Record<string, unknown>,
+      createdAt: updatedWall.createdAt,
+    };
+
+    // Broadcast to all players
+    const updatedPayload: WallUpdatedPayload = { wall: wallPayload };
+    roomManager.broadcast(gameId, {
+      type: 'wall:updated',
+      payload: updatedPayload,
+      timestamp: Date.now(),
+    });
+
+    request.log.info({ wallId, gameId }, 'Wall updated');
+  } catch (error) {
+    request.log.error({ error, wallId }, 'Error updating wall');
+    sendMessage(socket, 'error', { message: 'Failed to update wall' });
+  }
+}
+
+/**
+ * Handle wall remove request
+ */
+async function handleWallRemove(
+  socket: WebSocket,
+  message: WSMessage<WallRemovePayload>,
+  request: FastifyRequest
+): Promise<void> {
+  request.log.debug({ payload: message.payload }, 'Wall remove');
+
+  const { wallId } = message.payload;
+
+  const gameId = roomManager.getRoomForSocket(socket);
+
+  if (!gameId) {
+    sendMessage(socket, 'error', { message: 'Not in a game room' });
+    return;
+  }
+
+  try {
+    // Delete wall from database
+    const deletedWalls = await request.server.db
+      .delete(walls)
+      .where(eq(walls.id, wallId))
+      .returning();
+
+    if (deletedWalls.length === 0) {
+      sendMessage(socket, 'error', { message: 'Wall not found' });
+      return;
+    }
+
+    // Broadcast to all players
+    const removedPayload: WallRemovedPayload = { wallId };
+    roomManager.broadcast(gameId, {
+      type: 'wall:removed',
+      payload: removedPayload,
+      timestamp: Date.now(),
+    });
+
+    request.log.info({ wallId, gameId }, 'Wall removed');
+  } catch (error) {
+    request.log.error({ error, wallId }, 'Error removing wall');
+    sendMessage(socket, 'error', { message: 'Failed to remove wall' });
+  }
 }

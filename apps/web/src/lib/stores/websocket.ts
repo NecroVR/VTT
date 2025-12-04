@@ -18,7 +18,17 @@ import type {
   GamePlayerJoinedPayload,
   GamePlayerLeftPayload,
   ChatMessagePayload,
-  PlayerInfo
+  PlayerInfo,
+  SceneSwitchPayload,
+  SceneSwitchedPayload,
+  SceneUpdatePayload,
+  SceneUpdatedPayload,
+  WallAddPayload,
+  WallAddedPayload,
+  WallUpdatePayload,
+  WallUpdatedPayload,
+  WallRemovePayload,
+  WallRemovedPayload
 } from '@vtt/shared';
 
 type MessageHandler<T = unknown> = (message: WSMessage<T>) => void;
@@ -181,6 +191,48 @@ class WebSocketStore {
 
   onDiceResult(handler: TypedMessageHandler<DiceResultPayload>): () => void {
     return this.on('dice:result', handler);
+  }
+
+  // Scene methods
+  sendSceneSwitch(payload: SceneSwitchPayload): void {
+    this.send('scene:switch', payload);
+  }
+
+  sendSceneUpdate(payload: SceneUpdatePayload): void {
+    this.send('scene:update', payload);
+  }
+
+  onSceneSwitched(handler: TypedMessageHandler<SceneSwitchedPayload>): () => void {
+    return this.on('scene:switched', handler);
+  }
+
+  onSceneUpdated(handler: TypedMessageHandler<SceneUpdatedPayload>): () => void {
+    return this.on('scene:updated', handler);
+  }
+
+  // Wall methods
+  sendWallAdd(payload: WallAddPayload): void {
+    this.send('wall:add', payload);
+  }
+
+  sendWallUpdate(payload: WallUpdatePayload): void {
+    this.send('wall:update', payload);
+  }
+
+  sendWallRemove(payload: WallRemovePayload): void {
+    this.send('wall:remove', payload);
+  }
+
+  onWallAdded(handler: TypedMessageHandler<WallAddedPayload>): () => void {
+    return this.on('wall:added', handler);
+  }
+
+  onWallUpdated(handler: TypedMessageHandler<WallUpdatedPayload>): () => void {
+    return this.on('wall:updated', handler);
+  }
+
+  onWallRemoved(handler: TypedMessageHandler<WallRemovedPayload>): () => void {
+    return this.on('wall:removed', handler);
   }
 
   /**

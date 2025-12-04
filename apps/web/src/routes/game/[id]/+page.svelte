@@ -1,23 +1,30 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount } from 'svelte';
   import { websocket } from '$stores/websocket';
   import { authStore } from '$lib/stores/auth';
+  import { scenesStore } from '$lib/stores/scenes';
+  import { tokensStore } from '$lib/stores/tokens';
+  import { wallsStore } from '$lib/stores/walls';
+  import SceneCanvas from '$lib/components/SceneCanvas.svelte';
+  import type { Scene } from '@vtt/shared';
 
-  let gameId: string;
-  let canvasContainer: HTMLDivElement;
   let wsState: { connected: boolean; reconnecting: boolean; error: string | null };
+  let isGM = false; // TODO: Get this from game data
 
-  // Subscribe to WebSocket state
-  const unsubscribeState = websocket.state.subscribe(state => {
-    wsState = state;
-  });
-
-  // Subscribe to page params to get game ID
-  const unsubscribePage = page.subscribe(p => {
-    gameId = p.params.id;
-  });
+  // Use auto-subscription with $ prefix - Svelte handles cleanup automatically
+  $: gameId = $page.params.id;
+  $: scenes = Array.from($scenesStore.scenes.values());
+  $: activeScene = $scenesStore.activeSceneId
+    ? $scenesStore.scenes.get($scenesStore.activeSceneId)
+    : null;
+  $: tokens = Array.from($tokensStore.tokens.values()).filter(
+    token => activeScene && token.sceneId === activeScene.id
+  );
+  $: walls = Array.from($wallsStore.walls.values()).filter(
+    wall => activeScene && wall.sceneId === activeScene.id
+  );
 
   onMount(async () => {
     // Check if user is authenticated
@@ -26,6 +33,7 @@
       goto('/login');
       return;
     }
+
     // Connect to WebSocket
     const wsUrl = import.meta.env.DEV
       ? 'ws://localhost:3000/ws'
@@ -33,27 +41,90 @@
 
     websocket.connect(wsUrl);
 
-    // Subscribe to WebSocket messages
-    const unsubscribeMessages = websocket.subscribe((message) => {
-      console.log('Received WebSocket message:', message);
-      // Handle game state updates here
+    // Load scenes and tokens
+    await scenesStore.loadScenes(gameId);
+    await tokensStore.loadTokens(gameId);
+
+    // Subscribe to WebSocket state
+    const unsubscribeState = websocket.state.subscribe(state => {
+      wsState = state;
+    });
+
+    // Subscribe to token events
+    const unsubscribeTokenMove = websocket.onTokenMove((payload) => {
+      tokensStore.moveToken(payload.tokenId, payload.x, payload.y);
+    });
+
+    const unsubscribeTokenAdded = websocket.onTokenAdded((payload) => {
+      tokensStore.addToken(payload.token);
+    });
+
+    const unsubscribeTokenUpdated = websocket.onTokenUpdated((payload) => {
+      tokensStore.updateToken(payload.token.id, payload.token);
+    });
+
+    const unsubscribeTokenRemoved = websocket.onTokenRemoved((payload) => {
+      tokensStore.removeToken(payload.tokenId);
+    });
+
+    // Subscribe to scene events
+    const unsubscribeSceneSwitched = websocket.onSceneSwitched((payload) => {
+      scenesStore.setActiveScene(payload.scene.id);
+    });
+
+    const unsubscribeSceneUpdated = websocket.onSceneUpdated((payload) => {
+      scenesStore.updateScene(payload.scene.id, payload.scene);
+    });
+
+    // Subscribe to wall events
+    const unsubscribeWallAdded = websocket.onWallAdded((payload) => {
+      wallsStore.addWall(payload.wall);
+    });
+
+    const unsubscribeWallUpdated = websocket.onWallUpdated((payload) => {
+      wallsStore.updateWall(payload.wall.id, payload.wall);
+    });
+
+    const unsubscribeWallRemoved = websocket.onWallRemoved((payload) => {
+      wallsStore.removeWall(payload.wallId);
     });
 
     // Join game room
-    websocket.send('game:join', { gameId });
+    const token = localStorage.getItem('sessionToken') || sessionStorage.getItem('sessionToken') || '';
+    websocket.joinGame(gameId, token);
 
-    // PixiJS canvas will be initialized here in the future
-
+    // Return cleanup function that will be called when component is destroyed
     return () => {
-      unsubscribeMessages();
+      unsubscribeState();
+      unsubscribeTokenMove();
+      unsubscribeTokenAdded();
+      unsubscribeTokenUpdated();
+      unsubscribeTokenRemoved();
+      unsubscribeSceneSwitched();
+      unsubscribeSceneUpdated();
+      unsubscribeWallAdded();
+      unsubscribeWallUpdated();
+      unsubscribeWallRemoved();
+
+      scenesStore.clear();
+      tokensStore.clear();
+      wallsStore.clear();
+      websocket.disconnect();
     };
   });
 
-  onDestroy(() => {
-    unsubscribeState();
-    unsubscribePage();
-    websocket.disconnect();
-  });
+  function handleTokenMove(tokenId: string, x: number, y: number) {
+    websocket.sendTokenMove({ tokenId, x, y });
+  }
+
+  function handleTokenSelect(tokenId: string | null) {
+    tokensStore.selectToken(tokenId);
+  }
+
+  function handleSceneChange(sceneId: string) {
+    scenesStore.setActiveScene(sceneId);
+    websocket.sendSceneSwitch({ sceneId });
+  }
 </script>
 
 <svelte:head>
@@ -65,6 +136,21 @@
     <div class="game-info">
       <h1>Game Session</h1>
       <span class="game-id">ID: {gameId}</span>
+
+      {#if scenes.length > 0}
+        <div class="scene-selector">
+          <label for="scene-select">Scene:</label>
+          <select
+            id="scene-select"
+            value={activeScene?.id || ''}
+            on:change={(e) => handleSceneChange(e.currentTarget.value)}
+          >
+            {#each scenes as scene}
+              <option value={scene.id}>{scene.name}</option>
+            {/each}
+          </select>
+        </div>
+      {/if}
     </div>
     <div class="connection-status">
       {#if wsState?.connected}
@@ -78,12 +164,22 @@
   </header>
 
   <div class="game-content">
-    <div class="canvas-container" bind:this={canvasContainer}>
-      <!-- PixiJS canvas will be rendered here -->
-      <div class="placeholder">
-        <p>PixiJS Canvas</p>
-        <p class="placeholder-text">Game canvas will be rendered here</p>
-      </div>
+    <div class="canvas-container">
+      {#if activeScene}
+        <SceneCanvas
+          scene={activeScene}
+          {tokens}
+          {walls}
+          {isGM}
+          onTokenMove={handleTokenMove}
+          onTokenSelect={handleTokenSelect}
+        />
+      {:else}
+        <div class="placeholder">
+          <p>No Scene Available</p>
+          <p class="placeholder-text">Create a scene to get started</p>
+        </div>
+      {/if}
     </div>
 
     <aside class="sidebar">
@@ -132,6 +228,32 @@
     font-size: var(--font-size-sm);
     color: var(--color-text-secondary);
     font-family: monospace;
+  }
+
+  .scene-selector {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  .scene-selector label {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .scene-selector select {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+  }
+
+  .scene-selector select:focus {
+    outline: none;
+    border-color: #4a90e2;
   }
 
   .connection-status {
