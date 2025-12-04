@@ -272,6 +272,20 @@ describe('Tokens Routes', () => {
 
       expect(response.statusCode).toBe(401);
     });
+
+    it('should handle database errors gracefully', async () => {
+      // Use an invalid scene ID format that might cause database errors
+      const response = await app.inject({
+        method: 'GET',
+        url: '/api/v1/scenes/invalid-uuid-format/tokens',
+        headers: {
+          authorization: `Bearer ${sessionId}`,
+        },
+      });
+
+      // Should return an error (either 404 or 500)
+      expect(response.statusCode).toBeGreaterThanOrEqual(400);
+    });
   });
 
   describe('GET /api/v1/scenes/:sceneId/tokens/:tokenId', () => {
@@ -407,6 +421,20 @@ describe('Tokens Routes', () => {
       });
 
       expect(response.statusCode).toBe(401);
+    });
+
+    it('should handle database errors gracefully', async () => {
+      // Use an invalid token ID format that might cause database errors
+      const response = await app.inject({
+        method: 'GET',
+        url: `/api/v1/scenes/${sceneId}/tokens/invalid-uuid-format`,
+        headers: {
+          authorization: `Bearer ${sessionId}`,
+        },
+      });
+
+      // Should return an error (either 404 or 500)
+      expect(response.statusCode).toBeGreaterThanOrEqual(400);
     });
   });
 });

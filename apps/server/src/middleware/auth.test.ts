@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { buildApp } from '../app.js';
 import type { FastifyInstance } from 'fastify';
 import { sessions, users } from '@vtt/database';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 
 describe('Authentication Middleware', () => {
   let app: FastifyInstance;
@@ -158,6 +158,20 @@ describe('Authentication Middleware', () => {
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
       expect(body.user).not.toHaveProperty('passwordHash');
+    });
+
+    it('should return 401 with invalid UUID format', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: '/api/v1/auth/me',
+        headers: {
+          authorization: 'Bearer not-a-valid-uuid',
+        },
+      });
+
+      expect(response.statusCode).toBe(401);
+      const body = JSON.parse(response.body);
+      expect(body.error).toBe('Invalid session format');
     });
   });
 });
