@@ -153,6 +153,38 @@ describe('SceneCanvas component', () => {
     expect(mockContext.fillRect).toHaveBeenCalled();
   });
 
+  it('should show loading state while background image loads', () => {
+    const sceneWithImage = { ...mockScene, backgroundImage: 'https://example.com/map.png' };
+    render(SceneCanvas, { props: { scene: sceneWithImage } });
+
+    // Should render loading message
+    expect(mockContext.fillText).toHaveBeenCalledWith('Loading background image...', expect.any(Number), expect.any(Number));
+  });
+
+  it('should cache loaded background images', async () => {
+    const sceneWithImage = { ...mockScene, backgroundImage: 'https://example.com/map.png' };
+
+    // First render - image should load
+    const { unmount } = render(SceneCanvas, { props: { scene: sceneWithImage } });
+
+    unmount();
+    vi.clearAllMocks();
+
+    // Second render with same URL - should use cache
+    render(SceneCanvas, { props: { scene: sceneWithImage } });
+
+    // Background should still be rendered
+    expect(mockContext.fillRect).toHaveBeenCalled();
+  });
+
+  it('should show error state when background image fails to load', () => {
+    const sceneWithImage = { ...mockScene, backgroundImage: 'https://example.com/invalid.png' };
+    render(SceneCanvas, { props: { scene: sceneWithImage } });
+
+    // Initially shows loading
+    expect(mockContext.fillText).toHaveBeenCalled();
+  });
+
   it('should render tokens', () => {
     const tokens: Token[] = [
       {

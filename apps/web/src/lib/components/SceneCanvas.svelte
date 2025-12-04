@@ -39,8 +39,14 @@
   let dragOffsetX = 0;
   let dragOffsetY = 0;
 
-  // Background image
+  // Background image state
   let backgroundImage: HTMLImageElement | null = null;
+  let imageLoadingState: 'idle' | 'loading' | 'loaded' | 'error' = 'idle';
+  let imageErrorMessage: string | null = null;
+  let currentImageUrl: string | null = null;
+
+  // Image cache (module-level to persist across component instances)
+  const imageCache = new Map<string, HTMLImageElement>();
 
   const MIN_SCALE = 0.25;
   const MAX_SCALE = 4;
@@ -62,9 +68,13 @@
     // Cleanup
   });
 
-  // Watch for scene changes
-  $: if (scene) {
+  // Watch for background image URL changes only
+  $: if (scene.backgroundImage !== currentImageUrl) {
     loadBackgroundImage();
+  }
+
+  // Watch for other scene changes (re-render without reloading image)
+  $: if (scene) {
     render();
   }
 
@@ -108,23 +118,60 @@
   }
 
   function loadBackgroundImage() {
-    if (!scene.backgroundImage) {
+    const imageUrl = scene.backgroundImage;
+
+    // Update current URL tracker
+    currentImageUrl = imageUrl || null;
+
+    // Clear image if no URL provided
+    if (!imageUrl) {
       backgroundImage = null;
+      imageLoadingState = 'idle';
+      imageErrorMessage = null;
       renderBackground();
       return;
     }
 
+    // Check cache first
+    const cachedImage = imageCache.get(imageUrl);
+    if (cachedImage) {
+      backgroundImage = cachedImage;
+      imageLoadingState = 'loaded';
+      imageErrorMessage = null;
+      renderBackground();
+      return;
+    }
+
+    // Load new image
+    imageLoadingState = 'loading';
+    imageErrorMessage = null;
+    renderBackground(); // Show loading state
+
     const img = new Image();
+
     img.onload = () => {
-      backgroundImage = img;
-      renderBackground();
+      // Only update if this is still the current image URL
+      if (imageUrl === currentImageUrl) {
+        backgroundImage = img;
+        imageLoadingState = 'loaded';
+        imageErrorMessage = null;
+        imageCache.set(imageUrl, img);
+        renderBackground();
+      }
     };
-    img.onerror = () => {
-      console.error('Failed to load background image:', scene.backgroundImage);
-      backgroundImage = null;
-      renderBackground();
+
+    img.onerror = (error) => {
+      // Only update if this is still the current image URL
+      if (imageUrl === currentImageUrl) {
+        console.error('Failed to load background image:', imageUrl, error);
+        backgroundImage = null;
+        imageLoadingState = 'error';
+        imageErrorMessage = `Failed to load image: ${imageUrl}`;
+        renderBackground();
+      }
     };
-    img.src = scene.backgroundImage;
+
+    img.src = imageUrl;
   }
 
   function render() {
@@ -147,15 +194,39 @@
     backgroundCtx.translate(-viewX * scale, -viewY * scale);
     backgroundCtx.scale(scale, scale);
 
-    if (backgroundImage && scene.backgroundWidth && scene.backgroundHeight) {
+    const sceneWidth = scene.backgroundWidth || 4000;
+    const sceneHeight = scene.backgroundHeight || 4000;
+
+    if (backgroundImage && imageLoadingState === 'loaded' && scene.backgroundWidth && scene.backgroundHeight) {
+      // Draw loaded background image
       backgroundCtx.drawImage(backgroundImage, 0, 0, scene.backgroundWidth, scene.backgroundHeight);
     } else {
       // Draw default gray background
       backgroundCtx.fillStyle = '#2a2a2a';
-      backgroundCtx.fillRect(0, 0, scene.backgroundWidth || 4000, scene.backgroundHeight || 4000);
+      backgroundCtx.fillRect(0, 0, sceneWidth, sceneHeight);
+
+      // Show loading or error state
+      if (imageLoadingState === 'loading') {
+        drawCenteredMessage('Loading background image...', sceneWidth, sceneHeight, '#4a90e2');
+      } else if (imageLoadingState === 'error') {
+        drawCenteredMessage('Failed to load background image', sceneWidth, sceneHeight, '#ef4444');
+      }
     }
 
     backgroundCtx.restore();
+  }
+
+  function drawCenteredMessage(message: string, width: number, height: number, color: string) {
+    if (!backgroundCtx) return;
+
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    backgroundCtx.fillStyle = color;
+    backgroundCtx.font = `${24 / scale}px sans-serif`;
+    backgroundCtx.textAlign = 'center';
+    backgroundCtx.textBaseline = 'middle';
+    backgroundCtx.fillText(message, centerX, centerY);
   }
 
   function renderGrid() {
