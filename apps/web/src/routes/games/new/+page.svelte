@@ -15,16 +15,17 @@
   let gridSize = 50;
   let snapToGrid = true;
 
-  const unsubscribeGames = gamesStore.subscribe(state => {
-    loading = state.loading;
-    error = state.error;
-  });
-
-  const unsubscribeAuth = authStore.subscribe(state => {
-    user = state.user;
-  });
-
   onMount(async () => {
+    // Subscribe inside onMount to ensure proper cleanup
+    const unsubscribeGames = gamesStore.subscribe(state => {
+      loading = state.loading;
+      error = state.error;
+    });
+
+    const unsubscribeAuth = authStore.subscribe(state => {
+      user = state.user;
+    });
+
     // Check if user is authenticated
     if (!user) {
       const isAuthenticated = await authStore.checkSession();
@@ -33,6 +34,12 @@
         return;
       }
     }
+
+    // Return cleanup function
+    return () => {
+      unsubscribeGames();
+      unsubscribeAuth();
+    };
   });
 
   async function handleSubmit() {

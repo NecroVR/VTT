@@ -82,7 +82,7 @@
     backgroundCtx = backgroundCanvas.getContext('2d');
     gridCtx = gridCanvas.getContext('2d');
     tokensCtx = tokensCanvas.getContext('2d');
-    wallsCtx = wallsCanvas.getContext('2d');
+    wallsCtx = wallsCanvas ? wallsCanvas.getContext('2d') : null;
     controlsCtx = controlsCanvas.getContext('2d');
   }
 
@@ -92,10 +92,17 @@
     const width = canvasContainer.clientWidth;
     const height = canvasContainer.clientHeight;
 
-    [backgroundCanvas, gridCanvas, tokensCanvas, wallsCanvas, controlsCanvas].forEach(canvas => {
-      canvas.width = width;
-      canvas.height = height;
+    [backgroundCanvas, gridCanvas, tokensCanvas, controlsCanvas].forEach(canvas => {
+      if (canvas) {
+        canvas.width = width;
+        canvas.height = height;
+      }
     });
+
+    if (wallsCanvas) {
+      wallsCanvas.width = width;
+      wallsCanvas.height = height;
+    }
 
     render();
   }
