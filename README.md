@@ -1,5 +1,8 @@
 # Virtual Table Top (VTT)
 
+[![Test Suite](https://github.com/YOUR_USERNAME/VTT/actions/workflows/test.yml/badge.svg)](https://github.com/YOUR_USERNAME/VTT/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/YOUR_USERNAME/VTT/branch/main/graph/badge.svg)](https://codecov.io/gh/YOUR_USERNAME/VTT)
+
 A modern, web-based Virtual Table Top system for playing tabletop role-playing games online.
 
 ## Overview
