@@ -104,12 +104,34 @@ export interface DiceRollPayload {
   label?: string;
 }
 
+export interface DiceRollGroup {
+  /** Dice notation for this group (e.g., "2d6", "1d20kh1") */
+  dice: string;
+  /** Individual die results */
+  results: number[];
+  /** Indices of kept dice (if keep/drop applied) */
+  kept?: number[];
+  /** This group's contribution to total */
+  subtotal: number;
+}
+
 export interface DiceResultPayload {
+  /** Original notation string */
   notation: string;
-  rolls: number[];
+  /** Individual dice roll groups */
+  rolls: DiceRollGroup[];
+  /** Sum of all modifiers */
+  modifiers: number;
+  /** Final total (rolls + modifiers) */
   total: number;
+  /** Human-readable breakdown */
+  breakdown: string;
+  /** Optional label for the roll */
   label?: string;
+  /** User who rolled */
   userId: string;
+  /** Username who rolled */
+  username: string;
 }
 
 // Chat payloads

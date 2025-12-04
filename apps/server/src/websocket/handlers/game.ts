@@ -15,6 +15,7 @@ import type {
   TokenRemovedPayload,
   DiceRollPayload,
   DiceResultPayload,
+  DiceRollGroup,
   GameJoinPayload,
   GameLeavePayload,
   GamePlayersPayload,
@@ -33,6 +34,7 @@ import type {
   WallRemovedPayload,
   ErrorPayload
 } from '@vtt/shared';
+import { parseDiceNotation, type DiceGroup } from '@vtt/shared/dice';
 import { roomManager } from '../rooms';
 import { validateSession, extractSessionToken } from '../auth';
 import { tokens, scenes, walls } from '@vtt/database';
@@ -504,22 +506,75 @@ function handleDiceRoll(
     return;
   }
 
-  // TODO: Implement actual dice rolling logic
-  // For now, send a mock result
-  const mockResult: DiceResultPayload = {
-    notation,
-    rolls: [4, 3, 6], // Mock rolls
-    total: 13,
-    label,
-    userId: playerInfo.userId,
-  };
+  try {
+    // Parse and roll dice
+    const diceRoll = parseDiceNotation(notation);
 
-  // Broadcast dice result to all players
-  roomManager.broadcast(gameId, {
-    type: 'dice:result',
-    payload: mockResult,
-    timestamp: Date.now(),
-  });
+    // Convert to WebSocket payload format
+    const rolls: DiceRollGroup[] = diceRoll.rolls.map((group: DiceGroup) => {
+      let diceStr = `${group.count}d${group.sides}`;
+
+      // Add keep/drop notation
+      if (group.keep) {
+        if ('highest' in group.keep) {
+          diceStr += `kh${group.keep.highest}`;
+        } else {
+          diceStr += `kl${group.keep.lowest}`;
+        }
+      } else if (group.drop) {
+        if ('highest' in group.drop) {
+          diceStr += `dh${group.drop.highest}`;
+        } else {
+          diceStr += `dl${group.drop.lowest}`;
+        }
+      }
+
+      // Add exploding notation
+      if (group.exploding) {
+        diceStr += '!';
+      }
+
+      return {
+        dice: diceStr,
+        results: group.results,
+        kept: group.kept,
+        subtotal: group.subtotal,
+      };
+    });
+
+    // Calculate total modifiers
+    const groupTotal = diceRoll.rolls.reduce((sum: number, group: DiceGroup) => sum + group.subtotal, 0);
+    const modifiers = diceRoll.total - groupTotal;
+
+    const result: DiceResultPayload = {
+      notation,
+      rolls,
+      modifiers,
+      total: diceRoll.total,
+      breakdown: diceRoll.breakdown,
+      label,
+      userId: playerInfo.userId,
+      username: playerInfo.username,
+    };
+
+    request.log.info({
+      notation,
+      total: result.total,
+      breakdown: result.breakdown
+    }, 'Dice rolled');
+
+    // Broadcast dice result to all players
+    roomManager.broadcast(gameId, {
+      type: 'dice:result',
+      payload: result,
+      timestamp: Date.now(),
+    });
+  } catch (error) {
+    request.log.error({ error, notation }, 'Error rolling dice');
+    sendMessage(socket, 'error', {
+      message: error instanceof Error ? error.message : 'Invalid dice notation'
+    });
+  }
 }
 
 /**
