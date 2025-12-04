@@ -28,7 +28,21 @@ import type {
   WallUpdatePayload,
   WallUpdatedPayload,
   WallRemovePayload,
-  WallRemovedPayload
+  WallRemovedPayload,
+  CombatStartPayload,
+  CombatStartedPayload,
+  CombatEndPayload,
+  CombatEndedPayload,
+  CombatUpdatePayload,
+  CombatUpdatedPayload,
+  CombatantAddPayload,
+  CombatantAddedPayload,
+  CombatantUpdatePayload,
+  CombatantUpdatedPayload,
+  CombatantRemovePayload,
+  CombatantRemovedPayload,
+  CombatNextTurnPayload,
+  CombatTurnChangedPayload
 } from '@vtt/shared';
 
 type MessageHandler<T = unknown> = (message: WSMessage<T>) => void;
@@ -274,6 +288,66 @@ class WebSocketStore {
 
   onChatMessage(handler: TypedMessageHandler<ChatMessagePayload>): () => void {
     return this.on('chat:message', handler);
+  }
+
+  /**
+   * Combat methods
+   */
+  sendCombatStart(payload: CombatStartPayload): void {
+    this.send('combat:start', payload);
+  }
+
+  sendCombatEnd(payload: CombatEndPayload): void {
+    this.send('combat:end', payload);
+  }
+
+  sendCombatUpdate(payload: CombatUpdatePayload): void {
+    this.send('combat:update', payload);
+  }
+
+  sendCombatNextTurn(payload: CombatNextTurnPayload): void {
+    this.send('combat:next-turn', payload);
+  }
+
+  onCombatStarted(handler: TypedMessageHandler<CombatStartedPayload>): () => void {
+    return this.on('combat:started', handler);
+  }
+
+  onCombatEnded(handler: TypedMessageHandler<CombatEndedPayload>): () => void {
+    return this.on('combat:ended', handler);
+  }
+
+  onCombatUpdated(handler: TypedMessageHandler<CombatUpdatedPayload>): () => void {
+    return this.on('combat:updated', handler);
+  }
+
+  onCombatTurnChanged(handler: TypedMessageHandler<CombatTurnChangedPayload>): () => void {
+    return this.on('combat:turn-changed', handler);
+  }
+
+  // Combatant methods
+  sendCombatantAdd(payload: CombatantAddPayload): void {
+    this.send('combatant:add', payload);
+  }
+
+  sendCombatantUpdate(payload: CombatantUpdatePayload): void {
+    this.send('combatant:update', payload);
+  }
+
+  sendCombatantRemove(payload: CombatantRemovePayload): void {
+    this.send('combatant:remove', payload);
+  }
+
+  onCombatantAdded(handler: TypedMessageHandler<CombatantAddedPayload>): () => void {
+    return this.on('combatant:added', handler);
+  }
+
+  onCombatantUpdated(handler: TypedMessageHandler<CombatantUpdatedPayload>): () => void {
+    return this.on('combatant:updated', handler);
+  }
+
+  onCombatantRemoved(handler: TypedMessageHandler<CombatantRemovedPayload>): () => void {
+    return this.on('combatant:removed', handler);
   }
 
   /**
