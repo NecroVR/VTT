@@ -5,8 +5,19 @@ import type {
   WSMessageType,
   TokenMovePayload,
   DiceRollPayload,
-  DiceResultPayload
+  DiceResultPayload,
+  GameJoinPayload,
+  GameLeavePayload,
+  GamePlayersPayload,
+  GamePlayerJoinedPayload,
+  GamePlayerLeftPayload,
+  ChatMessagePayload,
+  ErrorPayload,
+  TokenAddPayload,
+  TokenRemovePayload
 } from '@vtt/shared';
+import { roomManager } from '../rooms';
+import { validateSession, extractSessionToken } from '../auth';
 
 /**
  * Game session WebSocket handler
@@ -35,11 +46,11 @@ export async function handleGameWebSocket(
           break;
 
         case 'game:join':
-          handleGameJoin(socket, message, request);
+          handleGameJoin(socket, message as WSMessage<GameJoinPayload>, request);
           break;
 
         case 'game:leave':
-          handleGameLeave(socket, message, request);
+          handleGameLeave(socket, message as WSMessage<GameLeavePayload>, request);
           break;
 
         case 'token:move':
@@ -47,11 +58,11 @@ export async function handleGameWebSocket(
           break;
 
         case 'token:add':
-          handleTokenAdd(socket, message, request);
+          handleTokenAdd(socket, message as WSMessage<TokenAddPayload>, request);
           break;
 
         case 'token:remove':
-          handleTokenRemove(socket, message, request);
+          handleTokenRemove(socket, message as WSMessage<TokenRemovePayload>, request);
           break;
 
         case 'dice:roll':
@@ -59,7 +70,7 @@ export async function handleGameWebSocket(
           break;
 
         case 'chat:message':
-          handleChatMessage(socket, message, request);
+          handleChatMessage(socket, message as WSMessage<ChatMessagePayload>, request);
           break;
 
         default:
@@ -75,6 +86,23 @@ export async function handleGameWebSocket(
   // Handle connection close
   socket.on('close', () => {
     request.log.info(`WebSocket client disconnected: ${clientId}`);
+
+    // Clean up: remove player from their room
+    const gameId = roomManager.getRoomForSocket(socket);
+    if (gameId) {
+      const playerInfo = roomManager.getPlayerInfo(socket);
+      roomManager.leave(socket);
+
+      // Notify other players
+      if (playerInfo) {
+        const payload: GamePlayerLeftPayload = { userId: playerInfo.userId };
+        roomManager.broadcast(gameId, {
+          type: 'game:player-left',
+          payload,
+          timestamp: Date.now(),
+        });
+      }
+    }
   });
 
   // Handle errors
@@ -112,19 +140,63 @@ function handlePing(socket: WebSocket): void {
 /**
  * Handle game join request
  */
-function handleGameJoin(
+async function handleGameJoin(
   socket: WebSocket,
-  message: WSMessage,
+  message: WSMessage<GameJoinPayload>,
   request: FastifyRequest
-): void {
-  request.log.info({ message }, 'Client joining game session');
+): Promise<void> {
+  const { gameId, token } = message.payload;
 
-  // TODO: Implement game session join logic
-  // Expected payload: { gameId: string, userId: string }
-  sendMessage(socket, 'game:state', {
-    message: 'Joined game session',
-    // TODO: Include full game state
+  request.log.info({ gameId }, 'Client joining game session');
+
+  // Validate session token
+  const user = await validateSession(request.server, token);
+
+  if (!user) {
+    const errorPayload: ErrorPayload = {
+      message: 'Invalid or expired session',
+      code: 'UNAUTHORIZED',
+    };
+    sendMessage(socket, 'error', errorPayload);
+    return;
+  }
+
+  // Add player to room
+  roomManager.join(gameId, socket, {
+    userId: user.userId,
+    username: user.username,
   });
+
+  // Get current players in room
+  const players = roomManager.getPlayersInRoom(gameId);
+
+  // Send player list to the joining player
+  const playersPayload: GamePlayersPayload = { players };
+  sendMessage(socket, 'game:players', playersPayload);
+
+  // Notify other players that someone joined
+  const joinedPayload: GamePlayerJoinedPayload = {
+    player: {
+      userId: user.userId,
+      username: user.username,
+    },
+  };
+
+  roomManager.broadcast(
+    gameId,
+    {
+      type: 'game:player-joined',
+      payload: joinedPayload,
+      timestamp: Date.now(),
+    },
+    socket // Exclude the joining player
+  );
+
+  request.log.info({
+    gameId,
+    userId: user.userId,
+    playerCount: players.length,
+  }, 'Player joined game session');
 }
 
 /**
@@ -132,15 +204,33 @@ function handleGameJoin(
  */
 function handleGameLeave(
   socket: WebSocket,
-  message: WSMessage,
+  message: WSMessage<GameLeavePayload>,
   request: FastifyRequest
 ): void {
-  request.log.info({ message }, 'Client leaving game session');
+  const { gameId } = message.payload;
 
-  // TODO: Implement game session leave logic
-  sendMessage(socket, 'game:state', {
-    message: 'Left game session'
-  });
+  request.log.info({ gameId }, 'Client leaving game session');
+
+  // Get player info before removing
+  const playerInfo = roomManager.getPlayerInfo(socket);
+
+  // Remove player from room
+  roomManager.leave(socket);
+
+  // Notify other players
+  if (playerInfo) {
+    const payload: GamePlayerLeftPayload = { userId: playerInfo.userId };
+    roomManager.broadcast(gameId, {
+      type: 'game:player-left',
+      payload,
+      timestamp: Date.now(),
+    });
+
+    request.log.info({
+      gameId,
+      userId: playerInfo.userId,
+    }, 'Player left game session');
+  }
 }
 
 /**
@@ -155,11 +245,22 @@ function handleTokenMove(
 
   const { tokenId, x, y } = message.payload;
 
-  // TODO: Validate token ownership and update database
-  // TODO: Broadcast to other players in the game
+  // Get the game room for this socket
+  const gameId = roomManager.getRoomForSocket(socket);
 
-  // Echo back the move for now
-  sendMessage(socket, 'token:move', { tokenId, x, y });
+  if (!gameId) {
+    sendMessage(socket, 'error', { message: 'Not in a game room' });
+    return;
+  }
+
+  // TODO: Validate token ownership and update database
+
+  // Broadcast to all players in the game (including sender for confirmation)
+  roomManager.broadcast(gameId, {
+    type: 'token:move',
+    payload: { tokenId, x, y },
+    timestamp: Date.now(),
+  });
 }
 
 /**
@@ -167,14 +268,26 @@ function handleTokenMove(
  */
 function handleTokenAdd(
   socket: WebSocket,
-  message: WSMessage,
+  message: WSMessage<TokenAddPayload>,
   request: FastifyRequest
 ): void {
   request.log.debug({ payload: message.payload }, 'Token add');
 
-  // TODO: Implement token creation logic
-  // Expected payload: Token data
-  sendMessage(socket, 'token:add', message.payload);
+  const gameId = roomManager.getRoomForSocket(socket);
+
+  if (!gameId) {
+    sendMessage(socket, 'error', { message: 'Not in a game room' });
+    return;
+  }
+
+  // TODO: Implement token creation logic and save to database
+
+  // Broadcast to all players
+  roomManager.broadcast(gameId, {
+    type: 'token:add',
+    payload: message.payload,
+    timestamp: Date.now(),
+  });
 }
 
 /**
@@ -182,14 +295,26 @@ function handleTokenAdd(
  */
 function handleTokenRemove(
   socket: WebSocket,
-  message: WSMessage,
+  message: WSMessage<TokenRemovePayload>,
   request: FastifyRequest
 ): void {
   request.log.debug({ payload: message.payload }, 'Token remove');
 
-  // TODO: Implement token removal logic
-  // Expected payload: { tokenId: string }
-  sendMessage(socket, 'token:remove', message.payload);
+  const gameId = roomManager.getRoomForSocket(socket);
+
+  if (!gameId) {
+    sendMessage(socket, 'error', { message: 'Not in a game room' });
+    return;
+  }
+
+  // TODO: Implement token removal logic and update database
+
+  // Broadcast to all players
+  roomManager.broadcast(gameId, {
+    type: 'token:remove',
+    payload: message.payload,
+    timestamp: Date.now(),
+  });
 }
 
 /**
@@ -204,6 +329,14 @@ function handleDiceRoll(
 
   const { notation, label } = message.payload;
 
+  const gameId = roomManager.getRoomForSocket(socket);
+  const playerInfo = roomManager.getPlayerInfo(socket);
+
+  if (!gameId || !playerInfo) {
+    sendMessage(socket, 'error', { message: 'Not in a game room' });
+    return;
+  }
+
   // TODO: Implement actual dice rolling logic
   // For now, send a mock result
   const mockResult: DiceResultPayload = {
@@ -211,10 +344,15 @@ function handleDiceRoll(
     rolls: [4, 3, 6], // Mock rolls
     total: 13,
     label,
-    userId: 'mock-user-id', // TODO: Get from session
+    userId: playerInfo.userId,
   };
 
-  sendMessage(socket, 'dice:result', mockResult);
+  // Broadcast dice result to all players
+  roomManager.broadcast(gameId, {
+    type: 'dice:result',
+    payload: mockResult,
+    timestamp: Date.now(),
+  });
 }
 
 /**
@@ -222,12 +360,30 @@ function handleDiceRoll(
  */
 function handleChatMessage(
   socket: WebSocket,
-  message: WSMessage,
+  message: WSMessage<ChatMessagePayload>,
   request: FastifyRequest
 ): void {
   request.log.debug({ payload: message.payload }, 'Chat message');
 
-  // TODO: Implement chat message broadcasting
-  // Expected payload: { text: string, userId: string }
-  sendMessage(socket, 'chat:message', message.payload);
+  const gameId = roomManager.getRoomForSocket(socket);
+  const playerInfo = roomManager.getPlayerInfo(socket);
+
+  if (!gameId || !playerInfo) {
+    sendMessage(socket, 'error', { message: 'Not in a game room' });
+    return;
+  }
+
+  // Ensure the message has the correct user info
+  const chatPayload: ChatMessagePayload = {
+    text: message.payload.text,
+    userId: playerInfo.userId,
+    username: playerInfo.username,
+  };
+
+  // Broadcast to all players
+  roomManager.broadcast(gameId, {
+    type: 'chat:message',
+    payload: chatPayload,
+    timestamp: Date.now(),
+  });
 }

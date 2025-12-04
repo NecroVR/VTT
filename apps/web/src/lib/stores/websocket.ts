@@ -1,11 +1,28 @@
 import { writable, type Writable } from 'svelte/store';
+import type {
+  WSMessage,
+  WSMessageType,
+  TokenMovePayload,
+  DiceRollPayload,
+  DiceResultPayload,
+  GameJoinPayload,
+  GameLeavePayload,
+  GamePlayersPayload,
+  GamePlayerJoinedPayload,
+  GamePlayerLeftPayload,
+  ChatMessagePayload,
+  PlayerInfo
+} from '@vtt/shared';
 
-type MessageHandler = (data: any) => void;
+type MessageHandler<T = unknown> = (message: WSMessage<T>) => void;
+type TypedMessageHandler<T = unknown> = (payload: T) => void;
 
 interface WebSocketState {
   connected: boolean;
   reconnecting: boolean;
   error: string | null;
+  currentRoom: string | null;
+  players: PlayerInfo[];
 }
 
 class WebSocketStore {
@@ -14,13 +31,16 @@ class WebSocketStore {
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
   private reconnectDelay = 1000;
-  private messageHandlers: Set<MessageHandler> = new Set();
-  private heartbeatInterval: NodeJS.Timeout | null = null;
+  private messageHandlers: Set<MessageHandler<any>> = new Set();
+  private typedHandlers: Map<WSMessageType, Set<TypedMessageHandler<any>>> = new Map();
+  private heartbeatInterval: ReturnType<typeof setInterval> | null = null;
 
   public state: Writable<WebSocketState> = writable({
     connected: false,
     reconnecting: false,
-    error: null
+    error: null,
+    currentRoom: null,
+    players: []
   });
 
   /**
@@ -49,17 +69,26 @@ class WebSocketStore {
     this.state.set({
       connected: false,
       reconnecting: false,
-      error: null
+      error: null,
+      currentRoom: null,
+      players: []
     });
   }
 
   /**
-   * Send message to WebSocket server
-   * @param data Data to send (will be JSON stringified)
+   * Send typed message to WebSocket server
+   * @param type Message type
+   * @param payload Message payload
    */
-  send(data: any): void {
+  send<T = unknown>(type: WSMessageType, payload: T): void {
+    const message: WSMessage<T> = {
+      type,
+      payload,
+      timestamp: Date.now()
+    };
+
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify(data));
+      this.ws.send(JSON.stringify(message));
     } else {
       console.error('WebSocket is not connected');
       this.state.update(s => ({ ...s, error: 'WebSocket is not connected' }));
@@ -67,15 +96,98 @@ class WebSocketStore {
   }
 
   /**
-   * Subscribe to incoming messages
-   * @param handler Function to call when message is received
+   * Subscribe to all incoming messages
+   * @param handler Function to call when any message is received
    * @returns Unsubscribe function
    */
-  subscribe(handler: MessageHandler): () => void {
+  subscribe<T = unknown>(handler: MessageHandler<T>): () => void {
     this.messageHandlers.add(handler);
     return () => {
       this.messageHandlers.delete(handler);
     };
+  }
+
+  /**
+   * Subscribe to specific message type
+   * @param type Message type to listen for
+   * @param handler Function to call when message of this type is received
+   * @returns Unsubscribe function
+   */
+  on<T = unknown>(type: WSMessageType, handler: TypedMessageHandler<T>): () => void {
+    if (!this.typedHandlers.has(type)) {
+      this.typedHandlers.set(type, new Set());
+    }
+    this.typedHandlers.get(type)!.add(handler);
+
+    return () => {
+      const handlers = this.typedHandlers.get(type);
+      if (handlers) {
+        handlers.delete(handler);
+        if (handlers.size === 0) {
+          this.typedHandlers.delete(type);
+        }
+      }
+    };
+  }
+
+  /**
+   * Typed helper methods for common message types
+   */
+  sendTokenMove(payload: TokenMovePayload): void {
+    this.send('token:move', payload);
+  }
+
+  sendDiceRoll(payload: DiceRollPayload): void {
+    this.send('dice:roll', payload);
+  }
+
+  onTokenMove(handler: TypedMessageHandler<TokenMovePayload>): () => void {
+    return this.on('token:move', handler);
+  }
+
+  onDiceResult(handler: TypedMessageHandler<DiceResultPayload>): () => void {
+    return this.on('dice:result', handler);
+  }
+
+  /**
+   * Game room methods
+   */
+  joinGame(gameId: string, token: string): void {
+    const payload: GameJoinPayload = { gameId, token };
+    this.send('game:join', payload);
+    this.state.update(s => ({ ...s, currentRoom: gameId }));
+  }
+
+  leaveGame(gameId: string): void {
+    const payload: GameLeavePayload = { gameId };
+    this.send('game:leave', payload);
+    this.state.update(s => ({ ...s, currentRoom: null, players: [] }));
+  }
+
+  sendChatMessage(text: string): void {
+    // User info will be filled in by server
+    const payload: ChatMessagePayload = {
+      text,
+      userId: '', // Will be set by server
+      username: '' // Will be set by server
+    };
+    this.send('chat:message', payload);
+  }
+
+  onGamePlayers(handler: TypedMessageHandler<GamePlayersPayload>): () => void {
+    return this.on('game:players', handler);
+  }
+
+  onPlayerJoined(handler: TypedMessageHandler<GamePlayerJoinedPayload>): () => void {
+    return this.on('game:player-joined', handler);
+  }
+
+  onPlayerLeft(handler: TypedMessageHandler<GamePlayerLeftPayload>): () => void {
+    return this.on('game:player-left', handler);
+  }
+
+  onChatMessage(handler: TypedMessageHandler<ChatMessagePayload>): () => void {
+    return this.on('chat:message', handler);
   }
 
   /**
@@ -88,18 +200,28 @@ class WebSocketStore {
       this.ws.onopen = () => {
         console.log('WebSocket connected');
         this.reconnectAttempts = 0;
-        this.state.set({
+        this.state.update(s => ({
+          ...s,
           connected: true,
           reconnecting: false,
           error: null
-        });
+        }));
         this.startHeartbeat();
+        this.setupGameHandlers();
       };
 
       this.ws.onmessage = (event) => {
         try {
-          const data = JSON.parse(event.data);
-          this.messageHandlers.forEach(handler => handler(data));
+          const message: WSMessage = JSON.parse(event.data);
+
+          // Call general message handlers
+          this.messageHandlers.forEach(handler => handler(message));
+
+          // Call type-specific handlers
+          const handlers = this.typedHandlers.get(message.type);
+          if (handlers) {
+            handlers.forEach(handler => handler(message.payload));
+          }
         } catch (error) {
           console.error('Failed to parse WebSocket message:', error);
         }
@@ -162,9 +284,35 @@ class WebSocketStore {
   private startHeartbeat(): void {
     this.heartbeatInterval = setInterval(() => {
       if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-        this.send({ type: 'ping' });
+        this.send('ping', {});
       }
     }, 30000); // Send ping every 30 seconds
+  }
+
+  /**
+   * Setup handlers for game-related messages
+   */
+  private setupGameHandlers(): void {
+    // Handle initial player list
+    this.on<GamePlayersPayload>('game:players', (payload) => {
+      this.state.update(s => ({ ...s, players: payload.players }));
+    });
+
+    // Handle player joined
+    this.on<GamePlayerJoinedPayload>('game:player-joined', (payload) => {
+      this.state.update(s => ({
+        ...s,
+        players: [...s.players, payload.player]
+      }));
+    });
+
+    // Handle player left
+    this.on<GamePlayerLeftPayload>('game:player-left', (payload) => {
+      this.state.update(s => ({
+        ...s,
+        players: s.players.filter(p => p.userId !== payload.userId)
+      }));
+    });
   }
 }
 
