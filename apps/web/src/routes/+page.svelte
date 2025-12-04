@@ -1,22 +1,49 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import { authStore } from '$lib/stores/auth';
+  import { onMount } from 'svelte';
 
   let gameId = '';
 
+  onMount(() => {
+    // Check if user has an active session
+    authStore.checkSession();
+  });
+
   function createGame() {
+    if (!$authStore.user) {
+      goto('/login');
+      return;
+    }
     // Generate a random game ID
     const id = Math.random().toString(36).substring(2, 10);
     goto(`/game/${id}`);
   }
 
   function joinGame() {
+    if (!$authStore.user) {
+      goto('/login');
+      return;
+    }
     if (gameId.trim()) {
       goto(`/game/${gameId}`);
     }
   }
 
   function viewMyGames() {
+    if (!$authStore.user) {
+      goto('/login');
+      return;
+    }
     goto('/games');
+  }
+
+  function handleLogin() {
+    goto('/login');
+  }
+
+  function handleRegister() {
+    goto('/register');
   }
 </script>
 
@@ -28,6 +55,20 @@
   <div class="hero">
     <h1>VTT</h1>
     <p class="subtitle">Virtual Tabletop for RPG Sessions</p>
+
+    {#if !$authStore.user}
+      <div class="auth-prompt">
+        <p class="auth-message">Sign in to create and manage your game sessions</p>
+        <div class="auth-buttons">
+          <button class="btn btn-primary" on:click={handleLogin}>Login</button>
+          <button class="btn btn-secondary" on:click={handleRegister}>Register</button>
+        </div>
+      </div>
+    {:else}
+      <div class="user-welcome">
+        <p>Welcome back, <strong>{$authStore.user.username}</strong>!</p>
+      </div>
+    {/if}
 
     <div class="actions">
       <div class="card">
@@ -82,6 +123,62 @@
     font-size: var(--font-size-lg);
     color: var(--color-text-secondary);
     margin-bottom: var(--spacing-xl);
+  }
+
+  .auth-prompt {
+    margin: var(--spacing-xl) 0;
+    padding: var(--spacing-xl);
+    background: var(--color-bg-secondary);
+    border-radius: var(--border-radius-md);
+    border: 2px solid var(--color-accent);
+  }
+
+  .auth-message {
+    font-size: var(--font-size-lg);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .auth-buttons {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+  }
+
+  .btn-primary {
+    background-color: var(--color-accent);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    opacity: 0.9;
+  }
+
+  .btn-secondary {
+    background-color: transparent;
+    color: var(--color-accent);
+    border: 2px solid var(--color-accent);
+  }
+
+  .btn-secondary:hover {
+    background-color: var(--color-accent);
+    color: white;
+  }
+
+  .user-welcome {
+    margin: var(--spacing-lg) 0;
+    padding: var(--spacing-md);
+    background: var(--color-bg-secondary);
+    border-radius: var(--border-radius-sm);
+  }
+
+  .user-welcome p {
+    font-size: var(--font-size-md);
+    color: var(--color-text-primary);
+  }
+
+  .user-welcome strong {
+    color: var(--color-accent);
   }
 
   .actions {

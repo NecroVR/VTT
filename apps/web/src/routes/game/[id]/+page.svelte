@@ -1,7 +1,9 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
   import { onMount, onDestroy } from 'svelte';
   import { websocket } from '$stores/websocket';
+  import { authStore } from '$lib/stores/auth';
 
   let gameId: string;
   let canvasContainer: HTMLDivElement;
@@ -17,7 +19,13 @@
     gameId = p.params.id;
   });
 
-  onMount(() => {
+  onMount(async () => {
+    // Check if user is authenticated
+    const isAuthenticated = await authStore.checkSession();
+    if (!isAuthenticated) {
+      goto('/login');
+      return;
+    }
     // Connect to WebSocket
     const wsUrl = import.meta.env.DEV
       ? 'ws://localhost:3000/ws'
@@ -26,16 +34,13 @@
     websocket.connect(wsUrl);
 
     // Subscribe to WebSocket messages
-    const unsubscribeMessages = websocket.subscribe((data) => {
-      console.log('Received WebSocket message:', data);
+    const unsubscribeMessages = websocket.subscribe((message) => {
+      console.log('Received WebSocket message:', message);
       // Handle game state updates here
     });
 
     // Join game room
-    websocket.send({
-      type: 'join',
-      gameId
-    });
+    websocket.send('game:join', { gameId });
 
     // PixiJS canvas will be initialized here in the future
 
