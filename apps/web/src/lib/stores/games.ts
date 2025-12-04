@@ -23,16 +23,20 @@ function createGamesStore() {
 
   /**
    * Get authorization header with session token
+   * @param includeContentType - Whether to include Content-Type header (default: true)
    */
-  function getAuthHeader(): Record<string, string> {
+  function getAuthHeader(includeContentType: boolean = true): Record<string, string> {
     const sessionId = localStorage.getItem(SESSION_STORAGE_KEY);
     if (!sessionId) {
       throw new Error('Not authenticated');
     }
-    return {
+    const headers: Record<string, string> = {
       'Authorization': `Bearer ${sessionId}`,
-      'Content-Type': 'application/json',
     };
+    if (includeContentType) {
+      headers['Content-Type'] = 'application/json';
+    }
+    return headers;
   }
 
   return {
@@ -47,7 +51,7 @@ function createGamesStore() {
       try {
         const response = await fetch(`${API_BASE_URL}/api/v1/games`, {
           method: 'GET',
-          headers: getAuthHeader(),
+          headers: getAuthHeader(false),
         });
 
         if (!response.ok) {
@@ -81,7 +85,7 @@ function createGamesStore() {
       try {
         const response = await fetch(`${API_BASE_URL}/api/v1/games/${id}`, {
           method: 'GET',
-          headers: getAuthHeader(),
+          headers: getAuthHeader(false),
         });
 
         if (!response.ok) {
@@ -188,7 +192,7 @@ function createGamesStore() {
       try {
         const response = await fetch(`${API_BASE_URL}/api/v1/games/${id}`, {
           method: 'DELETE',
-          headers: getAuthHeader(),
+          headers: getAuthHeader(false),
         });
 
         if (!response.ok) {
