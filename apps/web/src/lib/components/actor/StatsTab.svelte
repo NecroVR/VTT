@@ -9,6 +9,7 @@
   let ac = $derived((actor.attributes?.ac as number) || 10);
   let level = $derived((actor.attributes?.level as number) || 1);
   let speed = $derived((actor.attributes?.speed as number) || 30);
+  let tokenSize = $derived(actor.tokenSize ?? 1);
   let str = $derived((actor.abilities?.str as number) || 10);
   let dex = $derived((actor.abilities?.dex as number) || 10);
   let con = $derived((actor.abilities?.con as number) || 10);
@@ -21,6 +22,7 @@
   let editedAC = $state(10);
   let editedLevel = $state(1);
   let editedSpeed = $state(30);
+  let editedTokenSize = $state(1);
   let editedStr = $state(10);
   let editedDex = $state(10);
   let editedCon = $state(10);
@@ -34,6 +36,7 @@
     editedAC = ac ?? 10;
     editedLevel = level ?? 1;
     editedSpeed = speed ?? 30;
+    editedTokenSize = tokenSize ?? 1;
     editedStr = str ?? 10;
     editedDex = dex ?? 10;
     editedCon = con ?? 10;
@@ -59,6 +62,12 @@
         level: editedLevel,
         speed: editedSpeed
       }
+    });
+  }
+
+  function handleTokenSizeChange() {
+    onUpdate({
+      tokenSize: editedTokenSize
     });
   }
 
@@ -146,6 +155,18 @@
           on:change={handleAttributeChange}
           class="stat-input"
           min="0"
+        />
+      </div>
+
+      <div class="stat-block">
+        <label class="stat-label">Token Size</label>
+        <input
+          type="number"
+          bind:value={editedTokenSize}
+          on:change={handleTokenSizeChange}
+          class="stat-input"
+          min="1"
+          max="10"
         />
       </div>
     </div>

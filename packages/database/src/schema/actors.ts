@@ -16,6 +16,8 @@ export const actors = pgTable('actors', {
   // Organization
   folderId: uuid('folder_id'),
   sort: integer('sort').notNull().default(0),
+  // Token configuration
+  tokenSize: integer('token_size').notNull().default(1),
   // Metadata
   data: jsonb('data').notNull().default({}),
   createdAt: timestamp('created_at').defaultNow().notNull(),

@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify';
-import { tokens, scenes, games } from '@vtt/database';
+import { tokens, scenes, games, actors } from '@vtt/database';
 import { eq, and } from 'drizzle-orm';
 import type { Token } from '@vtt/shared';
 import { authenticate } from '../../../middleware/auth.js';
@@ -204,6 +204,20 @@ const tokensRoute: FastifyPluginAsync = async (fastify) => {
 
         // TODO: Check if user has access to this scene's game
 
+        // Fetch actor's tokenSize if actorId is provided
+        let tokenSize = 1;
+        if (tokenData.actorId) {
+          const [actor] = await fastify.db
+            .select()
+            .from(actors)
+            .where(eq(actors.id, tokenData.actorId))
+            .limit(1);
+
+          if (actor && actor.tokenSize) {
+            tokenSize = actor.tokenSize;
+          }
+        }
+
         // Create token in database
         const newTokens = await fastify.db
           .insert(tokens)
@@ -213,8 +227,8 @@ const tokensRoute: FastifyPluginAsync = async (fastify) => {
             name: tokenData.name.trim(),
             x: tokenData.x,
             y: tokenData.y,
-            width: tokenData.width ?? 1,
-            height: tokenData.height ?? 1,
+            width: tokenData.width ?? tokenSize,
+            height: tokenData.height ?? tokenSize,
             elevation: tokenData.elevation ?? 0,
             rotation: tokenData.rotation ?? 0,
             locked: tokenData.locked ?? false,

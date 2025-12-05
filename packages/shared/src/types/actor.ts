@@ -12,6 +12,8 @@ export interface Actor {
   // Organization
   folderId?: string | null;
   sort: number;
+  // Token configuration
+  tokenSize: number;
   // Metadata
   data: Record<string, unknown>;
   createdAt: Date;
@@ -28,6 +30,7 @@ export interface CreateActorRequest {
   abilities?: Record<string, unknown>;
   folderId?: string | null;
   sort?: number;
+  tokenSize?: number;
   data?: Record<string, unknown>;
 }
 
@@ -40,6 +43,7 @@ export interface UpdateActorRequest {
   abilities?: Record<string, unknown>;
   folderId?: string | null;
   sort?: number;
+  tokenSize?: number;
   data?: Record<string, unknown>;
 }
 
