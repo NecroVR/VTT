@@ -29,6 +29,12 @@ import type {
   WallUpdatedPayload,
   WallRemovePayload,
   WallRemovedPayload,
+  LightAddPayload,
+  LightAddedPayload,
+  LightUpdatePayload,
+  LightUpdatedPayload,
+  LightRemovePayload,
+  LightRemovedPayload,
   CombatStartPayload,
   CombatStartedPayload,
   CombatEndPayload,
@@ -247,6 +253,31 @@ class WebSocketStore {
 
   onWallRemoved(handler: TypedMessageHandler<WallRemovedPayload>): () => void {
     return this.on('wall:removed', handler);
+  }
+
+  // Light methods
+  sendLightAdd(payload: LightAddPayload): void {
+    this.send('light:add', payload);
+  }
+
+  sendLightUpdate(payload: LightUpdatePayload): void {
+    this.send('light:update', payload);
+  }
+
+  sendLightRemove(payload: LightRemovePayload): void {
+    this.send('light:remove', payload);
+  }
+
+  onLightAdded(handler: TypedMessageHandler<LightAddedPayload>): () => void {
+    return this.on('light:added', handler);
+  }
+
+  onLightUpdated(handler: TypedMessageHandler<LightUpdatedPayload>): () => void {
+    return this.on('light:updated', handler);
+  }
+
+  onLightRemoved(handler: TypedMessageHandler<LightRemovedPayload>): () => void {
+    return this.on('light:removed', handler);
   }
 
   /**

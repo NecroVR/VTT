@@ -1,6 +1,7 @@
 import type { Token } from './game';
 import type { Scene } from './scene';
 import type { Wall } from './wall';
+import type { AmbientLight } from './ambientLight';
 
 export type WSMessageType =
   | 'ping' | 'pong'
@@ -8,6 +9,7 @@ export type WSMessageType =
   | 'token:move' | 'token:add' | 'token:added' | 'token:update' | 'token:updated' | 'token:remove' | 'token:removed'
   | 'scene:switch' | 'scene:switched' | 'scene:update' | 'scene:updated'
   | 'wall:add' | 'wall:added' | 'wall:update' | 'wall:updated' | 'wall:remove' | 'wall:removed'
+  | 'light:add' | 'light:added' | 'light:update' | 'light:updated' | 'light:remove' | 'light:removed'
   | 'actor:create' | 'actor:created' | 'actor:update' | 'actor:updated' | 'actor:delete' | 'actor:deleted'
   | 'combat:start' | 'combat:started' | 'combat:end' | 'combat:ended' | 'combat:update' | 'combat:updated'
   | 'combatant:add' | 'combatant:added' | 'combatant:update' | 'combatant:updated' | 'combatant:remove' | 'combatant:removed'
@@ -198,6 +200,46 @@ export interface WallRemovePayload {
 
 export interface WallRemovedPayload {
   wallId: string;
+}
+
+// Light payloads
+export interface LightAddPayload {
+  sceneId: string;
+  x: number;
+  y: number;
+  rotation?: number;
+  bright?: number;
+  dim?: number;
+  angle?: number;
+  color?: string;
+  alpha?: number;
+  animationType?: string | null;
+  animationSpeed?: number;
+  animationIntensity?: number;
+  walls?: boolean;
+  vision?: boolean;
+  data?: Record<string, unknown>;
+}
+
+export interface LightAddedPayload {
+  light: AmbientLight;
+}
+
+export interface LightUpdatePayload {
+  lightId: string;
+  updates: Partial<Omit<AmbientLight, 'id' | 'sceneId' | 'createdAt'>>;
+}
+
+export interface LightUpdatedPayload {
+  light: AmbientLight;
+}
+
+export interface LightRemovePayload {
+  lightId: string;
+}
+
+export interface LightRemovedPayload {
+  lightId: string;
 }
 
 // Error payload
