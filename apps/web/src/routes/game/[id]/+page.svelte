@@ -14,7 +14,7 @@
   import CombatTracker from '$lib/components/combat/CombatTracker.svelte';
   import ActorSheet from '$lib/components/actor/ActorSheet.svelte';
   import TokenConfig from '$lib/components/TokenConfig.svelte';
-  import type { Scene, Token } from '@vtt/shared';
+  import type { Scene, Token, Wall } from '@vtt/shared';
 
   let wsState: { connected: boolean; reconnecting: boolean; error: string | null };
   let activeTool = 'select';
@@ -173,7 +173,7 @@
 
   function handleWallAdd(wall: { x1: number; y1: number; x2: number; y2: number }) {
     if (!activeScene) return;
-    websocket.wallAdd({
+    websocket.sendWallAdd({
       sceneId: activeScene.id,
       x1: wall.x1,
       y1: wall.y1,
@@ -189,7 +189,11 @@
   }
 
   function handleWallRemove(wallId: string) {
-    websocket.wallRemove({ wallId });
+    websocket.sendWallRemove({ wallId });
+  }
+
+  function handleWallUpdate(wallId: string, updates: Partial<Wall>) {
+    websocket.sendWallUpdate({ wallId, updates });
   }
 
   function handleOpenActorSheet(actorId: string) {
@@ -254,6 +258,7 @@
           onTokenDoubleClick={handleTokenDoubleClick}
           onWallAdd={handleWallAdd}
           onWallRemove={handleWallRemove}
+          onWallUpdate={handleWallUpdate}
         />
         {#if isGM}
           <div class="scene-controls-overlay">

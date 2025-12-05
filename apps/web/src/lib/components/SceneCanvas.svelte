@@ -16,6 +16,7 @@
   export let onTokenDoubleClick: ((tokenId: string) => void) | undefined = undefined;
   export let onWallAdd: ((wall: { x1: number; y1: number; x2: number; y2: number }) => void) | undefined = undefined;
   export let onWallRemove: ((wallId: string) => void) | undefined = undefined;
+  export let onWallUpdate: ((wallId: string, updates: Partial<Wall>) => void) | undefined = undefined;
 
   // Canvas refs
   let canvasContainer: HTMLDivElement;
@@ -501,6 +502,118 @@
     tokensCtx.restore();
   }
 
+  /**
+   * Draw a door on the canvas with visual state (open/closed/locked)
+   */
+  function renderDoor(ctx: CanvasRenderingContext2D, wall: Wall) {
+    const { x1, y1, x2, y2, door, doorState } = wall;
+
+    // Calculate door center and dimensions
+    const centerX = (x1 + x2) / 2;
+    const centerY = (y1 + y2) / 2;
+    const doorWidth = Math.hypot(x2 - x1, y2 - y1);
+    const angle = Math.atan2(y2 - y1, x2 - x1);
+
+    ctx.save();
+    ctx.translate(centerX, centerY);
+    ctx.rotate(angle);
+
+    if (doorState === 'open') {
+      // Draw open door - dashed blue line
+      ctx.strokeStyle = '#60a5fa';
+      ctx.lineWidth = 3 / scale;
+      ctx.setLineDash([10 / scale, 5 / scale]);
+      ctx.beginPath();
+      ctx.moveTo(-doorWidth/2, 0);
+      ctx.lineTo(doorWidth/2, 0);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Draw open door icon
+      drawOpenDoorIcon(ctx, door);
+    } else if (doorState === 'locked') {
+      // Draw locked door - solid red line
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 4 / scale;
+      ctx.beginPath();
+      ctx.moveTo(-doorWidth/2, 0);
+      ctx.lineTo(doorWidth/2, 0);
+      ctx.stroke();
+
+      // Draw lock icon
+      drawLockIcon(ctx);
+    } else {
+      // Closed door - solid amber line
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = 4 / scale;
+      ctx.beginPath();
+      ctx.moveTo(-doorWidth/2, 0);
+      ctx.lineTo(doorWidth/2, 0);
+      ctx.stroke();
+
+      // Draw closed door icon
+      drawClosedDoorIcon(ctx, door);
+    }
+
+    ctx.restore();
+  }
+
+  /**
+   * Draw a closed door icon (single or double)
+   */
+  function drawClosedDoorIcon(ctx: CanvasRenderingContext2D, doorType: string) {
+    const iconSize = 8 / scale;
+
+    ctx.fillStyle = '#fbbf24';
+
+    if (doorType === 'double') {
+      // Two small rectangles for double door
+      ctx.fillRect(-iconSize/2 - 1/scale, -iconSize/2, iconSize/2 - 1/scale, iconSize);
+      ctx.fillRect(1/scale, -iconSize/2, iconSize/2 - 1/scale, iconSize);
+    } else {
+      // Single rectangle for single door
+      ctx.fillRect(-iconSize/2, -iconSize/2, iconSize, iconSize);
+    }
+  }
+
+  /**
+   * Draw an open door icon (single or double)
+   */
+  function drawOpenDoorIcon(ctx: CanvasRenderingContext2D, doorType: string) {
+    const iconSize = 8 / scale;
+
+    ctx.strokeStyle = '#60a5fa';
+    ctx.lineWidth = 1.5 / scale;
+
+    if (doorType === 'double') {
+      // Two door frames for double door
+      ctx.strokeRect(-iconSize/2 - 1/scale, -iconSize/2, iconSize/2 - 1/scale, iconSize);
+      ctx.strokeRect(1/scale, -iconSize/2, iconSize/2 - 1/scale, iconSize);
+    } else {
+      // Single door frame
+      ctx.strokeRect(-iconSize/2, -iconSize/2, iconSize, iconSize);
+    }
+  }
+
+  /**
+   * Draw a lock icon for locked doors
+   */
+  function drawLockIcon(ctx: CanvasRenderingContext2D) {
+    const size = 6 / scale;
+
+    ctx.fillStyle = '#ef4444';
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = 1.5 / scale;
+
+    // Lock body (filled rectangle)
+    ctx.fillRect(-size/2, -size/4, size, size/2);
+
+    // Lock shackle (arc)
+    ctx.beginPath();
+    ctx.arc(0, -size/4, size/3, Math.PI, 0, false);
+    ctx.stroke();
+  }
+
   function renderWalls() {
     if (!wallsCtx || !wallsCanvas) return;
 
@@ -530,14 +643,19 @@
         wallsCtx.globalAlpha = 1.0;
       }
 
-      // Draw wall
-      wallsCtx.strokeStyle = wall.wallType === 'door' ? '#fbbf24' : '#ef4444';
-      wallsCtx.lineWidth = 3 / scale;
+      // Render door or normal wall
+      if (wall.door !== 'none') {
+        renderDoor(wallsCtx, wall);
+      } else {
+        // Draw normal wall
+        wallsCtx.strokeStyle = '#ef4444';
+        wallsCtx.lineWidth = 3 / scale;
 
-      wallsCtx.beginPath();
-      wallsCtx.moveTo(wall.x1, wall.y1);
-      wallsCtx.lineTo(wall.x2, wall.y2);
-      wallsCtx.stroke();
+        wallsCtx.beginPath();
+        wallsCtx.moveTo(wall.x1, wall.y1);
+        wallsCtx.lineTo(wall.x2, wall.y2);
+        wallsCtx.stroke();
+      }
 
       // Draw endpoints for selected wall
       if (isSelected) {
@@ -679,8 +797,11 @@
     walls: Wall[],
     maxRadius: number
   ): Point[] {
-    // Only consider walls with sense === 'block'
-    const blockingWalls = walls.filter(w => w.sense === 'block');
+    // Only consider walls with effective sense === 'block' (closed doors block, open doors don't)
+    const blockingWalls = walls.filter(w => {
+      const effectiveProps = getEffectiveWallProperties(w);
+      return effectiveProps.sense === 'block';
+    });
 
     if (blockingWalls.length === 0) {
       // No blocking walls, return full circle
@@ -1231,6 +1352,40 @@
     // Controls like selection boxes, drawing tools, etc. can be rendered here
   }
 
+  /**
+   * Toggle door state (open/closed)
+   * Locked doors can only be toggled by GMs
+   */
+  function toggleDoor(wall: Wall) {
+    // Cannot toggle locked doors unless GM
+    if (wall.doorState === 'locked' && !isGM) {
+      return;
+    }
+
+    // Toggle between open and closed
+    const newState = wall.doorState === 'open' ? 'closed' : 'open';
+
+    // Update via callback
+    onWallUpdate?.(wall.id, { doorState: newState });
+  }
+
+  /**
+   * Get effective wall properties considering door state
+   * Open doors allow vision and movement
+   */
+  function getEffectiveWallProperties(wall: Wall): { sense: string; move: string } {
+    if (wall.door !== 'none' && wall.doorState === 'open') {
+      return {
+        sense: 'flow',
+        move: 'flow'
+      };
+    }
+    return {
+      sense: wall.sense,
+      move: wall.move
+    };
+  }
+
   // Mouse event handlers
   function handleMouseDown(e: MouseEvent) {
     // Right-click cancels wall drawing
@@ -1263,10 +1418,26 @@
       return;
     }
 
-    // Handle select tool - check for wall selection
+    // Handle select tool - check for wall/door selection
     if (activeTool === 'select' && isGM) {
       const wallId = findWallAtPoint(worldPos.x, worldPos.y);
       if (wallId) {
+        // Check if this is a door and if we clicked near the center (for toggling)
+        const wall = walls.find(w => w.id === wallId);
+        if (wall && wall.door !== 'none') {
+          const centerX = (wall.x1 + wall.x2) / 2;
+          const centerY = (wall.y1 + wall.y2) / 2;
+          const distToCenter = Math.hypot(worldPos.x - centerX, worldPos.y - centerY);
+          const clickThreshold = 20 / scale;
+
+          if (distToCenter <= clickThreshold) {
+            // Clicking near door center - toggle door
+            toggleDoor(wall);
+            return;
+          }
+        }
+
+        // Regular wall selection
         selectedWallId = wallId;
         selectedTokenId = null;
         onTokenSelect?.(null);
