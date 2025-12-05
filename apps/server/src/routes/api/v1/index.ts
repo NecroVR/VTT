@@ -11,6 +11,7 @@ import chatRoute from './chat.js';
 import wallsRoute from './walls.js';
 import lightsRoute from './lights.js';
 import effectsRoute from './effects.js';
+import assetsRoute from './assets.js';
 
 /**
  * API v1 routes
@@ -36,6 +37,7 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
         walls: '/api/v1/walls',
         lights: '/api/v1/lights',
         effects: '/api/v1/effects',
+        assets: '/api/v1/assets',
       },
     };
   });
@@ -53,6 +55,7 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
   await fastify.register(wallsRoute);
   await fastify.register(lightsRoute);
   await fastify.register(effectsRoute);
+  await fastify.register(assetsRoute);
 };
 
 export default apiV1Routes;

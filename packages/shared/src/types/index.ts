@@ -9,3 +9,4 @@ export * from './item';
 export * from './combat';
 export * from './chatMessage';
 export * from './activeEffect';
+export * from './asset';

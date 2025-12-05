@@ -4,6 +4,8 @@ import corsPlugin from './plugins/cors.js';
 import websocketPlugin from './plugins/websocket.js';
 import redisPlugin from './plugins/redis.js';
 import databasePlugin from './plugins/database.js';
+import multipartPlugin from './plugins/multipart.js';
+import staticPlugin from './plugins/static.js';
 import routes from './routes/index.js';
 import websocketHandlers from './websocket/index.js';
 import type { EnvConfig } from './types/index.js';
@@ -34,6 +36,8 @@ export async function buildApp(config: EnvConfig): Promise<FastifyInstance> {
   // Register plugins
   await app.register(corsPlugin);
   await app.register(databasePlugin);
+  await app.register(multipartPlugin);
+  await app.register(staticPlugin);
   await app.register(websocketPlugin);
   await app.register(redisPlugin);
 
