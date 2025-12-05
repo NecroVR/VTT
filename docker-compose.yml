@@ -43,12 +43,8 @@ services:
       REDIS_URL: redis://redis:6379
       HOST: 0.0.0.0
       PORT: 3000
-      HTTPS_ENABLED: "true"
-      HTTPS_CERT_PATH: /app/certs/localhost.pem
-      HTTPS_KEY_PATH: /app/certs/localhost-key.pem
+      HTTPS_ENABLED: "false"
       CORS_ORIGIN: https://localhost
-    volumes:
-      - ./certs:/app/certs:ro
     networks:
       - vtt-network
     depends_on:
@@ -67,8 +63,6 @@ services:
     environment:
       NODE_ENV: production
       VITE_API_BASE_URL: ""
-    volumes:
-      - ./certs:/app/certs:ro
     networks:
       - vtt-network
     depends_on:

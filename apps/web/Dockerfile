@@ -34,14 +34,21 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Install pnpm and serve for static file serving
-RUN npm install -g pnpm http-server
-
 # Copy built application from builder stage
+# SvelteKit node adapter outputs to build/
 COPY --from=builder /app/apps/web/build ./build
+COPY --from=builder /app/apps/web/package.json ./
+
+# Install only production dependencies for the built app
+RUN npm install --omit=dev 2>/dev/null || true
+
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=5173
+ENV HOST=0.0.0.0
 
 # Expose port
 EXPOSE 5173
 
-# Serve the built application with HTTPS
-CMD ["http-server", "build", "-p", "5173", "--ssl", "--cert", "/app/certs/localhost.pem", "--key", "/app/certs/localhost-key.pem"]
+# Run the SvelteKit node server
+CMD ["node", "build"]
