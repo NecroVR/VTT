@@ -64,6 +64,10 @@ import type {
   TemplatePlacePayload,
   TemplateUpdatePayload,
   TemplateRemovePayload,
+  DrawingCreatePayload,
+  DrawingUpdatePayload,
+  DrawingDeletePayload,
+  DrawingStreamPayload,
   ErrorPayload
 } from '@vtt/shared';
 import { parseDiceNotation, type DiceGroup } from '@vtt/shared/dice';
@@ -116,6 +120,12 @@ import {
   handleTemplateUpdate,
   handleTemplateRemove,
 } from './templates.js';
+import {
+  handleDrawingCreate,
+  handleDrawingUpdate,
+  handleDrawingDelete,
+  handleDrawingStream,
+} from './drawings.js';
 
 /**
  * Game session WebSocket handler
@@ -321,6 +331,22 @@ export async function handleGameWebSocket(
 
         case 'template:remove':
           await handleTemplateRemove(socket, message as WSMessage<TemplateRemovePayload>, request);
+          break;
+
+        case 'drawing:create':
+          await handleDrawingCreate(socket, message as WSMessage<DrawingCreatePayload>, request);
+          break;
+
+        case 'drawing:update':
+          await handleDrawingUpdate(socket, message as WSMessage<DrawingUpdatePayload>, request);
+          break;
+
+        case 'drawing:delete':
+          await handleDrawingDelete(socket, message as WSMessage<DrawingDeletePayload>, request);
+          break;
+
+        case 'drawing:stream':
+          await handleDrawingStream(socket, message as WSMessage<DrawingStreamPayload>, request);
           break;
 
         default:

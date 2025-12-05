@@ -56,7 +56,15 @@ import type {
   EffectRemovePayload,
   EffectRemovedPayload,
   EffectTogglePayload,
-  EffectToggledPayload
+  EffectToggledPayload,
+  DrawingCreatePayload,
+  DrawingCreatedPayload,
+  DrawingUpdatePayload,
+  DrawingUpdatedPayload,
+  DrawingDeletePayload,
+  DrawingDeletedPayload,
+  DrawingStreamPayload,
+  DrawingStreamedPayload
 } from '@vtt/shared';
 
 type MessageHandler<T = unknown> = (message: WSMessage<T>) => void;

@@ -4,6 +4,7 @@ import type { Wall } from './wall.js';
 import type { AmbientLight } from './ambientLight.js';
 import type { ActiveEffect } from './activeEffect.js';
 import type { MeasurementTemplate, RulerMeasurement } from './template.js';
+import type { Drawing, DrawingPoint } from './drawing.js';
 
 export type WSMessageType =
   | 'ping' | 'pong'
@@ -24,6 +25,7 @@ export type WSMessageType =
   | 'folder:create' | 'folder:created' | 'folder:update' | 'folder:updated' | 'folder:delete' | 'folder:deleted'
   | 'measure:start' | 'measure:started' | 'measure:update' | 'measure:updated' | 'measure:end' | 'measure:ended'
   | 'template:place' | 'template:placed' | 'template:update' | 'template:updated' | 'template:remove' | 'template:removed'
+  | 'drawing:create' | 'drawing:created' | 'drawing:update' | 'drawing:updated' | 'drawing:delete' | 'drawing:deleted' | 'drawing:stream' | 'drawing:streamed'
   | 'error';
 
 export interface WSMessage<T = unknown> {
@@ -866,4 +868,61 @@ export interface TemplateRemovePayload {
 
 export interface TemplateRemovedPayload {
   templateId: string;
+}
+
+// Drawing payloads
+export interface DrawingCreatePayload {
+  sceneId: string;
+  drawingType: 'freehand' | 'rectangle' | 'circle' | 'ellipse' | 'polygon' | 'text';
+  x?: number;
+  y?: number;
+  z?: number;
+  rotation?: number;
+  points?: DrawingPoint[];
+  width?: number;
+  height?: number;
+  radius?: number;
+  strokeColor?: string;
+  strokeWidth?: number;
+  strokeAlpha?: number;
+  fillColor?: string;
+  fillAlpha?: number;
+  text?: string;
+  fontSize?: number;
+  fontFamily?: string;
+  textColor?: string;
+  hidden?: boolean;
+  locked?: boolean;
+  data?: Record<string, unknown>;
+}
+
+export interface DrawingCreatedPayload {
+  drawing: Drawing;
+}
+
+export interface DrawingUpdatePayload {
+  drawingId: string;
+  updates: Partial<Omit<Drawing, 'id' | 'sceneId' | 'authorId' | 'createdAt' | 'updatedAt'>>;
+}
+
+export interface DrawingUpdatedPayload {
+  drawing: Drawing;
+}
+
+export interface DrawingDeletePayload {
+  drawingId: string;
+}
+
+export interface DrawingDeletedPayload {
+  drawingId: string;
+}
+
+export interface DrawingStreamPayload {
+  drawingId: string;
+  points: DrawingPoint[];
+}
+
+export interface DrawingStreamedPayload {
+  drawingId: string;
+  points: DrawingPoint[];
 }

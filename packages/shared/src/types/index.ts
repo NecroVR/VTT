@@ -13,3 +13,4 @@ export * from './asset.js';
 export * from './fogExploration.js';
 export * from './journal.js';
 export * from './template.js';
+export * from './drawing.js';
