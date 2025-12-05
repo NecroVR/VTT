@@ -44,6 +44,10 @@ import type {
   CombatNextTurnPayload,
   ChatDeletePayload,
   ChatWhisperPayload,
+  EffectAddPayload,
+  EffectUpdatePayload,
+  EffectRemovePayload,
+  EffectTogglePayload,
   ErrorPayload
 } from '@vtt/shared';
 import { parseDiceNotation, type DiceGroup } from '@vtt/shared/dice';
@@ -70,6 +74,12 @@ import {
   handleChatDelete,
   handleChatWhisper,
 } from './chat';
+import {
+  handleEffectAdd,
+  handleEffectUpdate,
+  handleEffectRemove,
+  handleEffectToggle,
+} from './effects';
 
 /**
  * Game session WebSocket handler
@@ -195,6 +205,22 @@ export async function handleGameWebSocket(
 
         case 'wall:remove':
           await handleWallRemove(socket, message as WSMessage<WallRemovePayload>, request);
+          break;
+
+        case 'effect:add':
+          await handleEffectAdd(socket, message as WSMessage<EffectAddPayload>, request);
+          break;
+
+        case 'effect:update':
+          await handleEffectUpdate(socket, message as WSMessage<EffectUpdatePayload>, request);
+          break;
+
+        case 'effect:remove':
+          await handleEffectRemove(socket, message as WSMessage<EffectRemovePayload>, request);
+          break;
+
+        case 'effect:toggle':
+          await handleEffectToggle(socket, message as WSMessage<EffectTogglePayload>, request);
           break;
 
         default:

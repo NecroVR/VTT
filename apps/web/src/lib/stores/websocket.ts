@@ -48,7 +48,15 @@ import type {
   CombatantRemovePayload,
   CombatantRemovedPayload,
   CombatNextTurnPayload,
-  CombatTurnChangedPayload
+  CombatTurnChangedPayload,
+  EffectAddPayload,
+  EffectAddedPayload,
+  EffectUpdatePayload,
+  EffectUpdatedPayload,
+  EffectRemovePayload,
+  EffectRemovedPayload,
+  EffectTogglePayload,
+  EffectToggledPayload
 } from '@vtt/shared';
 
 type MessageHandler<T = unknown> = (message: WSMessage<T>) => void;
@@ -379,6 +387,41 @@ class WebSocketStore {
 
   onCombatantRemoved(handler: TypedMessageHandler<CombatantRemovedPayload>): () => void {
     return this.on('combatant:removed', handler);
+  }
+
+  /**
+   * Effect methods
+   */
+  sendEffectAdd(payload: EffectAddPayload): void {
+    this.send('effect:add', payload);
+  }
+
+  sendEffectUpdate(payload: EffectUpdatePayload): void {
+    this.send('effect:update', payload);
+  }
+
+  sendEffectRemove(payload: EffectRemovePayload): void {
+    this.send('effect:remove', payload);
+  }
+
+  sendEffectToggle(payload: EffectTogglePayload): void {
+    this.send('effect:toggle', payload);
+  }
+
+  onEffectAdded(handler: TypedMessageHandler<EffectAddedPayload>): () => void {
+    return this.on('effect:added', handler);
+  }
+
+  onEffectUpdated(handler: TypedMessageHandler<EffectUpdatedPayload>): () => void {
+    return this.on('effect:updated', handler);
+  }
+
+  onEffectRemoved(handler: TypedMessageHandler<EffectRemovedPayload>): () => void {
+    return this.on('effect:removed', handler);
+  }
+
+  onEffectToggled(handler: TypedMessageHandler<EffectToggledPayload>): () => void {
+    return this.on('effect:toggled', handler);
   }
 
   /**
