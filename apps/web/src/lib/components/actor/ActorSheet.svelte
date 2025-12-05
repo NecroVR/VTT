@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import type { Actor } from '@vtt/shared';
+  import { API_BASE_URL } from '$lib/config/api';
   import ActorHeader from './ActorHeader.svelte';
   import StatsTab from './StatsTab.svelte';
   import InventoryTab from './InventoryTab.svelte';
@@ -30,9 +31,20 @@
     error = null;
 
     try {
-      const response = await fetch(`/api/v1/actors/${actorId}`, {
-        credentials: 'include'
+      const authToken = localStorage.getItem('vtt_session_id') || sessionStorage.getItem('vtt_session_id');
+
+      if (!authToken) {
+        error = 'No authentication token found';
+        loading = false;
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/v1/actors/${actorId}`, {
+        headers: {
+          'Authorization': `Bearer ${authToken}`
+        }
       });
+
       if (response.ok) {
         const data = await response.json();
         actor = data.actor;
@@ -51,10 +63,19 @@
     if (!actor) return;
 
     try {
-      const response = await fetch(`/api/v1/actors/${actorId}`, {
+      const authToken = localStorage.getItem('vtt_session_id') || sessionStorage.getItem('vtt_session_id');
+
+      if (!authToken) {
+        error = 'No authentication token found';
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/v1/actors/${actorId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        },
         body: JSON.stringify(updates)
       });
 
