@@ -39,9 +39,6 @@
       return;
     }
 
-    // Load tokens from API
-    await tokensStore.loadTokens(gameId);
-
     // Connect to WebSocket if not already connected
     if (!wsState.connected) {
       const wsUrl = getWebSocketUrl();

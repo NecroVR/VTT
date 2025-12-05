@@ -22,9 +22,9 @@ function createTokensStore() {
     subscribe,
 
     /**
-     * Load tokens for a game from the API
+     * Load tokens for a scene from the API
      */
-    async loadTokens(gameId: string): Promise<void> {
+    async loadTokens(sceneId: string): Promise<void> {
       if (!browser) return;
 
       update(state => ({ ...state, loading: true, error: null }));
@@ -36,7 +36,7 @@ function createTokensStore() {
           throw new Error('No authentication token found');
         }
 
-        const response = await fetch(`${API_BASE_URL}/api/v1/games/${gameId}/tokens`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/scenes/${sceneId}/tokens`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },

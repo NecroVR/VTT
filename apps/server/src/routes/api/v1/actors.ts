@@ -57,6 +57,7 @@ const actorsRoute: FastifyPluginAsync = async (fastify) => {
           abilities: actor.abilities as Record<string, unknown>,
           folderId: actor.folderId,
           sort: actor.sort,
+          tokenSize: actor.tokenSize,
           data: actor.data as Record<string, unknown>,
           createdAt: actor.createdAt,
           updatedAt: actor.updatedAt,
@@ -110,6 +111,7 @@ const actorsRoute: FastifyPluginAsync = async (fastify) => {
           abilities: actor.abilities as Record<string, unknown>,
           folderId: actor.folderId,
           sort: actor.sort,
+          tokenSize: actor.tokenSize,
           data: actor.data as Record<string, unknown>,
           createdAt: actor.createdAt,
           updatedAt: actor.updatedAt,
@@ -174,6 +176,7 @@ const actorsRoute: FastifyPluginAsync = async (fastify) => {
             abilities: actorData.abilities ?? {},
             folderId: actorData.folderId ?? null,
             sort: actorData.sort ?? 0,
+            tokenSize: actorData.tokenSize ?? 1,
             data: actorData.data ?? {},
           })
           .returning();
@@ -192,6 +195,7 @@ const actorsRoute: FastifyPluginAsync = async (fastify) => {
           abilities: newActor.abilities as Record<string, unknown>,
           folderId: newActor.folderId,
           sort: newActor.sort,
+          tokenSize: newActor.tokenSize,
           data: newActor.data as Record<string, unknown>,
           createdAt: newActor.createdAt,
           updatedAt: newActor.updatedAt,
@@ -273,6 +277,9 @@ const actorsRoute: FastifyPluginAsync = async (fastify) => {
         if (updates.sort !== undefined) {
           updateData.sort = updates.sort;
         }
+        if (updates.tokenSize !== undefined) {
+          updateData.tokenSize = updates.tokenSize;
+        }
         if (updates.data !== undefined) {
           updateData.data = updates.data;
         }
@@ -298,6 +305,7 @@ const actorsRoute: FastifyPluginAsync = async (fastify) => {
           abilities: updatedActor.abilities as Record<string, unknown>,
           folderId: updatedActor.folderId,
           sort: updatedActor.sort,
+          tokenSize: updatedActor.tokenSize,
           data: updatedActor.data as Record<string, unknown>,
           createdAt: updatedActor.createdAt,
           updatedAt: updatedActor.updatedAt,

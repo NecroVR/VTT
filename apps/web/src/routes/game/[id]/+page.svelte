@@ -44,6 +44,10 @@
   $: activeScene = $scenesStore.activeSceneId
     ? $scenesStore.scenes.get($scenesStore.activeSceneId)
     : null;
+  // Load tokens when active scene changes
+  $: if (activeScene?.id) {
+    tokensStore.loadTokens(activeScene.id);
+  }
   $: tokens = Array.from($tokensStore.tokens.values()).filter(
     token => activeScene && token.sceneId === activeScene.id
   );
@@ -101,9 +105,8 @@
 
     websocket.connect(wsUrl);
 
-    // Load scenes, tokens, and actors
+    // Load scenes and actors (tokens are loaded reactively when active scene changes)
     await scenesStore.loadScenes(gameId);
-    await tokensStore.loadTokens(gameId);
     await actorsStore.loadActors(gameId);
 
     // Subscribe to WebSocket state
