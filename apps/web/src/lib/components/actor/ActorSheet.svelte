@@ -5,18 +5,20 @@
   import StatsTab from './StatsTab.svelte';
   import InventoryTab from './InventoryTab.svelte';
   import NotesTab from './NotesTab.svelte';
+  import EffectsList from '../effects/EffectsList.svelte';
 
   // Props
   export let actorId: string;
   export let gameId: string;
   export let isGM: boolean = false;
   export let onClose: (() => void) | null = null;
+  export let token: string = '';
 
   // State
   let actor: Actor | null = null;
   let loading = false;
   let error: string | null = null;
-  let activeTab: 'stats' | 'inventory' | 'notes' = 'stats';
+  let activeTab: 'stats' | 'inventory' | 'notes' | 'effects' = 'stats';
   let hasUnsavedChanges = false;
 
   onMount(async () => {
@@ -66,7 +68,7 @@
     }
   }
 
-  function handleTabChange(tab: 'stats' | 'inventory' | 'notes') {
+  function handleTabChange(tab: 'stats' | 'inventory' | 'notes' | 'effects') {
     activeTab = tab;
   }
 
@@ -127,6 +129,13 @@
           >
             Notes
           </button>
+          <button
+            class="tab-btn"
+            class:active={activeTab === 'effects'}
+            on:click={() => handleTabChange('effects')}
+          >
+            Effects
+          </button>
         </div>
 
         <div class="tab-content">
@@ -136,6 +145,8 @@
             <InventoryTab {actorId} {gameId} />
           {:else if activeTab === 'notes'}
             <NotesTab {actor} {isGM} onUpdate={updateActor} />
+          {:else if activeTab === 'effects'}
+            <EffectsList {actorId} {gameId} {isGM} {token} />
           {/if}
         </div>
       </div>
