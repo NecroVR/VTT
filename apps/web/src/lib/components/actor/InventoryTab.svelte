@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Item } from '@vtt/shared';
   import { onMount } from 'svelte';
+  import ItemSheet from '../ItemSheet.svelte';
 
   // Props
   export let actorId: string;
@@ -11,18 +12,9 @@
   let loading = false;
   let error: string | null = null;
 
-  // Add item form
-  let showAddForm = false;
-  let newItemName = '';
-  let newItemType = 'item';
-  let newItemQuantity = 1;
-  let newItemWeight = 0;
-  let newItemPrice = 0;
-  let newItemDescription = '';
-
-  // Edit item state
-  let editingItemId: string | null = null;
-  let editedItem: Partial<Item> = {};
+  // ItemSheet modal state
+  let showItemSheet = false;
+  let selectedItem: Item | null = null;
 
   onMount(async () => {
     await loadItems();
@@ -48,37 +40,32 @@
     }
   }
 
-  async function addItem() {
-    if (!newItemName.trim()) return;
+  function openItemSheet(item: Item | null = null) {
+    selectedItem = item;
+    showItemSheet = true;
+  }
 
-    try {
-      const response = await fetch(`/api/v1/actors/${actorId}/items`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          gameId,
-          actorId,
-          name: newItemName.trim(),
-          itemType: newItemType,
-          quantity: newItemQuantity,
-          weight: newItemWeight,
-          price: newItemPrice,
-          description: newItemDescription.trim() || null,
-          equipped: false
-        })
-      });
+  function closeItemSheet() {
+    showItemSheet = false;
+    selectedItem = null;
+  }
 
-      if (response.ok) {
-        const data = await response.json();
-        items = [...items, data.item];
-        resetAddForm();
-      } else {
-        error = 'Failed to add item';
-      }
-    } catch (err) {
-      console.error('Error adding item:', err);
-      error = 'Failed to add item';
+  function handleItemSave(event: CustomEvent<Item>) {
+    const savedItem = event.detail;
+
+    // Update or add item to list
+    const existingIndex = items.findIndex(item => item.id === savedItem.id);
+    if (existingIndex >= 0) {
+      items[existingIndex] = savedItem;
+      items = items; // Trigger reactivity
+    } else {
+      items = [...items, savedItem];
     }
+  }
+
+  function handleItemDelete(event: CustomEvent<string>) {
+    const deletedItemId = event.detail;
+    items = items.filter(item => item.id !== deletedItemId);
   }
 
   async function updateItem(itemId: string, updates: Partial<Item>) {
@@ -92,8 +79,6 @@
       if (response.ok) {
         const data = await response.json();
         items = items.map(item => item.id === itemId ? data.item : item);
-        editingItemId = null;
-        editedItem = {};
       } else {
         error = 'Failed to update item';
       }
@@ -101,58 +86,6 @@
       console.error('Error updating item:', err);
       error = 'Failed to update item';
     }
-  }
-
-  async function deleteItem(itemId: string) {
-    if (!confirm('Are you sure you want to delete this item?')) return;
-
-    try {
-      const response = await fetch(`/api/v1/items/${itemId}`, {
-        method: 'DELETE'
-      });
-
-      if (response.ok) {
-        items = items.filter(item => item.id !== itemId);
-      } else {
-        error = 'Failed to delete item';
-      }
-    } catch (err) {
-      console.error('Error deleting item:', err);
-      error = 'Failed to delete item';
-    }
-  }
-
-  function startEditing(item: Item) {
-    editingItemId = item.id;
-    editedItem = { ...item };
-  }
-
-  function cancelEditing() {
-    editingItemId = null;
-    editedItem = {};
-  }
-
-  function saveEdit(itemId: string) {
-    const updates: Partial<Item> = {};
-    if (editedItem.name !== undefined) updates.name = editedItem.name;
-    if (editedItem.itemType !== undefined) updates.itemType = editedItem.itemType;
-    if (editedItem.quantity !== undefined) updates.quantity = editedItem.quantity;
-    if (editedItem.weight !== undefined) updates.weight = editedItem.weight;
-    if (editedItem.price !== undefined) updates.price = editedItem.price;
-    if (editedItem.description !== undefined) updates.description = editedItem.description;
-    if (editedItem.equipped !== undefined) updates.equipped = editedItem.equipped;
-
-    updateItem(itemId, updates);
-  }
-
-  function resetAddForm() {
-    newItemName = '';
-    newItemType = 'item';
-    newItemQuantity = 1;
-    newItemWeight = 0;
-    newItemPrice = 0;
-    newItemDescription = '';
-    showAddForm = false;
   }
 
   function toggleEquipped(item: Item) {
@@ -173,58 +106,10 @@
       <h3>Inventory</h3>
       <span class="total-weight">Total Weight: {totalWeight.toFixed(1)} lbs</span>
     </div>
-    <button class="add-item-btn" on:click={() => showAddForm = !showAddForm}>
-      {showAddForm ? 'Cancel' : 'Add Item'}
+    <button class="add-item-btn" on:click={() => openItemSheet()}>
+      Add Item
     </button>
   </div>
-
-  {#if showAddForm}
-    <div class="add-item-form">
-      <h4>Add New Item</h4>
-      <div class="form-grid">
-        <div class="form-field full-width">
-          <label>Name</label>
-          <input type="text" bind:value={newItemName} placeholder="Item name" />
-        </div>
-
-        <div class="form-field">
-          <label>Type</label>
-          <select bind:value={newItemType}>
-            <option value="weapon">Weapon</option>
-            <option value="armor">Armor</option>
-            <option value="consumable">Consumable</option>
-            <option value="item">Item</option>
-            <option value="treasure">Treasure</option>
-          </select>
-        </div>
-
-        <div class="form-field">
-          <label>Quantity</label>
-          <input type="number" bind:value={newItemQuantity} min="1" />
-        </div>
-
-        <div class="form-field">
-          <label>Weight (lbs)</label>
-          <input type="number" bind:value={newItemWeight} min="0" step="0.1" />
-        </div>
-
-        <div class="form-field">
-          <label>Price (gp)</label>
-          <input type="number" bind:value={newItemPrice} min="0" />
-        </div>
-
-        <div class="form-field full-width">
-          <label>Description</label>
-          <textarea bind:value={newItemDescription} placeholder="Item description" rows="2"></textarea>
-        </div>
-      </div>
-
-      <div class="form-actions">
-        <button class="save-btn" on:click={addItem}>Add Item</button>
-        <button class="cancel-btn" on:click={resetAddForm}>Cancel</button>
-      </div>
-    </div>
-  {/if}
 
   <div class="items-container">
     {#if loading}
@@ -238,72 +123,61 @@
       <div class="items-list">
         {#each items as item (item.id)}
           <div class="item-row" class:equipped={item.equipped}>
-            {#if editingItemId === item.id}
-              <div class="item-edit-form">
-                <div class="edit-grid">
-                  <input type="text" bind:value={editedItem.name} class="edit-name" />
-                  <select bind:value={editedItem.itemType} class="edit-type">
-                    <option value="weapon">Weapon</option>
-                    <option value="armor">Armor</option>
-                    <option value="consumable">Consumable</option>
-                    <option value="item">Item</option>
-                    <option value="treasure">Treasure</option>
-                  </select>
-                  <input type="number" bind:value={editedItem.quantity} class="edit-qty" min="1" />
-                  <input type="number" bind:value={editedItem.weight} class="edit-weight" min="0" step="0.1" />
-                  <input type="number" bind:value={editedItem.price} class="edit-price" min="0" />
-                </div>
-                <div class="edit-actions">
-                  <button class="save-btn-sm" on:click={() => saveEdit(item.id)}>Save</button>
-                  <button class="cancel-btn-sm" on:click={cancelEditing}>Cancel</button>
-                </div>
-              </div>
-            {:else}
-              <div class="item-info">
-                <div class="item-main">
-                  <div class="item-name-section">
+            <div class="item-info">
+              <div class="item-main">
+                <div class="item-name-section">
+                  <button class="item-name-btn" on:click={() => openItemSheet(item)}>
                     <h4 class="item-name">{item.name}</h4>
-                    <span class="item-type">{item.itemType}</span>
-                  </div>
-                  {#if item.description}
-                    <p class="item-description">{item.description}</p>
-                  {/if}
+                  </button>
+                  <span class="item-type">{item.itemType}</span>
                 </div>
-
-                <div class="item-stats">
-                  <div class="stat">
-                    <span class="stat-label">Qty</span>
-                    <span class="stat-value">{item.quantity}</span>
-                  </div>
-                  <div class="stat">
-                    <span class="stat-label">Wt</span>
-                    <span class="stat-value">{item.weight} lbs</span>
-                  </div>
-                  <div class="stat">
-                    <span class="stat-label">Price</span>
-                    <span class="stat-value">{item.price} gp</span>
-                  </div>
-                </div>
+                {#if item.description}
+                  <p class="item-description">{item.description}</p>
+                {/if}
               </div>
 
-              <div class="item-actions">
-                <button
-                  class="equip-btn"
-                  class:equipped={item.equipped}
-                  on:click={() => toggleEquipped(item)}
-                  title={item.equipped ? 'Unequip' : 'Equip'}
-                >
-                  {item.equipped ? 'E' : 'U'}
-                </button>
-                <button class="edit-btn" on:click={() => startEditing(item)}>Edit</button>
-                <button class="delete-btn" on:click={() => deleteItem(item.id)}>Delete</button>
+              <div class="item-stats">
+                <div class="stat">
+                  <span class="stat-label">Qty</span>
+                  <span class="stat-value">{item.quantity}</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-label">Wt</span>
+                  <span class="stat-value">{item.weight} lbs</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-label">Price</span>
+                  <span class="stat-value">{item.price} gp</span>
+                </div>
               </div>
-            {/if}
+            </div>
+
+            <div class="item-actions">
+              <button
+                class="equip-btn"
+                class:equipped={item.equipped}
+                on:click={() => toggleEquipped(item)}
+                title={item.equipped ? 'Unequip' : 'Equip'}
+              >
+                {item.equipped ? 'E' : 'U'}
+              </button>
+            </div>
           </div>
         {/each}
       </div>
     {/if}
   </div>
+
+  <!-- ItemSheet Modal -->
+  <ItemSheet
+    isOpen={showItemSheet}
+    item={selectedItem}
+    {actorId}
+    {gameId}
+    on:close={closeItemSheet}
+    on:save={handleItemSave}
+    on:delete={handleItemDelete}
+  />
 </div>
 
 <style>
@@ -364,92 +238,6 @@
     background-color: #2563eb;
   }
 
-  .add-item-form {
-    background-color: #111827;
-    padding: 1.5rem;
-    border-radius: 0.5rem;
-    border: 1px solid #374151;
-  }
-
-  .add-item-form h4 {
-    margin: 0 0 1rem 0;
-    color: #f9fafb;
-    font-size: 1rem;
-  }
-
-  .form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-  }
-
-  .form-field {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .form-field.full-width {
-    grid-column: span 2;
-  }
-
-  .form-field label {
-    color: #d1d5db;
-    font-size: 0.875rem;
-    font-weight: 500;
-  }
-
-  .form-field input,
-  .form-field select,
-  .form-field textarea {
-    padding: 0.5rem;
-    background-color: #374151;
-    border: 1px solid #4b5563;
-    border-radius: 0.375rem;
-    color: #f9fafb;
-  }
-
-  .form-field input:focus,
-  .form-field select:focus,
-  .form-field textarea:focus {
-    outline: none;
-    border-color: #3b82f6;
-  }
-
-  .form-actions {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 1rem;
-  }
-
-  .save-btn,
-  .cancel-btn {
-    flex: 1;
-    padding: 0.75rem;
-    border-radius: 0.375rem;
-    border: none;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.2s ease;
-  }
-
-  .save-btn {
-    background-color: #3b82f6;
-    color: #ffffff;
-  }
-
-  .save-btn:hover {
-    background-color: #2563eb;
-  }
-
-  .cancel-btn {
-    background-color: #374151;
-    color: #d1d5db;
-  }
-
-  .cancel-btn:hover {
-    background-color: #4b5563;
-  }
 
   .items-container {
     flex: 1;
@@ -518,11 +306,28 @@
     margin-bottom: 0.5rem;
   }
 
+  .item-name-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-align: left;
+    transition: opacity 0.2s ease;
+  }
+
+  .item-name-btn:hover {
+    opacity: 0.8;
+  }
+
   .item-name {
     margin: 0;
     font-size: 1rem;
     font-weight: 600;
     color: #f9fafb;
+  }
+
+  .item-name-btn:hover .item-name {
+    text-decoration: underline;
   }
 
   .item-type {
@@ -570,9 +375,7 @@
     flex-shrink: 0;
   }
 
-  .equip-btn,
-  .edit-btn,
-  .delete-btn {
+  .equip-btn {
     padding: 0.5rem 0.75rem;
     border-radius: 0.375rem;
     border: none;
@@ -580,9 +383,6 @@
     font-weight: 500;
     cursor: pointer;
     transition: background-color 0.2s ease;
-  }
-
-  .equip-btn {
     background-color: #374151;
     color: #d1d5db;
   }
@@ -598,87 +398,6 @@
 
   .equip-btn.equipped:hover {
     background-color: #2563eb;
-  }
-
-  .edit-btn {
-    background-color: #374151;
-    color: #d1d5db;
-  }
-
-  .edit-btn:hover {
-    background-color: #4b5563;
-  }
-
-  .delete-btn {
-    background-color: #7f1d1d;
-    color: #fca5a5;
-  }
-
-  .delete-btn:hover {
-    background-color: #991b1b;
-  }
-
-  .item-edit-form {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .edit-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr 0.5fr 0.75fr 0.75fr;
-    gap: 0.5rem;
-  }
-
-  .edit-grid input,
-  .edit-grid select {
-    padding: 0.5rem;
-    background-color: #374151;
-    border: 1px solid #4b5563;
-    border-radius: 0.375rem;
-    color: #f9fafb;
-    font-size: 0.875rem;
-  }
-
-  .edit-grid input:focus,
-  .edit-grid select:focus {
-    outline: none;
-    border-color: #3b82f6;
-  }
-
-  .edit-actions {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .save-btn-sm,
-  .cancel-btn-sm {
-    padding: 0.5rem 1rem;
-    border-radius: 0.375rem;
-    border: none;
-    font-size: 0.875rem;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.2s ease;
-  }
-
-  .save-btn-sm {
-    background-color: #3b82f6;
-    color: #ffffff;
-  }
-
-  .save-btn-sm:hover {
-    background-color: #2563eb;
-  }
-
-  .cancel-btn-sm {
-    background-color: #374151;
-    color: #d1d5db;
-  }
-
-  .cancel-btn-sm:hover {
-    background-color: #4b5563;
   }
 
   .items-container::-webkit-scrollbar {
