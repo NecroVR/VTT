@@ -2,7 +2,7 @@
 
 **Document Status**: Active Working Document
 **Last Updated**: 2025-12-04
-**Version**: 1.1 - Phase 1 Complete
+**Version**: 1.2 - Phase 2 UI Components Complete
 
 ---
 
@@ -134,16 +134,22 @@ Achieve feature parity with Foundry VTT while delivering a superior user experie
 - GM Role System - ✅ Complete (owner-based + delegated GMs)
 - Frontend isGM detection - ✅ Complete (reactive calculation)
 
-### In Progress
-- None (all current features complete and committed)
+### Phase 2 Progress (In Progress)
+
+**Completed** (Sessions 0031-0034):
+- TokenConfig modal with actor linking (commit 3ffcf78) ✅
+- ItemSheet component for equipment editing (commit c01e495) ✅
+- LightingConfig modal for ambient lights (commit 4a0b90f) ✅
+- token:update WebSocket handler and REST endpoints (commit 3ffcf78) ✅
+
+**In Progress**:
+- None (all Phase 2 UI components complete)
 
 ### Not Yet Started
 
 **Frontend Components Needed**:
-- ItemSheet (equipment editor)
-- TokenConfig (token property editor)
-- LightingConfig (ambient light editor)
 - GM Management UI (add/remove GMs - API ready)
+- Combat REST API (`/api/v1/games/:gameId/combats`)
 
 **API Routes Needed**:
 - Combat CRUD (`/api/v1/games/:gameId/combats`) - Schema ready, REST API needed
@@ -177,8 +183,9 @@ Comparison of Foundry VTT features vs our current implementation:
 | Token Movement | ✅ Drag & drop | ✅ Drag & drop | ✅ Complete | - |
 | Token Images | ✅ Full support | ✅ Circular clipping | ✅ Complete | - |
 | Token Vision | ✅ Line-of-sight | ❌ None | Vision calculation | P2 |
-| Token Resource Bars | ✅ HP/MP bars | Schema ready, no UI | UI implementation | P2 |
+| Token Resource Bars | ✅ HP/MP bars | ✅ TokenConfig modal | ✅ Complete | - |
 | Token Rotation | ✅ Full support | Schema ready, no UI | UI implementation | P3 |
+| Token Properties | ✅ Full support | ✅ TokenConfig modal | ✅ Complete | - |
 | **Scene Management** |
 | Scene CRUD | ✅ Full support | ✅ Full support | ✅ Complete | - |
 | Scene Switching | ✅ Full support | ✅ Full support | ✅ Complete | - |
@@ -189,7 +196,7 @@ Comparison of Foundry VTT features vs our current implementation:
 | Vision Blocking | ✅ Full support | ❌ None | Vision calculation | P2 |
 | Movement Blocking | ✅ Full support | ❌ None | Collision detection | P3 |
 | **Lighting** |
-| Ambient Lights | ✅ Full support | ✅ Full CRUD API | UI config needed | P2 |
+| Ambient Lights | ✅ Full support | ✅ LightingConfig modal | ✅ Complete | - |
 | Dynamic Lighting | ✅ Full support | ❌ None | Lighting engine | P2 |
 | Light Animation | ✅ Torch, fog, etc. | ❌ None | Animation system | P3 |
 | Darkness Levels | ✅ 0-1 scale | ❌ None | Lighting system | P2 |
@@ -199,11 +206,11 @@ Comparison of Foundry VTT features vs our current implementation:
 | **Characters & NPCs** |
 | Actor System | ✅ Full support | ✅ Full CRUD API | ✅ Complete | - |
 | Character Sheets | ✅ Editable sheets | ✅ ActorSheet | ✅ Complete | - |
-| Actor-Token Link | ✅ Full support | Schema ready | Implementation | P1 |
+| Actor-Token Link | ✅ Full support | ✅ TokenConfig modal | ✅ Complete | - |
 | **Items & Inventory** |
 | Item System | ✅ Full support | ✅ Full CRUD API | ✅ Complete | - |
-| Item Types | Equipment, spells, etc. | Generic only | Type system | P2 |
-| Inventory UI | ✅ Drag-drop | ✅ InventoryTab | ItemSheet editor | P2 |
+| Item Types | Equipment, spells, etc. | ✅ ItemSheet editor | ✅ Complete | - |
+| Inventory UI | ✅ Drag-drop | ✅ ItemSheet modal | ✅ Complete | - |
 | **Combat** |
 | Combat Tracker | ✅ Full support | ✅ CombatTracker UI | ✅ Complete | - |
 | Initiative Rolling | ✅ Full support | ✅ WebSocket events | ✅ Complete | - |
@@ -302,7 +309,44 @@ Comparison of Foundry VTT features vs our current implementation:
 
 ---
 
-### Phase 2: Game Mechanics Enhancement
+### Phase 2: Game Mechanics Enhancement (PARTIAL - UI COMPONENTS COMPLETE) ✅ (Sessions 0031-0034)
+
+**Status**: All Phase 2 UI components implemented and tested
+
+**Features Completed**:
+
+1. **TokenConfig Modal** ✅
+   - Double-click token to open editor
+   - Edit token properties (name, image, size, vision range)
+   - Actor linking (select actor from dropdown)
+   - Full PATCH endpoint integration
+   - Live canvas updates via WebSocket
+
+2. **ItemSheet Component** ✅
+   - Comprehensive equipment editor
+   - Type-specific fields (weapon damage, armor AC, consumable quantity, spell level)
+   - Create/edit/delete operations
+   - Integration with ActorSheet InventoryTab
+   - Full CRUD API support
+
+3. **LightingConfig Modal** ✅
+   - Ambient light editor modal
+   - Light properties (position, brightness, radius, angle, color, opacity)
+   - Animation settings (torch, pulse, chroma, wave)
+   - Live gradient preview
+   - Full API integration with scene-based storage
+
+4. **Token Update WebSocket Handler** ✅
+   - `handleTokenUpdate()` handler in game.ts
+   - PATCH `/api/v1/tokens/:tokenId` REST endpoint
+   - POST `/api/v1/scenes/:sceneId/tokens` REST endpoint
+   - Real-time token property synchronization
+
+**Success Criteria**: ✅ UI COMPONENTS COMPLETE
+
+---
+
+### Phase 2 (CONTINUED): Game Mechanics Enhancement
 
 **Goal**: Add depth to gameplay with items, effects, and better actor management
 
@@ -980,20 +1024,20 @@ Quick reference for Foundry's 36 document types and our equivalents:
 ## Next Steps
 
 ### Immediate (Next Session)
-**Phase 1 Complete** - Ready to begin Phase 2
+**Phase 2 UI Components Complete** - Ready for remaining Phase 2 features
 
 Recommended priorities:
-1. **Actor-Token Linking**: Connect tokens to actors for synchronized data
-2. **Item System UI**: ItemSheet component for equipment editing
-3. **Token Configuration**: TokenConfig modal for editing token properties
-4. **Lighting Configuration**: LightingConfig modal for ambient lights
+1. **Active Effects System**: Database schema and UI components
+2. **Asset Upload & Management**: File upload system and asset library
+3. **Combat REST API**: Complete REST endpoints for combat management
+4. **GM Management UI**: UI for adding/removing GMs (API already complete)
 
-### Short-term (Phase 2)
-- Item System UI (ItemSheet component)
-- Active Effects system
-- Enhanced Actor Sheets (skills, inventory display)
-- Asset upload and management
-- Token-Actor linking implementation
+### Short-term (Phase 2 Continued)
+- Active Effects system (database schema, UI, application)
+- Asset upload and management system
+- Combat CRUD REST API endpoints
+- GM Management UI (add/remove GMs)
+- Enhanced Actor Sheets (passive skills, conditions, active effects display)
 
 ### Medium-term (Phase 3)
 - Dynamic lighting engine
