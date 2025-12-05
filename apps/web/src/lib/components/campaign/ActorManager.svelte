@@ -7,7 +7,7 @@
   import { browser } from '$app/environment';
 
   // Props
-  export let gameId: string;
+  export let campaignId: string;
   export let isGM: boolean = false;
   export let currentSceneId: string | null = null;
 
@@ -59,8 +59,8 @@
   }
 
   onMount(async () => {
-    // Load actors for the current game
-    await actorsStore.loadActors(gameId);
+    // Load actors for the current campaign
+    await actorsStore.loadActors(campaignId);
   });
 
   /**

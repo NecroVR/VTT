@@ -15,12 +15,12 @@
   import ChatPanel from '$lib/components/chat/ChatPanel.svelte';
   import CombatTracker from '$lib/components/combat/CombatTracker.svelte';
   import ActorSheet from '$lib/components/actor/ActorSheet.svelte';
-  import ActorManager from '$lib/components/game/ActorManager.svelte';
+  import ActorManager from '$lib/components/campaign/ActorManager.svelte';
   import ActorCreateModal from '$lib/components/actor/ActorCreateModal.svelte';
   import TokenConfig from '$lib/components/TokenConfig.svelte';
-  import TokenBrowser from '$lib/components/game/TokenBrowser.svelte';
-  import TabbedSidebar, { type Tab } from '$lib/components/game/TabbedSidebar.svelte';
-  import ResizableDivider from '$lib/components/game/ResizableDivider.svelte';
+  import TokenBrowser from '$lib/components/campaign/TokenBrowser.svelte';
+  import TabbedSidebar, { type Tab } from '$lib/components/campaign/TabbedSidebar.svelte';
+  import ResizableDivider from '$lib/components/campaign/ResizableDivider.svelte';
   import type { Scene, Token, Wall } from '@vtt/shared';
   import { getWebSocketUrl } from '$lib/config/api';
 
@@ -79,13 +79,13 @@
       id: 'actors',
       label: 'Actors',
       component: ActorManager,
-      props: { gameId: campaignId, isGM, currentSceneId: activeScene?.id || null }
+      props: { campaignId: campaignId, isGM, currentSceneId: activeScene?.id || null }
     },
     {
       id: 'tokens',
       label: 'Tokens',
       component: TokenBrowser,
-      props: { gameId: campaignId, isGM }
+      props: { campaignId: campaignId, isGM }
     }
   ] as Tab[];
 

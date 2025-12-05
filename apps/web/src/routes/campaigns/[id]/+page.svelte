@@ -3,7 +3,7 @@
   import { page } from '$app/stores';
   import { websocket } from '$lib/stores/websocket';
   import { tokensStore } from '$lib/stores/tokens';
-  import GameCanvas from '$lib/components/GameCanvas.svelte';
+  import CampaignCanvas from '$lib/components/CampaignCanvas.svelte';
   import { browser } from '$app/environment';
   import { getWebSocketUrl } from '$lib/config/api';
 
@@ -219,7 +219,7 @@
 
       <!-- Campaign canvas -->
       <div class="campaign-canvas">
-        <GameCanvas
+        <CampaignCanvas
           tokens={tokenState.tokens}
           selectedTokenId={tokenState.selectedTokenId}
           onTokenClick={handleTokenClick}

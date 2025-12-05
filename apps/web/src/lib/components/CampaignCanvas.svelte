@@ -644,7 +644,7 @@
     on:mousemove={handleMouseMove}
     on:mouseup={handleMouseUp}
     on:dblclick={handleDrawingDoubleClick}
-    class="game-canvas"
+    class="campaign-canvas"
   />
 
   <!-- Background tiles (z < 0) -->
@@ -749,7 +749,7 @@
     height: 100%;
   }
 
-  .game-canvas {
+  .campaign-canvas {
     width: 100%;
     height: 100%;
     background-color: #1a1a1a;
@@ -757,7 +757,7 @@
     display: block;
   }
 
-  .game-canvas:active {
+  .campaign-canvas:active {
     cursor: grabbing;
   }
 </style>

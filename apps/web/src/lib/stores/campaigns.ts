@@ -1,25 +1,25 @@
 import { writable } from 'svelte/store';
-import type { Game, CreateGameRequest, UpdateGameRequest, GamesListResponse, GameResponse } from '@vtt/shared';
+import type { Campaign, CreateCampaignRequest, UpdateCampaignRequest, CampaignsListResponse, CampaignResponse } from '@vtt/shared';
 import { API_BASE_URL } from '$lib/config/api';
 
 const SESSION_STORAGE_KEY = 'vtt_session_id';
 
-interface GamesState {
-  games: Game[];
-  currentGame: Game | null;
+interface CampaignsState {
+  campaigns: Campaign[];
+  currentCampaign: Campaign | null;
   loading: boolean;
   error: string | null;
 }
 
-const initialState: GamesState = {
-  games: [],
-  currentGame: null,
+const initialState: CampaignsState = {
+  campaigns: [],
+  currentCampaign: null,
   loading: false,
   error: null,
 };
 
-function createGamesStore() {
-  const { subscribe, set, update } = writable<GamesState>(initialState);
+function createCampaignsStore() {
+  const { subscribe, set, update } = writable<CampaignsState>(initialState);
 
   /**
    * Get authorization header with session token
@@ -43,81 +43,81 @@ function createGamesStore() {
     subscribe,
 
     /**
-     * Fetch all games for the current user
+     * Fetch all campaigns for the current user
      */
-    async fetchGames(): Promise<boolean> {
+    async fetchCampaigns(): Promise<boolean> {
       update(state => ({ ...state, loading: true, error: null }));
 
       try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/games`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/campaigns`, {
           method: 'GET',
           headers: getAuthHeader(false),
         });
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to fetch games');
+          throw new Error(errorData.error || 'Failed to fetch campaigns');
         }
 
-        const data: GamesListResponse = await response.json();
+        const data: CampaignsListResponse = await response.json();
 
         update(state => ({
           ...state,
-          games: data.games,
+          campaigns: data.campaigns,
           loading: false,
           error: null,
         }));
 
         return true;
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to fetch games';
+        const errorMessage = error instanceof Error ? error.message : 'Failed to fetch campaigns';
         update(state => ({ ...state, loading: false, error: errorMessage }));
         return false;
       }
     },
 
     /**
-     * Fetch a single game by ID
+     * Fetch a single campaign by ID
      */
-    async fetchGame(id: string): Promise<boolean> {
+    async fetchCampaign(id: string): Promise<boolean> {
       update(state => ({ ...state, loading: true, error: null }));
 
       try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/games/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/campaigns/${id}`, {
           method: 'GET',
           headers: getAuthHeader(false),
         });
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to fetch game');
+          throw new Error(errorData.error || 'Failed to fetch campaign');
         }
 
-        const data: GameResponse = await response.json();
+        const data: CampaignResponse = await response.json();
 
         update(state => ({
           ...state,
-          currentGame: data.game,
+          currentCampaign: data.campaign,
           loading: false,
           error: null,
         }));
 
         return true;
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to fetch game';
+        const errorMessage = error instanceof Error ? error.message : 'Failed to fetch campaign';
         update(state => ({ ...state, loading: false, error: errorMessage }));
         return false;
       }
     },
 
     /**
-     * Create a new game
+     * Create a new campaign
      */
-    async createGame(data: CreateGameRequest): Promise<Game | null> {
+    async createCampaign(data: CreateCampaignRequest): Promise<Campaign | null> {
       update(state => ({ ...state, loading: true, error: null }));
 
       try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/games`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/campaigns`, {
           method: 'POST',
           headers: getAuthHeader(),
           body: JSON.stringify(data),
@@ -125,34 +125,34 @@ function createGamesStore() {
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to create game');
+          throw new Error(errorData.error || 'Failed to create campaign');
         }
 
-        const responseData: GameResponse = await response.json();
+        const responseData: CampaignResponse = await response.json();
 
         update(state => ({
           ...state,
-          games: [...state.games, responseData.game],
+          campaigns: [...state.campaigns, responseData.campaign],
           loading: false,
           error: null,
         }));
 
-        return responseData.game;
+        return responseData.campaign;
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to create game';
+        const errorMessage = error instanceof Error ? error.message : 'Failed to create campaign';
         update(state => ({ ...state, loading: false, error: errorMessage }));
         return null;
       }
     },
 
     /**
-     * Update an existing game
+     * Update an existing campaign
      */
-    async updateGame(id: string, data: UpdateGameRequest): Promise<boolean> {
+    async updateCampaign(id: string, data: UpdateCampaignRequest): Promise<boolean> {
       update(state => ({ ...state, loading: true, error: null }));
 
       try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/games/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/campaigns/${id}`, {
           method: 'PATCH',
           headers: getAuthHeader(),
           body: JSON.stringify(data),
@@ -160,57 +160,57 @@ function createGamesStore() {
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to update game');
+          throw new Error(errorData.error || 'Failed to update campaign');
         }
 
-        const responseData: GameResponse = await response.json();
+        const responseData: CampaignResponse = await response.json();
 
         update(state => ({
           ...state,
-          games: state.games.map(game =>
-            game.id === id ? responseData.game : game
+          campaigns: state.campaigns.map(campaign =>
+            campaign.id === id ? responseData.campaign : campaign
           ),
-          currentGame: state.currentGame?.id === id ? responseData.game : state.currentGame,
+          currentCampaign: state.currentCampaign?.id === id ? responseData.campaign : state.currentCampaign,
           loading: false,
           error: null,
         }));
 
         return true;
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to update game';
+        const errorMessage = error instanceof Error ? error.message : 'Failed to update campaign';
         update(state => ({ ...state, loading: false, error: errorMessage }));
         return false;
       }
     },
 
     /**
-     * Delete a game
+     * Delete a campaign
      */
-    async deleteGame(id: string): Promise<boolean> {
+    async deleteCampaign(id: string): Promise<boolean> {
       update(state => ({ ...state, loading: true, error: null }));
 
       try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/games/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/campaigns/${id}`, {
           method: 'DELETE',
           headers: getAuthHeader(false),
         });
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to delete game');
+          throw new Error(errorData.error || 'Failed to delete campaign');
         }
 
         update(state => ({
           ...state,
-          games: state.games.filter(game => game.id !== id),
-          currentGame: state.currentGame?.id === id ? null : state.currentGame,
+          campaigns: state.campaigns.filter(campaign => campaign.id !== id),
+          currentCampaign: state.currentCampaign?.id === id ? null : state.currentCampaign,
           loading: false,
           error: null,
         }));
 
         return true;
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to delete game';
+        const errorMessage = error instanceof Error ? error.message : 'Failed to delete campaign';
         update(state => ({ ...state, loading: false, error: errorMessage }));
         return false;
       }
@@ -224,10 +224,10 @@ function createGamesStore() {
     },
 
     /**
-     * Clear current game
+     * Clear current campaign
      */
-    clearCurrentGame(): void {
-      update(state => ({ ...state, currentGame: null }));
+    clearCurrentCampaign(): void {
+      update(state => ({ ...state, currentCampaign: null }));
     },
 
     /**
@@ -239,4 +239,4 @@ function createGamesStore() {
   };
 }
 
-export const gamesStore = createGamesStore();
+export const campaignsStore = createCampaignsStore();

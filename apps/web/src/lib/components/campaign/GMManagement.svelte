@@ -1,10 +1,10 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import type { Game } from '@vtt/shared';
+  import type { Campaign } from '@vtt/shared';
 
   // Props
   export let isOpen: boolean = false;
-  export let game: Game;
+  export let campaign: Campaign;
   export let currentUserId: string;
   export let token: string = '';
 
@@ -22,10 +22,10 @@
   let addGmError: string | null = null;
 
   // Check if current user is GM or owner
-  $: isCurrentUserGM = game.ownerId === currentUserId || game.gmUserIds.includes(currentUserId);
+  $: isCurrentUserGM = campaign.ownerId === currentUserId || campaign.gmUserIds.includes(currentUserId);
 
   // Load GM details when modal opens
-  $: if (isOpen && game) {
+  $: if (isOpen && campaign) {
     loadGMUsers();
   }
 
@@ -35,7 +35,7 @@
 
     try {
       // Get all user IDs (owner + GM list)
-      const allGmUserIds = [game.ownerId, ...game.gmUserIds];
+      const allGmUserIds = [campaign.ownerId, ...campaign.gmUserIds];
       const uniqueGmUserIds = [...new Set(allGmUserIds)];
 
       // Fetch user details for each GM
@@ -55,7 +55,7 @@
           id: data.user.id,
           username: data.user.username,
           email: data.user.email,
-          isOwner: userId === game.ownerId,
+          isOwner: userId === campaign.ownerId,
         };
       });
 
@@ -108,18 +108,18 @@
       }
 
       // Check if user is already a GM
-      if (targetUser.id === game.ownerId) {
-        addGmError = 'User is already the game owner';
+      if (targetUser.id === campaign.ownerId) {
+        addGmError = 'User is already the campaign owner';
         return;
       }
 
-      if (game.gmUserIds.includes(targetUser.id)) {
+      if (campaign.gmUserIds.includes(targetUser.id)) {
         addGmError = 'User is already a GM';
         return;
       }
 
       // Add the user as GM
-      const response = await fetch(`/api/v1/games/${game.id}/gms`, {
+      const response = await fetch(`/api/v1/campaigns/${campaign.id}/gms`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -151,7 +151,7 @@
     }
 
     try {
-      const response = await fetch(`/api/v1/games/${game.id}/gms/${userId}`, {
+      const response = await fetch(`/api/v1/campaigns/${campaign.id}/gms/${userId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -241,7 +241,7 @@
                     <div class="gm-email">{gmUser.email}</div>
                   </div>
 
-                  {#if !gmUser.isOwner && game.ownerId === currentUserId}
+                  {#if !gmUser.isOwner && campaign.ownerId === currentUserId}
                     <button
                       class="button-remove"
                       on:click={() => handleRemoveGM(gmUser.id, gmUser.username)}
@@ -256,7 +256,7 @@
           </section>
 
           <!-- Add GM Section (only for owner) -->
-          {#if game.ownerId === currentUserId}
+          {#if campaign.ownerId === currentUserId}
             <section class="add-gm-section">
               <h3>Add Game Master</h3>
 

@@ -4,7 +4,7 @@
   import type { Actor } from '@vtt/shared';
 
   // Props
-  export let gameId: string;
+  export let campaignId: string;
   export let isGM: boolean = false;
 
   // State
@@ -27,8 +27,8 @@
   }
 
   onMount(async () => {
-    // Load actors for the current game
-    await actorsStore.loadActors(gameId);
+    // Load actors for the current campaign
+    await actorsStore.loadActors(campaignId);
   });
 
   /**

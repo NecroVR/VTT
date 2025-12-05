@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, fireEvent } from '@testing-library/svelte';
-import GameCanvas from './GameCanvas.svelte';
+import CampaignCanvas from './CampaignCanvas.svelte';
 import type { Token } from '@vtt/shared';
 
-describe('GameCanvas component', () => {
+describe('CampaignCanvas component', () => {
   let mockCanvas: HTMLCanvasElement;
   let mockContext: any;
 
@@ -66,24 +66,24 @@ describe('GameCanvas component', () => {
   });
 
   it('should render the canvas element', () => {
-    const { container } = render(GameCanvas);
+    const { container } = render(CampaignCanvas);
     const canvas = container.querySelector('canvas');
     expect(canvas).toBeInTheDocument();
   });
 
   it('should initialize canvas with correct context', () => {
-    render(GameCanvas);
+    render(CampaignCanvas);
     expect(HTMLCanvasElement.prototype.getContext).toHaveBeenCalledWith('2d');
   });
 
   it('should render with default empty tokens map', () => {
-    const { container } = render(GameCanvas);
+    const { container } = render(CampaignCanvas);
     const canvas = container.querySelector('canvas');
     expect(canvas).toBeInTheDocument();
   });
 
   it('should render grid when showGrid is true', () => {
-    render(GameCanvas, { props: { showGrid: true } });
+    render(CampaignCanvas, { props: { showGrid: true } });
 
     // Check that grid lines are drawn
     expect(mockContext.beginPath).toHaveBeenCalled();
@@ -94,7 +94,7 @@ describe('GameCanvas component', () => {
 
   it('should not render grid when showGrid is false', () => {
     vi.clearAllMocks();
-    render(GameCanvas, { props: { showGrid: false } });
+    render(CampaignCanvas, { props: { showGrid: false } });
 
     // Grid drawing should be minimal or none
     const callCount = mockContext.beginPath.mock.calls.length;
@@ -119,7 +119,7 @@ describe('GameCanvas component', () => {
       updatedAt: new Date(),
     });
 
-    render(GameCanvas, { props: { tokens } });
+    render(CampaignCanvas, { props: { tokens } });
 
     // Check that fillRect was called for the token
     expect(mockContext.fillRect).toHaveBeenCalled();
@@ -145,7 +145,7 @@ describe('GameCanvas component', () => {
       updatedAt: new Date(),
     });
 
-    render(GameCanvas, { props: { tokens, selectedTokenId: 'token1' } });
+    render(CampaignCanvas, { props: { tokens, selectedTokenId: 'token1' } });
 
     // Check that token is rendered with selection styling
     expect(mockContext.strokeRect).toHaveBeenCalled();
@@ -169,7 +169,7 @@ describe('GameCanvas component', () => {
       updatedAt: new Date(),
     });
 
-    render(GameCanvas, { props: { tokens } });
+    render(CampaignCanvas, { props: { tokens } });
 
     // Check that fillRect is called multiple times (token + overlay)
     expect(mockContext.fillRect).toHaveBeenCalled();
@@ -195,7 +195,7 @@ describe('GameCanvas component', () => {
       updatedAt: new Date(),
     });
 
-    const { container } = render(GameCanvas, {
+    const { container } = render(CampaignCanvas, {
       props: { tokens, onTokenClick, gridSize: 50 },
     });
 
@@ -209,7 +209,7 @@ describe('GameCanvas component', () => {
 
   it('should handle mouse down on empty space', async () => {
     const onTokenClick = vi.fn();
-    const { container } = render(GameCanvas, {
+    const { container } = render(CampaignCanvas, {
       props: { onTokenClick },
     });
 
@@ -240,7 +240,7 @@ describe('GameCanvas component', () => {
       updatedAt: new Date(),
     });
 
-    const { container } = render(GameCanvas, {
+    const { container } = render(CampaignCanvas, {
       props: { tokens, onTokenClick, gridSize: 50 },
     });
 
@@ -270,7 +270,7 @@ describe('GameCanvas component', () => {
       updatedAt: new Date(),
     });
 
-    const { container } = render(GameCanvas, {
+    const { container } = render(CampaignCanvas, {
       props: { tokens, onTokenMove, gridSize: 50 },
     });
 
@@ -305,7 +305,7 @@ describe('GameCanvas component', () => {
       updatedAt: new Date(),
     });
 
-    const { container } = render(GameCanvas, {
+    const { container } = render(CampaignCanvas, {
       props: { tokens, onTokenMove, gridSize: 50 },
     });
 
@@ -342,7 +342,7 @@ describe('GameCanvas component', () => {
       updatedAt: new Date(),
     });
 
-    const { container } = render(GameCanvas, {
+    const { container } = render(CampaignCanvas, {
       props: { tokens, onTokenMove, gridSize: 50 },
     });
 
@@ -394,7 +394,7 @@ describe('GameCanvas component', () => {
       updatedAt: new Date(),
     });
 
-    render(GameCanvas, { props: { tokens } });
+    render(CampaignCanvas, { props: { tokens } });
 
     // Check that both tokens are rendered
     expect(mockContext.fillText).toHaveBeenCalledWith('Warrior', expect.any(Number), expect.any(Number));
@@ -403,7 +403,7 @@ describe('GameCanvas component', () => {
 
   it('should use custom grid size', () => {
     const gridSize = 100;
-    render(GameCanvas, { props: { showGrid: true, gridSize } });
+    render(CampaignCanvas, { props: { showGrid: true, gridSize } });
 
     // Grid should be drawn with custom size
     expect(mockContext.moveTo).toHaveBeenCalled();
@@ -411,7 +411,7 @@ describe('GameCanvas component', () => {
   });
 
   it('should handle window resize', async () => {
-    render(GameCanvas);
+    render(CampaignCanvas);
 
     // Trigger resize event
     window.dispatchEvent(new Event('resize'));
@@ -438,7 +438,7 @@ describe('GameCanvas component', () => {
       updatedAt: new Date(),
     });
 
-    render(GameCanvas, { props: { tokens } });
+    render(CampaignCanvas, { props: { tokens } });
 
     // Token should be rendered
     expect(mockContext.fillRect).toHaveBeenCalled();
@@ -478,7 +478,7 @@ describe('GameCanvas component', () => {
       updatedAt: new Date(),
     });
 
-    const { container } = render(GameCanvas, {
+    const { container } = render(CampaignCanvas, {
       props: { tokens, onTokenClick, gridSize: 50 },
     });
 

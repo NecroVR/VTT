@@ -1,15 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, fireEvent, waitFor } from '@testing-library/svelte';
 import GMManagement from '../GMManagement.svelte';
-import type { Game } from '@vtt/shared';
+import type { Campaign } from '@vtt/shared';
 
 // Mock fetch
 global.fetch = vi.fn();
 
 describe('GMManagement', () => {
-  const mockGame: Game = {
-    id: 'game-1',
-    name: 'Test Game',
+  const mockCampaign: Campaign = {
+    id: 'campaign-1',
+    name: 'Test Campaign',
     ownerId: 'owner-1',
     gmUserIds: ['gm-1', 'gm-2'],
     settings: {
@@ -62,7 +62,7 @@ describe('GMManagement', () => {
     const { container } = render(GMManagement, {
       props: {
         isOpen: true,
-        game: mockGame,
+        campaign: mockCampaign,
         currentUserId: 'owner-1',
         token: 'test-token',
       },
@@ -76,7 +76,7 @@ describe('GMManagement', () => {
     const { container } = render(GMManagement, {
       props: {
         isOpen: false,
-        game: mockGame,
+        campaign: mockCampaign,
         currentUserId: 'owner-1',
         token: 'test-token',
       },
@@ -89,7 +89,7 @@ describe('GMManagement', () => {
     const { container } = render(GMManagement, {
       props: {
         isOpen: true,
-        game: mockGame,
+        campaign: mockCampaign,
         currentUserId: 'owner-1',
         token: 'test-token',
       },
@@ -106,11 +106,11 @@ describe('GMManagement', () => {
     expect(container.textContent).toContain('Owner');
   });
 
-  it('shows owner badge for game owner', async () => {
+  it('shows owner badge for campaign owner', async () => {
     const { container } = render(GMManagement, {
       props: {
         isOpen: true,
-        game: mockGame,
+        campaign: mockCampaign,
         currentUserId: 'owner-1',
         token: 'test-token',
       },
@@ -127,7 +127,7 @@ describe('GMManagement', () => {
     const { container } = render(GMManagement, {
       props: {
         isOpen: true,
-        game: mockGame,
+        campaign: mockCampaign,
         currentUserId: 'owner-1',
         token: 'test-token',
       },
@@ -144,7 +144,7 @@ describe('GMManagement', () => {
     const { container } = render(GMManagement, {
       props: {
         isOpen: true,
-        game: mockGame,
+        campaign: mockCampaign,
         currentUserId: 'gm-1',
         token: 'test-token',
       },
@@ -156,11 +156,11 @@ describe('GMManagement', () => {
     });
   });
 
-  it('shows add GM section only for game owner', async () => {
+  it('shows add GM section only for campaign owner', async () => {
     const { container } = render(GMManagement, {
       props: {
         isOpen: true,
-        game: mockGame,
+        campaign: mockCampaign,
         currentUserId: 'owner-1',
         token: 'test-token',
       },
@@ -176,7 +176,7 @@ describe('GMManagement', () => {
     const { container } = render(GMManagement, {
       props: {
         isOpen: true,
-        game: mockGame,
+        campaign: mockCampaign,
         currentUserId: 'gm-1',
         token: 'test-token',
       },
@@ -191,7 +191,7 @@ describe('GMManagement', () => {
     const { container } = render(GMManagement, {
       props: {
         isOpen: true,
-        game: mockGame,
+        campaign: mockCampaign,
         currentUserId: 'random-user',
         token: 'test-token',
       },
@@ -209,7 +209,7 @@ describe('GMManagement', () => {
         });
       }
 
-      if (url === '/api/v1/games/game-1/gms' && options?.method === 'POST') {
+      if (url === '/api/v1/campaigns/campaign-1/gms' && options?.method === 'POST') {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ gmUserIds: ['gm-1', 'gm-2', 'user-1'] }),
@@ -234,7 +234,7 @@ describe('GMManagement', () => {
     const { container, getByPlaceholderText, getByText } = render(GMManagement, {
       props: {
         isOpen: true,
-        game: mockGame,
+        campaign: mockCampaign,
         currentUserId: 'owner-1',
         token: 'test-token',
       },
@@ -253,7 +253,7 @@ describe('GMManagement', () => {
     // Verify the API was called
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
-        '/api/v1/games/game-1/gms',
+        '/api/v1/campaigns/campaign-1/gms',
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify({ userId: 'user-1' }),
@@ -266,7 +266,7 @@ describe('GMManagement', () => {
     const { container, getByPlaceholderText, getByText } = render(GMManagement, {
       props: {
         isOpen: true,
-        game: mockGame,
+        campaign: mockCampaign,
         currentUserId: 'owner-1',
         token: 'test-token',
       },
@@ -291,7 +291,7 @@ describe('GMManagement', () => {
     const { component, getByText } = render(GMManagement, {
       props: {
         isOpen: true,
-        game: mockGame,
+        campaign: mockCampaign,
         currentUserId: 'owner-1',
         token: 'test-token',
       },
@@ -312,7 +312,7 @@ describe('GMManagement', () => {
     const { component, container } = render(GMManagement, {
       props: {
         isOpen: true,
-        game: mockGame,
+        campaign: mockCampaign,
         currentUserId: 'owner-1',
         token: 'test-token',
       },
@@ -333,7 +333,7 @@ describe('GMManagement', () => {
     const { container, getByText } = render(GMManagement, {
       props: {
         isOpen: true,
-        game: mockGame,
+        campaign: mockCampaign,
         currentUserId: 'owner-1',
         token: 'test-token',
       },
@@ -351,7 +351,7 @@ describe('GMManagement', () => {
     const { container } = render(GMManagement, {
       props: {
         isOpen: true,
-        game: mockGame,
+        campaign: mockCampaign,
         currentUserId: 'owner-1',
         token: 'test-token',
       },
@@ -367,7 +367,7 @@ describe('GMManagement', () => {
     const { container } = render(GMManagement, {
       props: {
         isOpen: true,
-        game: mockGame,
+        campaign: mockCampaign,
         currentUserId: 'owner-1',
         token: 'test-token',
       },

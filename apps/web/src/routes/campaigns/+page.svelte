@@ -3,7 +3,7 @@
   import { goto } from '$app/navigation';
   import { campaignsStore } from '$lib/stores/campaigns';
   import { authStore } from '$lib/stores/auth';
-  import GMManagement from '$lib/components/game/GMManagement.svelte';
+  import GMManagement from '$lib/components/campaign/GMManagement.svelte';
   import type { Campaign } from '@vtt/shared';
 
   let campaigns: Campaign[] = [];
@@ -183,7 +183,7 @@
 {#if selectedCampaign && user}
   <GMManagement
     isOpen={gmManagementOpen}
-    game={selectedCampaign}
+    campaign={selectedCampaign}
     currentUserId={user.id}
     {token}
     on:close={closeGMManagement}
