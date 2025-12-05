@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-  import type { Scene, Token, Wall, AmbientLight } from '@vtt/shared';
+  import type { Scene, Token, Wall, AmbientLight, FogGrid } from '@vtt/shared';
   import { lightsStore } from '$lib/stores/lights';
+  import { fogStore } from '$lib/stores/fog';
 
   // Props
   export let scene: Scene;
@@ -22,6 +23,7 @@
   let gridCanvas: HTMLCanvasElement;
   let tokensCanvas: HTMLCanvasElement;
   let lightingCanvas: HTMLCanvasElement;
+  let fogCanvas: HTMLCanvasElement;
   let wallsCanvas: HTMLCanvasElement;
   let controlsCanvas: HTMLCanvasElement;
 
@@ -29,6 +31,7 @@
   let gridCtx: CanvasRenderingContext2D | null = null;
   let tokensCtx: CanvasRenderingContext2D | null = null;
   let lightingCtx: CanvasRenderingContext2D | null = null;
+  let fogCtx: CanvasRenderingContext2D | null = null;
   let wallsCtx: CanvasRenderingContext2D | null = null;
   let controlsCtx: CanvasRenderingContext2D | null = null;
 
@@ -82,6 +85,9 @@
   // Subscribe to lights store
   $: lights = Array.from($lightsStore.lights.values()).filter(light => light.sceneId === scene.id);
 
+  // Subscribe to fog store
+  $: fogData = scene ? $fogStore.fog.get(scene.id) : undefined;
+
   onMount(() => {
     initializeCanvases();
     loadBackgroundImage();
@@ -128,13 +134,29 @@
     renderLights();
   }
 
+  // Watch for fog changes
+  $: if (scene.fogExploration && fogData) {
+    renderFog();
+  }
+
+  // Update explored areas when tokens move (with vision enabled)
+  $: if (scene.fogExploration && tokens && !isGM) {
+    updateExploredAreas();
+  }
+
   function initializeCanvases() {
     backgroundCtx = backgroundCanvas.getContext('2d');
     gridCtx = gridCanvas.getContext('2d');
     tokensCtx = tokensCanvas.getContext('2d');
     lightingCtx = lightingCanvas.getContext('2d');
+    fogCtx = fogCanvas ? fogCanvas.getContext('2d') : null;
     wallsCtx = wallsCanvas ? wallsCanvas.getContext('2d') : null;
     controlsCtx = controlsCanvas.getContext('2d');
+
+    // Load fog data when canvas initializes
+    if (scene && scene.fogExploration) {
+      fogStore.loadFog(scene.id);
+    }
   }
 
   function resizeCanvases() {
@@ -149,6 +171,11 @@
         canvas.height = height;
       }
     });
+
+    if (fogCanvas) {
+      fogCanvas.width = width;
+      fogCanvas.height = height;
+    }
 
     if (wallsCanvas) {
       wallsCanvas.width = width;
@@ -249,6 +276,9 @@
     renderGrid();
     renderTokens();
     renderLights();
+    if (scene.fogExploration && !isGM) {
+      renderFog();
+    }
     if (isGM) {
       renderWalls();
     }
@@ -1029,6 +1059,140 @@
     lightingCtx.restore();
   }
 
+  function renderFog() {
+    if (!fogCtx || !fogCanvas || !scene.fogExploration || isGM) return;
+    if (!fogData) return;
+
+    fogCtx.clearRect(0, 0, fogCanvas.width, fogCanvas.height);
+    fogCtx.save();
+
+    // Apply transform
+    fogCtx.translate(-viewX * scale, -viewY * scale);
+    fogCtx.scale(scale, scale);
+
+    const sceneWidth = scene.backgroundWidth || 4000;
+    const sceneHeight = scene.backgroundHeight || 4000;
+    const cellSize = fogData.gridCellSize;
+
+    // Draw dark overlay for entire scene
+    fogCtx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+    fogCtx.fillRect(0, 0, sceneWidth, sceneHeight);
+
+    // Cut out explored areas
+    fogCtx.globalCompositeOperation = 'destination-out';
+
+    // Render explored grid
+    const exploredGrid = fogData.exploredGrid as FogGrid;
+    if (exploredGrid && Array.isArray(exploredGrid)) {
+      for (let row = 0; row < exploredGrid.length; row++) {
+        for (let col = 0; col < exploredGrid[row].length; col++) {
+          if (exploredGrid[row][col]) {
+            fogCtx.fillStyle = 'rgba(0, 0, 0, 1)';
+            fogCtx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+          }
+        }
+      }
+    }
+
+    // Render revealed grid (GM-revealed areas)
+    const revealedGrid = fogData.revealedGrid as FogGrid;
+    if (revealedGrid && Array.isArray(revealedGrid)) {
+      for (let row = 0; row < revealedGrid.length; row++) {
+        for (let col = 0; col < revealedGrid[row].length; col++) {
+          if (revealedGrid[row][col]) {
+            fogCtx.fillStyle = 'rgba(0, 0, 0, 1)';
+            fogCtx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+          }
+        }
+      }
+    }
+
+    fogCtx.globalCompositeOperation = 'source-over';
+    fogCtx.restore();
+  }
+
+  /**
+   * Update explored areas based on current token vision
+   * Called when tokens move or vision changes
+   */
+  function updateExploredAreas() {
+    if (!scene.fogExploration || isGM || !fogData) return;
+
+    const cellSize = fogData.gridCellSize;
+    const sceneWidth = scene.backgroundWidth || 4000;
+    const sceneHeight = scene.backgroundHeight || 4000;
+
+    // Calculate grid dimensions
+    const gridWidth = Math.ceil(sceneWidth / cellSize);
+    const gridHeight = Math.ceil(sceneHeight / cellSize);
+
+    // Initialize explored grid if needed
+    let exploredGrid: FogGrid = fogData.exploredGrid as FogGrid || [];
+    while (exploredGrid.length < gridHeight) {
+      exploredGrid.push([]);
+    }
+    for (let row = 0; row < gridHeight; row++) {
+      while (exploredGrid[row].length < gridWidth) {
+        exploredGrid[row].push(false);
+      }
+    }
+
+    let hasChanges = false;
+
+    // Mark cells visible by tokens with vision as explored
+    tokens.forEach(token => {
+      if (!token.visible || !token.vision || token.visionRange <= 0) return;
+
+      const tokenX = token.x + (token.width * scene.gridSize) / 2;
+      const tokenY = token.y + (token.height * scene.gridSize) / 2;
+      const visionRadius = token.visionRange * scene.gridSize;
+
+      // Compute visibility polygon for this token
+      const visibilityPolygon = computeVisibilityPolygon(
+        { x: tokenX, y: tokenY },
+        walls,
+        visionRadius
+      );
+
+      // Mark grid cells within the visibility polygon as explored
+      for (let row = 0; row < gridHeight; row++) {
+        for (let col = 0; col < gridWidth; col++) {
+          if (exploredGrid[row][col]) continue; // Already explored
+
+          // Check if cell center is within visibility polygon
+          const cellCenterX = (col + 0.5) * cellSize;
+          const cellCenterY = (row + 0.5) * cellSize;
+
+          if (isPointInPolygon({ x: cellCenterX, y: cellCenterY }, visibilityPolygon)) {
+            exploredGrid[row][col] = true;
+            hasChanges = true;
+          }
+        }
+      }
+    });
+
+    // Update fog store if there are changes
+    if (hasChanges) {
+      fogStore.updateExplored(scene.id, exploredGrid);
+    }
+  }
+
+  /**
+   * Check if a point is inside a polygon
+   */
+  function isPointInPolygon(point: { x: number; y: number }, polygon: Array<{ x: number; y: number }>): boolean {
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+      const xi = polygon[i].x, yi = polygon[i].y;
+      const xj = polygon[j].x, yj = polygon[j].y;
+
+      const intersect = ((yi > point.y) !== (yj > point.y))
+        && (point.x < (xj - xi) * (point.y - yi) / (yj - yi) + xi);
+      if (intersect) inside = !inside;
+    }
+    return inside;
+  }
+
   function startAnimationLoop() {
     const animate = (timestamp: number) => {
       animationTime = timestamp;
@@ -1375,6 +1539,9 @@
   <canvas class="canvas-layer" bind:this={gridCanvas}></canvas>
   <canvas class="canvas-layer" bind:this={tokensCanvas}></canvas>
   <canvas class="canvas-layer" bind:this={lightingCanvas}></canvas>
+  {#if scene.fogExploration && !isGM}
+    <canvas class="canvas-layer" bind:this={fogCanvas}></canvas>
+  {/if}
   {#if isGM}
     <canvas class="canvas-layer" bind:this={wallsCanvas}></canvas>
   {/if}
