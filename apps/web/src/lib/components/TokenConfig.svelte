@@ -3,6 +3,7 @@
   import type { Token, Actor } from '@vtt/shared';
   import { websocket } from '$stores/websocket';
   import { actorsStore } from '$lib/stores/actors';
+  import { AssetPicker } from '$lib/components/assets';
 
   // Props
   export let token: Token;
@@ -38,6 +39,9 @@
   // Actors list
   let actors: Actor[] = [];
   $: actors = Array.from($actorsStore.actors.values());
+
+  // Asset picker state
+  let showAssetPicker = false;
 
   // Load actors on mount
   onMount(async () => {
@@ -113,6 +117,15 @@
       handleCancel();
     }
   }
+
+  function handleAssetSelect(event: CustomEvent<{ asset: any; url: string }>) {
+    formData.imageUrl = event.detail.url;
+    showAssetPicker = false;
+  }
+
+  function handleAssetPickerCancel() {
+    showAssetPicker = false;
+  }
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
@@ -147,12 +160,21 @@
           <div class="form-row">
             <label for="token-image">
               Image URL
-              <input
-                id="token-image"
-                type="text"
-                bind:value={formData.imageUrl}
-                placeholder="https://example.com/image.png"
-              />
+              <div class="image-url-input">
+                <input
+                  id="token-image"
+                  type="text"
+                  bind:value={formData.imageUrl}
+                  placeholder="https://example.com/image.png"
+                />
+                <button
+                  type="button"
+                  class="button-browse"
+                  on:click={() => (showAssetPicker = true)}
+                >
+                  Browse
+                </button>
+              </div>
             </label>
           </div>
 
@@ -385,6 +407,16 @@
   </div>
 </div>
 
+<!-- Asset Picker Modal -->
+<AssetPicker
+  bind:isOpen={showAssetPicker}
+  {gameId}
+  allowedTypes={['token', 'portrait']}
+  title="Select Token Image"
+  on:select={handleAssetSelect}
+  on:cancel={handleAssetPickerCancel}
+/>
+
 <style>
   .modal-backdrop {
     position: fixed;
@@ -532,6 +564,34 @@
   input[type="color"] {
     height: 2.5rem;
     cursor: pointer;
+  }
+
+  .image-url-input {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .image-url-input input {
+    flex: 1;
+  }
+
+  .button-browse {
+    padding: 0.5rem 1rem;
+    background-color: transparent;
+    color: var(--color-text-secondary, #aaa);
+    border: 1px solid var(--color-border, #333);
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    white-space: nowrap;
+  }
+
+  .button-browse:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--color-text-primary, #ffffff);
+    border-color: #4a90e2;
   }
 
   .image-preview {
