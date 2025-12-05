@@ -104,11 +104,14 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    min-height: 0;
   }
 
-  /* Make sure child components fill the space */
-  .tab-content :global(*) {
+  /* Only the direct child component should fill the space */
+  .tab-content > :global(*) {
     flex: 1;
     min-height: 0;
+    display: flex;
+    flex-direction: column;
   }
 </style>

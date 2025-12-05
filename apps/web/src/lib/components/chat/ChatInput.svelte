@@ -64,6 +64,8 @@
     padding: 0.5rem;
     background-color: #111827;
     border-top: 1px solid #374151;
+    flex-shrink: 0;
+    flex-grow: 0;
   }
 
   .input-field {
