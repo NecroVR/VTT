@@ -1,5 +1,7 @@
 import Fastify from 'fastify';
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance, FastifyServerOptions } from 'fastify';
+import fs from 'fs';
+import https from 'https';
 import corsPlugin from './plugins/cors.js';
 import websocketPlugin from './plugins/websocket.js';
 import redisPlugin from './plugins/redis.js';
@@ -14,7 +16,8 @@ import type { EnvConfig } from './types/index.js';
  * Build and configure the Fastify application
  */
 export async function buildApp(config: EnvConfig): Promise<FastifyInstance> {
-  const app = Fastify({
+  // Prepare Fastify options
+  const fastifyOptions: FastifyServerOptions = {
     logger: {
       level: config.NODE_ENV === 'production' ? 'info' : 'debug',
       transport: config.NODE_ENV === 'development' ? {
@@ -28,7 +31,17 @@ export async function buildApp(config: EnvConfig): Promise<FastifyInstance> {
     requestIdLogLabel: 'reqId',
     disableRequestLogging: false,
     requestIdHeader: 'x-request-id',
-  });
+  };
+
+  // Add HTTPS configuration if enabled
+  if (config.HTTPS_ENABLED && config.HTTPS_CERT_PATH && config.HTTPS_KEY_PATH) {
+    (fastifyOptions as any).https = {
+      key: fs.readFileSync(config.HTTPS_KEY_PATH),
+      cert: fs.readFileSync(config.HTTPS_CERT_PATH),
+    } as https.ServerOptions;
+  }
+
+  const app = Fastify(fastifyOptions);
 
   // Decorate app with config
   app.decorate('config', config);

@@ -10,3 +10,4 @@ export * from './combat';
 export * from './chatMessage';
 export * from './activeEffect';
 export * from './asset';
+export * from './fogExploration';

@@ -31,6 +31,9 @@ export interface EnvConfig {
   HOST: string;
   NODE_ENV: 'development' | 'production' | 'test';
   CORS_ORIGIN: string;
+  HTTPS_ENABLED: boolean;
+  HTTPS_CERT_PATH?: string;
+  HTTPS_KEY_PATH?: string;
 }
 
 /**

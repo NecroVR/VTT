@@ -232,3 +232,22 @@ CREATE INDEX IF NOT EXISTS "active_effects_game_id_idx" ON "active_effects" ("ga
 CREATE INDEX IF NOT EXISTS "active_effects_actor_id_idx" ON "active_effects" ("actor_id");
 CREATE INDEX IF NOT EXISTS "active_effects_token_id_idx" ON "active_effects" ("token_id");
 CREATE INDEX IF NOT EXISTS "active_effects_enabled_idx" ON "active_effects" ("enabled");
+
+-- Create fog_exploration table
+CREATE TABLE IF NOT EXISTS "fog_exploration" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+  "scene_id" uuid NOT NULL,
+  "user_id" uuid NOT NULL,
+  "explored_grid" jsonb DEFAULT '[]'::jsonb NOT NULL,
+  "revealed_grid" jsonb DEFAULT '[]'::jsonb NOT NULL,
+  "grid_cell_size" integer DEFAULT 50 NOT NULL,
+  "created_at" timestamp DEFAULT now() NOT NULL,
+  "updated_at" timestamp DEFAULT now() NOT NULL,
+  CONSTRAINT "fog_exploration_scene_id_scenes_id_fk" FOREIGN KEY ("scene_id") REFERENCES "scenes"("id") ON DELETE cascade,
+  CONSTRAINT "fog_exploration_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE cascade
+);
+
+-- Create indexes for fog_exploration
+CREATE INDEX IF NOT EXISTS "fog_exploration_scene_id_idx" ON "fog_exploration" ("scene_id");
+CREATE INDEX IF NOT EXISTS "fog_exploration_user_id_idx" ON "fog_exploration" ("user_id");
+CREATE UNIQUE INDEX IF NOT EXISTS "fog_exploration_scene_user_idx" ON "fog_exploration" ("scene_id", "user_id");

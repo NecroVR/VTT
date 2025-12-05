@@ -74,6 +74,9 @@ dump.rdb
 # Docker
 docker-compose.override.yml
 
+# SSL Certificates
+certs/
+
 # Misc
 .cache/
 .parcel-cache/
