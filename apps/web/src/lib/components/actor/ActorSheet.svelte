@@ -30,7 +30,7 @@
     error = null;
 
     try {
-      const response = await fetch(`/api/v1/games/${gameId}/actors/${actorId}`, {
+      const response = await fetch(`/api/v1/actors/${actorId}`, {
         credentials: 'include'
       });
       if (response.ok) {
@@ -51,7 +51,7 @@
     if (!actor) return;
 
     try {
-      const response = await fetch(`/api/v1/games/${gameId}/actors/${actorId}`, {
+      const response = await fetch(`/api/v1/actors/${actorId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
