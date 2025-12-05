@@ -567,10 +567,165 @@
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   }
 
-  function renderLight(ctx: CanvasRenderingContext2D, light: AmbientLight, time: number) {
-    const { x, y, bright, dim, color, alpha, angle, rotation, animationType, animationSpeed, animationIntensity } = light;
+  // Wall occlusion helpers
+  interface Point {
+    x: number;
+    y: number;
+  }
+
+  interface Segment {
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+  }
+
+  function lineIntersection(
+    p1: Point,
+    p2: Point,
+    p3: Point,
+    p4: Point
+  ): Point | null {
+    const x1 = p1.x, y1 = p1.y;
+    const x2 = p2.x, y2 = p2.y;
+    const x3 = p3.x, y3 = p3.y;
+    const x4 = p4.x, y4 = p4.y;
+
+    const denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+    if (Math.abs(denom) < 0.0001) return null; // Parallel or coincident
+
+    const t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom;
+    const u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / denom;
+
+    if (u >= 0 && u <= 1) {
+      return {
+        x: x1 + t * (x2 - x1),
+        y: y1 + t * (y2 - y1)
+      };
+    }
+
+    return null;
+  }
+
+  function castRay(
+    origin: Point,
+    angle: number,
+    walls: Segment[],
+    maxDistance: number
+  ): Point {
+    const rayEnd: Point = {
+      x: origin.x + Math.cos(angle) * maxDistance,
+      y: origin.y + Math.sin(angle) * maxDistance
+    };
+
+    let closestPoint = rayEnd;
+    let closestDist = maxDistance;
+
+    for (const wall of walls) {
+      const intersection = lineIntersection(
+        origin,
+        rayEnd,
+        { x: wall.x1, y: wall.y1 },
+        { x: wall.x2, y: wall.y2 }
+      );
+
+      if (intersection) {
+        const dx = intersection.x - origin.x;
+        const dy = intersection.y - origin.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < closestDist) {
+          closestDist = dist;
+          closestPoint = intersection;
+        }
+      }
+    }
+
+    return closestPoint;
+  }
+
+  function computeVisibilityPolygon(
+    source: Point,
+    walls: Wall[],
+    maxRadius: number
+  ): Point[] {
+    // Only consider walls with sense === 'block'
+    const blockingWalls = walls.filter(w => w.sense === 'block');
+
+    if (blockingWalls.length === 0) {
+      // No blocking walls, return full circle
+      const points: Point[] = [];
+      const steps = 32;
+      for (let i = 0; i < steps; i++) {
+        const angle = (i / steps) * Math.PI * 2;
+        points.push({
+          x: source.x + Math.cos(angle) * maxRadius,
+          y: source.y + Math.sin(angle) * maxRadius
+        });
+      }
+      return points;
+    }
+
+    // Collect all unique angles to wall endpoints
+    const angles: number[] = [];
+
+    for (const wall of blockingWalls) {
+      // Add angles to each wall endpoint, plus slightly offset angles
+      const angle1 = Math.atan2(wall.y1 - source.y, wall.x1 - source.x);
+      const angle2 = Math.atan2(wall.y2 - source.y, wall.x2 - source.x);
+
+      angles.push(angle1 - 0.0001, angle1, angle1 + 0.0001);
+      angles.push(angle2 - 0.0001, angle2, angle2 + 0.0001);
+    }
+
+    // Sort angles
+    angles.sort((a, b) => a - b);
+
+    // Cast rays at each angle and build visibility polygon
+    const segments: Segment[] = blockingWalls.map(w => ({
+      x1: w.x1,
+      y1: w.y1,
+      x2: w.x2,
+      y2: w.y2
+    }));
+
+    const points: Point[] = [];
+    for (const angle of angles) {
+      const point = castRay(source, angle, segments, maxRadius);
+      points.push(point);
+    }
+
+    return points;
+  }
+
+  function renderClippedLight(
+    ctx: CanvasRenderingContext2D,
+    source: Point,
+    maxRadius: number,
+    visibilityPolygon: Point[],
+    renderCallback: () => void
+  ) {
+    if (visibilityPolygon.length === 0) return;
 
     ctx.save();
+
+    // Create clipping path from visibility polygon
+    ctx.beginPath();
+    ctx.moveTo(visibilityPolygon[0].x, visibilityPolygon[0].y);
+    for (let i = 1; i < visibilityPolygon.length; i++) {
+      ctx.lineTo(visibilityPolygon[i].x, visibilityPolygon[i].y);
+    }
+    ctx.closePath();
+    ctx.clip();
+
+    // Render light within clipped area
+    renderCallback();
+
+    ctx.restore();
+  }
+
+  function renderLight(ctx: CanvasRenderingContext2D, light: AmbientLight, time: number) {
+    const { x, y, bright, dim, color, alpha, angle, rotation, animationType, animationSpeed, animationIntensity } = light;
 
     // Calculate animated radius for animations
     let animatedBright = bright;
@@ -592,42 +747,54 @@
       animatedDim = dim * (1 + pulse * intensity * 0.3);
     }
 
-    // If cone light, clip to cone shape
-    if (angle < 360) {
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      const startAngle = (rotation - angle / 2) * Math.PI / 180;
-      const endAngle = (rotation + angle / 2) * Math.PI / 180;
-      ctx.arc(x, y, animatedDim, startAngle, endAngle);
-      ctx.closePath();
-      ctx.clip();
-    }
+    // Compute visibility polygon for wall occlusion
+    const visibilityPolygon = computeVisibilityPolygon(
+      { x, y },
+      walls,
+      animatedDim
+    );
 
-    // Create radial gradient
-    const gradient = ctx.createRadialGradient(x, y, 0, x, y, animatedDim);
+    // Render light with wall occlusion
+    renderClippedLight(ctx, { x, y }, animatedDim, visibilityPolygon, () => {
+      ctx.save();
 
-    // Parse color and add alpha
-    const baseColor = hexToRgba(color, alpha);
-    const dimColor = hexToRgba(color, 0);
+      // If cone light, clip to cone shape
+      if (angle < 360) {
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        const startAngle = (rotation - angle / 2) * Math.PI / 180;
+        const endAngle = (rotation + angle / 2) * Math.PI / 180;
+        ctx.arc(x, y, animatedDim, startAngle, endAngle);
+        ctx.closePath();
+        ctx.clip();
+      }
 
-    // Bright zone (0 to bright radius)
-    gradient.addColorStop(0, baseColor);
-    if (animatedBright > 0 && animatedDim > 0) {
-      gradient.addColorStop(Math.min(1, animatedBright / animatedDim), baseColor);
-    }
-    // Dim zone (bright to dim radius)
-    gradient.addColorStop(1, dimColor);
+      // Create radial gradient
+      const gradient = ctx.createRadialGradient(x, y, 0, x, y, animatedDim);
 
-    ctx.fillStyle = gradient;
-    if (angle < 360) {
-      ctx.fill();
-    } else {
-      ctx.beginPath();
-      ctx.arc(x, y, animatedDim, 0, Math.PI * 2);
-      ctx.fill();
-    }
+      // Parse color and add alpha
+      const baseColor = hexToRgba(color, alpha);
+      const dimColor = hexToRgba(color, 0);
 
-    ctx.restore();
+      // Bright zone (0 to bright radius)
+      gradient.addColorStop(0, baseColor);
+      if (animatedBright > 0 && animatedDim > 0) {
+        gradient.addColorStop(Math.min(1, animatedBright / animatedDim), baseColor);
+      }
+      // Dim zone (bright to dim radius)
+      gradient.addColorStop(1, dimColor);
+
+      ctx.fillStyle = gradient;
+      if (angle < 360) {
+        ctx.fill();
+      } else {
+        ctx.beginPath();
+        ctx.arc(x, y, animatedDim, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    });
   }
 
   function renderTokenLight(ctx: CanvasRenderingContext2D, token: Token, time: number) {
@@ -648,45 +815,55 @@
     const color = token.lightColor || '#ffffff';
     const angle = token.lightAngle || 360;
 
-    ctx.save();
+    // Compute visibility polygon for wall occlusion
+    const visibilityPolygon = computeVisibilityPolygon(
+      { x, y },
+      walls,
+      dim
+    );
 
-    // If cone light, clip to cone shape
-    if (angle < 360) {
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      const rotation = token.rotation || 0; // Use token rotation for light direction
-      const startAngle = (rotation - angle / 2) * Math.PI / 180;
-      const endAngle = (rotation + angle / 2) * Math.PI / 180;
-      ctx.arc(x, y, dim, startAngle, endAngle);
-      ctx.closePath();
-      ctx.clip();
-    }
+    // Render light with wall occlusion
+    renderClippedLight(ctx, { x, y }, dim, visibilityPolygon, () => {
+      ctx.save();
 
-    // Create radial gradient
-    const gradient = ctx.createRadialGradient(x, y, 0, x, y, dim);
+      // If cone light, clip to cone shape
+      if (angle < 360) {
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        const rotation = token.rotation || 0; // Use token rotation for light direction
+        const startAngle = (rotation - angle / 2) * Math.PI / 180;
+        const endAngle = (rotation + angle / 2) * Math.PI / 180;
+        ctx.arc(x, y, dim, startAngle, endAngle);
+        ctx.closePath();
+        ctx.clip();
+      }
 
-    // Parse color with alpha (using default 0.8 alpha for token lights)
-    const baseColor = hexToRgba(color, 0.8);
-    const dimColor = hexToRgba(color, 0);
+      // Create radial gradient
+      const gradient = ctx.createRadialGradient(x, y, 0, x, y, dim);
 
-    // Bright zone (0 to bright radius)
-    gradient.addColorStop(0, baseColor);
-    if (bright > 0 && dim > 0) {
-      gradient.addColorStop(Math.min(1, bright / dim), baseColor);
-    }
-    // Dim zone (bright to dim radius)
-    gradient.addColorStop(1, dimColor);
+      // Parse color with alpha (using default 0.8 alpha for token lights)
+      const baseColor = hexToRgba(color, 0.8);
+      const dimColor = hexToRgba(color, 0);
 
-    ctx.fillStyle = gradient;
-    if (angle < 360) {
-      ctx.fill();
-    } else {
-      ctx.beginPath();
-      ctx.arc(x, y, dim, 0, Math.PI * 2);
-      ctx.fill();
-    }
+      // Bright zone (0 to bright radius)
+      gradient.addColorStop(0, baseColor);
+      if (bright > 0 && dim > 0) {
+        gradient.addColorStop(Math.min(1, bright / dim), baseColor);
+      }
+      // Dim zone (bright to dim radius)
+      gradient.addColorStop(1, dimColor);
 
-    ctx.restore();
+      ctx.fillStyle = gradient;
+      if (angle < 360) {
+        ctx.fill();
+      } else {
+        ctx.beginPath();
+        ctx.arc(x, y, dim, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    });
   }
 
   function renderTokenVision(ctx: CanvasRenderingContext2D, token: Token) {
@@ -742,20 +919,30 @@
     // Convert vision range from grid units to pixels
     const visionRadius = token.visionRange * gridSize;
 
-    ctx.save();
+    // Compute visibility polygon for wall occlusion
+    const visibilityPolygon = computeVisibilityPolygon(
+      { x, y },
+      walls,
+      visionRadius
+    );
 
-    // Create radial gradient for vision area
-    const gradient = ctx.createRadialGradient(x, y, 0, x, y, visionRadius);
-    gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-    gradient.addColorStop(0.8, 'rgba(255, 255, 255, 0.8)');
-    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    // Render vision with wall occlusion
+    renderClippedLight(ctx, { x, y }, visionRadius, visibilityPolygon, () => {
+      ctx.save();
 
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.arc(x, y, visionRadius, 0, Math.PI * 2);
-    ctx.fill();
+      // Create radial gradient for vision area
+      const gradient = ctx.createRadialGradient(x, y, 0, x, y, visionRadius);
+      gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+      gradient.addColorStop(0.8, 'rgba(255, 255, 255, 0.8)');
+      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
 
-    ctx.restore();
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(x, y, visionRadius, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    });
   }
 
   function renderLights() {
