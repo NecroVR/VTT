@@ -19,6 +19,7 @@ import drawingsRoute from './drawings.js';
 import tilesRoute from './tiles.js';
 import regionsRoute from './regions.js';
 import pinsRoute from './pins.js';
+import compendiumsRoute from './compendiums.js';
 
 /**
  * API v1 routes
@@ -54,6 +55,8 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
         tiles: '/api/v1/scenes/:sceneId/tiles',
         regions: '/api/v1/scenes/:sceneId/regions',
         pins: '/api/v1/scenes/:sceneId/pins',
+        compendiums: '/api/v1/compendiums',
+        compendiumEntries: '/api/v1/compendium-entries/:entryId',
       },
     };
   });
@@ -79,6 +82,7 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
   await fastify.register(tilesRoute);
   await fastify.register(regionsRoute);
   await fastify.register(pinsRoute);
+  await fastify.register(compendiumsRoute);
 };
 
 export default apiV1Routes;

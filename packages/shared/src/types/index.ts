@@ -17,3 +17,4 @@ export * from './drawing.js';
 export * from './tile.js';
 export * from './region.js';
 export * from './scenePin.js';
+export * from './compendium.js';

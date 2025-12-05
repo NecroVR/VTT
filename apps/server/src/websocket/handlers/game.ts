@@ -78,6 +78,12 @@ import type {
   PinUpdatePayload,
   PinRemovePayload,
   PinClickPayload,
+  CompendiumCreatePayload,
+  CompendiumUpdatePayload,
+  CompendiumDeletePayload,
+  CompendiumEntryCreatePayload,
+  CompendiumEntryUpdatePayload,
+  CompendiumEntryDeletePayload,
   ErrorPayload
 } from '@vtt/shared';
 import { parseDiceNotation, type DiceGroup } from '@vtt/shared/dice';
@@ -152,6 +158,14 @@ import {
   handlePinRemove,
   handlePinClick,
 } from './pins.js';
+import {
+  handleCompendiumCreate,
+  handleCompendiumUpdate,
+  handleCompendiumDelete,
+  handleCompendiumEntryCreate,
+  handleCompendiumEntryUpdate,
+  handleCompendiumEntryDelete,
+} from './compendiums.js';
 
 /**
  * Game session WebSocket handler
@@ -413,6 +427,30 @@ export async function handleGameWebSocket(
 
         case 'pin:click':
           await handlePinClick(socket, message as WSMessage<PinClickPayload>, request);
+          break;
+
+        case 'compendium:create':
+          await handleCompendiumCreate(socket, message as WSMessage<CompendiumCreatePayload>, request);
+          break;
+
+        case 'compendium:update':
+          await handleCompendiumUpdate(socket, message as WSMessage<CompendiumUpdatePayload>, request);
+          break;
+
+        case 'compendium:delete':
+          await handleCompendiumDelete(socket, message as WSMessage<CompendiumDeletePayload>, request);
+          break;
+
+        case 'compendium:entry-create':
+          await handleCompendiumEntryCreate(socket, message as WSMessage<CompendiumEntryCreatePayload>, request);
+          break;
+
+        case 'compendium:entry-update':
+          await handleCompendiumEntryUpdate(socket, message as WSMessage<CompendiumEntryUpdatePayload>, request);
+          break;
+
+        case 'compendium:entry-delete':
+          await handleCompendiumEntryDelete(socket, message as WSMessage<CompendiumEntryDeletePayload>, request);
           break;
 
         default:

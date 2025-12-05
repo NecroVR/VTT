@@ -32,6 +32,8 @@ export type WSMessageType =
   | 'tile:add' | 'tile:added' | 'tile:update' | 'tile:updated' | 'tile:remove' | 'tile:removed'
   | 'region:add' | 'region:added' | 'region:update' | 'region:updated' | 'region:remove' | 'region:removed' | 'region:enter' | 'region:exit'
   | 'pin:add' | 'pin:added' | 'pin:update' | 'pin:updated' | 'pin:remove' | 'pin:removed' | 'pin:click' | 'pin:opened'
+  | 'compendium:create' | 'compendium:created' | 'compendium:update' | 'compendium:updated' | 'compendium:delete' | 'compendium:deleted'
+  | 'compendium:entry-create' | 'compendium:entry-created' | 'compendium:entry-update' | 'compendium:entry-updated' | 'compendium:entry-delete' | 'compendium:entry-deleted'
   | 'error';
 
 export interface WSMessage<T = unknown> {
