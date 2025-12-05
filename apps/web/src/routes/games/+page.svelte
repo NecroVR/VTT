@@ -3,12 +3,16 @@
   import { goto } from '$app/navigation';
   import { gamesStore } from '$lib/stores/games';
   import { authStore } from '$lib/stores/auth';
+  import GMManagement from '$lib/components/game/GMManagement.svelte';
   import type { Game } from '@vtt/shared';
 
   let games: Game[] = [];
   let loading = false;
   let error: string | null = null;
   let user: any = null;
+  let gmManagementOpen = false;
+  let selectedGame: Game | null = null;
+  let token = '';
 
   const unsubscribeGames = gamesStore.subscribe(state => {
     games = state.games;
@@ -29,6 +33,9 @@
         return;
       }
     }
+
+    // Get session token for GM management
+    token = localStorage.getItem('vtt_session_id') || '';
 
     // Fetch games
     await gamesStore.fetchGames();
@@ -57,6 +64,21 @@
       month: 'short',
       day: 'numeric',
     });
+  }
+
+  function openGMManagement(game: Game) {
+    selectedGame = game;
+    gmManagementOpen = true;
+  }
+
+  function closeGMManagement() {
+    gmManagementOpen = false;
+    selectedGame = null;
+  }
+
+  async function handleGMUpdated() {
+    // Refresh the games list to get updated GM info
+    await gamesStore.fetchGames();
   }
 </script>
 
@@ -98,6 +120,18 @@
           <div class="game-card-header">
             <h2>{game.name}</h2>
             <div class="game-card-actions">
+              <button
+                class="btn-icon"
+                on:click={() => openGMManagement(game)}
+                title="Manage GMs"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+              </button>
               <button
                 class="btn-icon"
                 on:click={() => openGame(game.id)}
@@ -144,6 +178,18 @@
     </div>
   {/if}
 </main>
+
+<!-- GM Management Modal -->
+{#if selectedGame && user}
+  <GMManagement
+    isOpen={gmManagementOpen}
+    game={selectedGame}
+    currentUserId={user.id}
+    {token}
+    on:close={closeGMManagement}
+    on:updated={handleGMUpdated}
+  />
+{/if}
 
 <style>
   .container {
