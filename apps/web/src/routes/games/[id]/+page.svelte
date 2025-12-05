@@ -5,7 +5,7 @@
   import { tokensStore } from '$lib/stores/tokens';
   import GameCanvas from '$lib/components/GameCanvas.svelte';
   import { browser } from '$app/environment';
-  import { getWebSocketUrl } from '/config/api';
+  import { getWebSocketUrl } from '$lib/config/api';
 
   // Get game ID from route params
   $: gameId = $page.params.id;
