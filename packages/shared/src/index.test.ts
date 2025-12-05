@@ -125,6 +125,7 @@ describe('Index Exports', () => {
         abilities: {},
         folderId: null,
         sort: 0,
+        tokenSize: 1,
         data: {},
         createdAt: new Date(),
         updatedAt: new Date(),
