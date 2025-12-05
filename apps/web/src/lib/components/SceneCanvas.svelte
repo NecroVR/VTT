@@ -83,6 +83,21 @@
   const MIN_SCALE = 0.25;
   const MAX_SCALE = 4;
 
+  // Performance optimization: Layer caching
+  let backgroundCached = false;
+  let gridCached = false;
+  let backgroundNeedsUpdate = true;
+  let gridNeedsUpdate = true;
+
+  // Performance optimization: Visibility cache
+  let visibilityCache = new Map<string, Point[]>();
+  let visibilityCacheValid = false;
+
+  // Performance optimization: Animation throttling
+  const TARGET_FPS = 30;
+  const FRAME_TIME = 1000 / TARGET_FPS;
+  let lastAnimationTime = 0;
+
   // Subscribe to lights store
   $: lights = Array.from($lightsStore.lights.values()).filter(light => light.sceneId === scene.id);
 
@@ -113,6 +128,17 @@
   // Watch for background image URL changes only
   $: if (scene.backgroundImage !== currentImageUrl) {
     loadBackgroundImage();
+    backgroundNeedsUpdate = true;
+  }
+
+  // Watch for background dimension changes
+  $: if (scene.backgroundWidth || scene.backgroundHeight) {
+    backgroundNeedsUpdate = true;
+  }
+
+  // Watch for grid setting changes
+  $: if (scene.gridSize || scene.gridColor || scene.gridAlpha || scene.gridType) {
+    gridNeedsUpdate = true;
   }
 
   // Watch for other scene changes (re-render without reloading image)
@@ -127,6 +153,7 @@
 
   // Watch for wall changes
   $: if (walls && isGM) {
+    invalidateVisibilityCache();
     renderWalls();
   }
 
@@ -182,6 +209,10 @@
       wallsCanvas.width = width;
       wallsCanvas.height = height;
     }
+
+    // Invalidate caches on resize
+    backgroundNeedsUpdate = true;
+    gridNeedsUpdate = true;
 
     render();
   }
@@ -289,6 +320,11 @@
   function renderBackground() {
     if (!backgroundCtx || !backgroundCanvas) return;
 
+    // Performance optimization: Skip re-render if cached and no updates needed
+    if (backgroundCached && !backgroundNeedsUpdate) {
+      return;
+    }
+
     backgroundCtx.clearRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
     backgroundCtx.save();
 
@@ -316,6 +352,10 @@
     }
 
     backgroundCtx.restore();
+
+    // Mark as cached and up to date
+    backgroundCached = true;
+    backgroundNeedsUpdate = false;
   }
 
   function drawCenteredMessage(message: string, width: number, height: number, color: string) {
@@ -333,6 +373,11 @@
 
   function renderGrid() {
     if (!gridCtx || !gridCanvas) return;
+
+    // Performance optimization: Skip re-render if cached and no updates needed
+    if (gridCached && !gridNeedsUpdate) {
+      return;
+    }
 
     gridCtx.clearRect(0, 0, gridCanvas.width, gridCanvas.height);
     gridCtx.save();
@@ -371,6 +416,10 @@
     }
 
     gridCtx.restore();
+
+    // Mark as cached and up to date
+    gridCached = true;
+    gridNeedsUpdate = false;
   }
 
   function renderHexGrid(ctx: CanvasRenderingContext2D, width: number, height: number, size: number) {
@@ -405,6 +454,48 @@
     ctx.stroke();
   }
 
+  /**
+   * Performance optimization: Check if entity is in viewport
+   */
+  function isInViewport(x: number, y: number, width: number, height: number): boolean {
+    if (!backgroundCanvas) return true;
+
+    const canvasWidth = backgroundCanvas.width;
+    const canvasHeight = backgroundCanvas.height;
+
+    const viewLeft = viewX;
+    const viewTop = viewY;
+    const viewRight = viewX + canvasWidth / scale;
+    const viewBottom = viewY + canvasHeight / scale;
+
+    // Check if entity bounds intersect viewport
+    return !(x + width < viewLeft ||
+             x > viewRight ||
+             y + height < viewTop ||
+             y > viewBottom);
+  }
+
+  /**
+   * Performance optimization: Invalidate visibility cache
+   */
+  function invalidateVisibilityCache() {
+    visibilityCacheValid = false;
+  }
+
+  /**
+   * Performance optimization: Get cached visibility polygon
+   */
+  function getVisibilityPolygon(sourceId: string, x: number, y: number, radius: number): Point[] {
+    if (visibilityCacheValid && visibilityCache.has(sourceId)) {
+      return visibilityCache.get(sourceId)!;
+    }
+
+    const polygon = computeVisibilityPolygon({ x, y }, walls, radius);
+    visibilityCache.set(sourceId, polygon);
+
+    return polygon;
+  }
+
   function renderTokens() {
     if (!tokensCtx || !tokensCanvas) return;
 
@@ -415,8 +506,16 @@
     tokensCtx.translate(-viewX * scale, -viewY * scale);
     tokensCtx.scale(scale, scale);
 
-    tokens.forEach(token => {
-      if (!token.visible) return; // Skip invisible tokens (unless GM, but we'll add that later)
+    // Performance optimization: Filter to only visible tokens in viewport
+    const visibleTokens = tokens.filter(token => {
+      if (!token.visible) return false;
+
+      const width = token.width || 50;
+      const height = token.height || 50;
+      return isInViewport(token.x, token.y, width, height);
+    });
+
+    visibleTokens.forEach(token => {
 
       const x = token.x;
       const y = token.y;
@@ -878,6 +977,11 @@
   function renderLight(ctx: CanvasRenderingContext2D, light: AmbientLight, time: number) {
     const { x, y, bright, dim, color, alpha, angle, rotation, animationType, animationSpeed, animationIntensity } = light;
 
+    // Performance optimization: Cull lights outside viewport
+    if (!isInViewport(x - dim, y - dim, dim * 2, dim * 2)) {
+      return;
+    }
+
     // Calculate animated radius for animations
     let animatedBright = bright;
     let animatedDim = dim;
@@ -898,10 +1002,11 @@
       animatedDim = dim * (1 + pulse * intensity * 0.3);
     }
 
-    // Compute visibility polygon for wall occlusion
-    const visibilityPolygon = computeVisibilityPolygon(
-      { x, y },
-      walls,
+    // Performance optimization: Get cached visibility polygon
+    const visibilityPolygon = getVisibilityPolygon(
+      `light-${light.id}`,
+      x,
+      y,
       animatedDim
     );
 
@@ -966,10 +1071,16 @@
     const color = token.lightColor || '#ffffff';
     const angle = token.lightAngle || 360;
 
-    // Compute visibility polygon for wall occlusion
-    const visibilityPolygon = computeVisibilityPolygon(
-      { x, y },
-      walls,
+    // Performance optimization: Cull lights outside viewport
+    if (!isInViewport(x - dim, y - dim, dim * 2, dim * 2)) {
+      return;
+    }
+
+    // Performance optimization: Get cached visibility polygon
+    const visibilityPolygon = getVisibilityPolygon(
+      `token-light-${token.id}`,
+      x,
+      y,
       dim
     );
 
@@ -1098,6 +1209,12 @@
 
   function renderLights() {
     if (!lightingCtx || !lightingCanvas) return;
+
+    // Performance optimization: Pre-calculate visibility at start of frame
+    if (!visibilityCacheValid) {
+      visibilityCache.clear();
+      visibilityCacheValid = true;
+    }
 
     lightingCtx.clearRect(0, 0, lightingCanvas.width, lightingCanvas.height);
     lightingCtx.save();
@@ -1294,7 +1411,16 @@
 
     // Update fog store if there are changes
     if (hasChanges) {
-      fogStore.updateExplored(scene.id, exploredGrid);
+      // Performance optimization: Use requestIdleCallback for non-critical updates
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => {
+          fogStore.updateExplored(scene.id, exploredGrid);
+        });
+      } else {
+        setTimeout(() => {
+          fogStore.updateExplored(scene.id, exploredGrid);
+        }, 0);
+      }
     }
   }
 
@@ -1316,6 +1442,13 @@
 
   function startAnimationLoop() {
     const animate = (timestamp: number) => {
+      // Performance optimization: Throttle animation to target FPS
+      if (timestamp - lastAnimationTime < FRAME_TIME) {
+        animationFrameId = requestAnimationFrame(animate);
+        return;
+      }
+      lastAnimationTime = timestamp;
+
       animationTime = timestamp;
 
       // Only re-render lights if there are animated lights or token lights
@@ -1569,6 +1702,9 @@
       lastMouseX = e.clientX;
       lastMouseY = e.clientY;
 
+      // Performance optimization: Invalidate visibility cache on pan
+      invalidateVisibilityCache();
+
       render();
     }
   }
@@ -1608,6 +1744,9 @@
 
       viewX = worldX - mouseX / scale;
       viewY = worldY - mouseY / scale;
+
+      // Performance optimization: Invalidate visibility cache on zoom
+      invalidateVisibilityCache();
 
       render();
     }
