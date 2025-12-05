@@ -1,17 +1,17 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
 import { RegisterPage } from '../pages/RegisterPage';
-import { GamesListPage } from '../pages/GamesListPage';
-import { CreateGamePage } from '../pages/CreateGamePage';
-import { GameSessionPage } from '../pages/GameSessionPage';
+import { CampaignsListPage } from '../pages/CampaignsListPage';
+import { CreateCampaignPage } from '../pages/CreateCampaignPage';
+import { CampaignSessionPage } from '../pages/CampaignSessionPage';
 
 test.describe('Dice Rolling', () => {
-  let gameSessionPage: GameSessionPage;
+  let campaignSessionPage: CampaignSessionPage;
   let testUser: { email: string; password: string; username: string };
-  let gameId: string;
+  let campaignId: string;
 
   test.beforeAll(async ({ browser }) => {
-    // Create a test user and game for dice rolling tests
+    // Create a test user and campaign for dice rolling tests
     const context = await browser.newContext();
     const page = await context.newPage();
     const registerPage = new RegisterPage(page);
@@ -28,54 +28,54 @@ test.describe('Dice Rolling', () => {
     await registerPage.register(testUser.email, testUser.username, testUser.password);
     await registerPage.waitForRedirect();
 
-    // Create a test game
-    const gamesListPage = new GamesListPage(page);
-    const createGamePage = new CreateGamePage(page);
+    // Create a test campaign
+    const campaignsListPage = new CampaignsListPage(page);
+    const createCampaignPage = new CreateCampaignPage(page);
 
-    await gamesListPage.goto();
-    await gamesListPage.clickCreateGame();
-    await createGamePage.createGame(`Dice Test Game ${timestamp}`);
-    await createGamePage.waitForRedirect();
+    await campaignsListPage.goto();
+    await campaignsListPage.clickCreateCampaign();
+    await createCampaignPage.createCampaign(`Dice Test Campaign ${timestamp}`);
+    await createCampaignPage.waitForRedirect();
 
-    // Extract game ID from URL
+    // Extract campaign ID from URL
     const url = page.url();
-    const match = url.match(/\/game[s]?\/([^\/]+)/);
+    const match = url.match(/\/campaign[s]?\/([^\/]+)/);
     if (match) {
-      gameId = match[1];
+      campaignId = match[1];
     }
 
     await context.close();
   });
 
   test.beforeEach(async ({ page }) => {
-    // Login and navigate to game before each test
+    // Login and navigate to campaign before each test
     const loginPage = new LoginPage(page);
     await loginPage.goto();
     await loginPage.login(testUser.email, testUser.password);
     await loginPage.waitForRedirect();
 
-    gameSessionPage = new GameSessionPage(page);
-    if (gameId) {
-      await gameSessionPage.gotoGame(gameId);
+    campaignSessionPage = new CampaignSessionPage(page);
+    if (campaignId) {
+      await campaignSessionPage.gotoCampaign(campaignId);
     } else {
-      // Fallback: go to games list and click first game
-      const gamesListPage = new GamesListPage(page);
-      await gamesListPage.goto();
-      const gameNames = await gamesListPage.getGameNames();
-      if (gameNames.length > 0) {
-        await gamesListPage.clickGameByName(gameNames[0]);
+      // Fallback: go to campaigns list and click first campaign
+      const campaignsListPage = new CampaignsListPage(page);
+      await campaignsListPage.goto();
+      const campaignNames = await campaignsListPage.getCampaignNames();
+      if (campaignNames.length > 0) {
+        await campaignsListPage.clickCampaignByName(campaignNames[0]);
       }
     }
 
-    await gameSessionPage.waitForLoad();
+    await campaignSessionPage.waitForLoad();
   });
 
   test('user can roll dice', async ({ page }) => {
     // Roll a simple d20
-    await gameSessionPage.rollDice('d20');
+    await campaignSessionPage.rollDice('d20');
 
     // Wait for result
-    const result = await gameSessionPage.getRollResult();
+    const result = await campaignSessionPage.getRollResult();
 
     // Verify result is a number between 1 and 20
     expect(result).toBeTruthy();
@@ -91,17 +91,17 @@ test.describe('Dice Rolling', () => {
 
   test('roll results appear in chat or result area', async ({ page }) => {
     // Get initial chat message count
-    const initialMessageCount = await gameSessionPage.getChatMessageCount();
+    const initialMessageCount = await campaignSessionPage.getChatMessageCount();
 
     // Roll dice
-    await gameSessionPage.rollDice('d6');
+    await campaignSessionPage.rollDice('d6');
 
     // Wait a moment for message to appear
     await page.waitForTimeout(1000);
 
     // Check if result appears in chat or result area
-    const hasRollResult = await gameSessionPage.rollResult.isVisible().catch(() => false);
-    const newMessageCount = await gameSessionPage.getChatMessageCount();
+    const hasRollResult = await campaignSessionPage.rollResult.isVisible().catch(() => false);
+    const newMessageCount = await campaignSessionPage.getChatMessageCount();
     const chatUpdated = newMessageCount > initialMessageCount;
 
     // Either roll result is visible OR chat was updated
@@ -109,9 +109,9 @@ test.describe('Dice Rolling', () => {
   });
 
   test('d20 notation works', async ({ page }) => {
-    await gameSessionPage.rollDice('d20');
+    await campaignSessionPage.rollDice('d20');
 
-    const result = await gameSessionPage.getRollResult();
+    const result = await campaignSessionPage.getRollResult();
     expect(result).toBeTruthy();
 
     // Result should contain a number
@@ -126,9 +126,9 @@ test.describe('Dice Rolling', () => {
   });
 
   test('2d6 notation works', async ({ page }) => {
-    await gameSessionPage.rollDice('2d6');
+    await campaignSessionPage.rollDice('2d6');
 
-    const result = await gameSessionPage.getRollResult();
+    const result = await campaignSessionPage.getRollResult();
     expect(result).toBeTruthy();
 
     // Result should contain a number
@@ -144,9 +144,9 @@ test.describe('Dice Rolling', () => {
   });
 
   test('2d6+5 notation with modifier works', async ({ page }) => {
-    await gameSessionPage.rollDice('2d6+5');
+    await campaignSessionPage.rollDice('2d6+5');
 
-    const result = await gameSessionPage.getRollResult();
+    const result = await campaignSessionPage.getRollResult();
     expect(result).toBeTruthy();
 
     // Result should contain a number
@@ -162,9 +162,9 @@ test.describe('Dice Rolling', () => {
   });
 
   test('d100 notation works', async ({ page }) => {
-    await gameSessionPage.rollDice('d100');
+    await campaignSessionPage.rollDice('d100');
 
-    const result = await gameSessionPage.getRollResult();
+    const result = await campaignSessionPage.getRollResult();
     expect(result).toBeTruthy();
 
     // Result should contain a number
@@ -183,8 +183,8 @@ test.describe('Dice Rolling', () => {
 
     // Roll dice 5 times
     for (let i = 0; i < 5; i++) {
-      await gameSessionPage.rollDice('d20');
-      const result = await gameSessionPage.getRollResult();
+      await campaignSessionPage.rollDice('d20');
+      const result = await campaignSessionPage.getRollResult();
       results.push(result);
 
       // Wait a moment between rolls
@@ -201,19 +201,19 @@ test.describe('Dice Rolling', () => {
 
   test('dice roller modal or interface can be closed and reopened', async ({ page }) => {
     // Open dice roller
-    await gameSessionPage.openDiceRoller();
+    await campaignSessionPage.openDiceRoller();
 
     // Verify dice roller UI is visible
-    await expect(gameSessionPage.diceNotationInput.or(gameSessionPage.rollDiceButton)).toBeVisible();
+    await expect(campaignSessionPage.diceNotationInput.or(campaignSessionPage.rollDiceButton)).toBeVisible();
 
     // Try to close it (click outside or press Escape)
     await page.keyboard.press('Escape');
     await page.waitForTimeout(500);
 
     // Reopen dice roller
-    await gameSessionPage.openDiceRoller();
+    await campaignSessionPage.openDiceRoller();
 
     // Verify it's visible again
-    await expect(gameSessionPage.diceNotationInput.or(gameSessionPage.rollDiceButton)).toBeVisible();
+    await expect(campaignSessionPage.diceNotationInput.or(campaignSessionPage.rollDiceButton)).toBeVisible();
   });
 });

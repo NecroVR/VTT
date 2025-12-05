@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { RegisterPage } from '../pages/RegisterPage';
-import { GamesListPage } from '../pages/GamesListPage';
+import { CampaignsListPage } from '../pages/CampaignsListPage';
 
 test.describe('User Registration', () => {
   let registerPage: RegisterPage;
@@ -98,8 +98,8 @@ test.describe('User Registration', () => {
     expect(page.url()).toContain('/games');
 
     // Verify games list page is loaded
-    const gamesPage = new GamesListPage(page);
-    await expect(gamesPage.createGameButton.or(gamesPage.emptyState)).toBeVisible();
+    const campaignsPage = new CampaignsListPage(page);
+    await expect(campaignsPage.createCampaignButton.or(campaignsPage.emptyState)).toBeVisible();
   });
 
   test('registration form validates password confirmation mismatch', async ({ page }) => {

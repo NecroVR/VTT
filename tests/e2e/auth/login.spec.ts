@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
 import { RegisterPage } from '../pages/RegisterPage';
-import { GamesListPage } from '../pages/GamesListPage';
+import { CampaignsListPage } from '../pages/CampaignsListPage';
 
 test.describe('User Login', () => {
   let loginPage: LoginPage;
@@ -84,8 +84,8 @@ test.describe('User Login', () => {
     expect(page.url()).toContain('/games');
 
     // Verify games list page is loaded
-    const gamesPage = new GamesListPage(page);
-    await expect(gamesPage.createGameButton.or(gamesPage.emptyState)).toBeVisible();
+    const campaignsPage = new CampaignsListPage(page);
+    await expect(campaignsPage.createCampaignButton.or(campaignsPage.emptyState)).toBeVisible();
   });
 
   test('user session persists after page refresh', async ({ page }) => {
@@ -102,8 +102,8 @@ test.describe('User Login', () => {
     expect(page.url()).toMatch(/\/games/);
 
     // Verify games page content is visible
-    const gamesPage = new GamesListPage(page);
-    await expect(gamesPage.createGameButton.or(gamesPage.emptyState)).toBeVisible();
+    const campaignsPage = new CampaignsListPage(page);
+    await expect(campaignsPage.createCampaignButton.or(campaignsPage.emptyState)).toBeVisible();
   });
 
   test('user can log out', async ({ page }) => {
@@ -113,8 +113,8 @@ test.describe('User Login', () => {
     await page.waitForURL(/\/games/);
 
     // Logout
-    const gamesPage = new GamesListPage(page);
-    await gamesPage.logout();
+    const campaignsPage = new CampaignsListPage(page);
+    await campaignsPage.logout();
 
     // Should redirect to login page
     expect(page.url()).toContain('/login');

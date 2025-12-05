@@ -1,7 +1,7 @@
 import { BasePage } from './BasePage';
 import { Page, Locator } from '@playwright/test';
 
-export class GameSessionPage extends BasePage {
+export class CampaignSessionPage extends BasePage {
   readonly canvas: Locator;
   readonly chatInput: Locator;
   readonly chatMessages: Locator;
@@ -13,11 +13,11 @@ export class GameSessionPage extends BasePage {
   readonly rollDiceButton: Locator;
   readonly rollResult: Locator;
   readonly deleteTokenButton: Locator;
-  readonly gameTitle: Locator;
+  readonly campaignTitle: Locator;
 
   constructor(page: Page) {
     super(page);
-    this.canvas = page.locator('canvas, [data-testid="game-canvas"]');
+    this.canvas = page.locator('canvas, [data-testid="campaign-canvas"]');
     this.chatInput = page.locator('[data-testid="chat-input"], textarea[name="message"], input[name="message"]');
     this.chatMessages = page.locator('[data-testid="chat-messages"], .chat-message');
     this.addTokenButton = page.locator('button[data-testid="add-token"], button:has-text("Add Token")');
@@ -28,11 +28,11 @@ export class GameSessionPage extends BasePage {
     this.rollDiceButton = page.locator('button[data-testid="roll-button"], button:has-text("Roll")');
     this.rollResult = page.locator('[data-testid="roll-result"], .roll-result');
     this.deleteTokenButton = page.locator('button[data-testid="delete-token"], button:has-text("Delete")');
-    this.gameTitle = page.locator('h1, [data-testid="game-title"]');
+    this.campaignTitle = page.locator('h1, [data-testid="campaign-title"]');
   }
 
-  async gotoGame(gameId: string) {
-    await super.goto(`/games/${gameId}`);
+  async gotoCampaign(campaignId: string) {
+    await super.goto(`/campaign/${campaignId}`);
     await this.waitForLoad();
   }
 
@@ -107,7 +107,7 @@ export class GameSessionPage extends BasePage {
     await this.waitForLoad();
   }
 
-  async getGameTitle(): Promise<string> {
-    return await this.gameTitle.textContent() || '';
+  async getCampaignTitle(): Promise<string> {
+    return await this.campaignTitle.textContent() || '';
   }
 }
