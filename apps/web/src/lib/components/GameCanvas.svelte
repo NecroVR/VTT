@@ -5,8 +5,17 @@
   import TemplateConfig from './scene/TemplateConfig.svelte';
   import DrawingLayer from './scene/DrawingLayer.svelte';
   import DrawingConfig from './scene/DrawingConfig.svelte';
+  import TileLayer from './scene/TileLayer.svelte';
+  import TileConfig from './scene/TileConfig.svelte';
+  import RegionLayer from './scene/RegionLayer.svelte';
+  import RegionConfig from './scene/RegionConfig.svelte';
+  import ScenePinLayer from './scene/ScenePinLayer.svelte';
+  import ScenePinConfig from './scene/ScenePinConfig.svelte';
   import { templatesStore } from '$lib/stores/templates';
   import { drawingsStore } from '$lib/stores/drawings';
+  import { tilesStore } from '$lib/stores/tiles';
+  import { regionsStore } from '$lib/stores/regions';
+  import { scenePinsStore } from '$lib/stores/scenePins';
   import { API_BASE_URL } from '$lib/config/api';
 
   // Props
@@ -21,6 +30,7 @@
   export let activeTool: string = 'select';
   export let sceneId: string = '';
   export let userId: string = '';
+  export let isGM: boolean = false;
 
   // Canvas state
   let canvas: HTMLCanvasElement;
@@ -51,6 +61,24 @@
   let tempDrawingId: string | null = null;
   let showDrawingConfig = false;
   let selectedDrawingId: string | null = null;
+
+  // Tile state
+  let showTileConfig = false;
+  let selectedTileId: string | null = null;
+  let tilePlacementX = 0;
+  let tilePlacementY = 0;
+
+  // Region state
+  let showRegionConfig = false;
+  let selectedRegionId: string | null = null;
+  let regionStartX = 0;
+  let regionStartY = 0;
+
+  // Pin state
+  let showPinConfig = false;
+  let selectedPinId: string | null = null;
+  let pinPlacementX = 0;
+  let pinPlacementY = 0;
 
   onMount(() => {
     if (!canvas) return;
@@ -236,6 +264,30 @@
       templatePlacementX = gridX;
       templatePlacementY = gridY;
       showTemplateConfig = true;
+      return;
+    }
+
+    // Handle tile placement tool
+    if (activeTool === 'tile' && isGM) {
+      tilePlacementX = gridX;
+      tilePlacementY = gridY;
+      createTile(gridX, gridY);
+      return;
+    }
+
+    // Handle region creation tool
+    if (activeTool === 'region' && isGM) {
+      regionStartX = gridX;
+      regionStartY = gridY;
+      createRegion(gridX, gridY);
+      return;
+    }
+
+    // Handle pin placement tool
+    if (activeTool === 'pin') {
+      pinPlacementX = gridX;
+      pinPlacementY = gridY;
+      createPin(gridX, gridY);
       return;
     }
 
@@ -496,6 +548,93 @@
     showDrawingConfig = false;
     selectedDrawingId = null;
   }
+
+  async function createTile(x: number, y: number) {
+    const tile = await tilesStore.createTile(sceneId, {
+      img: 'https://via.placeholder.com/150', // Default placeholder
+      x,
+      y,
+      width: 2,
+      height: 2,
+      z: 0,
+      rotation: 0,
+      alpha: 1,
+      hidden: false,
+      locked: false,
+      overhead: false,
+      roof: false,
+    });
+
+    if (tile) {
+      selectedTileId = tile.id;
+      showTileConfig = true;
+    }
+  }
+
+  async function createRegion(x: number, y: number) {
+    const region = await regionsStore.createRegion(sceneId, {
+      name: 'New Region',
+      shape: 'rectangle',
+      x,
+      y,
+      width: 5,
+      height: 5,
+      color: '#3b82f6',
+      alpha: 0.3,
+      hidden: false,
+      locked: false,
+    });
+
+    if (region) {
+      selectedRegionId = region.id;
+      showRegionConfig = true;
+    }
+  }
+
+  async function createPin(x: number, y: number) {
+    const pin = await scenePinsStore.createPin(sceneId, {
+      x,
+      y,
+      iconSize: 1,
+      fontSize: 14,
+      textAnchor: 'bottom',
+      textColor: '#ffffff',
+      global: false,
+    });
+
+    if (pin) {
+      selectedPinId = pin.id;
+      showPinConfig = true;
+    }
+  }
+
+  function handleTileClick(tileId: string) {
+    tilesStore.selectTile(tileId);
+    selectedTileId = tileId;
+  }
+
+  function handleRegionClick(regionId: string) {
+    regionsStore.selectRegion(regionId);
+  }
+
+  function handlePinClick(pinId: string) {
+    scenePinsStore.selectPin(pinId);
+  }
+
+  function handleTileConfigClose() {
+    showTileConfig = false;
+    selectedTileId = null;
+  }
+
+  function handleRegionConfigClose() {
+    showRegionConfig = false;
+    selectedRegionId = null;
+  }
+
+  function handlePinConfigClose() {
+    showPinConfig = false;
+    selectedPinId = null;
+  }
 </script>
 
 <div class="canvas-container">
@@ -508,6 +647,55 @@
     class="game-canvas"
   />
 
+  <!-- Background tiles (z < 0) -->
+  <TileLayer
+    {sceneId}
+    {gridSize}
+    {canvasWidth}
+    {canvasHeight}
+    onTileClick={handleTileClick}
+    zFilter="background"
+  />
+
+  <!-- Regions (GM only) -->
+  <RegionLayer
+    {sceneId}
+    {gridSize}
+    {canvasWidth}
+    {canvasHeight}
+    onRegionClick={handleRegionClick}
+    {isGM}
+  />
+
+  <!-- Foreground/overhead tiles (z >= 0) -->
+  <TileLayer
+    {sceneId}
+    {gridSize}
+    {canvasWidth}
+    {canvasHeight}
+    onTileClick={handleTileClick}
+    zFilter="foreground"
+  />
+
+  <!-- Scene pins -->
+  <ScenePinLayer
+    {sceneId}
+    {gridSize}
+    {canvasWidth}
+    {canvasHeight}
+    onPinClick={handlePinClick}
+  />
+
+  <!-- Drawing layer -->
+  <DrawingLayer
+    {sceneId}
+    {gridSize}
+    {canvasWidth}
+    {canvasHeight}
+    onDrawingClick={handleDrawingClick}
+  />
+
+  <!-- Measurement layer -->
   <MeasurementLayer
     {sceneId}
     {gridSize}
@@ -515,14 +703,6 @@
     {gridUnits}
     {canvasWidth}
     {canvasHeight}
-  />
-
-  <DrawingLayer
-    {sceneId}
-    {gridSize}
-    {canvasWidth}
-    {canvasHeight}
-    onDrawingClick={handleDrawingClick}
   />
 </div>
 
@@ -539,6 +719,27 @@
   drawingId={selectedDrawingId || ''}
   {sceneId}
   onClose={handleDrawingConfigClose}
+/>
+
+<TileConfig
+  isOpen={showTileConfig}
+  tileId={selectedTileId || ''}
+  {sceneId}
+  onClose={handleTileConfigClose}
+/>
+
+<RegionConfig
+  isOpen={showRegionConfig}
+  regionId={selectedRegionId || ''}
+  {sceneId}
+  onClose={handleRegionConfigClose}
+/>
+
+<ScenePinConfig
+  isOpen={showPinConfig}
+  pinId={selectedPinId || ''}
+  {sceneId}
+  onClose={handlePinConfigClose}
 />
 
 <style>
