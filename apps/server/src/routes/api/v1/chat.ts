@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify';
-import { chatMessages, games, users } from '@vtt/database';
+import { chatMessages, campaigns, users } from '@vtt/database';
 import { eq, and, desc, sql } from 'drizzle-orm';
 import type { ChatMessage, CreateChatMessageRequest } from '@vtt/shared';
 import { authenticate } from '../../../middleware/auth.js';
@@ -11,22 +11,22 @@ import { authenticate } from '../../../middleware/auth.js';
  */
 const chatRoute: FastifyPluginAsync = async (fastify) => {
   /**
-   * GET /api/v1/games/:gameId/chat - Get chat history for a game
+   * GET /api/v1/games/:campaignId/chat - Get chat history for a campaign
    * Returns paginated chat messages with optional filtering
    * Query params: limit (default 50), offset (default 0), type (optional)
    */
   fastify.get<{
-    Params: { gameId: string };
+    Params: { campaignId: string };
     Querystring: { limit?: string; offset?: string; type?: string };
   }>(
-    '/games/:gameId/chat',
+    '/campaigns/:campaignId/chat',
     { preHandler: authenticate },
     async (request, reply) => {
       if (!request.user) {
         return reply.status(401).send({ error: 'Not authenticated' });
       }
 
-      const { gameId } = request.params;
+      const { campaignId } = request.params;
       const { limit = '50', offset = '0', type } = request.query;
 
       // Parse and validate pagination params
@@ -34,21 +34,21 @@ const chatRoute: FastifyPluginAsync = async (fastify) => {
       const offsetNum = Math.max(parseInt(offset, 10) || 0, 0);
 
       try {
-        // Verify game exists and user has access to it
-        const [game] = await fastify.db
+        // Verify campaign exists and user has access to it
+        const [campaign] = await fastify.db
           .select()
-          .from(games)
-          .where(eq(games.id, gameId))
+          .from(campaigns)
+          .where(eq(campaigns.id, campaignId))
           .limit(1);
 
-        if (!game) {
-          return reply.status(404).send({ error: 'Game not found' });
+        if (!campaign) {
+          return reply.status(404).send({ error: 'Campaign not found' });
         }
 
-        // TODO: Check if user is a participant in the game
+        // TODO: Check if user is a participant in the campaign
 
         // Build query conditions
-        let conditions = eq(chatMessages.gameId, gameId);
+        let conditions = eq(chatMessages.campaignId, campaignId);
 
         // Add type filter if specified
         if (type) {
@@ -59,7 +59,7 @@ const chatRoute: FastifyPluginAsync = async (fastify) => {
         const messages = await fastify.db
           .select({
             id: chatMessages.id,
-            gameId: chatMessages.gameId,
+            campaignId: chatMessages.campaignId,
             userId: chatMessages.userId,
             content: chatMessages.content,
             messageType: chatMessages.messageType,
@@ -91,9 +91,9 @@ const chatRoute: FastifyPluginAsync = async (fastify) => {
             return true;
           }
 
-          // TODO: Check if user is GM (game owner)
-          // For now, game owner sees all messages
-          if (game.ownerId === request.user?.id) {
+          // TODO: Check if user is GM (campaign owner)
+          // For now, campaign owner sees all messages
+          if (campaign.ownerId === request.user?.id) {
             return true;
           }
 
@@ -116,7 +116,7 @@ const chatRoute: FastifyPluginAsync = async (fastify) => {
         // Format messages
         const formattedMessages: ChatMessage[] = filteredMessages.map((msg) => ({
           id: msg.id,
-          gameId: msg.gameId,
+          campaignId: msg.campaignId,
           userId: msg.userId,
           content: msg.content,
           messageType: msg.messageType,
@@ -144,21 +144,21 @@ const chatRoute: FastifyPluginAsync = async (fastify) => {
   );
 
   /**
-   * POST /api/v1/games/:gameId/chat - Send a chat message
-   * Creates a new chat message for a game (REST fallback, WebSocket preferred)
+   * POST /api/v1/games/:campaignId/chat - Send a chat message
+   * Creates a new chat message for a campaign (REST fallback, WebSocket preferred)
    */
   fastify.post<{
-    Params: { gameId: string };
+    Params: { campaignId: string };
     Body: CreateChatMessageRequest;
   }>(
-    '/games/:gameId/chat',
+    '/campaigns/:campaignId/chat',
     { preHandler: authenticate },
     async (request, reply) => {
       if (!request.user) {
         return reply.status(401).send({ error: 'Not authenticated' });
       }
 
-      const { gameId } = request.params;
+      const { campaignId } = request.params;
       const messageData = request.body;
 
       // Validate required fields
@@ -167,24 +167,24 @@ const chatRoute: FastifyPluginAsync = async (fastify) => {
       }
 
       try {
-        // Verify game exists and user has access to it
-        const [game] = await fastify.db
+        // Verify campaign exists and user has access to it
+        const [campaign] = await fastify.db
           .select()
-          .from(games)
-          .where(eq(games.id, gameId))
+          .from(campaigns)
+          .where(eq(campaigns.id, campaignId))
           .limit(1);
 
-        if (!game) {
-          return reply.status(404).send({ error: 'Game not found' });
+        if (!campaign) {
+          return reply.status(404).send({ error: 'Campaign not found' });
         }
 
-        // TODO: Check if user is a participant in the game
+        // TODO: Check if user is a participant in the campaign
 
         // Create chat message in database
         const newMessages = await fastify.db
           .insert(chatMessages)
           .values({
-            gameId,
+            campaignId,
             userId: request.user.id,
             content: messageData.content.trim(),
             messageType: messageData.messageType || 'chat',
@@ -201,7 +201,7 @@ const chatRoute: FastifyPluginAsync = async (fastify) => {
         // Convert to ChatMessage interface
         const formattedMessage: ChatMessage = {
           id: newMessage.id,
-          gameId: newMessage.gameId,
+          campaignId: newMessage.campaignId,
           userId: newMessage.userId,
           content: newMessage.content,
           messageType: newMessage.messageType,
@@ -238,14 +238,14 @@ const chatRoute: FastifyPluginAsync = async (fastify) => {
       const { messageId } = request.params;
 
       try {
-        // Fetch the message with game information
+        // Fetch the message with campaign information
         const [message] = await fastify.db
           .select({
             message: chatMessages,
-            gameOwnerId: games.ownerId,
+            campaignOwnerId: campaigns.ownerId,
           })
           .from(chatMessages)
-          .leftJoin(games, eq(chatMessages.gameId, games.id))
+          .leftJoin(campaigns, eq(chatMessages.campaignId, campaigns.id))
           .where(eq(chatMessages.id, messageId))
           .limit(1);
 
@@ -253,9 +253,9 @@ const chatRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Chat message not found' });
         }
 
-        // Check authorization: user owns the message OR user is the game owner (GM)
+        // Check authorization: user owns the message OR user is the campaign owner (GM)
         const isOwner = message.message.userId === request.user.id;
-        const isGM = message.gameOwnerId === request.user.id;
+        const isGM = message.campaignOwnerId === request.user.id;
 
         if (!isOwner && !isGM) {
           return reply.status(403).send({

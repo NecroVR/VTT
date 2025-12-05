@@ -1,6 +1,6 @@
 export interface Folder {
   id: string;
-  gameId: string;
+  campaignId: string;
   name: string;
   folderType: string;
   parentId?: string | null;
@@ -12,7 +12,7 @@ export interface Folder {
 
 export interface Journal {
   id: string;
-  gameId: string;
+  campaignId: string;
   name: string;
   img?: string | null;
   folderId?: string | null;
@@ -39,7 +39,7 @@ export interface JournalPage {
 }
 
 export interface CreateFolderRequest {
-  gameId: string;
+  campaignId: string;
   name: string;
   folderType: string;
   parentId?: string | null;
@@ -58,7 +58,7 @@ export interface UpdateFolderRequest {
 }
 
 export interface CreateJournalRequest {
-  gameId: string;
+  campaignId: string;
   name: string;
   img?: string | null;
   folderId?: string | null;

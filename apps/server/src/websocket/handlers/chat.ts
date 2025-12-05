@@ -23,10 +23,10 @@ export async function handleChatMessage(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Chat message');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
   const playerInfo = roomManager.getPlayerInfo(socket);
 
-  if (!gameId || !playerInfo) {
+  if (!campaignId || !playerInfo) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -36,7 +36,7 @@ export async function handleChatMessage(
     const newMessages = await request.server.db
       .insert(chatMessages)
       .values({
-        gameId,
+        campaignId,
         userId: playerInfo.userId,
         content: message.payload.text,
         messageType: 'chat',
@@ -58,7 +58,7 @@ export async function handleChatMessage(
       username: playerInfo.username,
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'chat:message',
       payload: chatPayload,
       timestamp: Date.now(),
@@ -67,7 +67,7 @@ export async function handleChatMessage(
     request.log.info({
       messageId: newMessage.id,
       userId: playerInfo.userId,
-      gameId
+      campaignId
     }, 'Chat message sent');
   } catch (error) {
     request.log.error({ error }, 'Error sending chat message');
@@ -86,9 +86,9 @@ export async function handleChatDelete(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Chat delete');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -109,13 +109,13 @@ export async function handleChatDelete(
 
     // Broadcast to all players
     const deletedPayload: ChatDeletedPayload = { messageId };
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'chat:deleted',
       payload: deletedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ messageId, gameId }, 'Chat message deleted');
+    request.log.info({ messageId, campaignId }, 'Chat message deleted');
   } catch (error) {
     request.log.error({ error }, 'Error deleting chat message');
     sendError(socket, 'Failed to delete chat message');
@@ -133,10 +133,10 @@ export async function handleChatWhisper(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Chat whisper');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
   const playerInfo = roomManager.getPlayerInfo(socket);
 
-  if (!gameId || !playerInfo) {
+  if (!campaignId || !playerInfo) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -148,7 +148,7 @@ export async function handleChatWhisper(
     const newMessages = await request.server.db
       .insert(chatMessages)
       .values({
-        gameId,
+        campaignId,
         userId: playerInfo.userId,
         content: text,
         messageType: 'whisper',
@@ -179,10 +179,10 @@ export async function handleChatWhisper(
     };
 
     // Get all players in the room
-    const players = roomManager.getPlayersInRoom(gameId);
+    const players = roomManager.getPlayersInRoom(campaignId);
 
     // Find the sockets for the sender and target users
-    const room = (roomManager as any).rooms.get(gameId);
+    const room = (roomManager as any).rooms.get(campaignId);
     if (!room) {
       sendError(socket, 'Campaign room not found');
       return;
@@ -209,7 +209,7 @@ export async function handleChatWhisper(
       messageId: newMessage.id,
       senderId: playerInfo.userId,
       recipientCount,
-      gameId
+      campaignId
     }, 'Whisper sent');
   } catch (error) {
     request.log.error({ error }, 'Error sending whisper');

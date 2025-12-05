@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify';
-import { scenes, games } from '@vtt/database';
+import { scenes, campaigns } from '@vtt/database';
 import { eq } from 'drizzle-orm';
 import type { Scene, CreateSceneRequest, UpdateSceneRequest } from '@vtt/shared';
 import { authenticate } from '../../../middleware/auth.js';
@@ -11,44 +11,44 @@ import { authenticate } from '../../../middleware/auth.js';
  */
 const scenesRoute: FastifyPluginAsync = async (fastify) => {
   /**
-   * GET /api/v1/games/:gameId/scenes - List all scenes for a game
+   * GET /api/v1/games/:campaignId/scenes - List all scenes for a campaign
    * Returns scenes for a specific game
    */
-  fastify.get<{ Params: { gameId: string } }>(
-    '/games/:gameId/scenes',
+  fastify.get<{ Params: { campaignId: string } }>(
+    '/campaigns/:campaignId/scenes',
     { preHandler: authenticate },
     async (request, reply) => {
       if (!request.user) {
         return reply.status(401).send({ error: 'Not authenticated' });
       }
 
-      const { gameId } = request.params;
+      const { campaignId } = request.params;
 
       try {
-        // Verify game exists and user has access to it
-        const [game] = await fastify.db
+        // Verify campaign exists and user has access to it
+        const [campaign] = await fastify.db
           .select()
-          .from(games)
-          .where(eq(games.id, gameId))
+          .from(campaigns)
+          .where(eq(campaigns.id, campaignId))
           .limit(1);
 
-        if (!game) {
-          return reply.status(404).send({ error: 'Game not found' });
+        if (!campaign) {
+          return reply.status(404).send({ error: 'Campaign not found' });
         }
 
-        // TODO: Check if user is a participant in the game (for now, any authenticated user can access)
-        // This could be enhanced with a game_participants table
+        // TODO: Check if user is a participant in the campaign (for now, any authenticated user can access)
+        // This could be enhanced with a campaign_participants table
 
-        // Fetch all scenes for the game
+        // Fetch all scenes for the campaign
         const gameScenes = await fastify.db
           .select()
           .from(scenes)
-          .where(eq(scenes.gameId, gameId));
+          .where(eq(scenes.campaignId, campaignId));
 
         // Convert to Scene interface
         const formattedScenes: Scene[] = gameScenes.map(scene => ({
           id: scene.id,
-          gameId: scene.gameId,
+          campaignId: scene.campaignId,
           name: scene.name,
           active: scene.active,
           backgroundImage: scene.backgroundImage,
@@ -110,7 +110,7 @@ const scenesRoute: FastifyPluginAsync = async (fastify) => {
         // Convert to Scene interface
         const formattedScene: Scene = {
           id: scene.id,
-          gameId: scene.gameId,
+          campaignId: scene.campaignId,
           name: scene.name,
           active: scene.active,
           backgroundImage: scene.backgroundImage,
@@ -144,39 +144,39 @@ const scenesRoute: FastifyPluginAsync = async (fastify) => {
   );
 
   /**
-   * POST /api/v1/games/:gameId/scenes - Create a new scene
+   * POST /api/v1/games/:campaignId/scenes - Create a new scene
    * Creates a scene for a specific game
    */
-  fastify.post<{ Params: { gameId: string }; Body: CreateSceneRequest }>(
-    '/games/:gameId/scenes',
+  fastify.post<{ Params: { campaignId: string }; Body: CreateSceneRequest }>(
+    '/campaigns/:campaignId/scenes',
     { preHandler: authenticate },
     async (request, reply) => {
       if (!request.user) {
         return reply.status(401).send({ error: 'Not authenticated' });
       }
 
-      const { gameId } = request.params;
+      const { campaignId } = request.params;
       const sceneData = request.body;
 
       try {
-        // Verify game exists and user has access to it
-        const [game] = await fastify.db
+        // Verify campaign exists and user has access to it
+        const [campaign] = await fastify.db
           .select()
-          .from(games)
-          .where(eq(games.id, gameId))
+          .from(campaigns)
+          .where(eq(campaigns.id, campaignId))
           .limit(1);
 
-        if (!game) {
-          return reply.status(404).send({ error: 'Game not found' });
+        if (!campaign) {
+          return reply.status(404).send({ error: 'Campaign not found' });
         }
 
-        // TODO: Check if user is the game owner or has permission to create scenes
+        // TODO: Check if user is the campaign owner or has permission to create scenes
 
         // Create scene in database
         const newScenes = await fastify.db
           .insert(scenes)
           .values({
-            gameId,
+            campaignId,
             name: sceneData.name,
             active: sceneData.active ?? false,
             backgroundImage: sceneData.backgroundImage ?? null,
@@ -205,7 +205,7 @@ const scenesRoute: FastifyPluginAsync = async (fastify) => {
         // Convert to Scene interface
         const formattedScene: Scene = {
           id: newScene.id,
-          gameId: newScene.gameId,
+          campaignId: newScene.campaignId,
           name: newScene.name,
           active: newScene.active,
           backgroundImage: newScene.backgroundImage,
@@ -282,7 +282,7 @@ const scenesRoute: FastifyPluginAsync = async (fastify) => {
         // Convert to Scene interface
         const formattedScene: Scene = {
           id: updatedScene.id,
-          gameId: updatedScene.gameId,
+          campaignId: updatedScene.campaignId,
           name: updatedScene.name,
           active: updatedScene.active,
           backgroundImage: updatedScene.backgroundImage,

@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify';
-import { actors, games } from '@vtt/database';
+import { actors, campaigns } from '@vtt/database';
 import { eq } from 'drizzle-orm';
 import type { Actor, CreateActorRequest, UpdateActorRequest } from '@vtt/shared';
 import { authenticate } from '../../../middleware/auth.js';
@@ -11,44 +11,44 @@ import { authenticate } from '../../../middleware/auth.js';
  */
 const actorsRoute: FastifyPluginAsync = async (fastify) => {
   /**
-   * GET /api/v1/games/:gameId/actors - List all actors for a game
-   * Returns actors for a specific game
+   * GET /api/v1/campaigns/:campaignId/actors - List all actors for a campaign
+   * Returns actors for a specific campaign
    */
-  fastify.get<{ Params: { gameId: string } }>(
-    '/games/:gameId/actors',
+  fastify.get<{ Params: { campaignId: string } }>(
+    '/campaigns/:campaignId/actors',
     { preHandler: authenticate },
     async (request, reply) => {
       if (!request.user) {
         return reply.status(401).send({ error: 'Not authenticated' });
       }
 
-      const { gameId } = request.params;
+      const { campaignId } = request.params;
 
       try {
-        // Verify game exists and user has access to it
-        const [game] = await fastify.db
+        // Verify campaign exists and user has access to it
+        const [campaign] = await fastify.db
           .select()
-          .from(games)
-          .where(eq(games.id, gameId))
+          .from(campaigns)
+          .where(eq(campaigns.id, campaignId))
           .limit(1);
 
-        if (!game) {
-          return reply.status(404).send({ error: 'Game not found' });
+        if (!campaign) {
+          return reply.status(404).send({ error: 'Campaign not found' });
         }
 
-        // TODO: Check if user is a participant in the game (for now, any authenticated user can access)
-        // This could be enhanced with a game_participants table
+        // TODO: Check if user is a participant in the campaign (for now, any authenticated user can access)
+        // This could be enhanced with a campaign_participants table
 
-        // Fetch all actors for the game
-        const gameActors = await fastify.db
+        // Fetch all actors for the campaign
+        const campaignActors = await fastify.db
           .select()
           .from(actors)
-          .where(eq(actors.gameId, gameId));
+          .where(eq(actors.campaignId, campaignId));
 
         // Convert to Actor interface
-        const formattedActors: Actor[] = gameActors.map(actor => ({
+        const formattedActors: Actor[] = campaignActors.map(actor => ({
           id: actor.id,
-          gameId: actor.gameId,
+          campaignId: actor.campaignId,
           name: actor.name,
           actorType: actor.actorType,
           img: actor.img,
@@ -97,12 +97,12 @@ const actorsRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Actor not found' });
         }
 
-        // TODO: Check if user has access to this actor's game
+        // TODO: Check if user has access to this actor's campaign
 
         // Convert to Actor interface
         const formattedActor: Actor = {
           id: actor.id,
-          gameId: actor.gameId,
+          campaignId: actor.campaignId,
           name: actor.name,
           actorType: actor.actorType,
           img: actor.img,
@@ -126,18 +126,18 @@ const actorsRoute: FastifyPluginAsync = async (fastify) => {
   );
 
   /**
-   * POST /api/v1/games/:gameId/actors - Create a new actor
-   * Creates an actor for a specific game
+   * POST /api/v1/campaigns/:campaignId/actors - Create a new actor
+   * Creates an actor for a specific campaign
    */
-  fastify.post<{ Params: { gameId: string }; Body: CreateActorRequest }>(
-    '/games/:gameId/actors',
+  fastify.post<{ Params: { campaignId: string }; Body: CreateActorRequest }>(
+    '/campaigns/:campaignId/actors',
     { preHandler: authenticate },
     async (request, reply) => {
       if (!request.user) {
         return reply.status(401).send({ error: 'Not authenticated' });
       }
 
-      const { gameId } = request.params;
+      const { campaignId } = request.params;
       const actorData = request.body;
 
       // Validate required fields
@@ -150,24 +150,24 @@ const actorsRoute: FastifyPluginAsync = async (fastify) => {
       }
 
       try {
-        // Verify game exists and user has access to it
-        const [game] = await fastify.db
+        // Verify campaign exists and user has access to it
+        const [campaign] = await fastify.db
           .select()
-          .from(games)
-          .where(eq(games.id, gameId))
+          .from(campaigns)
+          .where(eq(campaigns.id, campaignId))
           .limit(1);
 
-        if (!game) {
-          return reply.status(404).send({ error: 'Game not found' });
+        if (!campaign) {
+          return reply.status(404).send({ error: 'Campaign not found' });
         }
 
-        // TODO: Check if user is the game owner or has permission to create actors
+        // TODO: Check if user is the campaign owner or has permission to create actors
 
         // Create actor in database
         const newActors = await fastify.db
           .insert(actors)
           .values({
-            gameId,
+            campaignId,
             name: actorData.name.trim(),
             actorType: actorData.actorType.trim(),
             img: actorData.img ?? null,
@@ -186,7 +186,7 @@ const actorsRoute: FastifyPluginAsync = async (fastify) => {
         // Convert to Actor interface
         const formattedActor: Actor = {
           id: newActor.id,
-          gameId: newActor.gameId,
+          campaignId: newActor.campaignId,
           name: newActor.name,
           actorType: newActor.actorType,
           img: newActor.img,
@@ -296,7 +296,7 @@ const actorsRoute: FastifyPluginAsync = async (fastify) => {
         // Convert to Actor interface
         const formattedActor: Actor = {
           id: updatedActor.id,
-          gameId: updatedActor.gameId,
+          campaignId: updatedActor.campaignId,
           name: updatedActor.name,
           actorType: updatedActor.actorType,
           img: updatedActor.img,

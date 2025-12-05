@@ -10,7 +10,7 @@ describe('Actors Routes', () => {
   let db: ReturnType<typeof createDb>;
   let sessionId: string;
   let userId: string;
-  let gameId: string;
+  let campaignId: string;
 
   beforeAll(async () => {
     // Build app with test config
@@ -68,12 +68,12 @@ describe('Actors Routes', () => {
     gameId = gameBody.game.id;
   });
 
-  describe('GET /api/v1/games/:gameId/actors', () => {
+  describe('GET /api/v1/games/:campaignId/actors', () => {
     beforeEach(async () => {
       // Create test actors directly in database
       await db.insert(actors).values([
         {
-          gameId,
+          campaignId,
           name: 'Fighter Character',
           actorType: 'character',
           img: '/images/fighter.png',
@@ -84,7 +84,7 @@ describe('Actors Routes', () => {
           data: { level: 5, class: 'Fighter' },
         },
         {
-          gameId,
+          campaignId,
           name: 'Goblin Enemy',
           actorType: 'npc',
           img: '/images/goblin.png',
@@ -192,7 +192,7 @@ describe('Actors Routes', () => {
 
       expect(response.statusCode).toBe(404);
       const body = JSON.parse(response.body);
-      expect(body.error).toBe('Game not found');
+      expect(body.error).toBe('Campaign not found');
     });
 
     it('should return 401 without authorization header', async () => {
@@ -237,7 +237,7 @@ describe('Actors Routes', () => {
     beforeEach(async () => {
       // Create a test actor directly in database
       const [actor] = await db.insert(actors).values({
-        gameId,
+        campaignId,
         name: 'Test Actor',
         actorType: 'character',
         img: '/images/test.png',
@@ -341,7 +341,7 @@ describe('Actors Routes', () => {
     });
   });
 
-  describe('POST /api/v1/games/:gameId/actors', () => {
+  describe('POST /api/v1/games/:campaignId/actors', () => {
     it('should create a new actor', async () => {
       const response = await app.inject({
         method: 'POST',
@@ -479,7 +479,7 @@ describe('Actors Routes', () => {
 
       expect(response.statusCode).toBe(404);
       const body = JSON.parse(response.body);
-      expect(body.error).toBe('Game not found');
+      expect(body.error).toBe('Campaign not found');
     });
 
     it('should return 401 without authorization header', async () => {
@@ -518,7 +518,7 @@ describe('Actors Routes', () => {
     beforeEach(async () => {
       // Create a test actor directly in database
       const [actor] = await db.insert(actors).values({
-        gameId,
+        campaignId,
         name: 'Original Actor',
         actorType: 'character',
         img: '/images/original.png',
@@ -694,7 +694,7 @@ describe('Actors Routes', () => {
     beforeEach(async () => {
       // Create a test actor directly in database
       const [actor] = await db.insert(actors).values({
-        gameId,
+        campaignId,
         name: 'Actor to Delete',
         actorType: 'character',
         attributes: {},

@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify';
-import { combats, combatants, games } from '@vtt/database';
+import { combats, combatants, campaigns } from '@vtt/database';
 import { eq, and } from 'drizzle-orm';
 import type {
   Combat,
@@ -20,37 +20,37 @@ const combatsRoute: FastifyPluginAsync = async (fastify) => {
   // ==================== COMBAT ROUTES ====================
 
   /**
-   * GET /api/v1/games/:gameId/combats - List all combats for a game
+   * GET /api/v1/games/:campaignId/combats - List all combats for a campaign
    * Returns combats for a specific game
    * Optional query parameter: active (boolean) - filter by active status
    */
-  fastify.get<{ Params: { gameId: string }; Querystring: { active?: string } }>(
-    '/games/:gameId/combats',
+  fastify.get<{ Params: { campaignId: string }; Querystring: { active?: string } }>(
+    '/campaigns/:campaignId/combats',
     { preHandler: authenticate },
     async (request, reply) => {
       if (!request.user) {
         return reply.status(401).send({ error: 'Not authenticated' });
       }
 
-      const { gameId } = request.params;
+      const { campaignId } = request.params;
       const { active } = request.query;
 
       try {
-        // Verify game exists and user has access to it
-        const [game] = await fastify.db
+        // Verify campaign exists and user has access to it
+        const [campaign] = await fastify.db
           .select()
-          .from(games)
-          .where(eq(games.id, gameId))
+          .from(campaigns)
+          .where(eq(campaigns.id, campaignId))
           .limit(1);
 
-        if (!game) {
-          return reply.status(404).send({ error: 'Game not found' });
+        if (!campaign) {
+          return reply.status(404).send({ error: 'Campaign not found' });
         }
 
-        // TODO: Check if user is a participant in the game
+        // TODO: Check if user is a participant in the campaign
 
         // Build where conditions based on query parameters
-        const whereConditions = [eq(combats.gameId, gameId)];
+        const whereConditions = [eq(combats.campaignId, campaignId)];
 
         // Add active filter if provided
         if (active !== undefined) {
@@ -58,7 +58,7 @@ const combatsRoute: FastifyPluginAsync = async (fastify) => {
           whereConditions.push(eq(combats.active, activeValue));
         }
 
-        // Fetch combats for the game with optional active filter
+        // Fetch combats for the campaign with optional active filter
         const gameCombats = await fastify.db
           .select()
           .from(combats)
@@ -68,7 +68,7 @@ const combatsRoute: FastifyPluginAsync = async (fastify) => {
         const formattedCombats: Combat[] = gameCombats.map(combat => ({
           id: combat.id,
           sceneId: combat.sceneId,
-          gameId: combat.gameId,
+          campaignId: combat.campaignId,
           active: combat.active,
           round: combat.round,
           turn: combat.turn,
@@ -124,7 +124,7 @@ const combatsRoute: FastifyPluginAsync = async (fastify) => {
         const formattedCombat: Combat = {
           id: combat.id,
           sceneId: combat.sceneId,
-          gameId: combat.gameId,
+          campaignId: combat.campaignId,
           active: combat.active,
           round: combat.round,
           turn: combat.turn,
@@ -160,39 +160,39 @@ const combatsRoute: FastifyPluginAsync = async (fastify) => {
   );
 
   /**
-   * POST /api/v1/games/:gameId/combats - Create a new combat encounter
+   * POST /api/v1/games/:campaignId/combats - Create a new combat encounter
    * Creates a combat for a specific game
    */
-  fastify.post<{ Params: { gameId: string }; Body: CreateCombatRequest }>(
-    '/games/:gameId/combats',
+  fastify.post<{ Params: { campaignId: string }; Body: CreateCombatRequest }>(
+    '/campaigns/:campaignId/combats',
     { preHandler: authenticate },
     async (request, reply) => {
       if (!request.user) {
         return reply.status(401).send({ error: 'Not authenticated' });
       }
 
-      const { gameId } = request.params;
+      const { campaignId } = request.params;
       const combatData = request.body;
 
       try {
-        // Verify game exists and user has access to it
-        const [game] = await fastify.db
+        // Verify campaign exists and user has access to it
+        const [campaign] = await fastify.db
           .select()
-          .from(games)
-          .where(eq(games.id, gameId))
+          .from(campaigns)
+          .where(eq(campaigns.id, campaignId))
           .limit(1);
 
-        if (!game) {
-          return reply.status(404).send({ error: 'Game not found' });
+        if (!campaign) {
+          return reply.status(404).send({ error: 'Campaign not found' });
         }
 
-        // TODO: Check if user is the game owner or has GM permissions
+        // TODO: Check if user is the campaign owner or has GM permissions
 
         // Create combat in database
         const newCombats = await fastify.db
           .insert(combats)
           .values({
-            gameId,
+            campaignId,
             sceneId: combatData.sceneId ?? null,
             active: combatData.active ?? false,
             round: combatData.round ?? 0,
@@ -208,7 +208,7 @@ const combatsRoute: FastifyPluginAsync = async (fastify) => {
         const formattedCombat: Combat = {
           id: newCombat.id,
           sceneId: newCombat.sceneId,
-          gameId: newCombat.gameId,
+          campaignId: newCombat.campaignId,
           active: newCombat.active,
           round: newCombat.round,
           turn: newCombat.turn,
@@ -292,7 +292,7 @@ const combatsRoute: FastifyPluginAsync = async (fastify) => {
         const formattedCombat: Combat = {
           id: updatedCombat.id,
           sceneId: updatedCombat.sceneId,
-          gameId: updatedCombat.gameId,
+          campaignId: updatedCombat.campaignId,
           active: updatedCombat.active,
           round: updatedCombat.round,
           turn: updatedCombat.turn,

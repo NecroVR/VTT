@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify';
-import { activeEffects, actors, tokens, games } from '@vtt/database';
+import { activeEffects, actors, tokens, campaigns } from '@vtt/database';
 import { eq } from 'drizzle-orm';
 import type { ActiveEffect, CreateActiveEffectRequest, UpdateActiveEffectRequest, EffectChange } from '@vtt/shared';
 import { authenticate } from '../../../middleware/auth.js';
@@ -47,7 +47,7 @@ const effectsRoute: FastifyPluginAsync = async (fastify) => {
         // Convert to ActiveEffect interface
         const formattedEffects: ActiveEffect[] = actorEffects.map(effect => ({
           id: effect.id,
-          gameId: effect.gameId,
+          campaignId: effect.campaignId,
           actorId: effect.actorId,
           tokenId: effect.tokenId,
           name: effect.name,
@@ -117,7 +117,7 @@ const effectsRoute: FastifyPluginAsync = async (fastify) => {
         // Convert to ActiveEffect interface
         const formattedEffects: ActiveEffect[] = tokenEffects.map(effect => ({
           id: effect.id,
-          gameId: effect.gameId,
+          campaignId: effect.campaignId,
           actorId: effect.actorId,
           tokenId: effect.tokenId,
           name: effect.name,
@@ -151,43 +151,43 @@ const effectsRoute: FastifyPluginAsync = async (fastify) => {
   );
 
   /**
-   * GET /api/v1/games/:gameId/effects - List all effects in a game
+   * GET /api/v1/games/:campaignId/effects - List all effects in a campaign
    * Returns all effects for a specific game
    */
-  fastify.get<{ Params: { gameId: string } }>(
-    '/games/:gameId/effects',
+  fastify.get<{ Params: { campaignId: string } }>(
+    '/campaigns/:campaignId/effects',
     { preHandler: authenticate },
     async (request, reply) => {
       if (!request.user) {
         return reply.status(401).send({ error: 'Not authenticated' });
       }
 
-      const { gameId } = request.params;
+      const { campaignId } = request.params;
 
       try {
-        // Verify game exists and user has access to it
-        const [game] = await fastify.db
+        // Verify campaign exists and user has access to it
+        const [campaign] = await fastify.db
           .select()
-          .from(games)
-          .where(eq(games.id, gameId))
+          .from(campaigns)
+          .where(eq(campaigns.id, campaignId))
           .limit(1);
 
-        if (!game) {
-          return reply.status(404).send({ error: 'Game not found' });
+        if (!campaign) {
+          return reply.status(404).send({ error: 'Campaign not found' });
         }
 
-        // TODO: Check if user is a participant in the game
+        // TODO: Check if user is a participant in the campaign
 
-        // Fetch all effects for the game
+        // Fetch all effects for the campaign
         const gameEffects = await fastify.db
           .select()
           .from(activeEffects)
-          .where(eq(activeEffects.gameId, gameId));
+          .where(eq(activeEffects.campaignId, campaignId));
 
         // Convert to ActiveEffect interface
         const formattedEffects: ActiveEffect[] = gameEffects.map(effect => ({
           id: effect.id,
-          gameId: effect.gameId,
+          campaignId: effect.campaignId,
           actorId: effect.actorId,
           tokenId: effect.tokenId,
           name: effect.name,
@@ -251,7 +251,7 @@ const effectsRoute: FastifyPluginAsync = async (fastify) => {
         // Convert to ActiveEffect interface
         const formattedEffect: ActiveEffect = {
           id: effect.id,
-          gameId: effect.gameId,
+          campaignId: effect.campaignId,
           actorId: effect.actorId,
           tokenId: effect.tokenId,
           name: effect.name,
@@ -304,7 +304,7 @@ const effectsRoute: FastifyPluginAsync = async (fastify) => {
         return reply.status(400).send({ error: 'Effect name is required' });
       }
 
-      if (!effectData.gameId || effectData.gameId.trim() === '') {
+      if (!effectData.campaignId || effectData.campaignId.trim() === '') {
         return reply.status(400).send({ error: 'Game ID is required' });
       }
 
@@ -320,15 +320,15 @@ const effectsRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Actor not found' });
         }
 
-        // Verify game exists
-        const [game] = await fastify.db
+        // Verify campaign exists
+        const [campaign] = await fastify.db
           .select()
-          .from(games)
-          .where(eq(games.id, effectData.gameId))
+          .from(campaigns)
+          .where(eq(campaigns.id, effectData.campaignId))
           .limit(1);
 
-        if (!game) {
-          return reply.status(404).send({ error: 'Game not found' });
+        if (!campaign) {
+          return reply.status(404).send({ error: 'Campaign not found' });
         }
 
         // TODO: Check if user has permission to create effects for this actor
@@ -337,7 +337,7 @@ const effectsRoute: FastifyPluginAsync = async (fastify) => {
         const newEffects = await fastify.db
           .insert(activeEffects)
           .values({
-            gameId: effectData.gameId,
+            campaignId: effectData.campaignId,
             actorId: actorId,
             tokenId: effectData.tokenId ?? null,
             name: effectData.name.trim(),
@@ -366,7 +366,7 @@ const effectsRoute: FastifyPluginAsync = async (fastify) => {
         // Convert to ActiveEffect interface
         const formattedEffect: ActiveEffect = {
           id: newEffect.id,
-          gameId: newEffect.gameId,
+          campaignId: newEffect.campaignId,
           actorId: newEffect.actorId,
           tokenId: newEffect.tokenId,
           name: newEffect.name,
@@ -419,7 +419,7 @@ const effectsRoute: FastifyPluginAsync = async (fastify) => {
         return reply.status(400).send({ error: 'Effect name is required' });
       }
 
-      if (!effectData.gameId || effectData.gameId.trim() === '') {
+      if (!effectData.campaignId || effectData.campaignId.trim() === '') {
         return reply.status(400).send({ error: 'Game ID is required' });
       }
 
@@ -435,15 +435,15 @@ const effectsRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Token not found' });
         }
 
-        // Verify game exists
-        const [game] = await fastify.db
+        // Verify campaign exists
+        const [campaign] = await fastify.db
           .select()
-          .from(games)
-          .where(eq(games.id, effectData.gameId))
+          .from(campaigns)
+          .where(eq(campaigns.id, effectData.campaignId))
           .limit(1);
 
-        if (!game) {
-          return reply.status(404).send({ error: 'Game not found' });
+        if (!campaign) {
+          return reply.status(404).send({ error: 'Campaign not found' });
         }
 
         // TODO: Check if user has permission to create effects for this token
@@ -452,7 +452,7 @@ const effectsRoute: FastifyPluginAsync = async (fastify) => {
         const newEffects = await fastify.db
           .insert(activeEffects)
           .values({
-            gameId: effectData.gameId,
+            campaignId: effectData.campaignId,
             actorId: effectData.actorId ?? null,
             tokenId: tokenId,
             name: effectData.name.trim(),
@@ -481,7 +481,7 @@ const effectsRoute: FastifyPluginAsync = async (fastify) => {
         // Convert to ActiveEffect interface
         const formattedEffect: ActiveEffect = {
           id: newEffect.id,
-          gameId: newEffect.gameId,
+          campaignId: newEffect.campaignId,
           actorId: newEffect.actorId,
           tokenId: newEffect.tokenId,
           name: newEffect.name,
@@ -620,7 +620,7 @@ const effectsRoute: FastifyPluginAsync = async (fastify) => {
         // Convert to ActiveEffect interface
         const formattedEffect: ActiveEffect = {
           id: updatedEffect.id,
-          gameId: updatedEffect.gameId,
+          campaignId: updatedEffect.campaignId,
           actorId: updatedEffect.actorId,
           tokenId: updatedEffect.tokenId,
           name: updatedEffect.name,
@@ -696,7 +696,7 @@ const effectsRoute: FastifyPluginAsync = async (fastify) => {
         // Convert to ActiveEffect interface
         const formattedEffect: ActiveEffect = {
           id: updatedEffect.id,
-          gameId: updatedEffect.gameId,
+          campaignId: updatedEffect.campaignId,
           actorId: updatedEffect.actorId,
           tokenId: updatedEffect.tokenId,
           name: updatedEffect.name,

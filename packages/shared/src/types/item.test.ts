@@ -12,7 +12,7 @@ describe('Item Types', () => {
     it('should have correct structure for basic item', () => {
       const item: Item = {
         id: 'item123',
-        gameId: 'game123',
+        campaignId: 'game123',
         actorId: null,
         name: 'Longsword',
         itemType: 'weapon',
@@ -29,7 +29,7 @@ describe('Item Types', () => {
       };
 
       expect(item.id).toBe('item123');
-      expect(item.gameId).toBe('game123');
+      expect(item.campaignId).toBe('game123');
       expect(item.name).toBe('Longsword');
       expect(item.itemType).toBe('weapon');
     });
@@ -37,7 +37,7 @@ describe('Item Types', () => {
     it('should handle item with actor reference', () => {
       const item: Item = {
         id: 'item1',
-        gameId: 'game1',
+        campaignId: 'game1',
         actorId: 'actor123',
         name: 'Healing Potion',
         itemType: 'consumable',
@@ -60,7 +60,7 @@ describe('Item Types', () => {
     it('should handle item with image', () => {
       const item: Item = {
         id: 'item1',
-        gameId: 'game1',
+        campaignId: 'game1',
         actorId: null,
         name: 'Magic Staff',
         itemType: 'weapon',
@@ -83,7 +83,7 @@ describe('Item Types', () => {
     it('should handle item with description', () => {
       const item: Item = {
         id: 'item1',
-        gameId: 'game1',
+        campaignId: 'game1',
         actorId: null,
         name: 'Ring of Protection',
         itemType: 'equipment',
@@ -105,7 +105,7 @@ describe('Item Types', () => {
     it('should handle different item types', () => {
       const armor: Item = {
         id: 'item1',
-        gameId: 'game1',
+        campaignId: 'game1',
         actorId: null,
         name: 'Plate Armor',
         itemType: 'armor',
@@ -128,7 +128,7 @@ describe('Item Types', () => {
     it('should handle consumable items', () => {
       const item: Item = {
         id: 'item1',
-        gameId: 'game1',
+        campaignId: 'game1',
         actorId: 'actor1',
         name: 'Ration',
         itemType: 'consumable',
@@ -151,7 +151,7 @@ describe('Item Types', () => {
     it('should handle equipped state', () => {
       const item: Item = {
         id: 'item1',
-        gameId: 'game1',
+        campaignId: 'game1',
         actorId: 'actor1',
         name: 'Shield',
         itemType: 'equipment',
@@ -174,7 +174,7 @@ describe('Item Types', () => {
     it('should handle zero weight items', () => {
       const item: Item = {
         id: 'item1',
-        gameId: 'game1',
+        campaignId: 'game1',
         actorId: null,
         name: 'Coin',
         itemType: 'treasure',
@@ -197,7 +197,7 @@ describe('Item Types', () => {
     it('should handle sort order', () => {
       const item: Item = {
         id: 'item1',
-        gameId: 'game1',
+        campaignId: 'game1',
         actorId: null,
         name: 'Item',
         itemType: 'misc',
@@ -219,7 +219,7 @@ describe('Item Types', () => {
     it('should handle custom data', () => {
       const item: Item = {
         id: 'item1',
-        gameId: 'game1',
+        campaignId: 'game1',
         actorId: null,
         name: 'Magic Sword',
         itemType: 'weapon',
@@ -247,19 +247,19 @@ describe('Item Types', () => {
   describe('CreateItemRequest', () => {
     it('should have correct structure with minimal fields', () => {
       const request: CreateItemRequest = {
-        gameId: 'game123',
+        campaignId: 'game123',
         name: 'New Item',
         itemType: 'misc',
       };
 
-      expect(request.gameId).toBe('game123');
+      expect(request.campaignId).toBe('game123');
       expect(request.name).toBe('New Item');
       expect(request.itemType).toBe('misc');
     });
 
     it('should handle all optional fields', () => {
       const request: CreateItemRequest = {
-        gameId: 'game123',
+        campaignId: 'game123',
         actorId: 'actor123',
         name: 'Complete Item',
         itemType: 'weapon',
@@ -282,7 +282,7 @@ describe('Item Types', () => {
 
     it('should handle item without actor', () => {
       const request: CreateItemRequest = {
-        gameId: 'game123',
+        campaignId: 'game123',
         actorId: null,
         name: 'Unassigned Item',
         itemType: 'treasure',
@@ -293,7 +293,7 @@ describe('Item Types', () => {
 
     it('should handle consumable creation', () => {
       const request: CreateItemRequest = {
-        gameId: 'game123',
+        campaignId: 'game123',
         actorId: 'actor123',
         name: 'Healing Potion',
         itemType: 'consumable',
@@ -425,7 +425,7 @@ describe('Item Types', () => {
       const response: ItemResponse = {
         item: {
           id: 'item123',
-          gameId: 'game123',
+          campaignId: 'game123',
           actorId: null,
           name: 'Item',
           itemType: 'misc',
@@ -461,7 +461,7 @@ describe('Item Types', () => {
         items: [
           {
             id: 'item1',
-            gameId: 'game1',
+            campaignId: 'game1',
             actorId: 'actor1',
             name: 'Sword',
             itemType: 'weapon',
@@ -478,7 +478,7 @@ describe('Item Types', () => {
           },
           {
             id: 'item2',
-            gameId: 'game1',
+            campaignId: 'game1',
             actorId: 'actor1',
             name: 'Potion',
             itemType: 'consumable',

@@ -10,7 +10,7 @@ describe('Items Routes', () => {
   let db: ReturnType<typeof createDb>;
   let sessionId: string;
   let userId: string;
-  let gameId: string;
+  let campaignId: string;
   let actorId: string;
 
   beforeAll(async () => {
@@ -71,7 +71,7 @@ describe('Items Routes', () => {
 
     // Create a test actor
     const [actor] = await db.insert(actors).values({
-      gameId,
+      campaignId,
       name: 'Test Actor',
       actorType: 'character',
       attributes: {},
@@ -88,7 +88,7 @@ describe('Items Routes', () => {
       // Create test items directly in database
       await db.insert(items).values([
         {
-          gameId,
+          campaignId,
           actorId,
           name: 'Longsword',
           itemType: 'weapon',
@@ -102,7 +102,7 @@ describe('Items Routes', () => {
           data: { damage: '1d8', damageType: 'slashing' },
         },
         {
-          gameId,
+          campaignId,
           actorId,
           name: 'Health Potion',
           itemType: 'consumable',
@@ -263,7 +263,7 @@ describe('Items Routes', () => {
     beforeEach(async () => {
       // Create a test item directly in database
       const [item] = await db.insert(items).values({
-        gameId,
+        campaignId,
         actorId,
         name: 'Test Item',
         itemType: 'equipment',
@@ -383,7 +383,7 @@ describe('Items Routes', () => {
           authorization: `Bearer ${sessionId}`,
         },
         payload: {
-          gameId,
+          campaignId,
           name: 'New Sword',
           itemType: 'weapon',
           img: '/images/sword.png',
@@ -419,7 +419,7 @@ describe('Items Routes', () => {
           authorization: `Bearer ${sessionId}`,
         },
         payload: {
-          gameId,
+          campaignId,
           name: 'Simple Item',
           itemType: 'misc',
         },
@@ -447,7 +447,7 @@ describe('Items Routes', () => {
           authorization: `Bearer ${sessionId}`,
         },
         payload: {
-          gameId,
+          campaignId,
           itemType: 'weapon',
         },
       });
@@ -465,7 +465,7 @@ describe('Items Routes', () => {
           authorization: `Bearer ${sessionId}`,
         },
         payload: {
-          gameId,
+          campaignId,
           name: '   ',
           itemType: 'weapon',
         },
@@ -484,7 +484,7 @@ describe('Items Routes', () => {
           authorization: `Bearer ${sessionId}`,
         },
         payload: {
-          gameId,
+          campaignId,
           name: 'Test Item',
         },
       });
@@ -502,7 +502,7 @@ describe('Items Routes', () => {
           authorization: `Bearer ${sessionId}`,
         },
         payload: {
-          gameId,
+          campaignId,
           name: 'Test Item',
           itemType: '   ',
         },
@@ -539,7 +539,7 @@ describe('Items Routes', () => {
           authorization: `Bearer ${sessionId}`,
         },
         payload: {
-          gameId,
+          campaignId,
           name: 'Test Item',
           itemType: 'weapon',
         },
@@ -558,7 +558,7 @@ describe('Items Routes', () => {
           authorization: `Bearer ${sessionId}`,
         },
         payload: {
-          gameId: '00000000-0000-0000-0000-000000000000',
+          campaignId: '00000000-0000-0000-0000-000000000000',
           name: 'Test Item',
           itemType: 'weapon',
         },
@@ -566,7 +566,7 @@ describe('Items Routes', () => {
 
       expect(response.statusCode).toBe(404);
       const body = JSON.parse(response.body);
-      expect(body.error).toBe('Game not found');
+      expect(body.error).toBe('Campaign not found');
     });
 
     it('should return 401 without authorization header', async () => {
@@ -574,7 +574,7 @@ describe('Items Routes', () => {
         method: 'POST',
         url: `/api/v1/actors/${actorId}/items`,
         payload: {
-          gameId,
+          campaignId,
           name: 'Test Item',
           itemType: 'weapon',
         },
@@ -591,7 +591,7 @@ describe('Items Routes', () => {
           authorization: 'Bearer invalid-session-id',
         },
         payload: {
-          gameId,
+          campaignId,
           name: 'Test Item',
           itemType: 'weapon',
         },
@@ -607,7 +607,7 @@ describe('Items Routes', () => {
     beforeEach(async () => {
       // Create a test item directly in database
       const [item] = await db.insert(items).values({
-        gameId,
+        campaignId,
         actorId,
         name: 'Original Item',
         itemType: 'weapon',
@@ -798,7 +798,7 @@ describe('Items Routes', () => {
     beforeEach(async () => {
       // Create a test item directly in database
       const [item] = await db.insert(items).values({
-        gameId,
+        campaignId,
         actorId,
         name: 'Item to Delete',
         itemType: 'weapon',

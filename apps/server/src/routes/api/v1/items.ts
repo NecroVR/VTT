@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify';
-import { items, actors, games } from '@vtt/database';
+import { items, actors, campaigns } from '@vtt/database';
 import { eq, and } from 'drizzle-orm';
 import type { Item, CreateItemRequest, UpdateItemRequest } from '@vtt/shared';
 import { authenticate } from '../../../middleware/auth.js';
@@ -47,7 +47,7 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
         // Convert to Item interface
         const formattedItems: Item[] = actorItems.map(item => ({
           id: item.id,
-          gameId: item.gameId,
+          campaignId: item.campaignId,
           actorId: item.actorId,
           name: item.name,
           itemType: item.itemType,
@@ -102,7 +102,7 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
         // Convert to Item interface
         const formattedItem: Item = {
           id: item.id,
-          gameId: item.gameId,
+          campaignId: item.campaignId,
           actorId: item.actorId,
           name: item.name,
           itemType: item.itemType,
@@ -150,7 +150,7 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
         return reply.status(400).send({ error: 'Item type is required' });
       }
 
-      if (!itemData.gameId || itemData.gameId.trim() === '') {
+      if (!itemData.campaignId || itemData.campaignId.trim() === '') {
         return reply.status(400).send({ error: 'Game ID is required' });
       }
 
@@ -166,15 +166,15 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Actor not found' });
         }
 
-        // Verify game exists
-        const [game] = await fastify.db
+        // Verify campaign exists
+        const [campaign] = await fastify.db
           .select()
-          .from(games)
-          .where(eq(games.id, itemData.gameId))
+          .from(campaigns)
+          .where(eq(campaigns.id, itemData.campaignId))
           .limit(1);
 
-        if (!game) {
-          return reply.status(404).send({ error: 'Game not found' });
+        if (!campaign) {
+          return reply.status(404).send({ error: 'Campaign not found' });
         }
 
         // TODO: Check if user has permission to create items for this actor
@@ -183,7 +183,7 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
         const newItems = await fastify.db
           .insert(items)
           .values({
-            gameId: itemData.gameId,
+            campaignId: itemData.campaignId,
             actorId: actorId,
             name: itemData.name.trim(),
             itemType: itemData.itemType.trim(),
@@ -203,7 +203,7 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
         // Convert to Item interface
         const formattedItem: Item = {
           id: newItem.id,
-          gameId: newItem.gameId,
+          campaignId: newItem.campaignId,
           actorId: newItem.actorId,
           name: newItem.name,
           itemType: newItem.itemType,
@@ -317,7 +317,7 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
         // Convert to Item interface
         const formattedItem: Item = {
           id: updatedItem.id,
-          gameId: updatedItem.gameId,
+          campaignId: updatedItem.campaignId,
           actorId: updatedItem.actorId,
           name: updatedItem.name,
           itemType: updatedItem.itemType,

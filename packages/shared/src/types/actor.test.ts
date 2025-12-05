@@ -12,7 +12,7 @@ describe('Actor Types', () => {
     it('should have correct structure for basic actor', () => {
       const actor: Actor = {
         id: 'actor123',
-        gameId: 'game123',
+        campaignId: 'game123',
         name: 'Hero',
         actorType: 'character',
         img: null,
@@ -28,7 +28,7 @@ describe('Actor Types', () => {
       };
 
       expect(actor.id).toBe('actor123');
-      expect(actor.gameId).toBe('game123');
+      expect(actor.campaignId).toBe('game123');
       expect(actor.name).toBe('Hero');
       expect(actor.actorType).toBe('character');
     });
@@ -36,7 +36,7 @@ describe('Actor Types', () => {
     it('should handle actor with image', () => {
       const actor: Actor = {
         id: 'actor1',
-        gameId: 'game1',
+        campaignId: 'game1',
         name: 'Knight',
         actorType: 'character',
         img: 'https://example.com/knight.png',
@@ -58,7 +58,7 @@ describe('Actor Types', () => {
     it('should handle actor with attributes', () => {
       const actor: Actor = {
         id: 'actor1',
-        gameId: 'game1',
+        campaignId: 'game1',
         name: 'Warrior',
         actorType: 'character',
         img: null,
@@ -93,7 +93,7 @@ describe('Actor Types', () => {
     it('should handle actor with abilities', () => {
       const actor: Actor = {
         id: 'actor1',
-        gameId: 'game1',
+        campaignId: 'game1',
         name: 'Mage',
         actorType: 'character',
         img: null,
@@ -118,7 +118,7 @@ describe('Actor Types', () => {
     it('should handle different actor types', () => {
       const npc: Actor = {
         id: 'actor1',
-        gameId: 'game1',
+        campaignId: 'game1',
         name: 'Shopkeeper',
         actorType: 'npc',
         img: null,
@@ -139,7 +139,7 @@ describe('Actor Types', () => {
     it('should handle monster actor type', () => {
       const monster: Actor = {
         id: 'actor1',
-        gameId: 'game1',
+        campaignId: 'game1',
         name: 'Goblin',
         actorType: 'monster',
         img: null,
@@ -161,7 +161,7 @@ describe('Actor Types', () => {
     it('should handle folder organization', () => {
       const actor: Actor = {
         id: 'actor1',
-        gameId: 'game1',
+        campaignId: 'game1',
         name: 'Character',
         actorType: 'character',
         img: null,
@@ -183,7 +183,7 @@ describe('Actor Types', () => {
     it('should handle custom data', () => {
       const actor: Actor = {
         id: 'actor1',
-        gameId: 'game1',
+        campaignId: 'game1',
         name: 'Character',
         actorType: 'character',
         img: null,
@@ -211,19 +211,19 @@ describe('Actor Types', () => {
   describe('CreateActorRequest', () => {
     it('should have correct structure with minimal fields', () => {
       const request: CreateActorRequest = {
-        gameId: 'game123',
+        campaignId: 'game123',
         name: 'New Character',
         actorType: 'character',
       };
 
-      expect(request.gameId).toBe('game123');
+      expect(request.campaignId).toBe('game123');
       expect(request.name).toBe('New Character');
       expect(request.actorType).toBe('character');
     });
 
     it('should handle all optional fields', () => {
       const request: CreateActorRequest = {
-        gameId: 'game123',
+        campaignId: 'game123',
         name: 'Complete Character',
         actorType: 'character',
         img: 'https://example.com/avatar.png',
@@ -243,7 +243,7 @@ describe('Actor Types', () => {
 
     it('should handle NPC creation', () => {
       const request: CreateActorRequest = {
-        gameId: 'game123',
+        campaignId: 'game123',
         name: 'Merchant',
         actorType: 'npc',
         data: { shop: 'General Store' },
@@ -255,7 +255,7 @@ describe('Actor Types', () => {
 
     it('should handle monster creation', () => {
       const request: CreateActorRequest = {
-        gameId: 'game123',
+        campaignId: 'game123',
         name: 'Dragon',
         actorType: 'monster',
         attributes: { hp: 300, ac: 20 },
@@ -366,7 +366,7 @@ describe('Actor Types', () => {
       const response: ActorResponse = {
         actor: {
           id: 'actor123',
-          gameId: 'game123',
+          campaignId: 'game123',
           name: 'Hero',
           actorType: 'character',
           img: null,
@@ -401,7 +401,7 @@ describe('Actor Types', () => {
         actors: [
           {
             id: 'actor1',
-            gameId: 'game1',
+            campaignId: 'game1',
             name: 'Character 1',
             actorType: 'character',
             img: null,
@@ -417,7 +417,7 @@ describe('Actor Types', () => {
           },
           {
             id: 'actor2',
-            gameId: 'game1',
+            campaignId: 'game1',
             name: 'Goblin',
             actorType: 'monster',
             img: null,

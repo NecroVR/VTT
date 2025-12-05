@@ -12,7 +12,7 @@ describe('Scene Types', () => {
     it('should have correct structure for basic scene', () => {
       const scene: Scene = {
         id: 'scene123',
-        gameId: 'game123',
+        campaignId: 'game123',
         name: 'Dungeon Level 1',
         active: true,
         backgroundImage: null,
@@ -38,7 +38,7 @@ describe('Scene Types', () => {
       };
 
       expect(scene.id).toBe('scene123');
-      expect(scene.gameId).toBe('game123');
+      expect(scene.campaignId).toBe('game123');
       expect(scene.name).toBe('Dungeon Level 1');
       expect(scene.active).toBe(true);
     });
@@ -46,7 +46,7 @@ describe('Scene Types', () => {
     it('should handle scene with background image', () => {
       const scene: Scene = {
         id: 'scene1',
-        gameId: 'game1',
+        campaignId: 'game1',
         name: 'Battle Map',
         active: false,
         backgroundImage: 'https://example.com/map.jpg',
@@ -79,7 +79,7 @@ describe('Scene Types', () => {
     it('should handle different grid types', () => {
       const hexScene: Scene = {
         id: 's1',
-        gameId: 'g1',
+        campaignId: 'g1',
         name: 'Hex Map',
         active: true,
         gridType: 'hex',
@@ -106,7 +106,7 @@ describe('Scene Types', () => {
     it('should handle various grid colors', () => {
       const scene: Scene = {
         id: 's1',
-        gameId: 'g1',
+        campaignId: 'g1',
         name: 'Scene',
         active: true,
         gridType: 'square',
@@ -133,7 +133,7 @@ describe('Scene Types', () => {
     it('should handle vision settings', () => {
       const scene: Scene = {
         id: 's1',
-        gameId: 'g1',
+        campaignId: 'g1',
         name: 'Dark dungeon',
         active: true,
         gridType: 'square',
@@ -162,7 +162,7 @@ describe('Scene Types', () => {
     it('should handle initial view settings', () => {
       const scene: Scene = {
         id: 's1',
-        gameId: 'g1',
+        campaignId: 'g1',
         name: 'Scene',
         active: true,
         gridType: 'square',
@@ -192,7 +192,7 @@ describe('Scene Types', () => {
     it('should handle navigation order', () => {
       const scene: Scene = {
         id: 's1',
-        gameId: 'g1',
+        campaignId: 'g1',
         name: 'Scene',
         active: true,
         gridType: 'square',
@@ -218,7 +218,7 @@ describe('Scene Types', () => {
     it('should handle different grid units', () => {
       const metersScene: Scene = {
         id: 's1',
-        gameId: 'g1',
+        campaignId: 'g1',
         name: 'Metric Map',
         active: true,
         gridType: 'square',
@@ -247,17 +247,17 @@ describe('Scene Types', () => {
     it('should have correct structure with minimal fields', () => {
       const request: CreateSceneRequest = {
         name: 'New Scene',
-        gameId: 'game123',
+        campaignId: 'game123',
       };
 
       expect(request.name).toBe('New Scene');
-      expect(request.gameId).toBe('game123');
+      expect(request.campaignId).toBe('game123');
     });
 
     it('should handle all optional fields', () => {
       const request: CreateSceneRequest = {
         name: 'Complete Scene',
-        gameId: 'game123',
+        campaignId: 'game123',
         active: true,
         backgroundImage: 'https://example.com/bg.jpg',
         backgroundWidth: 1920,
@@ -287,7 +287,7 @@ describe('Scene Types', () => {
     it('should handle null background image', () => {
       const request: CreateSceneRequest = {
         name: 'Scene',
-        gameId: 'game1',
+        campaignId: 'game1',
         backgroundImage: null,
         backgroundWidth: null,
         backgroundHeight: null,
@@ -301,7 +301,7 @@ describe('Scene Types', () => {
     it('should handle null initial position', () => {
       const request: CreateSceneRequest = {
         name: 'Scene',
-        gameId: 'game1',
+        campaignId: 'game1',
         initialX: null,
         initialY: null,
       };
@@ -401,7 +401,7 @@ describe('Scene Types', () => {
       const response: SceneResponse = {
         scene: {
           id: 'scene123',
-          gameId: 'game123',
+          campaignId: 'game123',
           name: 'Scene',
           active: true,
           gridType: 'square',
@@ -441,7 +441,7 @@ describe('Scene Types', () => {
         scenes: [
           {
             id: 'scene1',
-            gameId: 'game1',
+            campaignId: 'game1',
             name: 'Scene 1',
             active: true,
             gridType: 'square',
@@ -462,7 +462,7 @@ describe('Scene Types', () => {
           },
           {
             id: 'scene2',
-            gameId: 'game1',
+            campaignId: 'game1',
             name: 'Scene 2',
             active: false,
             gridType: 'hex',

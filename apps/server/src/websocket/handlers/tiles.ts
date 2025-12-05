@@ -24,9 +24,9 @@ export async function handleTileAdd(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Tile add');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -101,13 +101,13 @@ export async function handleTileAdd(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'tile:added',
       payload: addedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ tileId: newTile.id, gameId }, 'Tile added');
+    request.log.info({ tileId: newTile.id, campaignId }, 'Tile added');
   } catch (error) {
     request.log.error({ error }, 'Error adding tile');
     sendError(socket, 'Failed to add tile');
@@ -125,9 +125,9 @@ export async function handleTileUpdate(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Tile update');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -177,13 +177,13 @@ export async function handleTileUpdate(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'tile:updated',
       payload: updatedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ tileId, gameId }, 'Tile updated');
+    request.log.info({ tileId, campaignId }, 'Tile updated');
   } catch (error) {
     request.log.error({ error }, 'Error updating tile');
     sendError(socket, 'Failed to update tile');
@@ -201,9 +201,9 @@ export async function handleTileRemove(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Tile remove');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -224,13 +224,13 @@ export async function handleTileRemove(
 
     // Broadcast to all players
     const removedPayload: TileRemovedPayload = { tileId };
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'tile:removed',
       payload: removedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ tileId, gameId }, 'Tile removed');
+    request.log.info({ tileId, campaignId }, 'Tile removed');
   } catch (error) {
     request.log.error({ error }, 'Error removing tile');
     sendError(socket, 'Failed to remove tile');

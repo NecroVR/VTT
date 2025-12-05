@@ -20,8 +20,8 @@ export async function handlePinAdd(
   message: WSMessage<PinAddPayload>,
   request: FastifyRequest
 ): Promise<void> {
-  const gameId = roomManager.getRoomForSocket(socket);
-  if (!gameId) {
+  const campaignId = roomManager.getRoomForSocket(socket);
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -88,13 +88,13 @@ export async function handlePinAdd(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'pin:added',
       payload: addedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ pinId: newPin.id, gameId }, 'Pin added');
+    request.log.info({ pinId: newPin.id, campaignId }, 'Pin added');
   } catch (error) {
     request.log.error({ error }, 'Error adding pin');
     sendError(socket, 'Failed to add pin');
@@ -106,8 +106,8 @@ export async function handlePinUpdate(
   message: WSMessage<PinUpdatePayload>,
   request: FastifyRequest
 ): Promise<void> {
-  const gameId = roomManager.getRoomForSocket(socket);
-  if (!gameId) {
+  const campaignId = roomManager.getRoomForSocket(socket);
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -153,13 +153,13 @@ export async function handlePinUpdate(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'pin:updated',
       payload: updatedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ pinId, gameId }, 'Pin updated');
+    request.log.info({ pinId, campaignId }, 'Pin updated');
   } catch (error) {
     request.log.error({ error }, 'Error updating pin');
     sendError(socket, 'Failed to update pin');
@@ -171,8 +171,8 @@ export async function handlePinRemove(
   message: WSMessage<PinRemovePayload>,
   request: FastifyRequest
 ): Promise<void> {
-  const gameId = roomManager.getRoomForSocket(socket);
-  if (!gameId) {
+  const campaignId = roomManager.getRoomForSocket(socket);
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -191,13 +191,13 @@ export async function handlePinRemove(
     }
 
     const removedPayload: PinRemovedPayload = { pinId };
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'pin:removed',
       payload: removedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ pinId, gameId }, 'Pin removed');
+    request.log.info({ pinId, campaignId }, 'Pin removed');
   } catch (error) {
     request.log.error({ error }, 'Error removing pin');
     sendError(socket, 'Failed to remove pin');
@@ -209,8 +209,8 @@ export async function handlePinClick(
   message: WSMessage<PinClickPayload>,
   request: FastifyRequest
 ): Promise<void> {
-  const gameId = roomManager.getRoomForSocket(socket);
-  if (!gameId) {
+  const campaignId = roomManager.getRoomForSocket(socket);
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -236,13 +236,13 @@ export async function handlePinClick(
       pageId: pin.pageId,
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'pin:opened',
       payload: openedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ pinId, gameId }, 'Pin clicked');
+    request.log.info({ pinId, campaignId }, 'Pin clicked');
   } catch (error) {
     request.log.error({ error }, 'Error handling pin click');
     sendError(socket, 'Failed to handle pin click');

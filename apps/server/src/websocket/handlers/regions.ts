@@ -18,8 +18,8 @@ export async function handleRegionAdd(
   message: WSMessage<RegionAddPayload>,
   request: FastifyRequest
 ): Promise<void> {
-  const gameId = roomManager.getRoomForSocket(socket);
-  if (!gameId) {
+  const campaignId = roomManager.getRoomForSocket(socket);
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -95,13 +95,13 @@ export async function handleRegionAdd(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'region:added',
       payload: addedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ regionId: newRegion.id, gameId }, 'Region added');
+    request.log.info({ regionId: newRegion.id, campaignId }, 'Region added');
   } catch (error) {
     request.log.error({ error }, 'Error adding region');
     sendError(socket, 'Failed to add region');
@@ -113,8 +113,8 @@ export async function handleRegionUpdate(
   message: WSMessage<RegionUpdatePayload>,
   request: FastifyRequest
 ): Promise<void> {
-  const gameId = roomManager.getRoomForSocket(socket);
-  if (!gameId) {
+  const campaignId = roomManager.getRoomForSocket(socket);
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -163,13 +163,13 @@ export async function handleRegionUpdate(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'region:updated',
       payload: updatedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ regionId, gameId }, 'Region updated');
+    request.log.info({ regionId, campaignId }, 'Region updated');
   } catch (error) {
     request.log.error({ error }, 'Error updating region');
     sendError(socket, 'Failed to update region');
@@ -181,8 +181,8 @@ export async function handleRegionRemove(
   message: WSMessage<RegionRemovePayload>,
   request: FastifyRequest
 ): Promise<void> {
-  const gameId = roomManager.getRoomForSocket(socket);
-  if (!gameId) {
+  const campaignId = roomManager.getRoomForSocket(socket);
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -201,13 +201,13 @@ export async function handleRegionRemove(
     }
 
     const removedPayload: RegionRemovedPayload = { regionId };
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'region:removed',
       payload: removedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ regionId, gameId }, 'Region removed');
+    request.log.info({ regionId, campaignId }, 'Region removed');
   } catch (error) {
     request.log.error({ error }, 'Error removing region');
     sendError(socket, 'Failed to remove region');

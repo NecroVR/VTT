@@ -10,7 +10,7 @@ describe('Chat Routes', () => {
   let db: ReturnType<typeof createDb>;
   let sessionId: string;
   let userId: string;
-  let gameId: string;
+  let campaignId: string;
   let gameOwnerId: string;
 
   beforeAll(async () => {
@@ -70,12 +70,12 @@ describe('Chat Routes', () => {
     gameOwnerId = userId;
   });
 
-  describe('GET /api/v1/games/:gameId/chat', () => {
+  describe('GET /api/v1/games/:campaignId/chat', () => {
     beforeEach(async () => {
       // Create test chat messages directly in database
       await db.insert(chatMessages).values([
         {
-          gameId,
+          campaignId,
           userId,
           content: 'Hello everyone!',
           messageType: 'chat',
@@ -86,7 +86,7 @@ describe('Chat Routes', () => {
           data: {},
         },
         {
-          gameId,
+          campaignId,
           userId,
           content: 'I rolled a d20',
           messageType: 'roll',
@@ -97,7 +97,7 @@ describe('Chat Routes', () => {
           data: {},
         },
         {
-          gameId,
+          campaignId,
           userId,
           content: 'Secret message',
           messageType: 'chat',
@@ -284,7 +284,7 @@ describe('Chat Routes', () => {
 
       // Create a whisper message not targeting the other user
       await db.insert(chatMessages).values({
-        gameId,
+        campaignId,
         userId,
         content: 'Private whisper',
         messageType: 'whisper',
@@ -339,7 +339,7 @@ describe('Chat Routes', () => {
 
       expect(response.statusCode).toBe(404);
       const body = JSON.parse(response.body);
-      expect(body.error).toBe('Game not found');
+      expect(body.error).toBe('Campaign not found');
     });
 
     it('should return 401 without authorization header', async () => {
@@ -378,7 +378,7 @@ describe('Chat Routes', () => {
     });
   });
 
-  describe('POST /api/v1/games/:gameId/chat', () => {
+  describe('POST /api/v1/games/:campaignId/chat', () => {
     it('should create a new chat message', async () => {
       const response = await app.inject({
         method: 'POST',
@@ -553,7 +553,7 @@ describe('Chat Routes', () => {
 
       expect(response.statusCode).toBe(404);
       const body = JSON.parse(response.body);
-      expect(body.error).toBe('Game not found');
+      expect(body.error).toBe('Campaign not found');
     });
 
     it('should return 401 without authorization header', async () => {
@@ -592,7 +592,7 @@ describe('Chat Routes', () => {
     beforeEach(async () => {
       // Create a test chat message
       const [message] = await db.insert(chatMessages).values({
-        gameId,
+        campaignId,
         userId,
         content: 'Message to delete',
         messageType: 'chat',
@@ -645,7 +645,7 @@ describe('Chat Routes', () => {
     it('should allow GM to delete any message', async () => {
       // Create a message from the other user in the game owned by the first user
       const [otherMessage] = await db.insert(chatMessages).values({
-        gameId,
+        campaignId,
         userId: otherUserId,
         content: 'Other user message',
         messageType: 'chat',

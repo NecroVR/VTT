@@ -11,7 +11,7 @@ describe('ChatMessage Types', () => {
     it('should have correct structure for basic chat message', () => {
       const message: ChatMessage = {
         id: 'msg123',
-        gameId: 'game123',
+        campaignId: 'game123',
         userId: null,
         content: 'Hello everyone!',
         messageType: 'chat',
@@ -24,7 +24,7 @@ describe('ChatMessage Types', () => {
       };
 
       expect(message.id).toBe('msg123');
-      expect(message.gameId).toBe('game123');
+      expect(message.campaignId).toBe('game123');
       expect(message.content).toBe('Hello everyone!');
       expect(message.messageType).toBe('chat');
     });
@@ -32,7 +32,7 @@ describe('ChatMessage Types', () => {
     it('should handle message with user', () => {
       const message: ChatMessage = {
         id: 'msg1',
-        gameId: 'game1',
+        campaignId: 'game1',
         userId: 'user123',
         content: 'I attack!',
         messageType: 'ic',
@@ -51,7 +51,7 @@ describe('ChatMessage Types', () => {
     it('should handle message with speaker info', () => {
       const message: ChatMessage = {
         id: 'msg1',
-        gameId: 'game1',
+        campaignId: 'game1',
         userId: 'user1',
         content: 'Greetings!',
         messageType: 'ic',
@@ -70,7 +70,7 @@ describe('ChatMessage Types', () => {
     it('should handle roll message type', () => {
       const message: ChatMessage = {
         id: 'msg1',
-        gameId: 'game1',
+        campaignId: 'game1',
         userId: 'user1',
         content: 'Rolling attack',
         messageType: 'roll',
@@ -94,7 +94,7 @@ describe('ChatMessage Types', () => {
     it('should handle whisper message', () => {
       const message: ChatMessage = {
         id: 'msg1',
-        gameId: 'game1',
+        campaignId: 'game1',
         userId: 'user1',
         content: 'Secret message',
         messageType: 'whisper',
@@ -113,7 +113,7 @@ describe('ChatMessage Types', () => {
     it('should handle blind message', () => {
       const message: ChatMessage = {
         id: 'msg1',
-        gameId: 'game1',
+        campaignId: 'game1',
         userId: 'user1',
         content: 'GM only',
         messageType: 'gm',
@@ -135,7 +135,7 @@ describe('ChatMessage Types', () => {
       types.forEach((type) => {
         const message: ChatMessage = {
           id: 'msg1',
-          gameId: 'game1',
+          campaignId: 'game1',
           userId: null,
           content: 'Test',
           messageType: type,
@@ -154,7 +154,7 @@ describe('ChatMessage Types', () => {
     it('should handle empty content', () => {
       const message: ChatMessage = {
         id: 'msg1',
-        gameId: 'game1',
+        campaignId: 'game1',
         userId: null,
         content: '',
         messageType: 'chat',
@@ -173,7 +173,7 @@ describe('ChatMessage Types', () => {
       const longContent = 'a'.repeat(1000);
       const message: ChatMessage = {
         id: 'msg1',
-        gameId: 'game1',
+        campaignId: 'game1',
         userId: null,
         content: longContent,
         messageType: 'chat',
@@ -191,7 +191,7 @@ describe('ChatMessage Types', () => {
     it('should handle custom data', () => {
       const message: ChatMessage = {
         id: 'msg1',
-        gameId: 'game1',
+        campaignId: 'game1',
         userId: null,
         content: 'Test',
         messageType: 'chat',
@@ -211,7 +211,7 @@ describe('ChatMessage Types', () => {
       const now = new Date();
       const message: ChatMessage = {
         id: 'msg1',
-        gameId: 'game1',
+        campaignId: 'game1',
         userId: null,
         content: 'Test',
         messageType: 'chat',
@@ -231,17 +231,17 @@ describe('ChatMessage Types', () => {
   describe('CreateChatMessageRequest', () => {
     it('should have correct structure with minimal fields', () => {
       const request: CreateChatMessageRequest = {
-        gameId: 'game123',
+        campaignId: 'game123',
         content: 'Hello!',
       };
 
-      expect(request.gameId).toBe('game123');
+      expect(request.campaignId).toBe('game123');
       expect(request.content).toBe('Hello!');
     });
 
     it('should handle all optional fields', () => {
       const request: CreateChatMessageRequest = {
-        gameId: 'game123',
+        campaignId: 'game123',
         userId: 'user123',
         content: 'I cast fireball!',
         messageType: 'ic',
@@ -261,7 +261,7 @@ describe('ChatMessage Types', () => {
 
     it('should handle null user', () => {
       const request: CreateChatMessageRequest = {
-        gameId: 'game123',
+        campaignId: 'game123',
         userId: null,
         content: 'System message',
       };
@@ -271,7 +271,7 @@ describe('ChatMessage Types', () => {
 
     it('should handle chat message', () => {
       const request: CreateChatMessageRequest = {
-        gameId: 'game123',
+        campaignId: 'game123',
         content: 'Hello everyone!',
         messageType: 'chat',
       };
@@ -281,7 +281,7 @@ describe('ChatMessage Types', () => {
 
     it('should handle IC message', () => {
       const request: CreateChatMessageRequest = {
-        gameId: 'game123',
+        campaignId: 'game123',
         userId: 'user1',
         content: 'I search for traps',
         messageType: 'ic',
@@ -294,7 +294,7 @@ describe('ChatMessage Types', () => {
 
     it('should handle OOC message', () => {
       const request: CreateChatMessageRequest = {
-        gameId: 'game123',
+        campaignId: 'game123',
         userId: 'user1',
         content: 'BRB, getting snacks',
         messageType: 'ooc',
@@ -305,7 +305,7 @@ describe('ChatMessage Types', () => {
 
     it('should handle emote message', () => {
       const request: CreateChatMessageRequest = {
-        gameId: 'game123',
+        campaignId: 'game123',
         userId: 'user1',
         content: 'draws sword dramatically',
         messageType: 'emote',
@@ -316,7 +316,7 @@ describe('ChatMessage Types', () => {
 
     it('should handle roll message with data', () => {
       const request: CreateChatMessageRequest = {
-        gameId: 'game123',
+        campaignId: 'game123',
         userId: 'user1',
         content: 'Attack roll',
         messageType: 'roll',
@@ -333,7 +333,7 @@ describe('ChatMessage Types', () => {
 
     it('should handle whisper with targets', () => {
       const request: CreateChatMessageRequest = {
-        gameId: 'game123',
+        campaignId: 'game123',
         userId: 'user1',
         content: 'Secret plan',
         messageType: 'whisper',
@@ -346,7 +346,7 @@ describe('ChatMessage Types', () => {
 
     it('should handle blind message', () => {
       const request: CreateChatMessageRequest = {
-        gameId: 'game123',
+        campaignId: 'game123',
         userId: 'user1',
         content: 'Hidden roll',
         messageType: 'roll',
@@ -362,7 +362,7 @@ describe('ChatMessage Types', () => {
       const response: ChatMessageResponse = {
         chatMessage: {
           id: 'msg123',
-          gameId: 'game123',
+          campaignId: 'game123',
           userId: null,
           content: 'Test',
           messageType: 'chat',
@@ -394,7 +394,7 @@ describe('ChatMessage Types', () => {
         chatMessages: [
           {
             id: 'msg1',
-            gameId: 'game1',
+            campaignId: 'game1',
             userId: 'user1',
             content: 'Hello!',
             messageType: 'chat',
@@ -407,7 +407,7 @@ describe('ChatMessage Types', () => {
           },
           {
             id: 'msg2',
-            gameId: 'game1',
+            campaignId: 'game1',
             userId: 'user2',
             content: 'Hi there!',
             messageType: 'chat',
@@ -433,7 +433,7 @@ describe('ChatMessage Types', () => {
         chatMessages: [
           {
             id: 'msg1',
-            gameId: 'game1',
+            campaignId: 'game1',
             userId: 'user1',
             content: 'Chat message',
             messageType: 'chat',
@@ -446,7 +446,7 @@ describe('ChatMessage Types', () => {
           },
           {
             id: 'msg2',
-            gameId: 'game1',
+            campaignId: 'game1',
             userId: 'user1',
             content: 'Roll result',
             messageType: 'roll',
@@ -459,7 +459,7 @@ describe('ChatMessage Types', () => {
           },
           {
             id: 'msg3',
-            gameId: 'game1',
+            campaignId: 'game1',
             userId: 'user2',
             content: 'Whisper',
             messageType: 'whisper',

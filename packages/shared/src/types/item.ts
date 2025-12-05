@@ -1,6 +1,6 @@
 export interface Item {
   id: string;
-  gameId: string;
+  campaignId: string;
   actorId?: string | null;
   name: string;
   itemType: string;
@@ -19,7 +19,7 @@ export interface Item {
 }
 
 export interface CreateItemRequest {
-  gameId: string;
+  campaignId: string;
   actorId?: string | null;
   name: string;
   itemType: string;

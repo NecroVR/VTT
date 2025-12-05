@@ -34,10 +34,10 @@ export async function handleMeasureStart(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Measure start');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
   const userId = (request as any).userId;
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -60,13 +60,13 @@ export async function handleMeasureStart(
 
   // Broadcast to all players in the room
   const startedPayload: MeasureStartedPayload = { measurement };
-  roomManager.broadcast(gameId, {
+  roomManager.broadcast(campaignId, {
     type: 'measure:started',
     payload: startedPayload,
     timestamp: Date.now(),
   });
 
-  request.log.info({ userId, sceneId, gameId }, 'Measurement started');
+  request.log.info({ userId, sceneId, campaignId }, 'Measurement started');
 }
 
 /**
@@ -80,10 +80,10 @@ export async function handleMeasureUpdate(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Measure update');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
   const userId = (request as any).userId;
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -112,7 +112,7 @@ export async function handleMeasureUpdate(
 
   // Broadcast to all players in the room
   const updatedPayload: MeasureUpdatedPayload = { measurement };
-  roomManager.broadcast(gameId, {
+  roomManager.broadcast(campaignId, {
     type: 'measure:updated',
     payload: updatedPayload,
     timestamp: Date.now(),
@@ -132,10 +132,10 @@ export async function handleMeasureEnd(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Measure end');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
   const userId = (request as any).userId;
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -150,13 +150,13 @@ export async function handleMeasureEnd(
 
   // Broadcast to all players in the room
   const endedPayload: MeasureEndedPayload = { userId };
-  roomManager.broadcast(gameId, {
+  roomManager.broadcast(campaignId, {
     type: 'measure:ended',
     payload: endedPayload,
     timestamp: Date.now(),
   });
 
-  request.log.info({ userId, gameId }, 'Measurement ended');
+  request.log.info({ userId, campaignId }, 'Measurement ended');
 }
 
 /**
@@ -170,10 +170,10 @@ export async function handleTemplatePlace(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Template place');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
   const userId = (request as any).userId;
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -245,13 +245,13 @@ export async function handleTemplatePlace(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'template:placed',
       payload: placedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ templateId: newTemplate.id, gameId }, 'Template placed');
+    request.log.info({ templateId: newTemplate.id, campaignId }, 'Template placed');
   } catch (error) {
     request.log.error({ error }, 'Error placing template');
     sendError(socket, 'Failed to place template');
@@ -269,9 +269,9 @@ export async function handleTemplateUpdate(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Template update');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -315,13 +315,13 @@ export async function handleTemplateUpdate(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'template:updated',
       payload: updatedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ templateId, gameId }, 'Template updated');
+    request.log.info({ templateId, campaignId }, 'Template updated');
   } catch (error) {
     request.log.error({ error }, 'Error updating template');
     sendError(socket, 'Failed to update template');
@@ -339,9 +339,9 @@ export async function handleTemplateRemove(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Template remove');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -362,13 +362,13 @@ export async function handleTemplateRemove(
 
     // Broadcast to all players
     const removedPayload: TemplateRemovedPayload = { templateId };
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'template:removed',
       payload: removedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ templateId, gameId }, 'Template removed');
+    request.log.info({ templateId, campaignId }, 'Template removed');
   } catch (error) {
     request.log.error({ error }, 'Error removing template');
     sendError(socket, 'Failed to remove template');

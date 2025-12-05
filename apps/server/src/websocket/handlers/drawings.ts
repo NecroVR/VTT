@@ -26,10 +26,10 @@ export async function handleDrawingCreate(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Drawing create');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
   const userId = (request as any).userId;
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -129,13 +129,13 @@ export async function handleDrawingCreate(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'drawing:created',
       payload: createdPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ drawingId: newDrawing.id, gameId }, 'Drawing created');
+    request.log.info({ drawingId: newDrawing.id, campaignId }, 'Drawing created');
   } catch (error) {
     request.log.error({ error }, 'Error creating drawing');
     sendError(socket, 'Failed to create drawing');
@@ -153,9 +153,9 @@ export async function handleDrawingUpdate(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Drawing update');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -212,13 +212,13 @@ export async function handleDrawingUpdate(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'drawing:updated',
       payload: updatedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ drawingId, gameId }, 'Drawing updated');
+    request.log.info({ drawingId, campaignId }, 'Drawing updated');
   } catch (error) {
     request.log.error({ error }, 'Error updating drawing');
     sendError(socket, 'Failed to update drawing');
@@ -236,9 +236,9 @@ export async function handleDrawingDelete(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Drawing delete');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -259,13 +259,13 @@ export async function handleDrawingDelete(
 
     // Broadcast to all players
     const deletedPayload: DrawingDeletedPayload = { drawingId };
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'drawing:deleted',
       payload: deletedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ drawingId, gameId }, 'Drawing deleted');
+    request.log.info({ drawingId, campaignId }, 'Drawing deleted');
   } catch (error) {
     request.log.error({ error }, 'Error deleting drawing');
     sendError(socket, 'Failed to delete drawing');
@@ -284,9 +284,9 @@ export async function handleDrawingStream(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Drawing stream');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -300,7 +300,7 @@ export async function handleDrawingStream(
       points,
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'drawing:streamed',
       payload: streamedPayload,
       timestamp: Date.now(),

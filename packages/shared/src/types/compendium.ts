@@ -14,7 +14,7 @@ export type CompendiumEntityType = 'Actor' | 'Item' | 'JournalEntry' | 'Scene';
  */
 export interface Compendium {
   id: string;
-  gameId: string | null; // null = system-wide compendium
+  campaignId: string | null; // null = system-wide compendium
   name: string;
   label: string;
   entityType: CompendiumEntityType;
@@ -163,7 +163,7 @@ export interface CompendiumImportData {
  * Request to instantiate an entity from a compendium entry
  */
 export interface CompendiumInstantiateRequest {
-  gameId: string;
+  campaignId: string;
   sceneId?: string; // required for Scene entity type
   actorId?: string; // required for Item entity type
 }

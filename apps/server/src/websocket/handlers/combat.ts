@@ -32,9 +32,9 @@ export async function handleCombatStart(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Combat start');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -46,7 +46,7 @@ export async function handleCombatStart(
     const newCombats = await request.server.db
       .insert(combats)
       .values({
-        gameId,
+        campaignId,
         sceneId,
         active: true,
         round: 1,
@@ -85,7 +85,7 @@ export async function handleCombatStart(
       combat: {
         id: newCombat.id,
         sceneId: newCombat.sceneId,
-        gameId: newCombat.gameId,
+        campaignId: newCombat.campaignId,
         active: newCombat.active,
         round: newCombat.round,
         turn: newCombat.turn,
@@ -108,13 +108,13 @@ export async function handleCombatStart(
       })),
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'combat:started',
       payload: startedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ combatId: newCombat.id, gameId }, 'Combat started');
+    request.log.info({ combatId: newCombat.id, campaignId }, 'Combat started');
   } catch (error) {
     request.log.error({ error }, 'Error starting combat');
     sendError(socket, 'Failed to start combat');
@@ -132,9 +132,9 @@ export async function handleCombatEnd(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Combat end');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -155,13 +155,13 @@ export async function handleCombatEnd(
 
     // Broadcast to all players
     const endedPayload: CombatEndedPayload = { combatId };
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'combat:ended',
       payload: endedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ combatId, gameId }, 'Combat ended');
+    request.log.info({ combatId, campaignId }, 'Combat ended');
   } catch (error) {
     request.log.error({ error }, 'Error ending combat');
     sendError(socket, 'Failed to end combat');
@@ -179,9 +179,9 @@ export async function handleCombatUpdate(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Combat update');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -211,7 +211,7 @@ export async function handleCombatUpdate(
       combat: {
         id: updatedCombat.id,
         sceneId: updatedCombat.sceneId,
-        gameId: updatedCombat.gameId,
+        campaignId: updatedCombat.campaignId,
         active: updatedCombat.active,
         round: updatedCombat.round,
         turn: updatedCombat.turn,
@@ -222,13 +222,13 @@ export async function handleCombatUpdate(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'combat:updated',
       payload: updatedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ combatId, gameId }, 'Combat updated');
+    request.log.info({ combatId, campaignId }, 'Combat updated');
   } catch (error) {
     request.log.error({ error }, 'Error updating combat');
     sendError(socket, 'Failed to update combat');
@@ -246,9 +246,9 @@ export async function handleCombatantAdd(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Combatant add');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -298,13 +298,13 @@ export async function handleCombatantAdd(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'combatant:added',
       payload: addedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ combatantId: newCombatant.id, combatId, gameId }, 'Combatant added');
+    request.log.info({ combatantId: newCombatant.id, combatId, campaignId }, 'Combatant added');
   } catch (error) {
     request.log.error({ error }, 'Error adding combatant');
     sendError(socket, 'Failed to add combatant');
@@ -322,9 +322,9 @@ export async function handleCombatantUpdate(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Combatant update');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -362,13 +362,13 @@ export async function handleCombatantUpdate(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'combatant:updated',
       payload: updatedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ combatantId, gameId }, 'Combatant updated');
+    request.log.info({ combatantId, campaignId }, 'Combatant updated');
   } catch (error) {
     request.log.error({ error }, 'Error updating combatant');
     sendError(socket, 'Failed to update combatant');
@@ -386,9 +386,9 @@ export async function handleCombatantRemove(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Combatant remove');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -409,13 +409,13 @@ export async function handleCombatantRemove(
 
     // Broadcast to all players
     const removedPayload: CombatantRemovedPayload = { combatantId };
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'combatant:removed',
       payload: removedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ combatantId, gameId }, 'Combatant removed');
+    request.log.info({ combatantId, campaignId }, 'Combatant removed');
   } catch (error) {
     request.log.error({ error }, 'Error removing combatant');
     sendError(socket, 'Failed to remove combatant');
@@ -433,9 +433,9 @@ export async function handleCombatNextTurn(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Combat next turn');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -493,7 +493,7 @@ export async function handleCombatNextTurn(
       combat: {
         id: updatedCombat.id,
         sceneId: updatedCombat.sceneId,
-        gameId: updatedCombat.gameId,
+        campaignId: updatedCombat.campaignId,
         active: updatedCombat.active,
         round: updatedCombat.round,
         turn: updatedCombat.turn,
@@ -505,7 +505,7 @@ export async function handleCombatNextTurn(
       currentCombatantId,
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'combat:turn-changed',
       payload: turnChangedPayload,
       timestamp: Date.now(),
@@ -516,7 +516,7 @@ export async function handleCombatNextTurn(
       round: nextRound,
       turn: actualTurn,
       currentCombatantId,
-      gameId
+      campaignId
     }, 'Combat turn advanced');
   } catch (error) {
     request.log.error({ error }, 'Error advancing combat turn');

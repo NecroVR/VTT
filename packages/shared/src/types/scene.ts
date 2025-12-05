@@ -1,6 +1,6 @@
 export interface Scene {
   id: string;
-  gameId: string;
+  campaignId: string;
   name: string;
   active: boolean;
   // Background
@@ -32,7 +32,7 @@ export interface Scene {
 
 export interface CreateSceneRequest {
   name: string;
-  gameId: string;
+  campaignId: string;
   active?: boolean;
   backgroundImage?: string | null;
   backgroundWidth?: number | null;

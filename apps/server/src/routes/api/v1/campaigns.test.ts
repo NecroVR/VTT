@@ -2,10 +2,10 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { buildApp } from '../../../app.js';
 import type { FastifyInstance } from 'fastify';
 import { createDb } from '@vtt/database';
-import { users, sessions, games } from '@vtt/database';
+import { users, sessions, campaigns } from '@vtt/database';
 import { eq } from 'drizzle-orm';
 
-describe('Games Routes', () => {
+describe('Campaigns Routes', () => {
   let app: FastifyInstance;
   let db: ReturnType<typeof createDb>;
   let sessionId: string;
@@ -33,7 +33,7 @@ describe('Games Routes', () => {
 
   beforeEach(async () => {
     // Clean up test data before each test
-    await db.delete(games);
+    await db.delete(campaigns);
     await db.delete(sessions);
     await db.delete(users);
 
@@ -68,16 +68,16 @@ describe('Games Routes', () => {
     otherUserId = otherRegisterBody.user.id;
   });
 
-  describe('POST /api/v1/games', () => {
-    it('should create a new game with valid data', async () => {
+  describe('POST /api/v1/campaigns', () => {
+    it('should create a new campaign with valid data', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: '/api/v1/games',
+        url: '/api/v1/campaigns',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
         payload: {
-          name: 'Test Game',
+          name: 'Test Campaign',
           settings: {
             gridType: 'hex',
             gridSize: 75,
@@ -88,54 +88,54 @@ describe('Games Routes', () => {
 
       expect(response.statusCode).toBe(201);
       const body = JSON.parse(response.body);
-      expect(body).toHaveProperty('game');
-      expect(body.game.name).toBe('Test Game');
-      expect(body.game.ownerId).toBe(userId);
-      expect(body.game.settings.gridType).toBe('hex');
-      expect(body.game.settings.gridSize).toBe(75);
-      expect(body.game.settings.snapToGrid).toBe(false);
+      expect(body).toHaveProperty('campaign');
+      expect(body.campaign.name).toBe('Test Campaign');
+      expect(body.campaign.ownerId).toBe(userId);
+      expect(body.campaign.settings.gridType).toBe('hex');
+      expect(body.campaign.settings.gridSize).toBe(75);
+      expect(body.campaign.settings.snapToGrid).toBe(false);
     });
 
-    it('should create a game with default settings', async () => {
+    it('should create a campaign with default settings', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: '/api/v1/games',
+        url: '/api/v1/campaigns',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
         payload: {
-          name: 'Test Game',
+          name: 'Test Campaign',
         },
       });
 
       expect(response.statusCode).toBe(201);
       const body = JSON.parse(response.body);
-      expect(body.game.settings.gridType).toBe('square');
-      expect(body.game.settings.gridSize).toBe(50);
-      expect(body.game.settings.snapToGrid).toBe(true);
+      expect(body.campaign.settings.gridType).toBe('square');
+      expect(body.campaign.settings.gridSize).toBe(50);
+      expect(body.campaign.settings.snapToGrid).toBe(true);
     });
 
-    it('should trim whitespace from game name', async () => {
+    it('should trim whitespace from campaign name', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: '/api/v1/games',
+        url: '/api/v1/campaigns',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
         payload: {
-          name: '  Test Game  ',
+          name: '  Test Campaign  ',
         },
       });
 
       expect(response.statusCode).toBe(201);
       const body = JSON.parse(response.body);
-      expect(body.game.name).toBe('Test Game');
+      expect(body.campaign.name).toBe('Test Campaign');
     });
 
     it('should return 400 if name is missing', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: '/api/v1/games',
+        url: '/api/v1/campaigns',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -144,13 +144,13 @@ describe('Games Routes', () => {
 
       expect(response.statusCode).toBe(400);
       const body = JSON.parse(response.body);
-      expect(body.error).toBe('Game name is required');
+      expect(body.error).toBe('Campaign name is required');
     });
 
     it('should return 400 if name is empty string', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: '/api/v1/games',
+        url: '/api/v1/campaigns',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -161,13 +161,13 @@ describe('Games Routes', () => {
 
       expect(response.statusCode).toBe(400);
       const body = JSON.parse(response.body);
-      expect(body.error).toBe('Game name is required');
+      expect(body.error).toBe('Campaign name is required');
     });
 
     it('should return 400 if name is only whitespace', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: '/api/v1/games',
+        url: '/api/v1/campaigns',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -178,15 +178,15 @@ describe('Games Routes', () => {
 
       expect(response.statusCode).toBe(400);
       const body = JSON.parse(response.body);
-      expect(body.error).toBe('Game name is required');
+      expect(body.error).toBe('Campaign name is required');
     });
 
     it('should return 401 without authorization header', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: '/api/v1/games',
+        url: '/api/v1/campaigns',
         payload: {
-          name: 'Test Game',
+          name: 'Test Campaign',
         },
       });
 
@@ -196,12 +196,12 @@ describe('Games Routes', () => {
     it('should return 401 with invalid session', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: '/api/v1/games',
+        url: '/api/v1/campaigns',
         headers: {
           authorization: 'Bearer invalid-session-id',
         },
         payload: {
-          name: 'Test Game',
+          name: 'Test Campaign',
         },
       });
 
@@ -209,48 +209,48 @@ describe('Games Routes', () => {
     });
   });
 
-  describe('GET /api/v1/games', () => {
+  describe('GET /api/v1/campaigns', () => {
     beforeEach(async () => {
-      // Create games for test user
+      // Create campaigns for test user
       await app.inject({
         method: 'POST',
-        url: '/api/v1/games',
+        url: '/api/v1/campaigns',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
         payload: {
-          name: 'Game 1',
+          name: 'Campaign 1',
         },
       });
 
       await app.inject({
         method: 'POST',
-        url: '/api/v1/games',
+        url: '/api/v1/campaigns',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
         payload: {
-          name: 'Game 2',
+          name: 'Campaign 2',
         },
       });
 
-      // Create game for other user
+      // Create campaign for other user
       await app.inject({
         method: 'POST',
-        url: '/api/v1/games',
+        url: '/api/v1/campaigns',
         headers: {
           authorization: `Bearer ${otherSessionId}`,
         },
         payload: {
-          name: 'Other User Game',
+          name: 'Other User Campaign',
         },
       });
     });
 
-    it('should list games owned by the authenticated user', async () => {
+    it('should list campaigns owned by the authenticated user', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: '/api/v1/games',
+        url: '/api/v1/campaigns',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -258,17 +258,17 @@ describe('Games Routes', () => {
 
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
-      expect(body.games).toHaveLength(2);
-      expect(body.games[0].name).toBe('Game 1');
-      expect(body.games[1].name).toBe('Game 2');
-      expect(body.games[0].ownerId).toBe(userId);
-      expect(body.games[1].ownerId).toBe(userId);
+      expect(body.campaigns).toHaveLength(2);
+      expect(body.campaigns[0].name).toBe('Campaign 1');
+      expect(body.campaigns[1].name).toBe('Campaign 2');
+      expect(body.campaigns[0].ownerId).toBe(userId);
+      expect(body.campaigns[1].ownerId).toBe(userId);
     });
 
-    it('should not include games owned by other users', async () => {
+    it('should not include campaigns owned by other users', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: '/api/v1/games',
+        url: '/api/v1/campaigns',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -276,17 +276,17 @@ describe('Games Routes', () => {
 
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
-      expect(body.games).toHaveLength(2);
-      expect(body.games.every((g: any) => g.name !== 'Other User Game')).toBe(true);
+      expect(body.campaigns).toHaveLength(2);
+      expect(body.campaigns.every((c: any) => c.name !== 'Other User Campaign')).toBe(true);
     });
 
-    it('should return empty array if user has no games', async () => {
-      // Clean up all games
-      await db.delete(games);
+    it('should return empty array if user has no campaigns', async () => {
+      // Clean up all campaigns
+      await db.delete(campaigns);
 
       const response = await app.inject({
         method: 'GET',
-        url: '/api/v1/games',
+        url: '/api/v1/campaigns',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -294,13 +294,13 @@ describe('Games Routes', () => {
 
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
-      expect(body.games).toHaveLength(0);
+      expect(body.campaigns).toHaveLength(0);
     });
 
     it('should return 401 without authorization header', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: '/api/v1/games',
+        url: '/api/v1/campaigns',
       });
 
       expect(response.statusCode).toBe(401);
@@ -309,7 +309,7 @@ describe('Games Routes', () => {
     it('should return 401 with invalid session', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: '/api/v1/games',
+        url: '/api/v1/campaigns',
         headers: {
           authorization: 'Bearer invalid-session-id',
         },
@@ -319,44 +319,44 @@ describe('Games Routes', () => {
     });
   });
 
-  describe('GET /api/v1/games/:id', () => {
-    let gameId: string;
-    let otherGameId: string;
+  describe('GET /api/v1/campaigns/:id', () => {
+    let campaignId: string;
+    let otherCampaignId: string;
 
     beforeEach(async () => {
-      // Create game for test user
-      const gameResponse = await app.inject({
+      // Create campaign for test user
+      const campaignResponse = await app.inject({
         method: 'POST',
-        url: '/api/v1/games',
+        url: '/api/v1/campaigns',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
         payload: {
-          name: 'Test Game',
+          name: 'Test Campaign',
         },
       });
-      const gameBody = JSON.parse(gameResponse.body);
-      gameId = gameBody.game.id;
+      const campaignBody = JSON.parse(campaignResponse.body);
+      campaignId = campaignBody.campaign.id;
 
-      // Create game for other user
-      const otherGameResponse = await app.inject({
+      // Create campaign for other user
+      const otherCampaignResponse = await app.inject({
         method: 'POST',
-        url: '/api/v1/games',
+        url: '/api/v1/campaigns',
         headers: {
           authorization: `Bearer ${otherSessionId}`,
         },
         payload: {
-          name: 'Other User Game',
+          name: 'Other User Campaign',
         },
       });
-      const otherGameBody = JSON.parse(otherGameResponse.body);
-      otherGameId = otherGameBody.game.id;
+      const otherCampaignBody = JSON.parse(otherCampaignResponse.body);
+      otherCampaignId = otherCampaignBody.campaign.id;
     });
 
-    it('should get a game by ID when user is the owner', async () => {
+    it('should get a campaign by ID when user is the owner', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}`,
+        url: `/api/v1/campaigns/${campaignId}`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -364,15 +364,15 @@ describe('Games Routes', () => {
 
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
-      expect(body.game.id).toBe(gameId);
-      expect(body.game.name).toBe('Test Game');
-      expect(body.game.ownerId).toBe(userId);
+      expect(body.campaign.id).toBe(campaignId);
+      expect(body.campaign.name).toBe('Test Campaign');
+      expect(body.campaign.ownerId).toBe(userId);
     });
 
-    it('should return 404 if game does not exist', async () => {
+    it('should return 404 if campaign does not exist', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: '/api/v1/games/00000000-0000-0000-0000-000000000000',
+        url: '/api/v1/campaigns/00000000-0000-0000-0000-000000000000',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -380,13 +380,13 @@ describe('Games Routes', () => {
 
       expect(response.statusCode).toBe(404);
       const body = JSON.parse(response.body);
-      expect(body.error).toBe('Game not found');
+      expect(body.error).toBe('Campaign not found');
     });
 
     it('should return 403 if user is not the owner', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${otherGameId}`,
+        url: `/api/v1/campaigns/${otherCampaignId}`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -400,7 +400,7 @@ describe('Games Routes', () => {
     it('should return 401 without authorization header', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}`,
+        url: `/api/v1/campaigns/${campaignId}`,
       });
 
       expect(response.statusCode).toBe(401);
@@ -409,7 +409,7 @@ describe('Games Routes', () => {
     it('should return 401 with invalid session', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}`,
+        url: `/api/v1/campaigns/${campaignId}`,
         headers: {
           authorization: 'Bearer invalid-session-id',
         },
@@ -419,20 +419,20 @@ describe('Games Routes', () => {
     });
   });
 
-  describe('PATCH /api/v1/games/:id', () => {
-    let gameId: string;
-    let otherGameId: string;
+  describe('PATCH /api/v1/campaigns/:id', () => {
+    let campaignId: string;
+    let otherCampaignId: string;
 
     beforeEach(async () => {
-      // Create game for test user
-      const gameResponse = await app.inject({
+      // Create campaign for test user
+      const campaignResponse = await app.inject({
         method: 'POST',
-        url: '/api/v1/games',
+        url: '/api/v1/campaigns',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
         payload: {
-          name: 'Test Game',
+          name: 'Test Campaign',
           settings: {
             gridType: 'square',
             gridSize: 50,
@@ -440,46 +440,46 @@ describe('Games Routes', () => {
           },
         },
       });
-      const gameBody = JSON.parse(gameResponse.body);
-      gameId = gameBody.game.id;
+      const campaignBody = JSON.parse(campaignResponse.body);
+      campaignId = campaignBody.campaign.id;
 
-      // Create game for other user
-      const otherGameResponse = await app.inject({
+      // Create campaign for other user
+      const otherCampaignResponse = await app.inject({
         method: 'POST',
-        url: '/api/v1/games',
+        url: '/api/v1/campaigns',
         headers: {
           authorization: `Bearer ${otherSessionId}`,
         },
         payload: {
-          name: 'Other User Game',
+          name: 'Other User Campaign',
         },
       });
-      const otherGameBody = JSON.parse(otherGameResponse.body);
-      otherGameId = otherGameBody.game.id;
+      const otherCampaignBody = JSON.parse(otherCampaignResponse.body);
+      otherCampaignId = otherCampaignBody.campaign.id;
     });
 
-    it('should update game name', async () => {
+    it('should update campaign name', async () => {
       const response = await app.inject({
         method: 'PATCH',
-        url: `/api/v1/games/${gameId}`,
+        url: `/api/v1/campaigns/${campaignId}`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
         payload: {
-          name: 'Updated Game Name',
+          name: 'Updated Campaign Name',
         },
       });
 
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
-      expect(body.game.name).toBe('Updated Game Name');
-      expect(body.game.id).toBe(gameId);
+      expect(body.campaign.name).toBe('Updated Campaign Name');
+      expect(body.campaign.id).toBe(campaignId);
     });
 
-    it('should update game settings', async () => {
+    it('should update campaign settings', async () => {
       const response = await app.inject({
         method: 'PATCH',
-        url: `/api/v1/games/${gameId}`,
+        url: `/api/v1/campaigns/${campaignId}`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -493,15 +493,15 @@ describe('Games Routes', () => {
 
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
-      expect(body.game.settings.gridType).toBe('hex');
-      expect(body.game.settings.gridSize).toBe(100);
-      expect(body.game.settings.snapToGrid).toBe(true); // Should preserve existing setting
+      expect(body.campaign.settings.gridType).toBe('hex');
+      expect(body.campaign.settings.gridSize).toBe(100);
+      expect(body.campaign.settings.snapToGrid).toBe(true); // Should preserve existing setting
     });
 
     it('should update both name and settings', async () => {
       const response = await app.inject({
         method: 'PATCH',
-        url: `/api/v1/games/${gameId}`,
+        url: `/api/v1/campaigns/${campaignId}`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -515,14 +515,14 @@ describe('Games Routes', () => {
 
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
-      expect(body.game.name).toBe('Updated Name');
-      expect(body.game.settings.gridType).toBe('hex');
+      expect(body.campaign.name).toBe('Updated Name');
+      expect(body.campaign.settings.gridType).toBe('hex');
     });
 
     it('should trim whitespace from updated name', async () => {
       const response = await app.inject({
         method: 'PATCH',
-        url: `/api/v1/games/${gameId}`,
+        url: `/api/v1/campaigns/${campaignId}`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -533,13 +533,13 @@ describe('Games Routes', () => {
 
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
-      expect(body.game.name).toBe('Updated Name');
+      expect(body.campaign.name).toBe('Updated Name');
     });
 
     it('should return 400 if no fields are provided', async () => {
       const response = await app.inject({
         method: 'PATCH',
-        url: `/api/v1/games/${gameId}`,
+        url: `/api/v1/campaigns/${campaignId}`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -554,7 +554,7 @@ describe('Games Routes', () => {
     it('should return 400 if name is empty', async () => {
       const response = await app.inject({
         method: 'PATCH',
-        url: `/api/v1/games/${gameId}`,
+        url: `/api/v1/campaigns/${campaignId}`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -571,7 +571,7 @@ describe('Games Routes', () => {
     it('should return 400 if name is only whitespace', async () => {
       const response = await app.inject({
         method: 'PATCH',
-        url: `/api/v1/games/${gameId}`,
+        url: `/api/v1/campaigns/${campaignId}`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -582,13 +582,13 @@ describe('Games Routes', () => {
 
       expect(response.statusCode).toBe(400);
       const body = JSON.parse(response.body);
-      expect(body.error).toBe('Game name cannot be empty');
+      expect(body.error).toBe('Campaign name cannot be empty');
     });
 
-    it('should return 404 if game does not exist', async () => {
+    it('should return 404 if campaign does not exist', async () => {
       const response = await app.inject({
         method: 'PATCH',
-        url: '/api/v1/games/00000000-0000-0000-0000-000000000000',
+        url: '/api/v1/campaigns/00000000-0000-0000-0000-000000000000',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -599,13 +599,13 @@ describe('Games Routes', () => {
 
       expect(response.statusCode).toBe(404);
       const body = JSON.parse(response.body);
-      expect(body.error).toBe('Game not found');
+      expect(body.error).toBe('Campaign not found');
     });
 
     it('should return 403 if user is not the owner', async () => {
       const response = await app.inject({
         method: 'PATCH',
-        url: `/api/v1/games/${otherGameId}`,
+        url: `/api/v1/campaigns/${otherCampaignId}`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -616,13 +616,13 @@ describe('Games Routes', () => {
 
       expect(response.statusCode).toBe(403);
       const body = JSON.parse(response.body);
-      expect(body.error).toBe('Only the owner can update this game');
+      expect(body.error).toBe('Only the owner can update this campaign');
     });
 
     it('should return 401 without authorization header', async () => {
       const response = await app.inject({
         method: 'PATCH',
-        url: `/api/v1/games/${gameId}`,
+        url: `/api/v1/campaigns/${campaignId}`,
         payload: {
           name: 'Updated Name',
         },
@@ -634,7 +634,7 @@ describe('Games Routes', () => {
     it('should return 401 with invalid session', async () => {
       const response = await app.inject({
         method: 'PATCH',
-        url: `/api/v1/games/${gameId}`,
+        url: `/api/v1/campaigns/${campaignId}`,
         headers: {
           authorization: 'Bearer invalid-session-id',
         },
@@ -647,44 +647,44 @@ describe('Games Routes', () => {
     });
   });
 
-  describe('DELETE /api/v1/games/:id', () => {
-    let gameId: string;
-    let otherGameId: string;
+  describe('DELETE /api/v1/campaigns/:id', () => {
+    let campaignId: string;
+    let otherCampaignId: string;
 
     beforeEach(async () => {
-      // Create game for test user
-      const gameResponse = await app.inject({
+      // Create campaign for test user
+      const campaignResponse = await app.inject({
         method: 'POST',
-        url: '/api/v1/games',
+        url: '/api/v1/campaigns',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
         payload: {
-          name: 'Test Game',
+          name: 'Test Campaign',
         },
       });
-      const gameBody = JSON.parse(gameResponse.body);
-      gameId = gameBody.game.id;
+      const campaignBody = JSON.parse(campaignResponse.body);
+      campaignId = campaignBody.campaign.id;
 
-      // Create game for other user
-      const otherGameResponse = await app.inject({
+      // Create campaign for other user
+      const otherCampaignResponse = await app.inject({
         method: 'POST',
-        url: '/api/v1/games',
+        url: '/api/v1/campaigns',
         headers: {
           authorization: `Bearer ${otherSessionId}`,
         },
         payload: {
-          name: 'Other User Game',
+          name: 'Other User Campaign',
         },
       });
-      const otherGameBody = JSON.parse(otherGameResponse.body);
-      otherGameId = otherGameBody.game.id;
+      const otherCampaignBody = JSON.parse(otherCampaignResponse.body);
+      otherCampaignId = otherCampaignBody.campaign.id;
     });
 
-    it('should delete a game when user is the owner', async () => {
+    it('should delete a campaign when user is the owner', async () => {
       const response = await app.inject({
         method: 'DELETE',
-        url: `/api/v1/games/${gameId}`,
+        url: `/api/v1/campaigns/${campaignId}`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -694,20 +694,20 @@ describe('Games Routes', () => {
       const body = JSON.parse(response.body);
       expect(body.success).toBe(true);
 
-      // Verify game is deleted from database
-      const [deletedGame] = await db
+      // Verify campaign is deleted from database
+      const [deletedCampaign] = await db
         .select()
-        .from(games)
-        .where(eq(games.id, gameId))
+        .from(campaigns)
+        .where(eq(campaigns.id, campaignId))
         .limit(1);
 
-      expect(deletedGame).toBeUndefined();
+      expect(deletedCampaign).toBeUndefined();
     });
 
-    it('should return 404 if game does not exist', async () => {
+    it('should return 404 if campaign does not exist', async () => {
       const response = await app.inject({
         method: 'DELETE',
-        url: '/api/v1/games/00000000-0000-0000-0000-000000000000',
+        url: '/api/v1/campaigns/00000000-0000-0000-0000-000000000000',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -715,13 +715,13 @@ describe('Games Routes', () => {
 
       expect(response.statusCode).toBe(404);
       const body = JSON.parse(response.body);
-      expect(body.error).toBe('Game not found');
+      expect(body.error).toBe('Campaign not found');
     });
 
     it('should return 403 if user is not the owner', async () => {
       const response = await app.inject({
         method: 'DELETE',
-        url: `/api/v1/games/${otherGameId}`,
+        url: `/api/v1/campaigns/${otherCampaignId}`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -729,13 +729,13 @@ describe('Games Routes', () => {
 
       expect(response.statusCode).toBe(403);
       const body = JSON.parse(response.body);
-      expect(body.error).toBe('Only the owner can delete this game');
+      expect(body.error).toBe('Only the owner can delete this campaign');
     });
 
     it('should return 401 without authorization header', async () => {
       const response = await app.inject({
         method: 'DELETE',
-        url: `/api/v1/games/${gameId}`,
+        url: `/api/v1/campaigns/${campaignId}`,
       });
 
       expect(response.statusCode).toBe(401);
@@ -744,7 +744,7 @@ describe('Games Routes', () => {
     it('should return 401 with invalid session', async () => {
       const response = await app.inject({
         method: 'DELETE',
-        url: `/api/v1/games/${gameId}`,
+        url: `/api/v1/campaigns/${campaignId}`,
         headers: {
           authorization: 'Bearer invalid-session-id',
         },

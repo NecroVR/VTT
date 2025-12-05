@@ -38,10 +38,10 @@ export async function handleJournalCreate(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Journal create');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
   const playerInfo = roomManager.getPlayerInfo(socket);
 
-  if (!gameId || !playerInfo) {
+  if (!campaignId || !playerInfo) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -61,7 +61,7 @@ export async function handleJournalCreate(
     const newJournals = await request.server.db
       .insert(journals)
       .values({
-        gameId,
+        campaignId,
         name,
         img,
         folderId,
@@ -78,7 +78,7 @@ export async function handleJournalCreate(
     const createdPayload: JournalCreatedPayload = {
       journal: {
         id: newJournal.id,
-        gameId: newJournal.gameId,
+        campaignId: newJournal.campaignId,
         name: newJournal.name,
         img: newJournal.img,
         folderId: newJournal.folderId,
@@ -91,13 +91,13 @@ export async function handleJournalCreate(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'journal:created',
       payload: createdPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ journalId: newJournal.id, gameId }, 'Journal created');
+    request.log.info({ journalId: newJournal.id, campaignId }, 'Journal created');
   } catch (error) {
     request.log.error({ error }, 'Error creating journal');
     sendError(socket, 'Failed to create journal');
@@ -115,9 +115,9 @@ export async function handleJournalUpdate(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Journal update');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -146,7 +146,7 @@ export async function handleJournalUpdate(
     const updatedPayload: JournalUpdatedPayload = {
       journal: {
         id: updatedJournal.id,
-        gameId: updatedJournal.gameId,
+        campaignId: updatedJournal.campaignId,
         name: updatedJournal.name,
         img: updatedJournal.img,
         folderId: updatedJournal.folderId,
@@ -159,13 +159,13 @@ export async function handleJournalUpdate(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'journal:updated',
       payload: updatedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ journalId, gameId }, 'Journal updated');
+    request.log.info({ journalId, campaignId }, 'Journal updated');
   } catch (error) {
     request.log.error({ error }, 'Error updating journal');
     sendError(socket, 'Failed to update journal');
@@ -183,9 +183,9 @@ export async function handleJournalDelete(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Journal delete');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -206,13 +206,13 @@ export async function handleJournalDelete(
 
     // Broadcast to all players
     const deletedPayload: JournalDeletedPayload = { journalId };
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'journal:deleted',
       payload: deletedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ journalId, gameId }, 'Journal deleted');
+    request.log.info({ journalId, campaignId }, 'Journal deleted');
   } catch (error) {
     request.log.error({ error }, 'Error deleting journal');
     sendError(socket, 'Failed to delete journal');
@@ -230,10 +230,10 @@ export async function handleJournalShow(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Journal show');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
   const playerInfo = roomManager.getPlayerInfo(socket);
 
-  if (!gameId || !playerInfo) {
+  if (!campaignId || !playerInfo) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -264,7 +264,7 @@ export async function handleJournalShow(
     const shownPayload: JournalShownPayload = {
       journal: {
         id: journal.id,
-        gameId: journal.gameId,
+        campaignId: journal.campaignId,
         name: journal.name,
         img: journal.img,
         folderId: journal.folderId,
@@ -300,7 +300,7 @@ export async function handleJournalShow(
 
     // For this implementation, we'll broadcast to all players in the room
     // and include the targetUserIds so clients can determine if they should display it
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'journal:shown',
       payload: shownPayload,
       timestamp: Date.now(),
@@ -308,7 +308,7 @@ export async function handleJournalShow(
 
     request.log.info({
       journalId,
-      gameId,
+      campaignId,
       targetUserIds,
       shownBy: playerInfo.userId
     }, 'Journal shown to players');
@@ -329,9 +329,9 @@ export async function handlePageCreate(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Page create');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -382,13 +382,13 @@ export async function handlePageCreate(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'page:created',
       payload: createdPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ pageId: newPage.id, journalId, gameId }, 'Page created');
+    request.log.info({ pageId: newPage.id, journalId, campaignId }, 'Page created');
   } catch (error) {
     request.log.error({ error }, 'Error creating page');
     sendError(socket, 'Failed to create page');
@@ -406,9 +406,9 @@ export async function handlePageUpdate(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Page update');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -450,13 +450,13 @@ export async function handlePageUpdate(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'page:updated',
       payload: updatedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ pageId, gameId }, 'Page updated');
+    request.log.info({ pageId, campaignId }, 'Page updated');
   } catch (error) {
     request.log.error({ error }, 'Error updating page');
     sendError(socket, 'Failed to update page');
@@ -474,9 +474,9 @@ export async function handlePageDelete(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Page delete');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -497,13 +497,13 @@ export async function handlePageDelete(
 
     // Broadcast to all players
     const deletedPayload: PageDeletedPayload = { pageId };
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'page:deleted',
       payload: deletedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ pageId, gameId }, 'Page deleted');
+    request.log.info({ pageId, campaignId }, 'Page deleted');
   } catch (error) {
     request.log.error({ error }, 'Error deleting page');
     sendError(socket, 'Failed to delete page');
@@ -521,9 +521,9 @@ export async function handleFolderCreate(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Folder create');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -542,7 +542,7 @@ export async function handleFolderCreate(
     const newFolders = await request.server.db
       .insert(folders)
       .values({
-        gameId,
+        campaignId,
         name,
         folderType,
         parentId,
@@ -558,7 +558,7 @@ export async function handleFolderCreate(
     const createdPayload: FolderCreatedPayload = {
       folder: {
         id: newFolder.id,
-        gameId: newFolder.gameId,
+        campaignId: newFolder.campaignId,
         name: newFolder.name,
         folderType: newFolder.folderType,
         parentId: newFolder.parentId,
@@ -569,13 +569,13 @@ export async function handleFolderCreate(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'folder:created',
       payload: createdPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ folderId: newFolder.id, gameId }, 'Folder created');
+    request.log.info({ folderId: newFolder.id, campaignId }, 'Folder created');
   } catch (error) {
     request.log.error({ error }, 'Error creating folder');
     sendError(socket, 'Failed to create folder');
@@ -593,9 +593,9 @@ export async function handleFolderUpdate(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Folder update');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -621,7 +621,7 @@ export async function handleFolderUpdate(
     const updatedPayload: FolderUpdatedPayload = {
       folder: {
         id: updatedFolder.id,
-        gameId: updatedFolder.gameId,
+        campaignId: updatedFolder.campaignId,
         name: updatedFolder.name,
         folderType: updatedFolder.folderType,
         parentId: updatedFolder.parentId,
@@ -632,13 +632,13 @@ export async function handleFolderUpdate(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'folder:updated',
       payload: updatedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ folderId, gameId }, 'Folder updated');
+    request.log.info({ folderId, campaignId }, 'Folder updated');
   } catch (error) {
     request.log.error({ error }, 'Error updating folder');
     sendError(socket, 'Failed to update folder');
@@ -656,9 +656,9 @@ export async function handleFolderDelete(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Folder delete');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -679,13 +679,13 @@ export async function handleFolderDelete(
 
     // Broadcast to all players
     const deletedPayload: FolderDeletedPayload = { folderId };
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'folder:deleted',
       payload: deletedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ folderId, gameId }, 'Folder deleted');
+    request.log.info({ folderId, campaignId }, 'Folder deleted');
   } catch (error) {
     request.log.error({ error }, 'Error deleting folder');
     sendError(socket, 'Failed to delete folder');

@@ -24,10 +24,10 @@ export async function handleActorCreate(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Actor create');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
   const playerInfo = roomManager.getPlayerInfo(socket);
 
-  if (!gameId || !playerInfo) {
+  if (!campaignId || !playerInfo) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -49,7 +49,7 @@ export async function handleActorCreate(
     const newActors = await request.server.db
       .insert(actors)
       .values({
-        gameId,
+        campaignId,
         name,
         actorType,
         img,
@@ -68,7 +68,7 @@ export async function handleActorCreate(
     const createdPayload: ActorCreatedPayload = {
       actor: {
         id: newActor.id,
-        gameId: newActor.gameId,
+        campaignId: newActor.campaignId,
         name: newActor.name,
         actorType: newActor.actorType,
         img: newActor.img,
@@ -83,13 +83,13 @@ export async function handleActorCreate(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'actor:created',
       payload: createdPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ actorId: newActor.id, gameId }, 'Actor created');
+    request.log.info({ actorId: newActor.id, campaignId }, 'Actor created');
   } catch (error) {
     request.log.error({ error }, 'Error creating actor');
     sendError(socket, 'Failed to create actor');
@@ -107,9 +107,9 @@ export async function handleActorUpdate(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Actor update');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -138,7 +138,7 @@ export async function handleActorUpdate(
     const updatedPayload: ActorUpdatedPayload = {
       actor: {
         id: updatedActor.id,
-        gameId: updatedActor.gameId,
+        campaignId: updatedActor.campaignId,
         name: updatedActor.name,
         actorType: updatedActor.actorType,
         img: updatedActor.img,
@@ -153,13 +153,13 @@ export async function handleActorUpdate(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'actor:updated',
       payload: updatedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ actorId, gameId }, 'Actor updated');
+    request.log.info({ actorId, campaignId }, 'Actor updated');
   } catch (error) {
     request.log.error({ error }, 'Error updating actor');
     sendError(socket, 'Failed to update actor');
@@ -177,9 +177,9 @@ export async function handleActorDelete(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Actor delete');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -200,13 +200,13 @@ export async function handleActorDelete(
 
     // Broadcast to all players
     const deletedPayload: ActorDeletedPayload = { actorId };
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'actor:deleted',
       payload: deletedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ actorId, gameId }, 'Actor deleted');
+    request.log.info({ actorId, campaignId }, 'Actor deleted');
   } catch (error) {
     request.log.error({ error }, 'Error deleting actor');
     sendError(socket, 'Failed to delete actor');

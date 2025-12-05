@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify';
-import { tokens, scenes, games, actors } from '@vtt/database';
+import { tokens, scenes, actors, campaigns } from '@vtt/database';
 import { eq, and } from 'drizzle-orm';
 import type { Token } from '@vtt/shared';
 import { authenticate } from '../../../middleware/auth.js';

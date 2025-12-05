@@ -14,7 +14,7 @@ export interface EffectChange {
 // Active Effect interface
 export interface ActiveEffect {
   id: string;
-  gameId: string;
+  campaignId: string;
   actorId?: string | null;
   tokenId?: string | null;
   name: string;
@@ -46,7 +46,7 @@ export interface ActiveEffect {
 
 // Create Active Effect Request
 export interface CreateActiveEffectRequest {
-  gameId: string;
+  campaignId: string;
   actorId?: string | null;
   tokenId?: string | null;
   name: string;

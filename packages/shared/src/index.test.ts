@@ -42,7 +42,7 @@ describe('Index Exports', () => {
       type TestScene = shared.Scene;
       const scene: TestScene = {
         id: 'scene1',
-        gameId: 'game1',
+        campaignId: 'game1',
         name: 'Test Scene',
         active: true,
         gridType: 'square',
@@ -116,7 +116,7 @@ describe('Index Exports', () => {
       type TestActor = shared.Actor;
       const actor: TestActor = {
         id: 'actor1',
-        gameId: 'game1',
+        campaignId: 'game1',
         name: 'Actor',
         actorType: 'character',
         img: null,
@@ -137,7 +137,7 @@ describe('Index Exports', () => {
       type TestItem = shared.Item;
       const item: TestItem = {
         id: 'item1',
-        gameId: 'game1',
+        campaignId: 'game1',
         actorId: null,
         name: 'Item',
         itemType: 'misc',
@@ -160,7 +160,7 @@ describe('Index Exports', () => {
       const combat: TestCombat = {
         id: 'combat1',
         sceneId: null,
-        gameId: 'game1',
+        campaignId: 'game1',
         active: false,
         round: 1,
         turn: 0,
@@ -176,7 +176,7 @@ describe('Index Exports', () => {
       type TestChatMessage = shared.ChatMessage;
       const message: TestChatMessage = {
         id: 'msg1',
-        gameId: 'game1',
+        campaignId: 'game1',
         userId: null,
         content: 'Test',
         messageType: 'chat',

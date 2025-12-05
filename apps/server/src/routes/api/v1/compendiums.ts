@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify';
-import { compendiums, compendiumEntries, games, actors, items } from '@vtt/database';
+import { compendiums, compendiumEntries, campaigns, actors, items } from '@vtt/database';
 import { eq, and, sql, ilike, inArray, isNull } from 'drizzle-orm';
 import type {
   Compendium,
@@ -39,11 +39,11 @@ const compendiumsRoute: FastifyPluginAsync = async (fastify) => {
       }
 
       try {
-        // Get all system-wide compendiums (gameId is null)
+        // Get all system-wide compendiums (campaignId is null)
         const systemCompendiums = await fastify.db
           .select()
           .from(compendiums)
-          .where(isNull(compendiums.gameId));
+          .where(isNull(compendiums.campaignId));
 
         // TODO: Get compendiums from user's games
         // For now, just return system compendiums
@@ -59,29 +59,29 @@ const compendiumsRoute: FastifyPluginAsync = async (fastify) => {
   );
 
   /**
-   * GET /api/v1/games/:gameId/compendiums - List game-specific compendiums
+   * GET /api/v1/games/:campaignId/compendiums - List game-specific compendiums
    * Returns compendiums for a specific game plus system-wide compendiums
    */
-  fastify.get<{ Params: { gameId: string } }>(
-    '/games/:gameId/compendiums',
+  fastify.get<{ Params: { campaignId: string } }>(
+    '/campaigns/:campaignId/compendiums',
     { preHandler: authenticate },
     async (request, reply) => {
       if (!request.user) {
         return reply.status(401).send({ error: 'Not authenticated' });
       }
 
-      const { gameId } = request.params;
+      const { campaignId } = request.params;
 
       try {
-        // Verify game exists
-        const [game] = await fastify.db
+        // Verify campaign exists
+        const [campaign] = await fastify.db
           .select()
-          .from(games)
-          .where(eq(games.id, gameId))
+          .from(campaigns)
+          .where(eq(campaigns.id, campaignId))
           .limit(1);
 
-        if (!game) {
-          return reply.status(404).send({ error: 'Game not found' });
+        if (!campaign) {
+          return reply.status(404).send({ error: 'Campaign not found' });
         }
 
         // TODO: Check if user has access to this game
@@ -91,7 +91,7 @@ const compendiumsRoute: FastifyPluginAsync = async (fastify) => {
           .select()
           .from(compendiums)
           .where(
-            sql`${compendiums.gameId} IS NULL OR ${compendiums.gameId} = ${gameId}`
+            sql`${compendiums.campaignId} IS NULL OR ${compendiums.campaignId} = ${campaignId}`
           );
 
         const formattedCompendiums: Compendium[] = gameCompendiums.map(formatCompendium);
@@ -105,18 +105,18 @@ const compendiumsRoute: FastifyPluginAsync = async (fastify) => {
   );
 
   /**
-   * POST /api/v1/games/:gameId/compendiums - Create a compendium
-   * Creates a new compendium for a game
+   * POST /api/v1/games/:campaignId/compendiums - Create a compendium
+   * Creates a new compendium for a campaign
    */
-  fastify.post<{ Params: { gameId: string }; Body: CreateCompendiumRequest }>(
-    '/games/:gameId/compendiums',
+  fastify.post<{ Params: { campaignId: string }; Body: CreateCompendiumRequest }>(
+    '/campaigns/:campaignId/compendiums',
     { preHandler: authenticate },
     async (request, reply) => {
       if (!request.user) {
         return reply.status(401).send({ error: 'Not authenticated' });
       }
 
-      const { gameId } = request.params;
+      const { campaignId } = request.params;
       const compendiumData = request.body;
 
       // Validate required fields
@@ -133,24 +133,24 @@ const compendiumsRoute: FastifyPluginAsync = async (fastify) => {
       }
 
       try {
-        // Verify game exists
-        const [game] = await fastify.db
+        // Verify campaign exists
+        const [campaign] = await fastify.db
           .select()
-          .from(games)
-          .where(eq(games.id, gameId))
+          .from(campaigns)
+          .where(eq(campaigns.id, campaignId))
           .limit(1);
 
-        if (!game) {
-          return reply.status(404).send({ error: 'Game not found' });
+        if (!campaign) {
+          return reply.status(404).send({ error: 'Campaign not found' });
         }
 
-        // TODO: Check if user is the game owner
+        // TODO: Check if user is the campaign owner
 
         // Create compendium
         const newCompendiums = await fastify.db
           .insert(compendiums)
           .values({
-            gameId,
+            campaignId,
             name: compendiumData.name.trim(),
             label: compendiumData.label.trim(),
             entityType: compendiumData.entityType,
@@ -846,9 +846,9 @@ const compendiumsRoute: FastifyPluginAsync = async (fastify) => {
       }
 
       const { entryId } = request.params;
-      const { gameId, sceneId, actorId } = request.body;
+      const { campaignId, sceneId, actorId } = request.body;
 
-      if (!gameId) {
+      if (!campaignId) {
         return reply.status(400).send({ error: 'Game ID is required' });
       }
 
@@ -864,15 +864,15 @@ const compendiumsRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Entry not found' });
         }
 
-        // Verify game exists
-        const [game] = await fastify.db
+        // Verify campaign exists
+        const [campaign] = await fastify.db
           .select()
-          .from(games)
-          .where(eq(games.id, gameId))
+          .from(campaigns)
+          .where(eq(campaigns.id, campaignId))
           .limit(1);
 
-        if (!game) {
-          return reply.status(404).send({ error: 'Game not found' });
+        if (!campaign) {
+          return reply.status(404).send({ error: 'Campaign not found' });
         }
 
         // TODO: Check if user has access to this game
@@ -886,7 +886,7 @@ const compendiumsRoute: FastifyPluginAsync = async (fastify) => {
             const newActors = await fastify.db
               .insert(actors)
               .values({
-                gameId,
+                campaignId,
                 name: entry.name,
                 actorType: (entityData.actorType as string) || 'character',
                 img: entry.img,
@@ -909,7 +909,7 @@ const compendiumsRoute: FastifyPluginAsync = async (fastify) => {
             const newItems = await fastify.db
               .insert(items)
               .values({
-                gameId,
+                campaignId,
                 actorId,
                 name: entry.name,
                 itemType: (entityData.itemType as string) || 'item',
@@ -962,7 +962,7 @@ const compendiumsRoute: FastifyPluginAsync = async (fastify) => {
 function formatCompendium(compendium: any): Compendium {
   return {
     id: compendium.id,
-    gameId: compendium.gameId,
+    campaignId: compendium.campaignId,
     name: compendium.name,
     label: compendium.label,
     entityType: compendium.entityType as CompendiumEntityType,

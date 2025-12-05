@@ -10,7 +10,7 @@ describe('Scenes Routes', () => {
   let db: ReturnType<typeof createDb>;
   let sessionId: string;
   let userId: string;
-  let gameId: string;
+  let campaignId: string;
 
   beforeAll(async () => {
     // Build app with test config
@@ -68,7 +68,7 @@ describe('Scenes Routes', () => {
     gameId = gameBody.game.id;
   });
 
-  describe('POST /api/v1/games/:gameId/scenes', () => {
+  describe('POST /api/v1/games/:campaignId/scenes', () => {
     it('should create a new scene with minimal data', async () => {
       const response = await app.inject({
         method: 'POST',
@@ -160,7 +160,7 @@ describe('Scenes Routes', () => {
 
       expect(response.statusCode).toBe(404);
       const body = JSON.parse(response.body);
-      expect(body.error).toBe('Game not found');
+      expect(body.error).toBe('Campaign not found');
     });
 
     it('should return 401 without authorization header', async () => {
@@ -191,7 +191,7 @@ describe('Scenes Routes', () => {
     });
   });
 
-  describe('GET /api/v1/games/:gameId/scenes', () => {
+  describe('GET /api/v1/games/:campaignId/scenes', () => {
     beforeEach(async () => {
       // Create test scenes
       await app.inject({
@@ -263,7 +263,7 @@ describe('Scenes Routes', () => {
 
       expect(response.statusCode).toBe(404);
       const body = JSON.parse(response.body);
-      expect(body.error).toBe('Game not found');
+      expect(body.error).toBe('Campaign not found');
     });
 
     it('should return 401 without authorization header', async () => {

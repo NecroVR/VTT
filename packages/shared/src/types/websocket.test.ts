@@ -425,7 +425,7 @@ describe('WebSocket Types', () => {
       const payload: SceneSwitchedPayload = {
         scene: {
           id: 'scene123',
-          gameId: 'game123',
+          campaignId: 'game123',
           name: 'Battle Map',
           active: true,
           gridType: 'square',
@@ -468,7 +468,7 @@ describe('WebSocket Types', () => {
       const payload: SceneUpdatedPayload = {
         scene: {
           id: 'scene123',
-          gameId: 'game123',
+          campaignId: 'game123',
           name: 'Updated Scene',
           active: true,
           gridType: 'square',

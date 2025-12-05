@@ -18,7 +18,7 @@ describe('Combat Types', () => {
       const combat: Combat = {
         id: 'combat123',
         sceneId: null,
-        gameId: 'game123',
+        campaignId: 'game123',
         active: false,
         round: 1,
         turn: 0,
@@ -29,7 +29,7 @@ describe('Combat Types', () => {
       };
 
       expect(combat.id).toBe('combat123');
-      expect(combat.gameId).toBe('game123');
+      expect(combat.campaignId).toBe('game123');
       expect(combat.active).toBe(false);
       expect(combat.round).toBe(1);
       expect(combat.turn).toBe(0);
@@ -39,7 +39,7 @@ describe('Combat Types', () => {
       const combat: Combat = {
         id: 'combat1',
         sceneId: 'scene123',
-        gameId: 'game123',
+        campaignId: 'game123',
         active: true,
         round: 3,
         turn: 2,
@@ -57,7 +57,7 @@ describe('Combat Types', () => {
       const combat: Combat = {
         id: 'combat1',
         sceneId: 'scene1',
-        gameId: 'game1',
+        campaignId: 'game1',
         active: true,
         round: 1,
         turn: 0,
@@ -74,7 +74,7 @@ describe('Combat Types', () => {
       const combat: Combat = {
         id: 'combat1',
         sceneId: 'scene1',
-        gameId: 'game1',
+        campaignId: 'game1',
         active: true,
         round: 5,
         turn: 3,
@@ -92,7 +92,7 @@ describe('Combat Types', () => {
       const combat: Combat = {
         id: 'combat1',
         sceneId: null,
-        gameId: 'game1',
+        campaignId: 'game1',
         active: false,
         round: 1,
         turn: 0,
@@ -109,7 +109,7 @@ describe('Combat Types', () => {
       const combat: Combat = {
         id: 'combat1',
         sceneId: null,
-        gameId: 'game1',
+        campaignId: 'game1',
         active: false,
         round: 1,
         turn: 0,
@@ -272,15 +272,15 @@ describe('Combat Types', () => {
   describe('CreateCombatRequest', () => {
     it('should have correct structure with minimal fields', () => {
       const request: CreateCombatRequest = {
-        gameId: 'game123',
+        campaignId: 'game123',
       };
 
-      expect(request.gameId).toBe('game123');
+      expect(request.campaignId).toBe('game123');
     });
 
     it('should handle all optional fields', () => {
       const request: CreateCombatRequest = {
-        gameId: 'game123',
+        campaignId: 'game123',
         sceneId: 'scene123',
         active: true,
         round: 1,
@@ -297,7 +297,7 @@ describe('Combat Types', () => {
 
     it('should handle null scene', () => {
       const request: CreateCombatRequest = {
-        gameId: 'game123',
+        campaignId: 'game123',
         sceneId: null,
       };
 
@@ -492,7 +492,7 @@ describe('Combat Types', () => {
         combat: {
           id: 'combat123',
           sceneId: null,
-          gameId: 'game123',
+          campaignId: 'game123',
           active: false,
           round: 1,
           turn: 0,
@@ -523,7 +523,7 @@ describe('Combat Types', () => {
           {
             id: 'combat1',
             sceneId: 'scene1',
-            gameId: 'game1',
+            campaignId: 'game1',
             active: true,
             round: 2,
             turn: 1,
@@ -535,7 +535,7 @@ describe('Combat Types', () => {
           {
             id: 'combat2',
             sceneId: null,
-            gameId: 'game1',
+            campaignId: 'game1',
             active: false,
             round: 1,
             turn: 0,

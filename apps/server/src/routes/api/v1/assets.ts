@@ -34,7 +34,7 @@ const assetsRoute: FastifyPluginAsync = async (fastify) => {
         // Get metadata from fields
         const fields = data.fields as any;
         const assetType = (fields.assetType?.value as AssetType) || 'other';
-        const gameId = fields.gameId?.value as string | undefined;
+        const campaignId = fields.campaignId?.value as string | undefined;
         const name = fields.name?.value as string | undefined;
         const description = fields.description?.value as string | undefined;
         const tags = fields.tags?.value ? JSON.parse(fields.tags.value as string) : undefined;
@@ -52,7 +52,7 @@ const assetsRoute: FastifyPluginAsync = async (fastify) => {
           .insert(assets)
           .values({
             userId: request.user.id,
-            gameId: gameId || null,
+            campaignId: campaignId || null,
             filename: fileResult.filename,
             originalName: data.filename,
             mimeType: fileResult.mimeType,
@@ -75,7 +75,7 @@ const assetsRoute: FastifyPluginAsync = async (fastify) => {
         const formattedAsset: Asset = {
           id: newAsset.id,
           userId: newAsset.userId,
-          gameId: newAsset.gameId,
+          campaignId: newAsset.campaignId,
           filename: newAsset.filename,
           originalName: newAsset.originalName,
           mimeType: newAsset.mimeType,
@@ -106,12 +106,12 @@ const assetsRoute: FastifyPluginAsync = async (fastify) => {
 
   /**
    * GET /api/v1/assets - List user's assets with filtering
-   * Query params: assetType, gameId, search
+   * Query params: assetType, campaignId, search
    */
   fastify.get<{
     Querystring: {
       assetType?: AssetType;
-      gameId?: string;
+      campaignId?: string;
       search?: string;
     };
   }>(
@@ -122,7 +122,7 @@ const assetsRoute: FastifyPluginAsync = async (fastify) => {
         return reply.status(401).send({ error: 'Not authenticated' });
       }
 
-      const { assetType, gameId, search } = request.query;
+      const { assetType, campaignId, search } = request.query;
 
       try {
         // Build query conditions
@@ -132,8 +132,8 @@ const assetsRoute: FastifyPluginAsync = async (fastify) => {
           conditions.push(eq(assets.assetType, assetType));
         }
 
-        if (gameId) {
-          conditions.push(eq(assets.gameId, gameId));
+        if (campaignId) {
+          conditions.push(eq(assets.campaignId, campaignId));
         }
 
         if (search) {
@@ -156,7 +156,7 @@ const assetsRoute: FastifyPluginAsync = async (fastify) => {
         const formattedAssets: Asset[] = userAssets.map(asset => ({
           id: asset.id,
           userId: asset.userId,
-          gameId: asset.gameId,
+          campaignId: asset.campaignId,
           filename: asset.filename,
           originalName: asset.originalName,
           mimeType: asset.mimeType,
@@ -219,7 +219,7 @@ const assetsRoute: FastifyPluginAsync = async (fastify) => {
         const formattedAsset: Asset = {
           id: asset.id,
           userId: asset.userId,
-          gameId: asset.gameId,
+          campaignId: asset.campaignId,
           filename: asset.filename,
           originalName: asset.originalName,
           mimeType: asset.mimeType,
@@ -296,8 +296,8 @@ const assetsRoute: FastifyPluginAsync = async (fastify) => {
         if (updates.assetType !== undefined) {
           updateData.assetType = updates.assetType;
         }
-        if (updates.gameId !== undefined) {
-          updateData.gameId = updates.gameId;
+        if (updates.campaignId !== undefined) {
+          updateData.campaignId = updates.campaignId;
         }
 
         // Update asset in database
@@ -313,7 +313,7 @@ const assetsRoute: FastifyPluginAsync = async (fastify) => {
         const formattedAsset: Asset = {
           id: updatedAsset.id,
           userId: updatedAsset.userId,
-          gameId: updatedAsset.gameId,
+          campaignId: updatedAsset.campaignId,
           filename: updatedAsset.filename,
           originalName: updatedAsset.originalName,
           mimeType: updatedAsset.mimeType,

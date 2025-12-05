@@ -29,9 +29,9 @@ export async function handleEffectAdd(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Effect add');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -64,7 +64,7 @@ export async function handleEffectAdd(
     const newEffects = await request.server.db
       .insert(activeEffects)
       .values({
-        gameId,
+        campaignId,
         actorId,
         tokenId,
         name,
@@ -94,7 +94,7 @@ export async function handleEffectAdd(
     const addedPayload: EffectAddedPayload = {
       effect: {
         id: newEffect.id,
-        gameId: newEffect.gameId,
+        campaignId: newEffect.campaignId,
         actorId: newEffect.actorId,
         tokenId: newEffect.tokenId,
         name: newEffect.name,
@@ -120,13 +120,13 @@ export async function handleEffectAdd(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'effect:added',
       payload: addedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ effectId: newEffect.id, gameId }, 'Effect added');
+    request.log.info({ effectId: newEffect.id, campaignId }, 'Effect added');
   } catch (error) {
     request.log.error({ error }, 'Error adding effect');
     sendError(socket, 'Failed to add effect');
@@ -144,9 +144,9 @@ export async function handleEffectUpdate(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Effect update');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -175,7 +175,7 @@ export async function handleEffectUpdate(
     const updatedPayload: EffectUpdatedPayload = {
       effect: {
         id: updatedEffect.id,
-        gameId: updatedEffect.gameId,
+        campaignId: updatedEffect.campaignId,
         actorId: updatedEffect.actorId,
         tokenId: updatedEffect.tokenId,
         name: updatedEffect.name,
@@ -201,13 +201,13 @@ export async function handleEffectUpdate(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'effect:updated',
       payload: updatedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ effectId, gameId }, 'Effect updated');
+    request.log.info({ effectId, campaignId }, 'Effect updated');
   } catch (error) {
     request.log.error({ error }, 'Error updating effect');
     sendError(socket, 'Failed to update effect');
@@ -225,9 +225,9 @@ export async function handleEffectRemove(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Effect remove');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -248,13 +248,13 @@ export async function handleEffectRemove(
 
     // Broadcast to all players
     const removedPayload: EffectRemovedPayload = { effectId };
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'effect:removed',
       payload: removedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ effectId, gameId }, 'Effect removed');
+    request.log.info({ effectId, campaignId }, 'Effect removed');
   } catch (error) {
     request.log.error({ error }, 'Error removing effect');
     sendError(socket, 'Failed to remove effect');
@@ -272,9 +272,9 @@ export async function handleEffectToggle(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Effect toggle');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -303,7 +303,7 @@ export async function handleEffectToggle(
     const toggledPayload: EffectToggledPayload = {
       effect: {
         id: updatedEffect.id,
-        gameId: updatedEffect.gameId,
+        campaignId: updatedEffect.campaignId,
         actorId: updatedEffect.actorId,
         tokenId: updatedEffect.tokenId,
         name: updatedEffect.name,
@@ -329,13 +329,13 @@ export async function handleEffectToggle(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'effect:toggled',
       payload: toggledPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ effectId, enabled, gameId }, 'Effect toggled');
+    request.log.info({ effectId, enabled, campaignId }, 'Effect toggled');
   } catch (error) {
     request.log.error({ error }, 'Error toggling effect');
     sendError(socket, 'Failed to toggle effect');

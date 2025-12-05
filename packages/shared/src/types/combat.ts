@@ -1,7 +1,7 @@
 export interface Combat {
   id: string;
   sceneId?: string | null;
-  gameId: string;
+  campaignId: string;
   active: boolean;
   round: number;
   turn: number;
@@ -29,7 +29,7 @@ export interface Combatant {
 }
 
 export interface CreateCombatRequest {
-  gameId: string;
+  campaignId: string;
   sceneId?: string | null;
   active?: boolean;
   round?: number;

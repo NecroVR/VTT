@@ -10,11 +10,11 @@ export type {
 } from '@vtt/shared';
 
 /**
- * Re-export shared game and user types
+ * Re-export shared campaign and user types
  */
 export type {
-  Game,
-  GameSettings,
+  Campaign,
+  CampaignSettings,
   Token,
   MapLayer,
   User,

@@ -59,10 +59,10 @@ export async function handleCompendiumCreate(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Compendium create');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
   const playerInfo = roomManager.getPlayerInfo(socket);
 
-  if (!gameId || !playerInfo) {
+  if (!campaignId || !playerInfo) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -83,7 +83,7 @@ export async function handleCompendiumCreate(
     const newCompendiums = await request.server.db
       .insert(compendiums)
       .values({
-        gameId,
+        campaignId,
         name,
         label,
         entityType,
@@ -101,7 +101,7 @@ export async function handleCompendiumCreate(
     const createdPayload: CompendiumCreatedPayload = {
       compendium: {
         id: newCompendium.id,
-        gameId: newCompendium.gameId,
+        campaignId: newCompendium.campaignId,
         name: newCompendium.name,
         label: newCompendium.label,
         entityType: newCompendium.entityType as CompendiumEntityType,
@@ -115,13 +115,13 @@ export async function handleCompendiumCreate(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'compendium:created',
       payload: createdPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ compendiumId: newCompendium.id, gameId }, 'Compendium created');
+    request.log.info({ compendiumId: newCompendium.id, campaignId }, 'Compendium created');
   } catch (error) {
     request.log.error({ error }, 'Error creating compendium');
     sendError(socket, 'Failed to create compendium');
@@ -139,9 +139,9 @@ export async function handleCompendiumUpdate(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Compendium update');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -187,7 +187,7 @@ export async function handleCompendiumUpdate(
     const updatedPayload: CompendiumUpdatedPayload = {
       compendium: {
         id: updatedCompendium.id,
-        gameId: updatedCompendium.gameId,
+        campaignId: updatedCompendium.campaignId,
         name: updatedCompendium.name,
         label: updatedCompendium.label,
         entityType: updatedCompendium.entityType as CompendiumEntityType,
@@ -201,13 +201,13 @@ export async function handleCompendiumUpdate(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'compendium:updated',
       payload: updatedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ compendiumId, gameId }, 'Compendium updated');
+    request.log.info({ compendiumId, campaignId }, 'Compendium updated');
   } catch (error) {
     request.log.error({ error }, 'Error updating compendium');
     sendError(socket, 'Failed to update compendium');
@@ -225,9 +225,9 @@ export async function handleCompendiumDelete(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Compendium delete');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -265,13 +265,13 @@ export async function handleCompendiumDelete(
 
     // Broadcast to all players
     const deletedPayload: CompendiumDeletedPayload = { compendiumId };
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'compendium:deleted',
       payload: deletedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ compendiumId, gameId }, 'Compendium deleted');
+    request.log.info({ compendiumId, campaignId }, 'Compendium deleted');
   } catch (error) {
     request.log.error({ error }, 'Error deleting compendium');
     sendError(socket, 'Failed to delete compendium');
@@ -289,10 +289,10 @@ export async function handleCompendiumEntryCreate(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Compendium entry create');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
   const playerInfo = roomManager.getPlayerInfo(socket);
 
-  if (!gameId || !playerInfo) {
+  if (!campaignId || !playerInfo) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -374,13 +374,13 @@ export async function handleCompendiumEntryCreate(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'compendium:entry-created',
       payload: createdPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ entryId: newEntry.id, compendiumId, gameId }, 'Compendium entry created');
+    request.log.info({ entryId: newEntry.id, compendiumId, campaignId }, 'Compendium entry created');
   } catch (error) {
     request.log.error({ error }, 'Error creating compendium entry');
     sendError(socket, 'Failed to create compendium entry');
@@ -398,9 +398,9 @@ export async function handleCompendiumEntryUpdate(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Compendium entry update');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -478,13 +478,13 @@ export async function handleCompendiumEntryUpdate(
       },
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'compendium:entry-updated',
       payload: updatedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ entryId, gameId }, 'Compendium entry updated');
+    request.log.info({ entryId, campaignId }, 'Compendium entry updated');
   } catch (error) {
     request.log.error({ error }, 'Error updating compendium entry');
     sendError(socket, 'Failed to update compendium entry');
@@ -502,9 +502,9 @@ export async function handleCompendiumEntryDelete(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Compendium entry delete');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
+  if (!campaignId) {
     sendError(socket, 'Not in a campaign room');
     return;
   }
@@ -553,13 +553,13 @@ export async function handleCompendiumEntryDelete(
       compendiumId: existingEntry.compendiumId,
     };
 
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'compendium:entry-deleted',
       payload: deletedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ entryId, gameId }, 'Compendium entry deleted');
+    request.log.info({ entryId, campaignId }, 'Compendium entry deleted');
   } catch (error) {
     request.log.error({ error }, 'Error deleting compendium entry');
     sendError(socket, 'Failed to delete compendium entry');

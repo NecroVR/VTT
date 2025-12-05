@@ -1,6 +1,6 @@
 export interface Actor {
   id: string;
-  gameId: string;
+  campaignId: string;
   name: string;
   actorType: string;
   img?: string | null;
@@ -21,7 +21,7 @@ export interface Actor {
 }
 
 export interface CreateActorRequest {
-  gameId: string;
+  campaignId: string;
   name: string;
   actorType: string;
   img?: string | null;

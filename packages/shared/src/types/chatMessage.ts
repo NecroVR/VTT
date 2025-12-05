@@ -1,6 +1,6 @@
 export interface ChatMessage {
   id: string;
-  gameId: string;
+  campaignId: string;
   userId?: string | null;
   // Content
   content: string;
@@ -17,7 +17,7 @@ export interface ChatMessage {
 }
 
 export interface CreateChatMessageRequest {
-  gameId: string;
+  campaignId: string;
   userId?: string | null;
   content: string;
   messageType?: string;

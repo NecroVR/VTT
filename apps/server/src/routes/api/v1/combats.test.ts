@@ -10,7 +10,7 @@ describe('Combats Routes', () => {
   let db: ReturnType<typeof createDb>;
   let sessionId: string;
   let userId: string;
-  let gameId: string;
+  let campaignId: string;
 
   beforeAll(async () => {
     // Build app with test config
@@ -72,12 +72,12 @@ describe('Combats Routes', () => {
 
   // ==================== COMBAT ROUTES ====================
 
-  describe('GET /api/v1/games/:gameId/combats', () => {
+  describe('GET /api/v1/games/:campaignId/combats', () => {
     beforeEach(async () => {
       // Create test combats directly in database
       await db.insert(combats).values([
         {
-          gameId,
+          campaignId,
           sceneId: null,
           active: true,
           round: 3,
@@ -86,7 +86,7 @@ describe('Combats Routes', () => {
           data: { difficulty: 'medium' },
         },
         {
-          gameId,
+          campaignId,
           sceneId: null,
           active: false,
           round: 0,
@@ -186,7 +186,7 @@ describe('Combats Routes', () => {
 
       expect(response.statusCode).toBe(404);
       const body = JSON.parse(response.body);
-      expect(body.error).toBe('Game not found');
+      expect(body.error).toBe('Campaign not found');
     });
 
     it('should return 401 without authorization header', async () => {
@@ -232,7 +232,7 @@ describe('Combats Routes', () => {
     beforeEach(async () => {
       // Create a test actor
       const [actor] = await db.insert(actors).values({
-        gameId,
+        campaignId,
         name: 'Fighter',
         actorType: 'character',
         attributes: { hp: 50 },
@@ -245,7 +245,7 @@ describe('Combats Routes', () => {
 
       // Create a test combat
       const [combat] = await db.insert(combats).values({
-        gameId,
+        campaignId,
         sceneId: null,
         active: true,
         round: 2,
@@ -395,7 +395,7 @@ describe('Combats Routes', () => {
     });
   });
 
-  describe('POST /api/v1/games/:gameId/combats', () => {
+  describe('POST /api/v1/games/:campaignId/combats', () => {
     it('should create a new combat', async () => {
       const response = await app.inject({
         method: 'POST',
@@ -454,7 +454,7 @@ describe('Combats Routes', () => {
 
       expect(response.statusCode).toBe(404);
       const body = JSON.parse(response.body);
-      expect(body.error).toBe('Game not found');
+      expect(body.error).toBe('Campaign not found');
     });
 
     it('should return 401 without authorization header', async () => {
@@ -487,7 +487,7 @@ describe('Combats Routes', () => {
     beforeEach(async () => {
       // Create a test combat
       const [combat] = await db.insert(combats).values({
-        gameId,
+        campaignId,
         sceneId: null,
         active: false,
         round: 1,
@@ -629,7 +629,7 @@ describe('Combats Routes', () => {
     beforeEach(async () => {
       // Create a test combat
       const [combat] = await db.insert(combats).values({
-        gameId,
+        campaignId,
         sceneId: null,
         active: false,
         round: 0,
@@ -753,7 +753,7 @@ describe('Combats Routes', () => {
     beforeEach(async () => {
       // Create a test combat
       const [combat] = await db.insert(combats).values({
-        gameId,
+        campaignId,
         sceneId: null,
         active: false,
         round: 0,
@@ -766,7 +766,7 @@ describe('Combats Routes', () => {
 
       // Create a test actor
       const [actor] = await db.insert(actors).values({
-        gameId,
+        campaignId,
         name: 'Wizard',
         actorType: 'character',
         attributes: { hp: 30 },
@@ -896,7 +896,7 @@ describe('Combats Routes', () => {
     beforeEach(async () => {
       // Create a test combat
       const [combat] = await db.insert(combats).values({
-        gameId,
+        campaignId,
         sceneId: null,
         active: false,
         round: 0,
@@ -1051,7 +1051,7 @@ describe('Combats Routes', () => {
     beforeEach(async () => {
       // Create a test combat
       const [combat] = await db.insert(combats).values({
-        gameId,
+        campaignId,
         sceneId: null,
         active: false,
         round: 0,

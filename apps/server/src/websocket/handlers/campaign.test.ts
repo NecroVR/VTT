@@ -105,7 +105,7 @@ describe('Campaign WebSocket Handler', () => {
     const [scene] = await app.db
       .insert(scenes)
       .values({
-        gameId: testCampaignId,
+        campaignId: testCampaignId,
         name: 'Test Scene',
         active: true,
         backgroundImage: 'test.jpg',
@@ -206,7 +206,7 @@ describe('Campaign WebSocket Handler', () => {
       const joinMessage: WSMessage = {
         type: 'campaign:join',
         payload: {
-          gameId: testCampaignId,
+          campaignId: testCampaignId,
           token: testSessionId,
         },
         timestamp: Date.now(),
@@ -249,7 +249,7 @@ describe('Campaign WebSocket Handler', () => {
       const joinMessage: WSMessage = {
         type: 'campaign:join',
         payload: {
-          gameId: testCampaignId,
+          campaignId: testCampaignId,
           token: 'invalid-token',
         },
         timestamp: Date.now(),
@@ -288,7 +288,7 @@ describe('Campaign WebSocket Handler', () => {
       const joinMessage1: WSMessage = {
         type: 'campaign:join',
         payload: {
-          gameId: testCampaignId,
+          campaignId: testCampaignId,
           token: testSessionId,
         },
         timestamp: Date.now(),
@@ -341,7 +341,7 @@ describe('Campaign WebSocket Handler', () => {
       const joinMessage2: WSMessage = {
         type: 'campaign:join',
         payload: {
-          gameId: testCampaignId,
+          campaignId: testCampaignId,
           token: session2.id,
         },
         timestamp: Date.now(),
@@ -385,7 +385,7 @@ describe('Campaign WebSocket Handler', () => {
       const joinMessage: WSMessage = {
         type: 'campaign:join',
         payload: {
-          gameId: testCampaignId,
+          campaignId: testCampaignId,
           token: testSessionId,
         },
         timestamp: Date.now(),
@@ -397,7 +397,7 @@ describe('Campaign WebSocket Handler', () => {
       const leaveMessage: WSMessage = {
         type: 'campaign:leave',
         payload: {
-          gameId: testCampaignId,
+          campaignId: testCampaignId,
         },
         timestamp: Date.now(),
       };
@@ -429,7 +429,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler1(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -461,7 +461,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler2(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: session2.id },
+        payload: { campaignId: testCampaignId, token: session2.id },
         timestamp: Date.now(),
       })));
 
@@ -522,7 +522,7 @@ describe('Campaign WebSocket Handler', () => {
       // Join game first
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -567,7 +567,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -605,7 +605,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -671,7 +671,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -719,7 +719,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -763,7 +763,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -801,7 +801,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -865,7 +865,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -900,7 +900,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -936,7 +936,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -972,7 +972,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1018,7 +1018,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1055,7 +1055,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1119,7 +1119,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1157,7 +1157,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1229,7 +1229,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1266,7 +1266,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1302,7 +1302,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1355,7 +1355,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1394,7 +1394,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1445,7 +1445,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1507,7 +1507,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1564,7 +1564,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1620,7 +1620,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1665,7 +1665,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1778,7 +1778,7 @@ describe('Campaign WebSocket Handler', () => {
       // Join game first
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1833,7 +1833,7 @@ describe('Campaign WebSocket Handler', () => {
       // Join game
       await messageHandler(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1868,7 +1868,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler1(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: testSessionId },
+        payload: { campaignId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1900,7 +1900,7 @@ describe('Campaign WebSocket Handler', () => {
 
       await messageHandler2(Buffer.from(JSON.stringify({
         type: 'campaign:join',
-        payload: { gameId: testCampaignId, token: session2.id },
+        payload: { campaignId: testCampaignId, token: session2.id },
         timestamp: Date.now(),
       })));
 

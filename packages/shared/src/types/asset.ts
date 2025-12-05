@@ -5,7 +5,7 @@ export type AssetType = 'map' | 'token' | 'portrait' | 'tile' | 'other';
 export interface Asset {
   id: string;
   userId: string;
-  gameId?: string | null;
+  campaignId?: string | null;
   filename: string;
   originalName: string;
   mimeType: string;
@@ -25,7 +25,7 @@ export interface Asset {
 
 // Create Asset Request
 export interface CreateAssetRequest {
-  gameId?: string | null;
+  campaignId?: string | null;
   assetType?: AssetType;
   name?: string;
   description?: string;
@@ -40,7 +40,7 @@ export interface UpdateAssetRequest {
   tags?: string[];
   metadata?: Record<string, unknown>;
   assetType?: AssetType;
-  gameId?: string | null;
+  campaignId?: string | null;
 }
 
 // Response interfaces

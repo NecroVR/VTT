@@ -1031,7 +1031,7 @@ async function handleSceneSwitch(
     // Convert to Scene interface
     const scenePayload: Scene = {
       id: scene.id,
-      campaignId: scene.gameId,
+      campaignId: scene.campaignId,
       name: scene.name,
       active: scene.active,
       backgroundImage: scene.backgroundImage,
@@ -1111,7 +1111,7 @@ async function handleSceneUpdate(
     // Convert to Scene interface
     const scenePayload: Scene = {
       id: updatedScene.id,
-      campaignId: updatedScene.gameId,
+      campaignId: updatedScene.campaignId,
       name: updatedScene.name,
       active: updatedScene.active,
       backgroundImage: updatedScene.backgroundImage,

@@ -10,7 +10,7 @@ describe('Walls Routes', () => {
   let db: ReturnType<typeof createDb>;
   let sessionId: string;
   let userId: string;
-  let gameId: string;
+  let campaignId: string;
   let sceneId: string;
 
   beforeAll(async () => {
@@ -71,7 +71,7 @@ describe('Walls Routes', () => {
 
     // Create a test scene
     const [scene] = await db.insert(scenes).values({
-      gameId,
+      campaignId,
       name: 'Test Scene',
       width: 4000,
       height: 3000,

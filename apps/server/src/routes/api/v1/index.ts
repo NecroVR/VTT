@@ -1,7 +1,7 @@
 import type { FastifyPluginAsync } from 'fastify';
 import usersRoute from './users.js';
 import authRoute from './auth.js';
-import gamesRoute from './games.js';
+import campaignsRoute from './campaigns.js';
 import scenesRoute from './scenes.js';
 import tokensRoute from './tokens.js';
 import actorsRoute from './actors.js';
@@ -36,19 +36,19 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
         websocket: '/ws',
         users: '/api/v1/users',
         auth: '/api/v1/auth',
-        games: '/api/v1/games',
+        campaigns: '/api/v1/campaigns',
         scenes: '/api/v1/scenes',
         actors: '/api/v1/actors',
         items: '/api/v1/items',
         combats: '/api/v1/combats',
-        chat: '/api/v1/games/:gameId/chat',
+        chat: '/api/v1/campaigns/:campaignId/chat',
         walls: '/api/v1/walls',
         lights: '/api/v1/lights',
         effects: '/api/v1/effects',
         assets: '/api/v1/assets',
         fog: '/api/v1/scenes/:sceneId/fog',
-        folders: '/api/v1/games/:gameId/folders',
-        journals: '/api/v1/games/:gameId/journals',
+        folders: '/api/v1/campaigns/:campaignId/folders',
+        journals: '/api/v1/campaigns/:campaignId/journals',
         pages: '/api/v1/journals/:journalId/pages',
         templates: '/api/v1/scenes/:sceneId/templates',
         drawings: '/api/v1/scenes/:sceneId/drawings',
@@ -64,7 +64,7 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
   // Register API routes
   await fastify.register(usersRoute);
   await fastify.register(authRoute);
-  await fastify.register(gamesRoute);
+  await fastify.register(campaignsRoute);
   await fastify.register(scenesRoute);
   await fastify.register(tokensRoute);
   await fastify.register(actorsRoute);

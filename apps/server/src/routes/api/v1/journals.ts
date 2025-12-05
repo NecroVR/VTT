@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify';
-import { folders, journals, journalPages, games } from '@vtt/database';
+import { folders, journals, journalPages, campaigns } from '@vtt/database';
 import { eq, and } from 'drizzle-orm';
 import type {
   Folder,
@@ -25,52 +25,52 @@ const journalsRoute: FastifyPluginAsync = async (fastify) => {
   // ========================================
 
   /**
-   * GET /api/v1/games/:gameId/folders - List folders for a game
+   * GET /api/v1/games/:campaignId/folders - List folders for a campaign
    * Returns folders for a specific game, optionally filtered by folderType
    */
-  fastify.get<{ Params: { gameId: string }; Querystring: { folderType?: string } }>(
-    '/games/:gameId/folders',
+  fastify.get<{ Params: { campaignId: string }; Querystring: { folderType?: string } }>(
+    '/campaigns/:campaignId/folders',
     { preHandler: authenticate },
     async (request, reply) => {
       if (!request.user) {
         return reply.status(401).send({ error: 'Not authenticated' });
       }
 
-      const { gameId } = request.params;
+      const { campaignId } = request.params;
       const { folderType } = request.query;
 
       try {
-        // Verify game exists
-        const [game] = await fastify.db
+        // Verify campaign exists
+        const [campaign] = await fastify.db
           .select()
-          .from(games)
-          .where(eq(games.id, gameId))
+          .from(campaigns)
+          .where(eq(campaigns.id, campaignId))
           .limit(1);
 
-        if (!game) {
-          return reply.status(404).send({ error: 'Game not found' });
+        if (!campaign) {
+          return reply.status(404).send({ error: 'Campaign not found' });
         }
 
         // TODO: Check if user has access to this game
 
-        // Fetch folders for the game
+        // Fetch folders for the campaign
         let gameFolders;
         if (folderType) {
           gameFolders = await fastify.db
             .select()
             .from(folders)
-            .where(and(eq(folders.gameId, gameId), eq(folders.folderType, folderType)));
+            .where(and(eq(folders.campaignId, campaignId), eq(folders.folderType, folderType)));
         } else {
           gameFolders = await fastify.db
             .select()
             .from(folders)
-            .where(eq(folders.gameId, gameId));
+            .where(eq(folders.campaignId, campaignId));
         }
 
         // Convert to Folder interface
         const formattedFolders: Folder[] = gameFolders.map(folder => ({
           id: folder.id,
-          gameId: folder.gameId,
+          campaignId: folder.campaignId,
           name: folder.name,
           folderType: folder.folderType,
           parentId: folder.parentId,
@@ -89,18 +89,18 @@ const journalsRoute: FastifyPluginAsync = async (fastify) => {
   );
 
   /**
-   * POST /api/v1/games/:gameId/folders - Create a new folder
+   * POST /api/v1/games/:campaignId/folders - Create a new folder
    * Creates a folder for a specific game
    */
-  fastify.post<{ Params: { gameId: string }; Body: CreateFolderRequest }>(
-    '/games/:gameId/folders',
+  fastify.post<{ Params: { campaignId: string }; Body: CreateFolderRequest }>(
+    '/campaigns/:campaignId/folders',
     { preHandler: authenticate },
     async (request, reply) => {
       if (!request.user) {
         return reply.status(401).send({ error: 'Not authenticated' });
       }
 
-      const { gameId } = request.params;
+      const { campaignId } = request.params;
       const folderData = request.body;
 
       // Validate required fields
@@ -113,15 +113,15 @@ const journalsRoute: FastifyPluginAsync = async (fastify) => {
       }
 
       try {
-        // Verify game exists
-        const [game] = await fastify.db
+        // Verify campaign exists
+        const [campaign] = await fastify.db
           .select()
-          .from(games)
-          .where(eq(games.id, gameId))
+          .from(campaigns)
+          .where(eq(campaigns.id, campaignId))
           .limit(1);
 
-        if (!game) {
-          return reply.status(404).send({ error: 'Game not found' });
+        if (!campaign) {
+          return reply.status(404).send({ error: 'Campaign not found' });
         }
 
         // TODO: Check if user has permission to create folders in this game
@@ -130,7 +130,7 @@ const journalsRoute: FastifyPluginAsync = async (fastify) => {
         const newFolders = await fastify.db
           .insert(folders)
           .values({
-            gameId,
+            campaignId,
             name: folderData.name.trim(),
             folderType: folderData.folderType.trim(),
             parentId: folderData.parentId ?? null,
@@ -145,7 +145,7 @@ const journalsRoute: FastifyPluginAsync = async (fastify) => {
         // Convert to Folder interface
         const formattedFolder: Folder = {
           id: newFolder.id,
-          gameId: newFolder.gameId,
+          campaignId: newFolder.campaignId,
           name: newFolder.name,
           folderType: newFolder.folderType,
           parentId: newFolder.parentId,
@@ -236,7 +236,7 @@ const journalsRoute: FastifyPluginAsync = async (fastify) => {
         // Convert to Folder interface
         const formattedFolder: Folder = {
           id: updatedFolder.id,
-          gameId: updatedFolder.gameId,
+          campaignId: updatedFolder.campaignId,
           name: updatedFolder.name,
           folderType: updatedFolder.folderType,
           parentId: updatedFolder.parentId,
@@ -300,52 +300,52 @@ const journalsRoute: FastifyPluginAsync = async (fastify) => {
   // ========================================
 
   /**
-   * GET /api/v1/games/:gameId/journals - List journals for a game
+   * GET /api/v1/games/:campaignId/journals - List journals for a campaign
    * Returns journals for a specific game, optionally filtered by folderId
    */
-  fastify.get<{ Params: { gameId: string }; Querystring: { folderId?: string } }>(
-    '/games/:gameId/journals',
+  fastify.get<{ Params: { campaignId: string }; Querystring: { folderId?: string } }>(
+    '/campaigns/:campaignId/journals',
     { preHandler: authenticate },
     async (request, reply) => {
       if (!request.user) {
         return reply.status(401).send({ error: 'Not authenticated' });
       }
 
-      const { gameId } = request.params;
+      const { campaignId } = request.params;
       const { folderId } = request.query;
 
       try {
-        // Verify game exists
-        const [game] = await fastify.db
+        // Verify campaign exists
+        const [campaign] = await fastify.db
           .select()
-          .from(games)
-          .where(eq(games.id, gameId))
+          .from(campaigns)
+          .where(eq(campaigns.id, campaignId))
           .limit(1);
 
-        if (!game) {
-          return reply.status(404).send({ error: 'Game not found' });
+        if (!campaign) {
+          return reply.status(404).send({ error: 'Campaign not found' });
         }
 
         // TODO: Check if user has access to this game
 
-        // Fetch journals for the game
+        // Fetch journals for the campaign
         let gameJournals;
         if (folderId) {
           gameJournals = await fastify.db
             .select()
             .from(journals)
-            .where(and(eq(journals.gameId, gameId), eq(journals.folderId, folderId)));
+            .where(and(eq(journals.campaignId, campaignId), eq(journals.folderId, folderId)));
         } else {
           gameJournals = await fastify.db
             .select()
             .from(journals)
-            .where(eq(journals.gameId, gameId));
+            .where(eq(journals.campaignId, campaignId));
         }
 
         // Convert to Journal interface
         const formattedJournals: Journal[] = gameJournals.map(journal => ({
           id: journal.id,
-          gameId: journal.gameId,
+          campaignId: journal.campaignId,
           name: journal.name,
           img: journal.img,
           folderId: journal.folderId,
@@ -417,7 +417,7 @@ const journalsRoute: FastifyPluginAsync = async (fastify) => {
         // Convert to Journal interface with pages
         const formattedJournal = {
           id: journal.id,
-          gameId: journal.gameId,
+          campaignId: journal.campaignId,
           name: journal.name,
           img: journal.img,
           folderId: journal.folderId,
@@ -439,18 +439,18 @@ const journalsRoute: FastifyPluginAsync = async (fastify) => {
   );
 
   /**
-   * POST /api/v1/games/:gameId/journals - Create a new journal
+   * POST /api/v1/games/:campaignId/journals - Create a new journal
    * Creates a journal for a specific game
    */
-  fastify.post<{ Params: { gameId: string }; Body: CreateJournalRequest }>(
-    '/games/:gameId/journals',
+  fastify.post<{ Params: { campaignId: string }; Body: CreateJournalRequest }>(
+    '/campaigns/:campaignId/journals',
     { preHandler: authenticate },
     async (request, reply) => {
       if (!request.user) {
         return reply.status(401).send({ error: 'Not authenticated' });
       }
 
-      const { gameId } = request.params;
+      const { campaignId } = request.params;
       const journalData = request.body;
 
       // Validate required fields
@@ -459,15 +459,15 @@ const journalsRoute: FastifyPluginAsync = async (fastify) => {
       }
 
       try {
-        // Verify game exists
-        const [game] = await fastify.db
+        // Verify campaign exists
+        const [campaign] = await fastify.db
           .select()
-          .from(games)
-          .where(eq(games.id, gameId))
+          .from(campaigns)
+          .where(eq(campaigns.id, campaignId))
           .limit(1);
 
-        if (!game) {
-          return reply.status(404).send({ error: 'Game not found' });
+        if (!campaign) {
+          return reply.status(404).send({ error: 'Campaign not found' });
         }
 
         // TODO: Check if user has permission to create journals in this game
@@ -476,7 +476,7 @@ const journalsRoute: FastifyPluginAsync = async (fastify) => {
         const newJournals = await fastify.db
           .insert(journals)
           .values({
-            gameId,
+            campaignId,
             name: journalData.name.trim(),
             img: journalData.img ?? null,
             folderId: journalData.folderId ?? null,
@@ -492,7 +492,7 @@ const journalsRoute: FastifyPluginAsync = async (fastify) => {
         // Convert to Journal interface
         const formattedJournal: Journal = {
           id: newJournal.id,
-          gameId: newJournal.gameId,
+          campaignId: newJournal.campaignId,
           name: newJournal.name,
           img: newJournal.img,
           folderId: newJournal.folderId,
@@ -585,7 +585,7 @@ const journalsRoute: FastifyPluginAsync = async (fastify) => {
         // Convert to Journal interface
         const formattedJournal: Journal = {
           id: updatedJournal.id,
-          gameId: updatedJournal.gameId,
+          campaignId: updatedJournal.campaignId,
           name: updatedJournal.name,
           img: updatedJournal.img,
           folderId: updatedJournal.folderId,

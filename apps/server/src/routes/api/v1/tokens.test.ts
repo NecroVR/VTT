@@ -10,7 +10,7 @@ describe('Tokens Routes', () => {
   let db: ReturnType<typeof createDb>;
   let sessionId: string;
   let userId: string;
-  let gameId: string;
+  let campaignId: string;
   let sceneId: string;
 
   beforeAll(async () => {
