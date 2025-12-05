@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-  import type { Scene, Token, Wall } from '@vtt/shared';
+  import type { Scene, Token, Wall, AmbientLight } from '@vtt/shared';
+  import { lightsStore } from '$lib/stores/lights';
 
   // Props
   export let scene: Scene;
@@ -20,12 +21,14 @@
   let backgroundCanvas: HTMLCanvasElement;
   let gridCanvas: HTMLCanvasElement;
   let tokensCanvas: HTMLCanvasElement;
+  let lightingCanvas: HTMLCanvasElement;
   let wallsCanvas: HTMLCanvasElement;
   let controlsCanvas: HTMLCanvasElement;
 
   let backgroundCtx: CanvasRenderingContext2D | null = null;
   let gridCtx: CanvasRenderingContext2D | null = null;
   let tokensCtx: CanvasRenderingContext2D | null = null;
+  let lightingCtx: CanvasRenderingContext2D | null = null;
   let wallsCtx: CanvasRenderingContext2D | null = null;
   let controlsCtx: CanvasRenderingContext2D | null = null;
 
@@ -69,14 +72,22 @@
   const tokenImageCache = new Map<string, HTMLImageElement>();
   const tokenImageLoadingState = new Map<string, 'loading' | 'loaded' | 'error'>();
 
+  // Animation state
+  let animationFrameId: number | null = null;
+  let animationTime = 0;
+
   const MIN_SCALE = 0.25;
   const MAX_SCALE = 4;
+
+  // Subscribe to lights store
+  $: lights = Array.from($lightsStore.lights.values()).filter(light => light.sceneId === scene.id);
 
   onMount(() => {
     initializeCanvases();
     loadBackgroundImage();
     resizeCanvases();
     render();
+    startAnimationLoop();
 
     window.addEventListener('resize', resizeCanvases);
     window.addEventListener('keydown', handleKeyDown);
@@ -84,11 +95,12 @@
     return () => {
       window.removeEventListener('resize', resizeCanvases);
       window.removeEventListener('keydown', handleKeyDown);
+      stopAnimationLoop();
     };
   });
 
   onDestroy(() => {
-    // Cleanup
+    stopAnimationLoop();
   });
 
   // Watch for background image URL changes only
@@ -111,10 +123,16 @@
     renderWalls();
   }
 
+  // Watch for light changes
+  $: if (lights) {
+    renderLights();
+  }
+
   function initializeCanvases() {
     backgroundCtx = backgroundCanvas.getContext('2d');
     gridCtx = gridCanvas.getContext('2d');
     tokensCtx = tokensCanvas.getContext('2d');
+    lightingCtx = lightingCanvas.getContext('2d');
     wallsCtx = wallsCanvas ? wallsCanvas.getContext('2d') : null;
     controlsCtx = controlsCanvas.getContext('2d');
   }
@@ -125,7 +143,7 @@
     const width = canvasContainer.clientWidth;
     const height = canvasContainer.clientHeight;
 
-    [backgroundCanvas, gridCanvas, tokensCanvas, controlsCanvas].forEach(canvas => {
+    [backgroundCanvas, gridCanvas, tokensCanvas, lightingCanvas, controlsCanvas].forEach(canvas => {
       if (canvas) {
         canvas.width = width;
         canvas.height = height;
@@ -230,6 +248,7 @@
     renderBackground();
     renderGrid();
     renderTokens();
+    renderLights();
     if (isGM) {
       renderWalls();
     }
@@ -529,6 +548,168 @@
     }
 
     wallsCtx.restore();
+  }
+
+  function hexToRgba(hex: string, alpha: number): string {
+    // Remove # if present
+    hex = hex.replace(/^#/, '');
+
+    // Parse hex color
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
+  function renderLight(ctx: CanvasRenderingContext2D, light: AmbientLight, time: number) {
+    const { x, y, bright, dim, color, alpha, angle, rotation, animationType, animationSpeed, animationIntensity } = light;
+
+    ctx.save();
+
+    // Calculate animated radius for animations
+    let animatedBright = bright;
+    let animatedDim = dim;
+
+    if (animationType === 'torch') {
+      // Torch flicker - random-like variation using sine waves at different frequencies
+      const flicker = Math.sin(time * animationSpeed * 0.003) * 0.5 +
+                     Math.sin(time * animationSpeed * 0.005) * 0.3 +
+                     Math.sin(time * animationSpeed * 0.007) * 0.2;
+      const intensity = animationIntensity / 100;
+      animatedBright = bright * (1 + flicker * intensity * 0.15);
+      animatedDim = dim * (1 + flicker * intensity * 0.15);
+    } else if (animationType === 'pulse') {
+      // Smooth pulse animation
+      const pulse = Math.sin(time * animationSpeed * 0.002);
+      const intensity = animationIntensity / 100;
+      animatedBright = bright * (1 + pulse * intensity * 0.3);
+      animatedDim = dim * (1 + pulse * intensity * 0.3);
+    }
+
+    // If cone light, clip to cone shape
+    if (angle < 360) {
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      const startAngle = (rotation - angle / 2) * Math.PI / 180;
+      const endAngle = (rotation + angle / 2) * Math.PI / 180;
+      ctx.arc(x, y, animatedDim, startAngle, endAngle);
+      ctx.closePath();
+      ctx.clip();
+    }
+
+    // Create radial gradient
+    const gradient = ctx.createRadialGradient(x, y, 0, x, y, animatedDim);
+
+    // Parse color and add alpha
+    const baseColor = hexToRgba(color, alpha);
+    const dimColor = hexToRgba(color, 0);
+
+    // Bright zone (0 to bright radius)
+    gradient.addColorStop(0, baseColor);
+    if (animatedBright > 0 && animatedDim > 0) {
+      gradient.addColorStop(Math.min(1, animatedBright / animatedDim), baseColor);
+    }
+    // Dim zone (bright to dim radius)
+    gradient.addColorStop(1, dimColor);
+
+    ctx.fillStyle = gradient;
+    if (angle < 360) {
+      ctx.fill();
+    } else {
+      ctx.beginPath();
+      ctx.arc(x, y, animatedDim, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.restore();
+  }
+
+  function renderLights() {
+    if (!lightingCtx || !lightingCanvas) return;
+
+    lightingCtx.clearRect(0, 0, lightingCanvas.width, lightingCanvas.height);
+    lightingCtx.save();
+
+    // Apply transform
+    lightingCtx.translate(-viewX * scale, -viewY * scale);
+    lightingCtx.scale(scale, scale);
+
+    const sceneWidth = scene.backgroundWidth || 4000;
+    const sceneHeight = scene.backgroundHeight || 4000;
+
+    // Check if we need darkness overlay
+    const hasDarkness = scene.darkness > 0 && !scene.globalLight;
+
+    if (hasDarkness) {
+      // Create a temporary canvas for light compositing
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = lightingCanvas.width;
+      tempCanvas.height = lightingCanvas.height;
+      const tempCtx = tempCanvas.getContext('2d');
+
+      if (tempCtx) {
+        tempCtx.save();
+        tempCtx.translate(-viewX * scale, -viewY * scale);
+        tempCtx.scale(scale, scale);
+
+        // Set composite mode to lighten (lights add together)
+        tempCtx.globalCompositeOperation = 'lighten';
+
+        // Render all lights on temp canvas
+        lights.forEach(light => {
+          renderLight(tempCtx, light, animationTime);
+        });
+
+        tempCtx.restore();
+
+        // Now draw darkness on main lighting canvas
+        lightingCtx.fillStyle = `rgba(0, 0, 0, ${scene.darkness})`;
+        lightingCtx.fillRect(0, 0, sceneWidth, sceneHeight);
+
+        // Cut out lit areas using destination-out
+        lightingCtx.globalCompositeOperation = 'destination-out';
+        lightingCtx.drawImage(tempCanvas, 0, 0);
+        lightingCtx.globalCompositeOperation = 'source-over';
+      }
+    } else {
+      // No darkness - just render lights normally with additive blending
+      lightingCtx.globalCompositeOperation = 'lighten';
+
+      lights.forEach(light => {
+        renderLight(lightingCtx, light, animationTime);
+      });
+
+      lightingCtx.globalCompositeOperation = 'source-over';
+    }
+
+    lightingCtx.restore();
+  }
+
+  function startAnimationLoop() {
+    const animate = (timestamp: number) => {
+      animationTime = timestamp;
+
+      // Only re-render lights if there are animated lights
+      const hasAnimatedLights = lights.some(light =>
+        light.animationType === 'torch' || light.animationType === 'pulse'
+      );
+
+      if (hasAnimatedLights) {
+        renderLights();
+      }
+
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animationFrameId = requestAnimationFrame(animate);
+  }
+
+  function stopAnimationLoop() {
+    if (animationFrameId !== null) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
   }
 
   function renderControls() {
@@ -845,6 +1026,7 @@
   <canvas class="canvas-layer" bind:this={backgroundCanvas}></canvas>
   <canvas class="canvas-layer" bind:this={gridCanvas}></canvas>
   <canvas class="canvas-layer" bind:this={tokensCanvas}></canvas>
+  <canvas class="canvas-layer" bind:this={lightingCanvas}></canvas>
   {#if isGM}
     <canvas class="canvas-layer" bind:this={wallsCanvas}></canvas>
   {/if}
