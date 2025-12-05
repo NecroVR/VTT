@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ComponentType, SvelteComponent } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
 
   // Tab interface
   export interface Tab {
@@ -14,6 +15,8 @@
   export let activeTabId: string = '';
   export let sidebarWidth: number = 350;
 
+  const dispatch = createEventDispatcher();
+
   // If no active tab is set, use the first tab
   $: if (!activeTabId && tabs.length > 0) {
     activeTabId = tabs[0].id;
@@ -24,6 +27,11 @@
 
   function handleTabClick(tabId: string) {
     activeTabId = tabId;
+  }
+
+  // Forward events from child components
+  function forwardEvent(event: CustomEvent) {
+    dispatch(event.type, event.detail);
   }
 </script>
 
@@ -43,7 +51,13 @@
 
   <div class="tab-content">
     {#if activeTab}
-      <svelte:component this={activeTab.component} {...activeTab.props} />
+      <svelte:component
+        this={activeTab.component}
+        {...activeTab.props}
+        on:create-actor={forwardEvent}
+        on:edit-actor={forwardEvent}
+        on:select-token={forwardEvent}
+      />
     {/if}
   </div>
 </div>

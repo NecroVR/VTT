@@ -8,12 +8,15 @@
   import { scenesStore } from '$lib/stores/scenes';
   import { tokensStore } from '$lib/stores/tokens';
   import { wallsStore } from '$lib/stores/walls';
+  import { actorsStore } from '$lib/stores/actors';
   import SceneCanvas from '$lib/components/SceneCanvas.svelte';
   import SceneControls from '$lib/components/scene/SceneControls.svelte';
   import SceneManagementModal from '$lib/components/scene/SceneManagementModal.svelte';
   import ChatPanel from '$lib/components/chat/ChatPanel.svelte';
   import CombatTracker from '$lib/components/combat/CombatTracker.svelte';
   import ActorSheet from '$lib/components/actor/ActorSheet.svelte';
+  import ActorManager from '$lib/components/game/ActorManager.svelte';
+  import ActorCreateModal from '$lib/components/actor/ActorCreateModal.svelte';
   import TokenConfig from '$lib/components/TokenConfig.svelte';
   import TokenBrowser from '$lib/components/game/TokenBrowser.svelte';
   import TabbedSidebar, { type Tab } from '$lib/components/game/TabbedSidebar.svelte';
@@ -29,6 +32,7 @@
   let showTokenConfig = false;
   let selectedToken: Token | null = null;
   let showSceneModal = false;
+  let showActorCreateModal = false;
   let sidebarWidth = 350;
   let activeTabId = 'chat';
 
@@ -68,6 +72,12 @@
       props: { gameId, isGM }
     },
     {
+      id: 'actors',
+      label: 'Actors',
+      component: ActorManager,
+      props: { gameId, isGM, currentSceneId: activeScene?.id || null }
+    },
+    {
       id: 'tokens',
       label: 'Tokens',
       component: TokenBrowser,
@@ -91,9 +101,10 @@
 
     websocket.connect(wsUrl);
 
-    // Load scenes and tokens
+    // Load scenes, tokens, and actors
     await scenesStore.loadScenes(gameId);
     await tokensStore.loadTokens(gameId);
+    await actorsStore.loadActors(gameId);
 
     // Subscribe to WebSocket state
     const unsubscribeState = websocket.state.subscribe(state => {
@@ -160,6 +171,7 @@
       scenesStore.clear();
       tokensStore.clear();
       wallsStore.clear();
+      actorsStore.clear();
       websocket.disconnect();
     };
   });
@@ -265,6 +277,26 @@
   function handleSidebarWidthChange(event: CustomEvent<number>) {
     sidebarWidth = event.detail;
   }
+
+  function handleCreateActor() {
+    showActorCreateModal = true;
+  }
+
+  function handleActorCreated(actor: any) {
+    // Add actor to store
+    actorsStore.addActor(actor);
+    showActorCreateModal = false;
+  }
+
+  function handleEditActor(event: CustomEvent<{ actorId: string }>) {
+    selectedActorId = event.detail.actorId;
+    showActorSheet = true;
+  }
+
+  function handleSelectToken(event: CustomEvent<{ tokenId: string }>) {
+    // Token selection is already handled by tokensStore, just ensure UI updates
+    tokensStore.selectToken(event.detail.tokenId);
+  }
 </script>
 
 <svelte:head>
@@ -362,6 +394,9 @@
       {tabs}
       bind:activeTabId
       {sidebarWidth}
+      on:create-actor={handleCreateActor}
+      on:edit-actor={handleEditActor}
+      on:select-token={handleSelectToken}
     />
   </div>
 
@@ -393,6 +428,13 @@
     {gameId}
     onClose={() => showSceneModal = false}
     onSceneCreated={handleSceneCreated}
+  />
+
+  <ActorCreateModal
+    isOpen={showActorCreateModal}
+    {gameId}
+    onClose={() => showActorCreateModal = false}
+    onActorCreated={handleActorCreated}
   />
 </div>
 
