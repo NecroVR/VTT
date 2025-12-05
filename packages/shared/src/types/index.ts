@@ -11,3 +11,4 @@ export * from './chatMessage.js';
 export * from './activeEffect.js';
 export * from './asset.js';
 export * from './fogExploration.js';
+export * from './journal.js';
