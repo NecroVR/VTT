@@ -39,7 +39,6 @@ services:
     container_name: vtt_server
     environment:
       NODE_ENV: production
-      - VITE_API_BASE_URL=
       DATABASE_URL: postgresql://claude:Claude^YV18@db:5432/vtt
       REDIS_URL: redis://redis:6379
       HOST: 0.0.0.0
@@ -67,7 +66,7 @@ services:
     container_name: vtt_web
     environment:
       NODE_ENV: production
-      - VITE_API_BASE_URL=
+      VITE_API_BASE_URL: ""
     volumes:
       - ./certs:/app/certs:ro
     networks:
