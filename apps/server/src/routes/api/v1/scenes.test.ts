@@ -85,7 +85,7 @@ describe('Scenes Routes', () => {
       const body = JSON.parse(response.body);
       expect(body).toHaveProperty('scene');
       expect(body.scene.name).toBe('Test Scene');
-      expect(body.scene.campaignId).toBe(gameId);
+      expect(body.scene.campaignId).toBe(campaignId);
       expect(body.scene.active).toBe(false);
       expect(body.scene.gridType).toBe('square');
       expect(body.scene.gridSize).toBe(100);
@@ -232,8 +232,8 @@ describe('Scenes Routes', () => {
       expect(body.scenes).toHaveLength(2);
       expect(body.scenes[0].name).toBe('Scene 1');
       expect(body.scenes[1].name).toBe('Scene 2');
-      expect(body.scenes[0].campaignId).toBe(gameId);
-      expect(body.scenes[1].campaignId).toBe(gameId);
+      expect(body.scenes[0].campaignId).toBe(campaignId);
+      expect(body.scenes[1].campaignId).toBe(campaignId);
     });
 
     it('should return empty array if campaign has no scenes', async () => {
@@ -322,7 +322,7 @@ describe('Scenes Routes', () => {
       const body = JSON.parse(response.body);
       expect(body.scene.id).toBe(sceneId);
       expect(body.scene.name).toBe('Test Scene');
-      expect(body.scene.campaignId).toBe(gameId);
+      expect(body.scene.campaignId).toBe(campaignId);
       expect(body.scene.active).toBe(true);
     });
 

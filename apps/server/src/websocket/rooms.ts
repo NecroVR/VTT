@@ -15,10 +15,10 @@ export interface PlayerInfo {
  * Manages campaign rooms and player connections for WebSocket multiplayer
  */
 export class RoomManager {
-  // Map of gameId -> Set of WebSocket connections
+  // Map of campaignId -> Set of WebSocket connections
   private rooms: Map<string, Set<WebSocket>> = new Map();
 
-  // Map of WebSocket -> gameId
+  // Map of WebSocket -> campaignId
   private playerRooms: Map<WebSocket, string> = new Map();
 
   // Map of WebSocket -> player info
@@ -26,25 +26,25 @@ export class RoomManager {
 
   /**
    * Add a player to a campaign room
-   * @param gameId - The ID of the campaign to join
+   * @param campaignId - The ID of the campaign to join
    * @param socket - The player's WebSocket connection
    * @param userInfo - The player's user information
    */
-  join(gameId: string, socket: WebSocket, userInfo: { userId: string; username: string }): void {
+  join(campaignId: string, socket: WebSocket, userInfo: { userId: string; username: string }): void {
     // Remove player from any existing room
     this.leave(socket);
 
     // Get or create room
-    if (!this.rooms.has(gameId)) {
-      this.rooms.set(gameId, new Set());
+    if (!this.rooms.has(campaignId)) {
+      this.rooms.set(campaignId, new Set());
     }
 
     // Add player to room
-    const room = this.rooms.get(gameId)!;
+    const room = this.rooms.get(campaignId)!;
     room.add(socket);
 
     // Track player's room and info
-    this.playerRooms.set(socket, gameId);
+    this.playerRooms.set(socket, campaignId);
     this.playerInfo.set(socket, userInfo);
   }
 
@@ -53,16 +53,16 @@ export class RoomManager {
    * @param socket - The player's WebSocket connection
    */
   leave(socket: WebSocket): void {
-    const gameId = this.playerRooms.get(socket);
+    const campaignId = this.playerRooms.get(socket);
 
-    if (gameId) {
-      const room = this.rooms.get(gameId);
+    if (campaignId) {
+      const room = this.rooms.get(campaignId);
       if (room) {
         room.delete(socket);
 
         // Clean up empty rooms
         if (room.size === 0) {
-          this.rooms.delete(gameId);
+          this.rooms.delete(campaignId);
         }
       }
 
@@ -74,16 +74,16 @@ export class RoomManager {
 
   /**
    * Broadcast a message to all players in a room
-   * @param gameId - The campaign room to broadcast to
+   * @param campaignId - The campaign room to broadcast to
    * @param message - The message to send
    * @param excludeSocket - Optional socket to exclude from broadcast
    */
   broadcast<T>(
-    gameId: string,
+    campaignId: string,
     message: WSMessage<T>,
     excludeSocket?: WebSocket
   ): void {
-    const room = this.rooms.get(gameId);
+    const room = this.rooms.get(campaignId);
 
     if (!room) {
       return;
@@ -126,11 +126,11 @@ export class RoomManager {
 
   /**
    * Get list of players in a room
-   * @param gameId - The campaign room ID
+   * @param campaignId - The campaign room ID
    * @returns Array of player information
    */
-  getPlayersInRoom(gameId: string): Array<{ userId: string; username: string }> {
-    const room = this.rooms.get(gameId);
+  getPlayersInRoom(campaignId: string): Array<{ userId: string; username: string }> {
+    const room = this.rooms.get(campaignId);
 
     if (!room) {
       return [];
@@ -171,22 +171,22 @@ export class RoomManager {
 
   /**
    * Get the number of players in a room
-   * @param gameId - The campaign room ID
+   * @param campaignId - The campaign room ID
    * @returns Number of players
    */
-  getRoomSize(gameId: string): number {
-    const room = this.rooms.get(gameId);
+  getRoomSize(campaignId: string): number {
+    const room = this.rooms.get(campaignId);
     return room ? room.size : 0;
   }
 
   /**
    * Check if a socket is in a room
    * @param socket - The WebSocket connection
-   * @param gameId - The campaign room ID
+   * @param campaignId - The campaign room ID
    * @returns True if socket is in room
    */
-  isInRoom(socket: WebSocket, gameId: string): boolean {
-    return this.playerRooms.get(socket) === gameId;
+  isInRoom(socket: WebSocket, campaignId: string): boolean {
+    return this.playerRooms.get(socket) === campaignId;
   }
 }
 

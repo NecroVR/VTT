@@ -176,7 +176,7 @@ export interface SceneSwitchedPayload {
 
 export interface SceneUpdatePayload {
   sceneId: string;
-  updates: Partial<Omit<Scene, 'id' | 'gameId' | 'createdAt' | 'updatedAt'>>;
+  updates: Partial<Omit<Scene, 'id' | 'campaignId' | 'createdAt' | 'updatedAt'>>;
 }
 
 export interface SceneUpdatedPayload {
@@ -557,7 +557,7 @@ export interface EffectAddedPayload {
 
 export interface EffectUpdatePayload {
   effectId: string;
-  updates: Partial<Omit<ActiveEffect, 'id' | 'gameId' | 'createdAt' | 'updatedAt'>>;
+  updates: Partial<Omit<ActiveEffect, 'id' | 'campaignId' | 'createdAt' | 'updatedAt'>>;
 }
 
 export interface EffectUpdatedPayload {

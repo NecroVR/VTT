@@ -51,7 +51,7 @@ export interface CompendiumEntry {
  * Request to create a new compendium
  */
 export interface CreateCompendiumRequest {
-  gameId?: string | null;
+  campaignId?: string | null;
   name: string;
   label: string;
   entityType: CompendiumEntityType;
@@ -182,7 +182,7 @@ export interface CompendiumInstantiateResponse {
  * Payload for compendium:create event
  */
 export interface CompendiumCreatePayload {
-  gameId?: string | null;
+  campaignId?: string | null;
   name: string;
   label: string;
   entityType: CompendiumEntityType;

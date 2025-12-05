@@ -110,8 +110,8 @@ describe('Actors Routes', () => {
       expect(body.actors).toHaveLength(2);
       expect(body.actors[0].name).toBe('Fighter Character');
       expect(body.actors[1].name).toBe('Goblin Enemy');
-      expect(body.actors[0].campaignId).toBe(gameId);
-      expect(body.actors[1].campaignId).toBe(gameId);
+      expect(body.actors[0].campaignId).toBe(campaignId);
+      expect(body.actors[1].campaignId).toBe(campaignId);
     });
 
     it('should return actor with all properties', async () => {
@@ -128,7 +128,7 @@ describe('Actors Routes', () => {
       const actor = body.actors[0];
 
       expect(actor).toHaveProperty('id');
-      expect(actor).toHaveProperty('gameId');
+      expect(actor).toHaveProperty('campaignId');
       expect(actor).toHaveProperty('name');
       expect(actor).toHaveProperty('actorType');
       expect(actor).toHaveProperty('img');
@@ -264,7 +264,7 @@ describe('Actors Routes', () => {
       const body = JSON.parse(response.body);
       expect(body.actor.id).toBe(actorId);
       expect(body.actor.name).toBe('Test Actor');
-      expect(body.actor.campaignId).toBe(gameId);
+      expect(body.actor.campaignId).toBe(campaignId);
       expect(body.actor.actorType).toBe('character');
     });
 
@@ -282,7 +282,7 @@ describe('Actors Routes', () => {
       const actor = body.actor;
 
       expect(actor.id).toBe(actorId);
-      expect(actor.campaignId).toBe(gameId);
+      expect(actor.campaignId).toBe(campaignId);
       expect(actor.name).toBe('Test Actor');
       expect(actor.attributes).toEqual({ str: 10, dex: 10, con: 10 });
       expect(actor.abilities).toEqual({ skill: 'value' });
@@ -363,7 +363,7 @@ describe('Actors Routes', () => {
       const body = JSON.parse(response.body);
       expect(body.actor.name).toBe('New Character');
       expect(body.actor.actorType).toBe('character');
-      expect(body.actor.campaignId).toBe(gameId);
+      expect(body.actor.campaignId).toBe(campaignId);
       expect(body.actor.img).toBe('/images/character.png');
       expect(body.actor.attributes).toEqual({ str: 16, dex: 14 });
       expect(body.actor.abilities).toEqual({ attack: 3 });
@@ -387,7 +387,7 @@ describe('Actors Routes', () => {
       const body = JSON.parse(response.body);
       expect(body.actor.name).toBe('Simple Actor');
       expect(body.actor.actorType).toBe('npc');
-      expect(body.actor.campaignId).toBe(gameId);
+      expect(body.actor.campaignId).toBe(campaignId);
       expect(body.actor.attributes).toEqual({});
       expect(body.actor.abilities).toEqual({});
       expect(body.actor.data).toEqual({});

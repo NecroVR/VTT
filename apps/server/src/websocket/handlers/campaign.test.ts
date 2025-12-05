@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest';
 import { buildApp } from '../../app.js';
 import type { FastifyInstance } from 'fastify';
-import { users, sessions, tokens, scenes, walls, games } from '@vtt/database';
+import { users, sessions, tokens, scenes, walls, campaigns } from '@vtt/database';
 import { eq } from 'drizzle-orm';
 import type { WebSocket } from '@fastify/websocket';
 import type { WSMessage } from '@vtt/shared';
@@ -61,7 +61,7 @@ describe('Campaign WebSocket Handler', () => {
     await app.db.delete(walls);
     await app.db.delete(scenes);
     await app.db.delete(sessions);
-    await app.db.delete(games);
+    await app.db.delete(campaigns);
     await app.db.delete(users);
 
     // Create test user and session
@@ -89,9 +89,9 @@ describe('Campaign WebSocket Handler', () => {
 
     testSessionId = session.id;
 
-    // Create test game
+    // Create test campaign
     const [campaign] = await app.db
-      .insert(games)
+      .insert(campaigns)
       .values({
         ownerId: testUserId,
         name: 'Test Campaign',
@@ -137,7 +137,7 @@ describe('Campaign WebSocket Handler', () => {
       const mockSocket = createMockWebSocket();
 
       // Simulate WebSocket connection
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       // Create mock request
       const mockRequest = {
@@ -183,7 +183,7 @@ describe('Campaign WebSocket Handler', () => {
     it('should allow user to join campaign with valid token', async () => {
       const mockSocket = createMockWebSocket();
 
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
       const mockRequest = {
         id: 'test-client-id',
         log: {
@@ -226,7 +226,7 @@ describe('Campaign WebSocket Handler', () => {
     it('should reject join with invalid token', async () => {
       const mockSocket = createMockWebSocket();
 
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
       const mockRequest = {
         id: 'test-client-id',
         log: {
@@ -266,7 +266,7 @@ describe('Campaign WebSocket Handler', () => {
     it('should notify other players when someone joins', async () => {
       // First player joins
       const mockSocket1 = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest1 = {
         id: 'client-1',
@@ -362,7 +362,7 @@ describe('Campaign WebSocket Handler', () => {
   describe('campaign:leave handler', () => {
     it('should remove player from room', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -413,7 +413,7 @@ describe('Campaign WebSocket Handler', () => {
       // Setup two players
       const mockSocket1 = createMockWebSocket();
       const mockSocket2 = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       // First player
       const mockRequest1 = {
@@ -506,7 +506,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should update token position in database', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -552,7 +552,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should broadcast token move to all players in room', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -590,7 +590,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should return error if token not found', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -625,7 +625,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should return error if not in a campaign room', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -656,7 +656,7 @@ describe('Campaign WebSocket Handler', () => {
   describe('token:add handler', () => {
     it('should create new token in database', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -704,7 +704,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should broadcast token:added to all players', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -748,7 +748,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should return error if sceneId is missing', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -786,7 +786,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should set default values for optional fields', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -850,7 +850,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should delete token from database', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -885,7 +885,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should broadcast token:removed to all players', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -921,7 +921,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should return error if token not found', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -957,7 +957,7 @@ describe('Campaign WebSocket Handler', () => {
   describe('dice:roll handler', () => {
     it('should parse dice notation and broadcast result', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1003,7 +1003,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should handle complex dice notation with keep highest', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1040,7 +1040,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should return error for invalid dice notation', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1074,7 +1074,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should return error if not in a campaign room', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1104,7 +1104,7 @@ describe('Campaign WebSocket Handler', () => {
   describe('chat:message handler', () => {
     it('should broadcast chat message to all players', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1142,7 +1142,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should override userId and username from payload with authenticated user', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1184,7 +1184,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should return error if not in a campaign room', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1214,7 +1214,7 @@ describe('Campaign WebSocket Handler', () => {
   describe('scene:switch handler', () => {
     it('should fetch scene from database and broadcast to all players', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1251,7 +1251,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should return error if scene not found', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1287,7 +1287,7 @@ describe('Campaign WebSocket Handler', () => {
   describe('scene:update handler', () => {
     it('should update scene in database and broadcast changes', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1340,7 +1340,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should return error if scene not found', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1379,7 +1379,7 @@ describe('Campaign WebSocket Handler', () => {
   describe('wall:add handler', () => {
     it('should create wall in database and broadcast to all players', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1430,7 +1430,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should set default values for optional wall properties', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1492,7 +1492,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should update wall in database and broadcast changes', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1549,7 +1549,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should return error if wall not found', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1605,7 +1605,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should delete wall from database and broadcast removal', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1650,7 +1650,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should return error if wall not found', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1686,7 +1686,7 @@ describe('Campaign WebSocket Handler', () => {
   describe('error handling', () => {
     it('should handle invalid JSON gracefully', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1710,7 +1710,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should handle unknown message types', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1738,7 +1738,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should handle websocket errors', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1762,7 +1762,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should handle dice roll errors with invalid notation', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1799,7 +1799,7 @@ describe('Campaign WebSocket Handler', () => {
   describe('connection lifecycle', () => {
     it('should send welcome message on connection', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1816,7 +1816,7 @@ describe('Campaign WebSocket Handler', () => {
 
     it('should clean up player on disconnect', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1853,7 +1853,7 @@ describe('Campaign WebSocket Handler', () => {
       // Setup two players
       const mockSocket1 = createMockWebSocket();
       const mockSocket2 = createMockWebSocket();
-      const { handleCampaignWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./campaign.js');
 
       const mockRequest1 = {
         id: 'client-1',
