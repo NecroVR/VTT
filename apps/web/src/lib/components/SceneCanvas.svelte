@@ -11,6 +11,7 @@
   export let gridSnap: boolean = false;
   export let onTokenMove: ((tokenId: string, x: number, y: number) => void) | undefined = undefined;
   export let onTokenSelect: ((tokenId: string | null) => void) | undefined = undefined;
+  export let onTokenDoubleClick: ((tokenId: string) => void) | undefined = undefined;
   export let onWallAdd: ((wall: { x1: number; y1: number; x2: number; y2: number }) => void) | undefined = undefined;
   export let onWallRemove: ((wallId: string) => void) | undefined = undefined;
 
@@ -49,6 +50,11 @@
   let wallPreview: { x1: number; y1: number; x2: number; y2: number } | null = null;
   let selectedWallId: string | null = null;
   let hoveredWallId: string | null = null;
+
+  // Double-click detection
+  let lastClickTime = 0;
+  let lastClickTokenId: string | null = null;
+  const DOUBLE_CLICK_THRESHOLD = 300; // ms
 
   // Background image state
   let backgroundImage: HTMLImageElement | null = null;
@@ -589,17 +595,36 @@
     });
 
     if (clickedToken) {
-      selectedTokenId = clickedToken.id;
-      draggedTokenId = clickedToken.id;
-      isDraggingToken = true;
-      dragOffsetX = clickedToken.x - worldPos.x;
-      dragOffsetY = clickedToken.y - worldPos.y;
-      onTokenSelect?.(clickedToken.id);
-      renderControls();
+      // Check for double-click
+      const currentTime = Date.now();
+      const timeSinceLastClick = currentTime - lastClickTime;
+      const isDoubleClick = timeSinceLastClick < DOUBLE_CLICK_THRESHOLD && lastClickTokenId === clickedToken.id;
+
+      if (isDoubleClick) {
+        // Double-click detected - open token config
+        onTokenDoubleClick?.(clickedToken.id);
+        lastClickTime = 0; // Reset to prevent triple-click
+        lastClickTokenId = null;
+      } else {
+        // Single click - prepare for drag
+        selectedTokenId = clickedToken.id;
+        draggedTokenId = clickedToken.id;
+        isDraggingToken = true;
+        dragOffsetX = clickedToken.x - worldPos.x;
+        dragOffsetY = clickedToken.y - worldPos.y;
+        onTokenSelect?.(clickedToken.id);
+        renderControls();
+
+        // Store click time and token for double-click detection
+        lastClickTime = currentTime;
+        lastClickTokenId = clickedToken.id;
+      }
     } else {
       selectedTokenId = null;
       onTokenSelect?.(null);
       isPanning = true;
+      lastClickTime = 0;
+      lastClickTokenId = null;
     }
   }
 

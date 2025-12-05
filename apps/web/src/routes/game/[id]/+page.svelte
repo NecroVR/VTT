@@ -13,13 +13,16 @@
   import ChatPanel from '$lib/components/chat/ChatPanel.svelte';
   import CombatTracker from '$lib/components/combat/CombatTracker.svelte';
   import ActorSheet from '$lib/components/actor/ActorSheet.svelte';
-  import type { Scene } from '@vtt/shared';
+  import TokenConfig from '$lib/components/TokenConfig.svelte';
+  import type { Scene, Token } from '@vtt/shared';
 
   let wsState: { connected: boolean; reconnecting: boolean; error: string | null };
   let activeTool = 'select';
   let gridSnap = false;
   let showActorSheet = false;
   let selectedActorId: string | null = null;
+  let showTokenConfig = false;
+  let selectedToken: Token | null = null;
 
   // Use auto-subscription with $ prefix - Svelte handles cleanup automatically
   $: gameId = $page.params.id;
@@ -141,6 +144,24 @@
     tokensStore.selectToken(tokenId);
   }
 
+  function handleTokenDoubleClick(tokenId: string) {
+    const token = Array.from($tokensStore.tokens.values()).find(t => t.id === tokenId);
+    if (token) {
+      selectedToken = token;
+      showTokenConfig = true;
+    }
+  }
+
+  function handleCloseTokenConfig() {
+    showTokenConfig = false;
+    selectedToken = null;
+  }
+
+  function handleDeleteToken() {
+    showTokenConfig = false;
+    selectedToken = null;
+  }
+
   function handleSceneChange(sceneId: string) {
     scenesStore.setActiveScene(sceneId);
     websocket.sendSceneSwitch({ sceneId });
@@ -230,6 +251,7 @@
           {gridSnap}
           onTokenMove={handleTokenMove}
           onTokenSelect={handleTokenSelect}
+          onTokenDoubleClick={handleTokenDoubleClick}
           onWallAdd={handleWallAdd}
           onWallRemove={handleWallRemove}
         />
@@ -272,6 +294,16 @@
         />
       </div>
     </div>
+  {/if}
+
+  {#if showTokenConfig && selectedToken}
+    <TokenConfig
+      token={selectedToken}
+      {gameId}
+      {isGM}
+      on:close={handleCloseTokenConfig}
+      on:delete={handleDeleteToken}
+    />
   {/if}
 </div>
 
