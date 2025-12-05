@@ -18,6 +18,9 @@ export type WSMessageType =
   | 'effect:add' | 'effect:added' | 'effect:update' | 'effect:updated' | 'effect:remove' | 'effect:removed' | 'effect:toggle' | 'effect:toggled' | 'effects:expired'
   | 'dice:roll' | 'dice:result'
   | 'chat:message' | 'chat:delete' | 'chat:deleted' | 'chat:whisper'
+  | 'journal:create' | 'journal:created' | 'journal:update' | 'journal:updated' | 'journal:delete' | 'journal:deleted' | 'journal:show' | 'journal:shown'
+  | 'page:create' | 'page:created' | 'page:update' | 'page:updated' | 'page:delete' | 'page:deleted'
+  | 'folder:create' | 'folder:created' | 'folder:update' | 'folder:updated' | 'folder:delete' | 'folder:deleted'
   | 'error';
 
 export interface WSMessage<T = unknown> {
@@ -569,4 +572,228 @@ export interface EffectsExpiredPayload {
   effectIds: string[];
   actorId?: string | null;
   tokenId?: string | null;
+}
+
+// Journal payloads
+export interface JournalCreatePayload {
+  gameId: string;
+  name: string;
+  img?: string | null;
+  folderId?: string | null;
+  permission?: string;
+  ownerId?: string | null;
+  sort?: number;
+  data?: Record<string, unknown>;
+}
+
+export interface JournalCreatedPayload {
+  journal: {
+    id: string;
+    gameId: string;
+    name: string;
+    img?: string | null;
+    folderId?: string | null;
+    permission: string;
+    ownerId?: string | null;
+    sort: number;
+    data: Record<string, unknown>;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+}
+
+export interface JournalUpdatePayload {
+  journalId: string;
+  updates: {
+    name?: string;
+    img?: string | null;
+    folderId?: string | null;
+    permission?: string;
+    ownerId?: string | null;
+    sort?: number;
+    data?: Record<string, unknown>;
+  };
+}
+
+export interface JournalUpdatedPayload {
+  journal: {
+    id: string;
+    gameId: string;
+    name: string;
+    img?: string | null;
+    folderId?: string | null;
+    permission: string;
+    ownerId?: string | null;
+    sort: number;
+    data: Record<string, unknown>;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+}
+
+export interface JournalDeletePayload {
+  journalId: string;
+}
+
+export interface JournalDeletedPayload {
+  journalId: string;
+}
+
+export interface JournalShowPayload {
+  journalId: string;
+  targetUserIds: string[];
+}
+
+export interface JournalShownPayload {
+  journal: {
+    id: string;
+    gameId: string;
+    name: string;
+    img?: string | null;
+    folderId?: string | null;
+    permission: string;
+    ownerId?: string | null;
+    sort: number;
+    data: Record<string, unknown>;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+  pages: Array<{
+    id: string;
+    journalId: string;
+    name: string;
+    pageType: string;
+    content?: string | null;
+    src?: string | null;
+    sort: number;
+    showInNavigation: boolean;
+    data: Record<string, unknown>;
+    createdAt: Date;
+    updatedAt: Date;
+  }>;
+  targetUserIds: string[];
+  shownByUserId: string;
+}
+
+// Journal Page payloads
+export interface PageCreatePayload {
+  journalId: string;
+  name: string;
+  pageType?: string;
+  content?: string | null;
+  src?: string | null;
+  sort?: number;
+  showInNavigation?: boolean;
+  data?: Record<string, unknown>;
+}
+
+export interface PageCreatedPayload {
+  page: {
+    id: string;
+    journalId: string;
+    name: string;
+    pageType: string;
+    content?: string | null;
+    src?: string | null;
+    sort: number;
+    showInNavigation: boolean;
+    data: Record<string, unknown>;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+}
+
+export interface PageUpdatePayload {
+  pageId: string;
+  updates: {
+    name?: string;
+    pageType?: string;
+    content?: string | null;
+    src?: string | null;
+    sort?: number;
+    showInNavigation?: boolean;
+    data?: Record<string, unknown>;
+  };
+}
+
+export interface PageUpdatedPayload {
+  page: {
+    id: string;
+    journalId: string;
+    name: string;
+    pageType: string;
+    content?: string | null;
+    src?: string | null;
+    sort: number;
+    showInNavigation: boolean;
+    data: Record<string, unknown>;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+}
+
+export interface PageDeletePayload {
+  pageId: string;
+}
+
+export interface PageDeletedPayload {
+  pageId: string;
+}
+
+// Folder payloads
+export interface FolderCreatePayload {
+  gameId: string;
+  name: string;
+  folderType: string;
+  parentId?: string | null;
+  color?: string | null;
+  sort?: number;
+  data?: Record<string, unknown>;
+}
+
+export interface FolderCreatedPayload {
+  folder: {
+    id: string;
+    gameId: string;
+    name: string;
+    folderType: string;
+    parentId?: string | null;
+    color?: string | null;
+    sort: number;
+    data: Record<string, unknown>;
+    createdAt: Date;
+  };
+}
+
+export interface FolderUpdatePayload {
+  folderId: string;
+  updates: {
+    name?: string;
+    parentId?: string | null;
+    color?: string | null;
+    sort?: number;
+    data?: Record<string, unknown>;
+  };
+}
+
+export interface FolderUpdatedPayload {
+  folder: {
+    id: string;
+    gameId: string;
+    name: string;
+    folderType: string;
+    parentId?: string | null;
+    color?: string | null;
+    sort: number;
+    data: Record<string, unknown>;
+    createdAt: Date;
+  };
+}
+
+export interface FolderDeletePayload {
+  folderId: string;
+}
+
+export interface FolderDeletedPayload {
+  folderId: string;
 }

@@ -48,6 +48,16 @@ import type {
   EffectUpdatePayload,
   EffectRemovePayload,
   EffectTogglePayload,
+  JournalCreatePayload,
+  JournalUpdatePayload,
+  JournalDeletePayload,
+  JournalShowPayload,
+  PageCreatePayload,
+  PageUpdatePayload,
+  PageDeletePayload,
+  FolderCreatePayload,
+  FolderUpdatePayload,
+  FolderDeletePayload,
   ErrorPayload
 } from '@vtt/shared';
 import { parseDiceNotation, type DiceGroup } from '@vtt/shared/dice';
@@ -80,6 +90,18 @@ import {
   handleEffectRemove,
   handleEffectToggle,
 } from './effects.js';
+import {
+  handleJournalCreate,
+  handleJournalUpdate,
+  handleJournalDelete,
+  handleJournalShow,
+  handlePageCreate,
+  handlePageUpdate,
+  handlePageDelete,
+  handleFolderCreate,
+  handleFolderUpdate,
+  handleFolderDelete,
+} from './journals.js';
 
 /**
  * Game session WebSocket handler
@@ -221,6 +243,46 @@ export async function handleGameWebSocket(
 
         case 'effect:toggle':
           await handleEffectToggle(socket, message as WSMessage<EffectTogglePayload>, request);
+          break;
+
+        case 'journal:create':
+          await handleJournalCreate(socket, message as WSMessage<JournalCreatePayload>, request);
+          break;
+
+        case 'journal:update':
+          await handleJournalUpdate(socket, message as WSMessage<JournalUpdatePayload>, request);
+          break;
+
+        case 'journal:delete':
+          await handleJournalDelete(socket, message as WSMessage<JournalDeletePayload>, request);
+          break;
+
+        case 'journal:show':
+          await handleJournalShow(socket, message as WSMessage<JournalShowPayload>, request);
+          break;
+
+        case 'page:create':
+          await handlePageCreate(socket, message as WSMessage<PageCreatePayload>, request);
+          break;
+
+        case 'page:update':
+          await handlePageUpdate(socket, message as WSMessage<PageUpdatePayload>, request);
+          break;
+
+        case 'page:delete':
+          await handlePageDelete(socket, message as WSMessage<PageDeletePayload>, request);
+          break;
+
+        case 'folder:create':
+          await handleFolderCreate(socket, message as WSMessage<FolderCreatePayload>, request);
+          break;
+
+        case 'folder:update':
+          await handleFolderUpdate(socket, message as WSMessage<FolderUpdatePayload>, request);
+          break;
+
+        case 'folder:delete':
+          await handleFolderDelete(socket, message as WSMessage<FolderDeletePayload>, request);
           break;
 
         default:
