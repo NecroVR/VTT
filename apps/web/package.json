@@ -10,6 +10,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
     "lint": "eslint .",
     "clean": "rm -rf .svelte-kit node_modules"
   },
@@ -17,6 +20,7 @@
     "@vtt/shared": "workspace:*"
   },
   "devDependencies": {
+    "@playwright/test": "^1.57.0",
     "@sveltejs/adapter-auto": "^3.3.1",
     "@sveltejs/adapter-node": "^5.2.9",
     "@sveltejs/kit": "^2.9.0",

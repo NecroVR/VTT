@@ -94,6 +94,9 @@ importers:
         specifier: workspace:*
         version: link:../../packages/shared
     devDependencies:
+      '@playwright/test':
+        specifier: ^1.57.0
+        version: 1.57.0
       '@sveltejs/adapter-auto':
         specifier: ^3.3.1
         version: 3.3.1(@sveltejs/kit@2.49.1(@sveltejs/vite-plugin-svelte@4.0.4(svelte@5.45.5)(vite@5.4.21(@types/node@22.19.1)))(svelte@5.45.5)(vite@5.4.21(@types/node@22.19.1)))
