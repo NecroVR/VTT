@@ -13,6 +13,7 @@ import lightsRoute from './lights.js';
 import effectsRoute from './effects.js';
 import assetsRoute from './assets.js';
 import fogRoute from './fog.js';
+import journalsRoute from './journals.js';
 
 /**
  * API v1 routes
@@ -40,6 +41,9 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
         effects: '/api/v1/effects',
         assets: '/api/v1/assets',
         fog: '/api/v1/scenes/:sceneId/fog',
+        folders: '/api/v1/games/:gameId/folders',
+        journals: '/api/v1/games/:gameId/journals',
+        pages: '/api/v1/journals/:journalId/pages',
       },
     };
   });
@@ -59,6 +63,7 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
   await fastify.register(effectsRoute);
   await fastify.register(assetsRoute);
   await fastify.register(fogRoute);
+  await fastify.register(journalsRoute);
 };
 
 export default apiV1Routes;
