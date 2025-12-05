@@ -17,7 +17,7 @@
   },
   "scripts": {
     "dev": "tsc --watch",
-    "build": "node ../../node_modules/typescript/bin/tsc",
+    "build": "pnpm --dir ../.. exec tsc --project packages/shared/tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
