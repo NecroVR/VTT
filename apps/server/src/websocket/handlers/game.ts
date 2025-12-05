@@ -113,6 +113,10 @@ export async function handleGameWebSocket(
           await handleTokenAdd(socket, message as WSMessage<TokenAddPayload>, request);
           break;
 
+        case 'token:update':
+          await handleTokenUpdate(socket, message as WSMessage<TokenUpdatePayload>, request);
+          break;
+
         case 'token:remove':
           await handleTokenRemove(socket, message as WSMessage<TokenRemovePayload>, request);
           break;
@@ -516,6 +520,86 @@ async function handleTokenAdd(
   } catch (error) {
     request.log.error({ error }, 'Error creating token');
     sendMessage(socket, 'error', { message: 'Failed to create token' });
+  }
+}
+
+/**
+ * Handle token update action
+ */
+async function handleTokenUpdate(
+  socket: WebSocket,
+  message: WSMessage<TokenUpdatePayload>,
+  request: FastifyRequest
+): Promise<void> {
+  request.log.debug({ payload: message.payload }, 'Token update');
+
+  const { tokenId, updates } = message.payload;
+
+  const gameId = roomManager.getRoomForSocket(socket);
+
+  if (!gameId) {
+    sendMessage(socket, 'error', { message: 'Not in a game room' });
+    return;
+  }
+
+  try {
+    // Update token in database
+    const updatedTokens = await request.server.db
+      .update(tokens)
+      .set({
+        ...updates,
+        updatedAt: new Date(),
+      })
+      .where(eq(tokens.id, tokenId))
+      .returning();
+
+    if (updatedTokens.length === 0) {
+      sendMessage(socket, 'error', { message: 'Token not found' });
+      return;
+    }
+
+    const updatedToken = updatedTokens[0];
+
+    // Convert to Token interface
+    const tokenPayload: Token = {
+      id: updatedToken.id,
+      sceneId: updatedToken.sceneId,
+      actorId: updatedToken.actorId,
+      name: updatedToken.name,
+      imageUrl: updatedToken.imageUrl,
+      x: updatedToken.x,
+      y: updatedToken.y,
+      width: updatedToken.width,
+      height: updatedToken.height,
+      elevation: updatedToken.elevation,
+      rotation: updatedToken.rotation,
+      locked: updatedToken.locked,
+      ownerId: updatedToken.ownerId,
+      visible: updatedToken.visible,
+      vision: updatedToken.vision,
+      visionRange: updatedToken.visionRange,
+      bars: updatedToken.bars as Record<string, unknown>,
+      lightBright: updatedToken.lightBright,
+      lightDim: updatedToken.lightDim,
+      lightColor: updatedToken.lightColor,
+      lightAngle: updatedToken.lightAngle,
+      data: updatedToken.data as Record<string, unknown>,
+      createdAt: updatedToken.createdAt,
+      updatedAt: updatedToken.updatedAt,
+    };
+
+    // Broadcast to all players
+    const updatedPayload: TokenUpdatedPayload = { token: tokenPayload };
+    roomManager.broadcast(gameId, {
+      type: 'token:updated',
+      payload: updatedPayload,
+      timestamp: Date.now(),
+    });
+
+    request.log.info({ tokenId, gameId }, 'Token updated');
+  } catch (error) {
+    request.log.error({ error, tokenId }, 'Error updating token');
+    sendMessage(socket, 'error', { message: 'Failed to update token' });
   }
 }
 

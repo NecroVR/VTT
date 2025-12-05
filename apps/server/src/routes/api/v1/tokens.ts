@@ -142,6 +142,298 @@ const tokensRoute: FastifyPluginAsync = async (fastify) => {
       }
     }
   );
+
+  /**
+   * POST /api/v1/scenes/:sceneId/tokens - Create a new token
+   * Creates a token for a specific scene
+   */
+  fastify.post<{
+    Params: { sceneId: string };
+    Body: {
+      name: string;
+      x: number;
+      y: number;
+      width?: number;
+      height?: number;
+      imageUrl?: string | null;
+      visible?: boolean;
+      actorId?: string | null;
+      elevation?: number;
+      rotation?: number;
+      locked?: boolean;
+      vision?: boolean;
+      visionRange?: number;
+      bars?: Record<string, unknown>;
+      lightBright?: number;
+      lightDim?: number;
+      lightColor?: string | null;
+      lightAngle?: number;
+      data?: Record<string, unknown>;
+    };
+  }>(
+    '/scenes/:sceneId/tokens',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      if (!request.user) {
+        return reply.status(401).send({ error: 'Not authenticated' });
+      }
+
+      const { sceneId } = request.params;
+      const tokenData = request.body;
+
+      // Validate required fields
+      if (!tokenData.name || tokenData.name.trim() === '') {
+        return reply.status(400).send({ error: 'Token name is required' });
+      }
+
+      if (tokenData.x === undefined || tokenData.y === undefined) {
+        return reply.status(400).send({ error: 'Token position (x, y) is required' });
+      }
+
+      try {
+        // Verify scene exists
+        const [scene] = await fastify.db
+          .select()
+          .from(scenes)
+          .where(eq(scenes.id, sceneId))
+          .limit(1);
+
+        if (!scene) {
+          return reply.status(404).send({ error: 'Scene not found' });
+        }
+
+        // TODO: Check if user has access to this scene's game
+
+        // Create token in database
+        const newTokens = await fastify.db
+          .insert(tokens)
+          .values({
+            sceneId,
+            actorId: tokenData.actorId ?? null,
+            name: tokenData.name.trim(),
+            x: tokenData.x,
+            y: tokenData.y,
+            width: tokenData.width ?? 1,
+            height: tokenData.height ?? 1,
+            elevation: tokenData.elevation ?? 0,
+            rotation: tokenData.rotation ?? 0,
+            locked: tokenData.locked ?? false,
+            imageUrl: tokenData.imageUrl ?? null,
+            visible: tokenData.visible ?? true,
+            vision: tokenData.vision ?? false,
+            visionRange: tokenData.visionRange ?? 0,
+            bars: tokenData.bars ?? {},
+            lightBright: tokenData.lightBright ?? 0,
+            lightDim: tokenData.lightDim ?? 0,
+            lightColor: tokenData.lightColor ?? null,
+            lightAngle: tokenData.lightAngle ?? 360,
+            data: tokenData.data ?? {},
+            ownerId: request.user.id,
+          })
+          .returning();
+
+        const newToken = newTokens[0];
+
+        // Convert to Token interface
+        const formattedToken: Token = {
+          id: newToken.id,
+          sceneId: newToken.sceneId,
+          actorId: newToken.actorId,
+          name: newToken.name,
+          imageUrl: newToken.imageUrl,
+          x: newToken.x,
+          y: newToken.y,
+          width: newToken.width,
+          height: newToken.height,
+          elevation: newToken.elevation,
+          rotation: newToken.rotation,
+          locked: newToken.locked,
+          ownerId: newToken.ownerId,
+          visible: newToken.visible,
+          vision: newToken.vision,
+          visionRange: newToken.visionRange,
+          bars: newToken.bars as Record<string, unknown>,
+          lightBright: newToken.lightBright,
+          lightDim: newToken.lightDim,
+          lightColor: newToken.lightColor,
+          lightAngle: newToken.lightAngle,
+          data: newToken.data as Record<string, unknown>,
+          createdAt: newToken.createdAt,
+          updatedAt: newToken.updatedAt,
+        };
+
+        return reply.status(201).send({ token: formattedToken });
+      } catch (error) {
+        fastify.log.error(error, 'Failed to create token');
+        return reply.status(500).send({ error: 'Failed to create token' });
+      }
+    }
+  );
+
+  /**
+   * PATCH /api/v1/tokens/:tokenId - Update a token
+   * Updates a specific token
+   */
+  fastify.patch<{
+    Params: { tokenId: string };
+    Body: {
+      name?: string;
+      x?: number;
+      y?: number;
+      width?: number;
+      height?: number;
+      imageUrl?: string | null;
+      visible?: boolean;
+      actorId?: string | null;
+      elevation?: number;
+      rotation?: number;
+      locked?: boolean;
+      vision?: boolean;
+      visionRange?: number;
+      bars?: Record<string, unknown>;
+      lightBright?: number;
+      lightDim?: number;
+      lightColor?: string | null;
+      lightAngle?: number;
+      data?: Record<string, unknown>;
+    };
+  }>(
+    '/tokens/:tokenId',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      if (!request.user) {
+        return reply.status(401).send({ error: 'Not authenticated' });
+      }
+
+      const { tokenId } = request.params;
+      const updates = request.body;
+
+      try {
+        // Check if token exists
+        const [existingToken] = await fastify.db
+          .select()
+          .from(tokens)
+          .where(eq(tokens.id, tokenId))
+          .limit(1);
+
+        if (!existingToken) {
+          return reply.status(404).send({ error: 'Token not found' });
+        }
+
+        // TODO: Check if user has permission to update this token
+
+        // Validate name if provided
+        if (updates.name !== undefined && updates.name.trim() === '') {
+          return reply.status(400).send({ error: 'Token name cannot be empty' });
+        }
+
+        // Build update object
+        const updateData: any = {
+          updatedAt: new Date(),
+        };
+
+        if (updates.name !== undefined) {
+          updateData.name = updates.name.trim();
+        }
+        if (updates.x !== undefined) {
+          updateData.x = updates.x;
+        }
+        if (updates.y !== undefined) {
+          updateData.y = updates.y;
+        }
+        if (updates.width !== undefined) {
+          updateData.width = updates.width;
+        }
+        if (updates.height !== undefined) {
+          updateData.height = updates.height;
+        }
+        if (updates.imageUrl !== undefined) {
+          updateData.imageUrl = updates.imageUrl;
+        }
+        if (updates.visible !== undefined) {
+          updateData.visible = updates.visible;
+        }
+        if (updates.actorId !== undefined) {
+          updateData.actorId = updates.actorId;
+        }
+        if (updates.elevation !== undefined) {
+          updateData.elevation = updates.elevation;
+        }
+        if (updates.rotation !== undefined) {
+          updateData.rotation = updates.rotation;
+        }
+        if (updates.locked !== undefined) {
+          updateData.locked = updates.locked;
+        }
+        if (updates.vision !== undefined) {
+          updateData.vision = updates.vision;
+        }
+        if (updates.visionRange !== undefined) {
+          updateData.visionRange = updates.visionRange;
+        }
+        if (updates.bars !== undefined) {
+          updateData.bars = updates.bars;
+        }
+        if (updates.lightBright !== undefined) {
+          updateData.lightBright = updates.lightBright;
+        }
+        if (updates.lightDim !== undefined) {
+          updateData.lightDim = updates.lightDim;
+        }
+        if (updates.lightColor !== undefined) {
+          updateData.lightColor = updates.lightColor;
+        }
+        if (updates.lightAngle !== undefined) {
+          updateData.lightAngle = updates.lightAngle;
+        }
+        if (updates.data !== undefined) {
+          updateData.data = updates.data;
+        }
+
+        // Update token in database
+        const updatedTokens = await fastify.db
+          .update(tokens)
+          .set(updateData)
+          .where(eq(tokens.id, tokenId))
+          .returning();
+
+        const updatedToken = updatedTokens[0];
+
+        // Convert to Token interface
+        const formattedToken: Token = {
+          id: updatedToken.id,
+          sceneId: updatedToken.sceneId,
+          actorId: updatedToken.actorId,
+          name: updatedToken.name,
+          imageUrl: updatedToken.imageUrl,
+          x: updatedToken.x,
+          y: updatedToken.y,
+          width: updatedToken.width,
+          height: updatedToken.height,
+          elevation: updatedToken.elevation,
+          rotation: updatedToken.rotation,
+          locked: updatedToken.locked,
+          ownerId: updatedToken.ownerId,
+          visible: updatedToken.visible,
+          vision: updatedToken.vision,
+          visionRange: updatedToken.visionRange,
+          bars: updatedToken.bars as Record<string, unknown>,
+          lightBright: updatedToken.lightBright,
+          lightDim: updatedToken.lightDim,
+          lightColor: updatedToken.lightColor,
+          lightAngle: updatedToken.lightAngle,
+          data: updatedToken.data as Record<string, unknown>,
+          createdAt: updatedToken.createdAt,
+          updatedAt: updatedToken.updatedAt,
+        };
+
+        return reply.status(200).send({ token: formattedToken });
+      } catch (error) {
+        fastify.log.error(error, 'Failed to update token');
+        return reply.status(500).send({ error: 'Failed to update token' });
+      }
+    }
+  );
 };
 
 export default tokensRoute;
