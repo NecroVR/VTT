@@ -12,8 +12,8 @@
     }
   },
   "scripts": {
-    "dev": "pnpm exec tsc --watch",
-    "build": "pnpm exec tsc",
+    "dev": "tsc --watch",
+    "build": "tsc",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",

@@ -14,6 +14,9 @@ COPY packages/shared/package.json ./packages/shared/
 # Install dependencies
 RUN pnpm install --frozen-lockfile
 
+# Add root node_modules/.bin to PATH for hoisted executables
+ENV PATH="/app/node_modules/.bin:$PATH"
+
 # Copy source code
 COPY apps/web ./apps/web
 COPY packages/shared ./packages/shared
