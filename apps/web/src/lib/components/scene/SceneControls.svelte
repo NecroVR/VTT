@@ -15,7 +15,10 @@
     { id: 'light', label: 'Light', icon: '💡', gmOnly: true, shortcut: '3' },
     { id: 'ruler', label: 'Ruler', icon: '📏', gmOnly: false, shortcut: '4' },
     { id: 'template', label: 'Template', icon: '⭕', gmOnly: false, shortcut: '5' },
-    { id: 'ping', label: 'Ping', icon: '📍', gmOnly: false, shortcut: '6' },
+    { id: 'freehand', label: 'Freehand', icon: '✏', gmOnly: false, shortcut: '6' },
+    { id: 'rectangle', label: 'Rectangle', icon: '▭', gmOnly: false, shortcut: '7' },
+    { id: 'circle', label: 'Circle', icon: '◯', gmOnly: false, shortcut: '8' },
+    { id: 'text', label: 'Text', icon: '📝', gmOnly: false, shortcut: '9' },
   ];
 
   function handleToolClick(toolId: string) {
@@ -30,7 +33,7 @@
       return;
     }
 
-    // Check for tool shortcuts (1-5)
+    // Check for tool shortcuts (1-9)
     const key = e.key;
     const tool = tools.find(t => t.shortcut === key);
 
