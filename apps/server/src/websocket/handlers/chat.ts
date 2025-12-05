@@ -14,7 +14,7 @@ import { eq } from 'drizzle-orm';
 
 /**
  * Handle chat:message event
- * Broadcasts a chat message to all players in the game
+ * Broadcasts a chat message to all players in the campaign
  */
 export async function handleChatMessage(
   socket: WebSocket,
@@ -27,7 +27,7 @@ export async function handleChatMessage(
   const playerInfo = roomManager.getPlayerInfo(socket);
 
   if (!gameId || !playerInfo) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -89,7 +89,7 @@ export async function handleChatDelete(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -137,7 +137,7 @@ export async function handleChatWhisper(
   const playerInfo = roomManager.getPlayerInfo(socket);
 
   if (!gameId || !playerInfo) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -184,7 +184,7 @@ export async function handleChatWhisper(
     // Find the sockets for the sender and target users
     const room = (roomManager as any).rooms.get(gameId);
     if (!room) {
-      sendError(socket, 'Game room not found');
+      sendError(socket, 'Campaign room not found');
       return;
     }
 

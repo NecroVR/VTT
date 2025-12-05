@@ -38,7 +38,7 @@ export async function handleMeasureStart(
   const userId = (request as any).userId;
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -84,7 +84,7 @@ export async function handleMeasureUpdate(
   const userId = (request as any).userId;
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -136,7 +136,7 @@ export async function handleMeasureEnd(
   const userId = (request as any).userId;
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -174,7 +174,7 @@ export async function handleTemplatePlace(
   const userId = (request as any).userId;
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -272,7 +272,7 @@ export async function handleTemplateUpdate(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -342,7 +342,7 @@ export async function handleTemplateRemove(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 

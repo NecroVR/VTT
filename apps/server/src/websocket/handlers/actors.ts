@@ -15,7 +15,7 @@ import { eq } from 'drizzle-orm';
 
 /**
  * Handle actor:create event
- * Creates a new actor and broadcasts to all players in the game
+ * Creates a new actor and broadcasts to all players in the campaign
  */
 export async function handleActorCreate(
   socket: WebSocket,
@@ -28,7 +28,7 @@ export async function handleActorCreate(
   const playerInfo = roomManager.getPlayerInfo(socket);
 
   if (!gameId || !playerInfo) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -98,7 +98,7 @@ export async function handleActorCreate(
 
 /**
  * Handle actor:update event
- * Updates an actor and broadcasts to all players in the game
+ * Updates an actor and broadcasts to all players in the campaign
  */
 export async function handleActorUpdate(
   socket: WebSocket,
@@ -110,7 +110,7 @@ export async function handleActorUpdate(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -168,7 +168,7 @@ export async function handleActorUpdate(
 
 /**
  * Handle actor:delete event
- * Deletes an actor and broadcasts to all players in the game
+ * Deletes an actor and broadcasts to all players in the campaign
  */
 export async function handleActorDelete(
   socket: WebSocket,
@@ -180,7 +180,7 @@ export async function handleActorDelete(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 

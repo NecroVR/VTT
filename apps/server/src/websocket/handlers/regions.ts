@@ -20,7 +20,7 @@ export async function handleRegionAdd(
 ): Promise<void> {
   const gameId = roomManager.getRoomForSocket(socket);
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -115,7 +115,7 @@ export async function handleRegionUpdate(
 ): Promise<void> {
   const gameId = roomManager.getRoomForSocket(socket);
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -183,7 +183,7 @@ export async function handleRegionRemove(
 ): Promise<void> {
   const gameId = roomManager.getRoomForSocket(socket);
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 

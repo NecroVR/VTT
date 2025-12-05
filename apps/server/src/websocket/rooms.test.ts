@@ -234,11 +234,11 @@ describe('RoomManager', () => {
     it('should send message to specific socket', () => {
       const socket = createMockWebSocket();
 
-      roomManager.sendToSocket(socket, 'game:state', { clientId: 'test' });
+      roomManager.sendToSocket(socket, 'campaign:state', { clientId: 'test' });
 
       expect(socket.send).toHaveBeenCalledTimes(1);
       const sentMessage = JSON.parse((socket.send as ReturnType<typeof vi.fn>).mock.calls[0][0]);
-      expect(sentMessage.type).toBe('game:state');
+      expect(sentMessage.type).toBe('campaign:state');
       expect(sentMessage.payload).toEqual({ clientId: 'test' });
       expect(sentMessage.timestamp).toBeDefined();
     });
@@ -246,7 +246,7 @@ describe('RoomManager', () => {
     it('should not send if socket is not open', () => {
       const socket = createMockWebSocket(0); // CONNECTING
 
-      roomManager.sendToSocket(socket, 'game:state', { clientId: 'test' });
+      roomManager.sendToSocket(socket, 'campaign:state', { clientId: 'test' });
 
       expect(socket.send).not.toHaveBeenCalled();
     });

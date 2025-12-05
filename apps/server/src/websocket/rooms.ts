@@ -2,7 +2,7 @@ import type { WebSocket } from '@fastify/websocket';
 import type { WSMessage, WSMessageType } from '@vtt/shared';
 
 /**
- * Player information in a game room
+ * Player information in a campaign room
  */
 export interface PlayerInfo {
   userId: string;
@@ -12,7 +12,7 @@ export interface PlayerInfo {
 
 /**
  * Room Manager
- * Manages game rooms and player connections for WebSocket multiplayer
+ * Manages campaign rooms and player connections for WebSocket multiplayer
  */
 export class RoomManager {
   // Map of gameId -> Set of WebSocket connections
@@ -25,8 +25,8 @@ export class RoomManager {
   private playerInfo: Map<WebSocket, { userId: string; username: string }> = new Map();
 
   /**
-   * Add a player to a game room
-   * @param gameId - The ID of the game to join
+   * Add a player to a campaign room
+   * @param gameId - The ID of the campaign to join
    * @param socket - The player's WebSocket connection
    * @param userInfo - The player's user information
    */
@@ -74,7 +74,7 @@ export class RoomManager {
 
   /**
    * Broadcast a message to all players in a room
-   * @param gameId - The game room to broadcast to
+   * @param gameId - The campaign room to broadcast to
    * @param message - The message to send
    * @param excludeSocket - Optional socket to exclude from broadcast
    */
@@ -126,7 +126,7 @@ export class RoomManager {
 
   /**
    * Get list of players in a room
-   * @param gameId - The game room ID
+   * @param gameId - The campaign room ID
    * @returns Array of player information
    */
   getPlayersInRoom(gameId: string): Array<{ userId: string; username: string }> {
@@ -171,7 +171,7 @@ export class RoomManager {
 
   /**
    * Get the number of players in a room
-   * @param gameId - The game room ID
+   * @param gameId - The campaign room ID
    * @returns Number of players
    */
   getRoomSize(gameId: string): number {
@@ -182,7 +182,7 @@ export class RoomManager {
   /**
    * Check if a socket is in a room
    * @param socket - The WebSocket connection
-   * @param gameId - The game room ID
+   * @param gameId - The campaign room ID
    * @returns True if socket is in room
    */
   isInRoom(socket: WebSocket, gameId: string): boolean {

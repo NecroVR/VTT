@@ -16,11 +16,11 @@ import type {
   DiceRollPayload,
   DiceResultPayload,
   DiceRollGroup,
-  GameJoinPayload,
-  GameLeavePayload,
-  GamePlayersPayload,
-  GamePlayerJoinedPayload,
-  GamePlayerLeftPayload,
+  CampaignJoinPayload,
+  CampaignLeavePayload,
+  CampaignPlayersPayload,
+  CampaignPlayerJoinedPayload,
+  CampaignPlayerLeftPayload,
   ChatMessagePayload,
   SceneSwitchPayload,
   SceneSwitchedPayload,
@@ -168,10 +168,10 @@ import {
 } from './compendiums.js';
 
 /**
- * Game session WebSocket handler
- * Manages real-time communication for game sessions
+ * Campaign session WebSocket handler
+ * Manages real-time communication for campaign sessions
  */
-export async function handleGameWebSocket(
+export async function handleCampaignWebSocket(
   connection: WebSocket,
   request: FastifyRequest
 ) {
@@ -193,12 +193,12 @@ export async function handleGameWebSocket(
           handlePing(socket);
           break;
 
-        case 'game:join':
-          await handleGameJoin(socket, message as WSMessage<GameJoinPayload>, request);
+        case 'campaign:join':
+          await handleCampaignJoin(socket, message as WSMessage<CampaignJoinPayload>, request);
           break;
 
-        case 'game:leave':
-          handleGameLeave(socket, message as WSMessage<GameLeavePayload>, request);
+        case 'campaign:leave':
+          handleCampaignLeave(socket, message as WSMessage<CampaignLeavePayload>, request);
           break;
 
         case 'token:move':
@@ -468,16 +468,16 @@ export async function handleGameWebSocket(
     request.log.info(`WebSocket client disconnected: ${clientId}`);
 
     // Clean up: remove player from their room
-    const gameId = roomManager.getRoomForSocket(socket);
-    if (gameId) {
+    const campaignId = roomManager.getRoomForSocket(socket);
+    if (campaignId) {
       const playerInfo = roomManager.getPlayerInfo(socket);
       roomManager.leave(socket);
 
       // Notify other players
       if (playerInfo) {
-        const payload: GamePlayerLeftPayload = { userId: playerInfo.userId };
-        roomManager.broadcast(gameId, {
-          type: 'game:player-left',
+        const payload: CampaignPlayerLeftPayload = { userId: playerInfo.userId };
+        roomManager.broadcast(campaignId, {
+          type: 'campaign:player-left',
           payload,
           timestamp: Date.now(),
         });
@@ -491,7 +491,7 @@ export async function handleGameWebSocket(
   });
 
   // Send welcome message
-  sendMessage(socket, 'game:state', { clientId });
+  sendMessage(socket, 'campaign:state', { clientId });
 }
 
 /**
@@ -518,16 +518,16 @@ function handlePing(socket: WebSocket): void {
 }
 
 /**
- * Handle game join request
+ * Handle campaign join request
  */
-async function handleGameJoin(
+async function handleCampaignJoin(
   socket: WebSocket,
-  message: WSMessage<GameJoinPayload>,
+  message: WSMessage<CampaignJoinPayload>,
   request: FastifyRequest
 ): Promise<void> {
-  const { gameId, token } = message.payload;
+  const { campaignId, token } = message.payload;
 
-  request.log.info({ gameId }, 'Client joining game session');
+  request.log.info({ campaignId }, 'Client joining campaign session');
 
   // Validate session token
   const user = await validateSession(request.server, token);
@@ -542,20 +542,20 @@ async function handleGameJoin(
   }
 
   // Add player to room
-  roomManager.join(gameId, socket, {
+  roomManager.join(campaignId, socket, {
     userId: user.userId,
     username: user.username,
   });
 
   // Get current players in room
-  const players = roomManager.getPlayersInRoom(gameId);
+  const players = roomManager.getPlayersInRoom(campaignId);
 
   // Send player list to the joining player
-  const playersPayload: GamePlayersPayload = { players };
-  sendMessage(socket, 'game:players', playersPayload);
+  const playersPayload: CampaignPlayersPayload = { players };
+  sendMessage(socket, 'campaign:players', playersPayload);
 
   // Notify other players that someone joined
-  const joinedPayload: GamePlayerJoinedPayload = {
+  const joinedPayload: CampaignPlayerJoinedPayload = {
     player: {
       userId: user.userId,
       username: user.username,
@@ -563,9 +563,9 @@ async function handleGameJoin(
   };
 
   roomManager.broadcast(
-    gameId,
+    campaignId,
     {
-      type: 'game:player-joined',
+      type: 'campaign:player-joined',
       payload: joinedPayload,
       timestamp: Date.now(),
     },
@@ -573,23 +573,23 @@ async function handleGameJoin(
   );
 
   request.log.info({
-    gameId,
+    campaignId,
     userId: user.userId,
     playerCount: players.length,
-  }, 'Player joined game session');
+  }, 'Player joined campaign session');
 }
 
 /**
- * Handle game leave request
+ * Handle campaign leave request
  */
-function handleGameLeave(
+function handleCampaignLeave(
   socket: WebSocket,
-  message: WSMessage<GameLeavePayload>,
+  message: WSMessage<CampaignLeavePayload>,
   request: FastifyRequest
 ): void {
-  const { gameId } = message.payload;
+  const { campaignId } = message.payload;
 
-  request.log.info({ gameId }, 'Client leaving game session');
+  request.log.info({ campaignId }, 'Client leaving campaign session');
 
   // Get player info before removing
   const playerInfo = roomManager.getPlayerInfo(socket);
@@ -599,17 +599,17 @@ function handleGameLeave(
 
   // Notify other players
   if (playerInfo) {
-    const payload: GamePlayerLeftPayload = { userId: playerInfo.userId };
-    roomManager.broadcast(gameId, {
-      type: 'game:player-left',
+    const payload: CampaignPlayerLeftPayload = { userId: playerInfo.userId };
+    roomManager.broadcast(campaignId, {
+      type: 'campaign:player-left',
       payload,
       timestamp: Date.now(),
     });
 
     request.log.info({
-      gameId,
+      campaignId,
       userId: playerInfo.userId,
-    }, 'Player left game session');
+    }, 'Player left campaign session');
   }
 }
 
@@ -625,11 +625,11 @@ async function handleTokenMove(
 
   const { tokenId, x, y } = message.payload;
 
-  // Get the game room for this socket
-  const gameId = roomManager.getRoomForSocket(socket);
+  // Get the campaign room for this socket
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
-    sendMessage(socket, 'error', { message: 'Not in a game room' });
+  if (!campaignId) {
+    sendMessage(socket, 'error', { message: 'Not in a campaign room' });
     return;
   }
 
@@ -646,8 +646,8 @@ async function handleTokenMove(
       return;
     }
 
-    // Broadcast to all players in the game (including sender for confirmation)
-    roomManager.broadcast(gameId, {
+    // Broadcast to all players in the campaign (including sender for confirmation)
+    roomManager.broadcast(campaignId, {
       type: 'token:move',
       payload: { tokenId, x, y },
       timestamp: Date.now(),
@@ -668,11 +668,11 @@ async function handleTokenAdd(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Token add');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
   const playerInfo = roomManager.getPlayerInfo(socket);
 
-  if (!gameId || !playerInfo) {
-    sendMessage(socket, 'error', { message: 'Not in a game room' });
+  if (!campaignId || !playerInfo) {
+    sendMessage(socket, 'error', { message: 'Not in a campaign room' });
     return;
   }
 
@@ -766,13 +766,13 @@ async function handleTokenAdd(
 
     // Broadcast to all players with full token including ID
     const addedPayload: TokenAddedPayload = { token: tokenPayload };
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'token:added',
       payload: addedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ tokenId: newToken.id, sceneId, gameId }, 'Token created');
+    request.log.info({ tokenId: newToken.id, sceneId, campaignId }, 'Token created');
   } catch (error) {
     request.log.error({ error }, 'Error creating token');
     sendMessage(socket, 'error', { message: 'Failed to create token' });
@@ -791,10 +791,10 @@ async function handleTokenUpdate(
 
   const { tokenId, updates } = message.payload;
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
-    sendMessage(socket, 'error', { message: 'Not in a game room' });
+  if (!campaignId) {
+    sendMessage(socket, 'error', { message: 'Not in a campaign room' });
     return;
   }
 
@@ -846,13 +846,13 @@ async function handleTokenUpdate(
 
     // Broadcast to all players
     const updatedPayload: TokenUpdatedPayload = { token: tokenPayload };
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'token:updated',
       payload: updatedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ tokenId, gameId }, 'Token updated');
+    request.log.info({ tokenId, campaignId }, 'Token updated');
   } catch (error) {
     request.log.error({ error, tokenId }, 'Error updating token');
     sendMessage(socket, 'error', { message: 'Failed to update token' });
@@ -871,10 +871,10 @@ async function handleTokenRemove(
 
   const { tokenId } = message.payload;
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
-    sendMessage(socket, 'error', { message: 'Not in a game room' });
+  if (!campaignId) {
+    sendMessage(socket, 'error', { message: 'Not in a campaign room' });
     return;
   }
 
@@ -892,13 +892,13 @@ async function handleTokenRemove(
 
     // Broadcast to all players
     const removedPayload: TokenRemovedPayload = { tokenId };
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'token:removed',
       payload: removedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ tokenId, gameId }, 'Token removed');
+    request.log.info({ tokenId, campaignId }, 'Token removed');
   } catch (error) {
     request.log.error({ error, tokenId }, 'Error removing token');
     sendMessage(socket, 'error', { message: 'Failed to remove token' });
@@ -917,11 +917,11 @@ function handleDiceRoll(
 
   const { notation, label } = message.payload;
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
   const playerInfo = roomManager.getPlayerInfo(socket);
 
-  if (!gameId || !playerInfo) {
-    sendMessage(socket, 'error', { message: 'Not in a game room' });
+  if (!campaignId || !playerInfo) {
+    sendMessage(socket, 'error', { message: 'Not in a campaign room' });
     return;
   }
 
@@ -983,7 +983,7 @@ function handleDiceRoll(
     }, 'Dice rolled');
 
     // Broadcast dice result to all players
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'dice:result',
       payload: result,
       timestamp: Date.now(),
@@ -1008,10 +1008,10 @@ async function handleSceneSwitch(
 
   const { sceneId } = message.payload;
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
-    sendMessage(socket, 'error', { message: 'Not in a game room' });
+  if (!campaignId) {
+    sendMessage(socket, 'error', { message: 'Not in a campaign room' });
     return;
   }
 
@@ -1031,7 +1031,7 @@ async function handleSceneSwitch(
     // Convert to Scene interface
     const scenePayload: Scene = {
       id: scene.id,
-      gameId: scene.gameId,
+      campaignId: scene.gameId,
       name: scene.name,
       active: scene.active,
       backgroundImage: scene.backgroundImage,
@@ -1058,13 +1058,13 @@ async function handleSceneSwitch(
 
     // Broadcast to all players
     const switchedPayload: SceneSwitchedPayload = { scene: scenePayload };
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'scene:switched',
       payload: switchedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ sceneId, gameId }, 'Scene switched');
+    request.log.info({ sceneId, campaignId }, 'Scene switched');
   } catch (error) {
     request.log.error({ error, sceneId }, 'Error switching scene');
     sendMessage(socket, 'error', { message: 'Failed to switch scene' });
@@ -1083,10 +1083,10 @@ async function handleSceneUpdate(
 
   const { sceneId, updates } = message.payload;
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
-    sendMessage(socket, 'error', { message: 'Not in a game room' });
+  if (!campaignId) {
+    sendMessage(socket, 'error', { message: 'Not in a campaign room' });
     return;
   }
 
@@ -1111,7 +1111,7 @@ async function handleSceneUpdate(
     // Convert to Scene interface
     const scenePayload: Scene = {
       id: updatedScene.id,
-      gameId: updatedScene.gameId,
+      campaignId: updatedScene.gameId,
       name: updatedScene.name,
       active: updatedScene.active,
       backgroundImage: updatedScene.backgroundImage,
@@ -1138,13 +1138,13 @@ async function handleSceneUpdate(
 
     // Broadcast to all players
     const updatedPayload: SceneUpdatedPayload = { scene: scenePayload };
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'scene:updated',
       payload: updatedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ sceneId, gameId }, 'Scene updated');
+    request.log.info({ sceneId, campaignId }, 'Scene updated');
   } catch (error) {
     request.log.error({ error, sceneId }, 'Error updating scene');
     sendMessage(socket, 'error', { message: 'Failed to update scene' });
@@ -1161,10 +1161,10 @@ async function handleWallAdd(
 ): Promise<void> {
   request.log.debug({ payload: message.payload }, 'Wall add');
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
-    sendMessage(socket, 'error', { message: 'Not in a game room' });
+  if (!campaignId) {
+    sendMessage(socket, 'error', { message: 'Not in a campaign room' });
     return;
   }
 
@@ -1225,13 +1225,13 @@ async function handleWallAdd(
 
     // Broadcast to all players
     const addedPayload: WallAddedPayload = { wall: wallPayload };
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'wall:added',
       payload: addedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ wallId: newWall.id, sceneId, gameId }, 'Wall created');
+    request.log.info({ wallId: newWall.id, sceneId, campaignId }, 'Wall created');
   } catch (error) {
     request.log.error({ error }, 'Error creating wall');
     sendMessage(socket, 'error', { message: 'Failed to create wall' });
@@ -1250,10 +1250,10 @@ async function handleWallUpdate(
 
   const { wallId, updates } = message.payload;
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
-    sendMessage(socket, 'error', { message: 'Not in a game room' });
+  if (!campaignId) {
+    sendMessage(socket, 'error', { message: 'Not in a campaign room' });
     return;
   }
 
@@ -1292,13 +1292,13 @@ async function handleWallUpdate(
 
     // Broadcast to all players
     const updatedPayload: WallUpdatedPayload = { wall: wallPayload };
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'wall:updated',
       payload: updatedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ wallId, gameId }, 'Wall updated');
+    request.log.info({ wallId, campaignId }, 'Wall updated');
   } catch (error) {
     request.log.error({ error, wallId }, 'Error updating wall');
     sendMessage(socket, 'error', { message: 'Failed to update wall' });
@@ -1317,10 +1317,10 @@ async function handleWallRemove(
 
   const { wallId } = message.payload;
 
-  const gameId = roomManager.getRoomForSocket(socket);
+  const campaignId = roomManager.getRoomForSocket(socket);
 
-  if (!gameId) {
-    sendMessage(socket, 'error', { message: 'Not in a game room' });
+  if (!campaignId) {
+    sendMessage(socket, 'error', { message: 'Not in a campaign room' });
     return;
   }
 
@@ -1338,13 +1338,13 @@ async function handleWallRemove(
 
     // Broadcast to all players
     const removedPayload: WallRemovedPayload = { wallId };
-    roomManager.broadcast(gameId, {
+    roomManager.broadcast(campaignId, {
       type: 'wall:removed',
       payload: removedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ wallId, gameId }, 'Wall removed');
+    request.log.info({ wallId, campaignId }, 'Wall removed');
   } catch (error) {
     request.log.error({ error, wallId }, 'Error removing wall');
     sendMessage(socket, 'error', { message: 'Failed to remove wall' });

@@ -32,7 +32,7 @@ export async function handleEffectAdd(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -147,7 +147,7 @@ export async function handleEffectUpdate(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -228,7 +228,7 @@ export async function handleEffectRemove(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -275,7 +275,7 @@ export async function handleEffectToggle(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 

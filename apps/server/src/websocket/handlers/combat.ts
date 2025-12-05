@@ -35,7 +35,7 @@ export async function handleCombatStart(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -135,7 +135,7 @@ export async function handleCombatEnd(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -182,7 +182,7 @@ export async function handleCombatUpdate(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -249,7 +249,7 @@ export async function handleCombatantAdd(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -325,7 +325,7 @@ export async function handleCombatantUpdate(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -389,7 +389,7 @@ export async function handleCombatantRemove(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -436,7 +436,7 @@ export async function handleCombatNextTurn(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 

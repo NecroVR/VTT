@@ -33,11 +33,11 @@ function getAllSentMessages<T = unknown>(socket: WebSocket): WSMessage<T>[] {
   return sendMock.mock.calls.map((call) => JSON.parse(call[0]));
 }
 
-describe('Game WebSocket Handler', () => {
+describe('Campaign WebSocket Handler', () => {
   let app: FastifyInstance;
   let testUserId: string;
   let testSessionId: string;
-  let testGameId: string;
+  let testCampaignId: string;
   let testSceneId: string;
 
   beforeAll(async () => {
@@ -90,22 +90,22 @@ describe('Game WebSocket Handler', () => {
     testSessionId = session.id;
 
     // Create test game
-    const [game] = await app.db
+    const [campaign] = await app.db
       .insert(games)
       .values({
         ownerId: testUserId,
-        name: 'Test Game',
+        name: 'Test Campaign',
         settings: {},
       })
       .returning();
 
-    testGameId = game.id;
+    testCampaignId = campaign.id;
 
     // Create test scene
     const [scene] = await app.db
       .insert(scenes)
       .values({
-        gameId: testGameId,
+        gameId: testCampaignId,
         name: 'Test Scene',
         active: true,
         backgroundImage: 'test.jpg',
@@ -137,7 +137,7 @@ describe('Game WebSocket Handler', () => {
       const mockSocket = createMockWebSocket();
 
       // Simulate WebSocket connection
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       // Create mock request
       const mockRequest = {
@@ -152,7 +152,7 @@ describe('Game WebSocket Handler', () => {
       } as any;
 
       // Trigger connection
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
 
       // Get the message handler
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
@@ -179,11 +179,11 @@ describe('Game WebSocket Handler', () => {
     });
   });
 
-  describe('game:join handler', () => {
-    it('should allow user to join game with valid token', async () => {
+  describe('campaign:join handler', () => {
+    it('should allow user to join campaign with valid token', async () => {
       const mockSocket = createMockWebSocket();
 
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
       const mockRequest = {
         id: 'test-client-id',
         log: {
@@ -195,7 +195,7 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
 
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
@@ -204,9 +204,9 @@ describe('Game WebSocket Handler', () => {
       (mockSocket.send as ReturnType<typeof vi.fn>).mockClear();
 
       const joinMessage: WSMessage = {
-        type: 'game:join',
+        type: 'campaign:join',
         payload: {
-          gameId: testGameId,
+          gameId: testCampaignId,
           token: testSessionId,
         },
         timestamp: Date.now(),
@@ -215,7 +215,7 @@ describe('Game WebSocket Handler', () => {
       await messageHandler(Buffer.from(JSON.stringify(joinMessage)));
 
       const messages = getAllSentMessages(mockSocket);
-      const playersMessage = messages.find((m) => m.type === 'game:players');
+      const playersMessage = messages.find((m) => m.type === 'campaign:players');
 
       expect(playersMessage).toBeDefined();
       expect(playersMessage?.payload.players).toHaveLength(1);
@@ -226,7 +226,7 @@ describe('Game WebSocket Handler', () => {
     it('should reject join with invalid token', async () => {
       const mockSocket = createMockWebSocket();
 
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
       const mockRequest = {
         id: 'test-client-id',
         log: {
@@ -238,7 +238,7 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
 
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
@@ -247,9 +247,9 @@ describe('Game WebSocket Handler', () => {
       (mockSocket.send as ReturnType<typeof vi.fn>).mockClear();
 
       const joinMessage: WSMessage = {
-        type: 'game:join',
+        type: 'campaign:join',
         payload: {
-          gameId: testGameId,
+          gameId: testCampaignId,
           token: 'invalid-token',
         },
         timestamp: Date.now(),
@@ -266,7 +266,7 @@ describe('Game WebSocket Handler', () => {
     it('should notify other players when someone joins', async () => {
       // First player joins
       const mockSocket1 = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest1 = {
         id: 'client-1',
@@ -279,16 +279,16 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket1, mockRequest1);
+      await handleCampaignWebSocket(mockSocket1, mockRequest1);
 
       const messageHandler1 = (mockSocket1.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       const joinMessage1: WSMessage = {
-        type: 'game:join',
+        type: 'campaign:join',
         payload: {
-          gameId: testGameId,
+          gameId: testCampaignId,
           token: testSessionId,
         },
         timestamp: Date.now(),
@@ -330,7 +330,7 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket2, mockRequest2);
+      await handleCampaignWebSocket(mockSocket2, mockRequest2);
 
       const messageHandler2 = (mockSocket2.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
@@ -339,9 +339,9 @@ describe('Game WebSocket Handler', () => {
       (mockSocket1.send as ReturnType<typeof vi.fn>).mockClear();
 
       const joinMessage2: WSMessage = {
-        type: 'game:join',
+        type: 'campaign:join',
         payload: {
-          gameId: testGameId,
+          gameId: testCampaignId,
           token: session2.id,
         },
         timestamp: Date.now(),
@@ -351,7 +351,7 @@ describe('Game WebSocket Handler', () => {
 
       // Check that socket1 received player-joined notification
       const messages1 = getAllSentMessages(mockSocket1);
-      const joinedMessage = messages1.find((m) => m.type === 'game:player-joined');
+      const joinedMessage = messages1.find((m) => m.type === 'campaign:player-joined');
 
       expect(joinedMessage).toBeDefined();
       expect(joinedMessage?.payload.player.userId).toBe(user2.id);
@@ -359,10 +359,10 @@ describe('Game WebSocket Handler', () => {
     });
   });
 
-  describe('game:leave handler', () => {
+  describe('campaign:leave handler', () => {
     it('should remove player from room', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -375,7 +375,7 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
 
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
@@ -383,9 +383,9 @@ describe('Game WebSocket Handler', () => {
 
       // Join first
       const joinMessage: WSMessage = {
-        type: 'game:join',
+        type: 'campaign:join',
         payload: {
-          gameId: testGameId,
+          gameId: testCampaignId,
           token: testSessionId,
         },
         timestamp: Date.now(),
@@ -395,9 +395,9 @@ describe('Game WebSocket Handler', () => {
 
       // Then leave
       const leaveMessage: WSMessage = {
-        type: 'game:leave',
+        type: 'campaign:leave',
         payload: {
-          gameId: testGameId,
+          gameId: testCampaignId,
         },
         timestamp: Date.now(),
       };
@@ -413,7 +413,7 @@ describe('Game WebSocket Handler', () => {
       // Setup two players
       const mockSocket1 = createMockWebSocket();
       const mockSocket2 = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       // First player
       const mockRequest1 = {
@@ -422,14 +422,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket1, mockRequest1);
+      await handleCampaignWebSocket(mockSocket1, mockRequest1);
       const messageHandler1 = (mockSocket1.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler1(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -454,14 +454,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket2, mockRequest2);
+      await handleCampaignWebSocket(mockSocket2, mockRequest2);
       const messageHandler2 = (mockSocket2.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler2(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: session2.id },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: session2.id },
         timestamp: Date.now(),
       })));
 
@@ -469,14 +469,14 @@ describe('Game WebSocket Handler', () => {
 
       // Second player leaves
       await messageHandler2(Buffer.from(JSON.stringify({
-        type: 'game:leave',
-        payload: { gameId: testGameId },
+        type: 'campaign:leave',
+        payload: { campaignId: testCampaignId },
         timestamp: Date.now(),
       })));
 
       // Check socket1 received notification
       const messages = getAllSentMessages(mockSocket1);
-      const leftMessage = messages.find((m) => m.type === 'game:player-left');
+      const leftMessage = messages.find((m) => m.type === 'campaign:player-left');
 
       expect(leftMessage).toBeDefined();
       expect(leftMessage?.payload.userId).toBe(user2.id);
@@ -506,7 +506,7 @@ describe('Game WebSocket Handler', () => {
 
     it('should update token position in database', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -514,15 +514,15 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       // Join game first
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -552,7 +552,7 @@ describe('Game WebSocket Handler', () => {
 
     it('should broadcast token move to all players in room', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -560,14 +560,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -590,7 +590,7 @@ describe('Game WebSocket Handler', () => {
 
     it('should return error if token not found', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -598,14 +598,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -623,9 +623,9 @@ describe('Game WebSocket Handler', () => {
       expect(['Token not found', 'Failed to update token position']).toContain(lastMessage?.payload.message);
     });
 
-    it('should return error if not in a game room', async () => {
+    it('should return error if not in a campaign room', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -633,7 +633,7 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
@@ -649,14 +649,14 @@ describe('Game WebSocket Handler', () => {
 
       const lastMessage = getLastSentMessage(mockSocket);
       expect(lastMessage?.type).toBe('error');
-      expect(lastMessage?.payload.message).toBe('Not in a game room');
+      expect(lastMessage?.payload.message).toBe('Not in a campaign room');
     });
   });
 
   describe('token:add handler', () => {
     it('should create new token in database', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -664,14 +664,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -704,7 +704,7 @@ describe('Game WebSocket Handler', () => {
 
     it('should broadcast token:added to all players', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -712,14 +712,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -748,7 +748,7 @@ describe('Game WebSocket Handler', () => {
 
     it('should return error if sceneId is missing', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -756,14 +756,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -786,7 +786,7 @@ describe('Game WebSocket Handler', () => {
 
     it('should set default values for optional fields', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -794,14 +794,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -850,7 +850,7 @@ describe('Game WebSocket Handler', () => {
 
     it('should delete token from database', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -858,14 +858,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -885,7 +885,7 @@ describe('Game WebSocket Handler', () => {
 
     it('should broadcast token:removed to all players', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -893,14 +893,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -921,7 +921,7 @@ describe('Game WebSocket Handler', () => {
 
     it('should return error if token not found', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -929,14 +929,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -957,7 +957,7 @@ describe('Game WebSocket Handler', () => {
   describe('dice:roll handler', () => {
     it('should parse dice notation and broadcast result', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -965,14 +965,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1003,7 +1003,7 @@ describe('Game WebSocket Handler', () => {
 
     it('should handle complex dice notation with keep highest', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1011,14 +1011,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1040,7 +1040,7 @@ describe('Game WebSocket Handler', () => {
 
     it('should return error for invalid dice notation', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1048,14 +1048,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1072,9 +1072,9 @@ describe('Game WebSocket Handler', () => {
       expect(lastMessage?.payload.message).toBeDefined();
     });
 
-    it('should return error if not in a game room', async () => {
+    it('should return error if not in a campaign room', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1082,7 +1082,7 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
@@ -1097,14 +1097,14 @@ describe('Game WebSocket Handler', () => {
 
       const lastMessage = getLastSentMessage(mockSocket);
       expect(lastMessage?.type).toBe('error');
-      expect(lastMessage?.payload.message).toBe('Not in a game room');
+      expect(lastMessage?.payload.message).toBe('Not in a campaign room');
     });
   });
 
   describe('chat:message handler', () => {
     it('should broadcast chat message to all players', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1112,14 +1112,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1142,7 +1142,7 @@ describe('Game WebSocket Handler', () => {
 
     it('should override userId and username from payload with authenticated user', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1150,14 +1150,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1182,9 +1182,9 @@ describe('Game WebSocket Handler', () => {
       expect(chatMessage?.payload.username).toBe('testuser');
     });
 
-    it('should return error if not in a game room', async () => {
+    it('should return error if not in a campaign room', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1192,7 +1192,7 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
@@ -1207,14 +1207,14 @@ describe('Game WebSocket Handler', () => {
 
       const lastMessage = getLastSentMessage(mockSocket);
       expect(lastMessage?.type).toBe('error');
-      expect(lastMessage?.payload.message).toBe('Not in a game room');
+      expect(lastMessage?.payload.message).toBe('Not in a campaign room');
     });
   });
 
   describe('scene:switch handler', () => {
     it('should fetch scene from database and broadcast to all players', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1222,14 +1222,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1251,7 +1251,7 @@ describe('Game WebSocket Handler', () => {
 
     it('should return error if scene not found', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1259,14 +1259,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1287,7 +1287,7 @@ describe('Game WebSocket Handler', () => {
   describe('scene:update handler', () => {
     it('should update scene in database and broadcast changes', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1295,14 +1295,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1340,7 +1340,7 @@ describe('Game WebSocket Handler', () => {
 
     it('should return error if scene not found', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1348,14 +1348,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1379,7 +1379,7 @@ describe('Game WebSocket Handler', () => {
   describe('wall:add handler', () => {
     it('should create wall in database and broadcast to all players', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1387,14 +1387,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1430,7 +1430,7 @@ describe('Game WebSocket Handler', () => {
 
     it('should set default values for optional wall properties', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1438,14 +1438,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1492,7 +1492,7 @@ describe('Game WebSocket Handler', () => {
 
     it('should update wall in database and broadcast changes', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1500,14 +1500,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1549,7 +1549,7 @@ describe('Game WebSocket Handler', () => {
 
     it('should return error if wall not found', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1557,14 +1557,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1605,7 +1605,7 @@ describe('Game WebSocket Handler', () => {
 
     it('should delete wall from database and broadcast removal', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1613,14 +1613,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1650,7 +1650,7 @@ describe('Game WebSocket Handler', () => {
 
     it('should return error if wall not found', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1658,14 +1658,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1686,7 +1686,7 @@ describe('Game WebSocket Handler', () => {
   describe('error handling', () => {
     it('should handle invalid JSON gracefully', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1694,7 +1694,7 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
@@ -1710,7 +1710,7 @@ describe('Game WebSocket Handler', () => {
 
     it('should handle unknown message types', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1718,7 +1718,7 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
@@ -1738,7 +1738,7 @@ describe('Game WebSocket Handler', () => {
 
     it('should handle websocket errors', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1746,7 +1746,7 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const errorHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'error'
       )?.[1];
@@ -1762,7 +1762,7 @@ describe('Game WebSocket Handler', () => {
 
     it('should handle dice roll errors with invalid notation', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1770,15 +1770,15 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       // Join game first
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1799,7 +1799,7 @@ describe('Game WebSocket Handler', () => {
   describe('connection lifecycle', () => {
     it('should send welcome message on connection', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1807,16 +1807,16 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
 
       const lastMessage = getLastSentMessage(mockSocket);
-      expect(lastMessage?.type).toBe('game:state');
+      expect(lastMessage?.type).toBe('campaign:state');
       expect(lastMessage?.payload.clientId).toBe('test-client-id');
     });
 
     it('should clean up player on disconnect', async () => {
       const mockSocket = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest = {
         id: 'test-client-id',
@@ -1824,7 +1824,7 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket, mockRequest);
+      await handleCampaignWebSocket(mockSocket, mockRequest);
 
       const messageHandler = (mockSocket.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
@@ -1832,8 +1832,8 @@ describe('Game WebSocket Handler', () => {
 
       // Join game
       await messageHandler(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1853,7 +1853,7 @@ describe('Game WebSocket Handler', () => {
       // Setup two players
       const mockSocket1 = createMockWebSocket();
       const mockSocket2 = createMockWebSocket();
-      const { handleGameWebSocket } = await import('./game.js');
+      const { handleCampaignWebSocket } = await import('./game.js');
 
       const mockRequest1 = {
         id: 'client-1',
@@ -1861,14 +1861,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket1, mockRequest1);
+      await handleCampaignWebSocket(mockSocket1, mockRequest1);
       const messageHandler1 = (mockSocket1.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler1(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: testSessionId },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: testSessionId },
         timestamp: Date.now(),
       })));
 
@@ -1893,14 +1893,14 @@ describe('Game WebSocket Handler', () => {
         server: app,
       } as any;
 
-      await handleGameWebSocket(mockSocket2, mockRequest2);
+      await handleCampaignWebSocket(mockSocket2, mockRequest2);
       const messageHandler2 = (mockSocket2.on as ReturnType<typeof vi.fn>).mock.calls.find(
         (call) => call[0] === 'message'
       )?.[1];
 
       await messageHandler2(Buffer.from(JSON.stringify({
-        type: 'game:join',
-        payload: { gameId: testGameId, token: session2.id },
+        type: 'campaign:join',
+        payload: { gameId: testCampaignId, token: session2.id },
         timestamp: Date.now(),
       })));
 
@@ -1915,7 +1915,7 @@ describe('Game WebSocket Handler', () => {
 
       // Check socket1 received notification
       const messages = getAllSentMessages(mockSocket1);
-      const leftMessage = messages.find((m) => m.type === 'game:player-left');
+      const leftMessage = messages.find((m) => m.type === 'campaign:player-left');
 
       expect(leftMessage).toBeDefined();
       expect(leftMessage?.payload.userId).toBe(user2.id);

@@ -15,7 +15,7 @@ import { eq } from 'drizzle-orm';
 
 /**
  * Handle tile:add event
- * Creates a new tile and broadcasts to all players in the game
+ * Creates a new tile and broadcasts to all players in the campaign
  */
 export async function handleTileAdd(
   socket: WebSocket,
@@ -27,7 +27,7 @@ export async function handleTileAdd(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -116,7 +116,7 @@ export async function handleTileAdd(
 
 /**
  * Handle tile:update event
- * Updates a tile and broadcasts to all players in the game
+ * Updates a tile and broadcasts to all players in the campaign
  */
 export async function handleTileUpdate(
   socket: WebSocket,
@@ -128,7 +128,7 @@ export async function handleTileUpdate(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -192,7 +192,7 @@ export async function handleTileUpdate(
 
 /**
  * Handle tile:remove event
- * Deletes a tile and broadcasts to all players in the game
+ * Deletes a tile and broadcasts to all players in the campaign
  */
 export async function handleTileRemove(
   socket: WebSocket,
@@ -204,7 +204,7 @@ export async function handleTileRemove(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 

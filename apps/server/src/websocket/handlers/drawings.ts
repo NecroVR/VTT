@@ -17,7 +17,7 @@ import { eq } from 'drizzle-orm';
 
 /**
  * Handle drawing:create event
- * Creates a new drawing and broadcasts to all players in the game
+ * Creates a new drawing and broadcasts to all players in the campaign
  */
 export async function handleDrawingCreate(
   socket: WebSocket,
@@ -30,7 +30,7 @@ export async function handleDrawingCreate(
   const userId = (request as any).userId;
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -144,7 +144,7 @@ export async function handleDrawingCreate(
 
 /**
  * Handle drawing:update event
- * Updates a drawing and broadcasts to all players in the game
+ * Updates a drawing and broadcasts to all players in the campaign
  */
 export async function handleDrawingUpdate(
   socket: WebSocket,
@@ -156,7 +156,7 @@ export async function handleDrawingUpdate(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -227,7 +227,7 @@ export async function handleDrawingUpdate(
 
 /**
  * Handle drawing:delete event
- * Deletes a drawing and broadcasts to all players in the game
+ * Deletes a drawing and broadcasts to all players in the campaign
  */
 export async function handleDrawingDelete(
   socket: WebSocket,
@@ -239,7 +239,7 @@ export async function handleDrawingDelete(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -287,7 +287,7 @@ export async function handleDrawingStream(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 

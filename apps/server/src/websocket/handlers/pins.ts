@@ -22,7 +22,7 @@ export async function handlePinAdd(
 ): Promise<void> {
   const gameId = roomManager.getRoomForSocket(socket);
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -108,7 +108,7 @@ export async function handlePinUpdate(
 ): Promise<void> {
   const gameId = roomManager.getRoomForSocket(socket);
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -173,7 +173,7 @@ export async function handlePinRemove(
 ): Promise<void> {
   const gameId = roomManager.getRoomForSocket(socket);
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -211,7 +211,7 @@ export async function handlePinClick(
 ): Promise<void> {
   const gameId = roomManager.getRoomForSocket(socket);
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 

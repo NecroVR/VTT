@@ -50,7 +50,7 @@ function generateSearchText(name: string, entityData: Record<string, unknown>): 
 
 /**
  * Handle compendium:create event
- * Creates a new compendium and broadcasts to all players in the game
+ * Creates a new compendium and broadcasts to all players in the campaign
  */
 export async function handleCompendiumCreate(
   socket: WebSocket,
@@ -63,7 +63,7 @@ export async function handleCompendiumCreate(
   const playerInfo = roomManager.getPlayerInfo(socket);
 
   if (!gameId || !playerInfo) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -130,7 +130,7 @@ export async function handleCompendiumCreate(
 
 /**
  * Handle compendium:update event
- * Updates a compendium and broadcasts to all players in the game
+ * Updates a compendium and broadcasts to all players in the campaign
  */
 export async function handleCompendiumUpdate(
   socket: WebSocket,
@@ -142,7 +142,7 @@ export async function handleCompendiumUpdate(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -216,7 +216,7 @@ export async function handleCompendiumUpdate(
 
 /**
  * Handle compendium:delete event
- * Deletes a compendium and broadcasts to all players in the game
+ * Deletes a compendium and broadcasts to all players in the campaign
  */
 export async function handleCompendiumDelete(
   socket: WebSocket,
@@ -228,7 +228,7 @@ export async function handleCompendiumDelete(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -280,7 +280,7 @@ export async function handleCompendiumDelete(
 
 /**
  * Handle compendium:entry-create event
- * Creates a new compendium entry and broadcasts to all players in the game
+ * Creates a new compendium entry and broadcasts to all players in the campaign
  */
 export async function handleCompendiumEntryCreate(
   socket: WebSocket,
@@ -293,7 +293,7 @@ export async function handleCompendiumEntryCreate(
   const playerInfo = roomManager.getPlayerInfo(socket);
 
   if (!gameId || !playerInfo) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -389,7 +389,7 @@ export async function handleCompendiumEntryCreate(
 
 /**
  * Handle compendium:entry-update event
- * Updates a compendium entry and broadcasts to all players in the game
+ * Updates a compendium entry and broadcasts to all players in the campaign
  */
 export async function handleCompendiumEntryUpdate(
   socket: WebSocket,
@@ -401,7 +401,7 @@ export async function handleCompendiumEntryUpdate(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -493,7 +493,7 @@ export async function handleCompendiumEntryUpdate(
 
 /**
  * Handle compendium:entry-delete event
- * Deletes a compendium entry and broadcasts to all players in the game
+ * Deletes a compendium entry and broadcasts to all players in the campaign
  */
 export async function handleCompendiumEntryDelete(
   socket: WebSocket,
@@ -505,7 +505,7 @@ export async function handleCompendiumEntryDelete(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 

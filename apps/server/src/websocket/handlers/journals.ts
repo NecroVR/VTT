@@ -29,7 +29,7 @@ import { eq, and, asc } from 'drizzle-orm';
 
 /**
  * Handle journal:create event
- * Creates a new journal and broadcasts to all players in the game
+ * Creates a new journal and broadcasts to all players in the campaign
  */
 export async function handleJournalCreate(
   socket: WebSocket,
@@ -42,7 +42,7 @@ export async function handleJournalCreate(
   const playerInfo = roomManager.getPlayerInfo(socket);
 
   if (!gameId || !playerInfo) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -106,7 +106,7 @@ export async function handleJournalCreate(
 
 /**
  * Handle journal:update event
- * Updates a journal and broadcasts to all players in the game
+ * Updates a journal and broadcasts to all players in the campaign
  */
 export async function handleJournalUpdate(
   socket: WebSocket,
@@ -118,7 +118,7 @@ export async function handleJournalUpdate(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -174,7 +174,7 @@ export async function handleJournalUpdate(
 
 /**
  * Handle journal:delete event
- * Deletes a journal and broadcasts to all players in the game
+ * Deletes a journal and broadcasts to all players in the campaign
  */
 export async function handleJournalDelete(
   socket: WebSocket,
@@ -186,7 +186,7 @@ export async function handleJournalDelete(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -234,7 +234,7 @@ export async function handleJournalShow(
   const playerInfo = roomManager.getPlayerInfo(socket);
 
   if (!gameId || !playerInfo) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -320,7 +320,7 @@ export async function handleJournalShow(
 
 /**
  * Handle page:create event
- * Creates a new journal page and broadcasts to all players in the game
+ * Creates a new journal page and broadcasts to all players in the campaign
  */
 export async function handlePageCreate(
   socket: WebSocket,
@@ -332,7 +332,7 @@ export async function handlePageCreate(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -397,7 +397,7 @@ export async function handlePageCreate(
 
 /**
  * Handle page:update event
- * Updates a journal page and broadcasts to all players in the game
+ * Updates a journal page and broadcasts to all players in the campaign
  */
 export async function handlePageUpdate(
   socket: WebSocket,
@@ -409,7 +409,7 @@ export async function handlePageUpdate(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -465,7 +465,7 @@ export async function handlePageUpdate(
 
 /**
  * Handle page:delete event
- * Deletes a journal page and broadcasts to all players in the game
+ * Deletes a journal page and broadcasts to all players in the campaign
  */
 export async function handlePageDelete(
   socket: WebSocket,
@@ -477,7 +477,7 @@ export async function handlePageDelete(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -512,7 +512,7 @@ export async function handlePageDelete(
 
 /**
  * Handle folder:create event
- * Creates a new folder and broadcasts to all players in the game
+ * Creates a new folder and broadcasts to all players in the campaign
  */
 export async function handleFolderCreate(
   socket: WebSocket,
@@ -524,7 +524,7 @@ export async function handleFolderCreate(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -584,7 +584,7 @@ export async function handleFolderCreate(
 
 /**
  * Handle folder:update event
- * Updates a folder and broadcasts to all players in the game
+ * Updates a folder and broadcasts to all players in the campaign
  */
 export async function handleFolderUpdate(
   socket: WebSocket,
@@ -596,7 +596,7 @@ export async function handleFolderUpdate(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
@@ -647,7 +647,7 @@ export async function handleFolderUpdate(
 
 /**
  * Handle folder:delete event
- * Deletes a folder and broadcasts to all players in the game
+ * Deletes a folder and broadcasts to all players in the campaign
  */
 export async function handleFolderDelete(
   socket: WebSocket,
@@ -659,7 +659,7 @@ export async function handleFolderDelete(
   const gameId = roomManager.getRoomForSocket(socket);
 
   if (!gameId) {
-    sendError(socket, 'Not in a game room');
+    sendError(socket, 'Not in a campaign room');
     return;
   }
 
