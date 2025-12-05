@@ -30,7 +30,9 @@
     error = null;
 
     try {
-      const response = await fetch(`/api/v1/actors/${actorId}`);
+      const response = await fetch(`/api/v1/games/${gameId}/actors/${actorId}`, {
+        credentials: 'include'
+      });
       if (response.ok) {
         const data = await response.json();
         actor = data.actor;
@@ -49,9 +51,10 @@
     if (!actor) return;
 
     try {
-      const response = await fetch(`/api/v1/actors/${actorId}`, {
+      const response = await fetch(`/api/v1/games/${gameId}/actors/${actorId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(updates)
       });
 
