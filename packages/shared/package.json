@@ -16,8 +16,8 @@
     }
   },
   "scripts": {
-    "dev": "tsc --watch",
-    "build": "tsc",
+    "dev": "pnpm exec tsc --watch",
+    "build": "pnpm exec tsc",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
