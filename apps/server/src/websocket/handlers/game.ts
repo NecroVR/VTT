@@ -58,6 +58,12 @@ import type {
   FolderCreatePayload,
   FolderUpdatePayload,
   FolderDeletePayload,
+  MeasureStartPayload,
+  MeasureUpdatePayload,
+  MeasureEndPayload,
+  TemplatePlacePayload,
+  TemplateUpdatePayload,
+  TemplateRemovePayload,
   ErrorPayload
 } from '@vtt/shared';
 import { parseDiceNotation, type DiceGroup } from '@vtt/shared/dice';
@@ -102,6 +108,14 @@ import {
   handleFolderUpdate,
   handleFolderDelete,
 } from './journals.js';
+import {
+  handleMeasureStart,
+  handleMeasureUpdate,
+  handleMeasureEnd,
+  handleTemplatePlace,
+  handleTemplateUpdate,
+  handleTemplateRemove,
+} from './templates.js';
 
 /**
  * Game session WebSocket handler
@@ -283,6 +297,30 @@ export async function handleGameWebSocket(
 
         case 'folder:delete':
           await handleFolderDelete(socket, message as WSMessage<FolderDeletePayload>, request);
+          break;
+
+        case 'measure:start':
+          await handleMeasureStart(socket, message as WSMessage<MeasureStartPayload>, request);
+          break;
+
+        case 'measure:update':
+          await handleMeasureUpdate(socket, message as WSMessage<MeasureUpdatePayload>, request);
+          break;
+
+        case 'measure:end':
+          await handleMeasureEnd(socket, message as WSMessage<MeasureEndPayload>, request);
+          break;
+
+        case 'template:place':
+          await handleTemplatePlace(socket, message as WSMessage<TemplatePlacePayload>, request);
+          break;
+
+        case 'template:update':
+          await handleTemplateUpdate(socket, message as WSMessage<TemplateUpdatePayload>, request);
+          break;
+
+        case 'template:remove':
+          await handleTemplateRemove(socket, message as WSMessage<TemplateRemovePayload>, request);
           break;
 
         default:

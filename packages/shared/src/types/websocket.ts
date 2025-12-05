@@ -3,6 +3,7 @@ import type { Scene } from './scene.js';
 import type { Wall } from './wall.js';
 import type { AmbientLight } from './ambientLight.js';
 import type { ActiveEffect } from './activeEffect.js';
+import type { MeasurementTemplate, RulerMeasurement } from './template.js';
 
 export type WSMessageType =
   | 'ping' | 'pong'
@@ -21,6 +22,8 @@ export type WSMessageType =
   | 'journal:create' | 'journal:created' | 'journal:update' | 'journal:updated' | 'journal:delete' | 'journal:deleted' | 'journal:show' | 'journal:shown'
   | 'page:create' | 'page:created' | 'page:update' | 'page:updated' | 'page:delete' | 'page:deleted'
   | 'folder:create' | 'folder:created' | 'folder:update' | 'folder:updated' | 'folder:delete' | 'folder:deleted'
+  | 'measure:start' | 'measure:started' | 'measure:update' | 'measure:updated' | 'measure:end' | 'measure:ended'
+  | 'template:place' | 'template:placed' | 'template:update' | 'template:updated' | 'template:remove' | 'template:removed'
   | 'error';
 
 export interface WSMessage<T = unknown> {
@@ -796,4 +799,71 @@ export interface FolderDeletePayload {
 
 export interface FolderDeletedPayload {
   folderId: string;
+}
+
+// Measurement payloads (ruler - client-side only, not persisted)
+export interface MeasureStartPayload {
+  sceneId: string;
+  x: number;
+  y: number;
+}
+
+export interface MeasureStartedPayload {
+  measurement: RulerMeasurement;
+}
+
+export interface MeasureUpdatePayload {
+  x: number;
+  y: number;
+  addWaypoint?: boolean;
+}
+
+export interface MeasureUpdatedPayload {
+  measurement: RulerMeasurement;
+}
+
+export interface MeasureEndPayload {
+  // No payload needed
+}
+
+export interface MeasureEndedPayload {
+  userId: string;
+}
+
+// Template payloads (persistent)
+export interface TemplatePlacePayload {
+  sceneId: string;
+  templateType: 'circle' | 'cone' | 'ray' | 'rectangle';
+  x: number;
+  y: number;
+  distance: number;
+  direction?: number | null;
+  angle?: number | null;
+  width?: number | null;
+  color?: string;
+  fillAlpha?: number;
+  borderColor?: string | null;
+  hidden?: boolean;
+  data?: Record<string, unknown>;
+}
+
+export interface TemplatePlacedPayload {
+  template: MeasurementTemplate;
+}
+
+export interface TemplateUpdatePayload {
+  templateId: string;
+  updates: Partial<Omit<MeasurementTemplate, 'id' | 'sceneId' | 'createdAt'>>;
+}
+
+export interface TemplateUpdatedPayload {
+  template: MeasurementTemplate;
+}
+
+export interface TemplateRemovePayload {
+  templateId: string;
+}
+
+export interface TemplateRemovedPayload {
+  templateId: string;
 }
