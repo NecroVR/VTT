@@ -1,10 +1,10 @@
 import { pgTable, text, timestamp, uuid, integer, real, boolean, jsonb } from 'drizzle-orm/pg-core';
-import { games } from './games.js';
+import { campaigns } from './campaigns.js';
 import { actors } from './actors.js';
 
 export const items = pgTable('items', {
   id: uuid('id').primaryKey().defaultRandom(),
-  gameId: uuid('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
+  campaignId: uuid('campaign_id').notNull().references(() => campaigns.id, { onDelete: 'cascade' }),
   actorId: uuid('actor_id').references(() => actors.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
   itemType: text('item_type').notNull(),

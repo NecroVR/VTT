@@ -1,10 +1,10 @@
 import { pgTable, text, timestamp, uuid, integer, jsonb, boolean } from 'drizzle-orm/pg-core';
-import { games } from './games.js';
+import { campaigns } from './campaigns.js';
 import { users } from './users.js';
 
 export const folders = pgTable('folders', {
   id: uuid('id').primaryKey().defaultRandom(),
-  gameId: uuid('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
+  campaignId: uuid('campaign_id').notNull().references(() => campaigns.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
   folderType: text('folder_type').notNull(),
   parentId: uuid('parent_id').references((): any => folders.id, { onDelete: 'cascade' }),
@@ -16,7 +16,7 @@ export const folders = pgTable('folders', {
 
 export const journals = pgTable('journals', {
   id: uuid('id').primaryKey().defaultRandom(),
-  gameId: uuid('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
+  campaignId: uuid('campaign_id').notNull().references(() => campaigns.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
   img: text('img'),
   folderId: uuid('folder_id').references(() => folders.id, { onDelete: 'set null' }),

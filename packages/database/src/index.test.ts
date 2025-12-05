@@ -83,7 +83,7 @@ describe('index module', () => {
 
       expect(exports.users).toBeDefined();
       expect(exports.sessions).toBeDefined();
-      expect(exports.games).toBeDefined();
+      expect(exports.campaigns).toBeDefined();
       expect(exports.scenes).toBeDefined();
       expect(exports.tokens).toBeDefined();
       expect(exports.walls).toBeDefined();

@@ -1,7 +1,7 @@
 import { pgTable, text, timestamp, uuid, jsonb } from 'drizzle-orm/pg-core';
 import { users } from './users.js';
 
-export const games = pgTable('games', {
+export const campaigns = pgTable('campaigns', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
   ownerId: uuid('owner_id').notNull().references(() => users.id),

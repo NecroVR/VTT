@@ -13,7 +13,7 @@ describe('combats schema', () => {
       const columns = getTableColumns(combats);
       expect(columns.id).toBeDefined();
       expect(columns.sceneId).toBeDefined();
-      expect(columns.gameId).toBeDefined();
+      expect(columns.campaignId).toBeDefined();
       expect(columns.active).toBeDefined();
       expect(columns.round).toBeDefined();
       expect(columns.turn).toBeDefined();
@@ -27,7 +27,7 @@ describe('combats schema', () => {
       // UUID columns have 'string' dataType in Drizzle
       expect(columns.id.dataType).toBe('string');
       expect(columns.sceneId.dataType).toBe('string');
-      expect(columns.gameId.dataType).toBe('string');
+      expect(columns.campaignId.dataType).toBe('string');
       expect(columns.active.dataType).toBe('boolean');
       expect(columns.round.dataType).toBe('number');
       expect(columns.turn.dataType).toBe('number');
@@ -41,7 +41,7 @@ describe('combats schema', () => {
 
     it('should have not null constraints on required fields', () => {
       const columns = getTableColumns(combats);
-      expect(columns.gameId.notNull).toBe(true);
+      expect(columns.campaignId.notNull).toBe(true);
       expect(columns.active.notNull).toBe(true);
       expect(columns.round.notNull).toBe(true);
       expect(columns.turn.notNull).toBe(true);
@@ -63,7 +63,7 @@ describe('combats schema', () => {
       const columns = getTableColumns(combats);
       expect(columns.id.name).toBe('id');
       expect(columns.sceneId.name).toBe('scene_id');
-      expect(columns.gameId.name).toBe('game_id');
+      expect(columns.campaignId.name).toBe('campaign_id');
     });
 
     it('should have data as JSONB column', () => {

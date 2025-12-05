@@ -1,9 +1,9 @@
 import { pgTable, text, timestamp, uuid, boolean, integer, real, jsonb } from 'drizzle-orm/pg-core';
-import { games } from './games.js';
+import { campaigns } from './campaigns.js';
 
 export const scenes = pgTable('scenes', {
   id: uuid('id').primaryKey().defaultRandom(),
-  gameId: uuid('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
+  campaignId: uuid('campaign_id').notNull().references(() => campaigns.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
   active: boolean('active').notNull().default(false),
   // Background

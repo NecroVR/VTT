@@ -11,8 +11,8 @@ describe('schema/index module', () => {
       expect(schemaIndex.sessions).toBeDefined();
     });
 
-    it('should export games table', () => {
-      expect(schemaIndex.games).toBeDefined();
+    it('should export campaigns table', () => {
+      expect(schemaIndex.campaigns).toBeDefined();
     });
 
     it('should export scenes table', () => {
@@ -57,7 +57,7 @@ describe('schema/index module', () => {
       const expectedExports = [
         'users',
         'sessions',
-        'games',
+        'campaigns',
         'scenes',
         'tokens',
         'walls',

@@ -1,11 +1,11 @@
 import { pgTable, text, timestamp, uuid, integer, jsonb } from 'drizzle-orm/pg-core';
 import { users } from './users.js';
-import { games } from './games.js';
+import { campaigns } from './campaigns.js';
 
 export const assets = pgTable('assets', {
   id: uuid('id').primaryKey().defaultRandom(),
   userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  gameId: uuid('game_id').references(() => games.id, { onDelete: 'cascade' }),
+  campaignId: uuid('campaign_id').references(() => campaigns.id, { onDelete: 'cascade' }),
   filename: text('filename').notNull(),
   originalName: text('original_name').notNull(),
   mimeType: text('mime_type').notNull(),

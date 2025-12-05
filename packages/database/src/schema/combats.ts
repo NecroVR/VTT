@@ -1,5 +1,5 @@
 import { pgTable, timestamp, uuid, boolean, integer, real, jsonb } from 'drizzle-orm/pg-core';
-import { games } from './games.js';
+import { campaigns } from './campaigns.js';
 import { scenes } from './scenes.js';
 import { actors } from './actors.js';
 import { tokens } from './tokens.js';
@@ -7,7 +7,7 @@ import { tokens } from './tokens.js';
 export const combats = pgTable('combats', {
   id: uuid('id').primaryKey().defaultRandom(),
   sceneId: uuid('scene_id').references(() => scenes.id),
-  gameId: uuid('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
+  campaignId: uuid('campaign_id').notNull().references(() => campaigns.id, { onDelete: 'cascade' }),
   active: boolean('active').notNull().default(false),
   round: integer('round').notNull().default(0),
   turn: integer('turn').notNull().default(0),

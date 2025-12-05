@@ -12,7 +12,7 @@ describe('chatMessages schema', () => {
     it('should have all required columns', () => {
       const columns = getTableColumns(chatMessages);
       expect(columns.id).toBeDefined();
-      expect(columns.gameId).toBeDefined();
+      expect(columns.campaignId).toBeDefined();
       expect(columns.userId).toBeDefined();
       expect(columns.content).toBeDefined();
       expect(columns.messageType).toBeDefined();
@@ -35,7 +35,7 @@ describe('chatMessages schema', () => {
       const columns = getTableColumns(chatMessages);
       // UUID columns have 'string' dataType in Drizzle
       expect(columns.id.dataType).toBe('string');
-      expect(columns.gameId.dataType).toBe('string');
+      expect(columns.campaignId.dataType).toBe('string');
       expect(columns.userId.dataType).toBe('string');
       expect(columns.content.dataType).toBe('string');
       expect(columns.messageType.dataType).toBe('string');
@@ -53,7 +53,7 @@ describe('chatMessages schema', () => {
 
     it('should have not null constraints on required fields', () => {
       const columns = getTableColumns(chatMessages);
-      expect(columns.gameId.notNull).toBe(true);
+      expect(columns.campaignId.notNull).toBe(true);
       expect(columns.content.notNull).toBe(true);
       expect(columns.messageType.notNull).toBe(true);
       expect(columns.blind.notNull).toBe(true);
@@ -71,7 +71,7 @@ describe('chatMessages schema', () => {
     it('should have correct column names in database', () => {
       const columns = getTableColumns(chatMessages);
       expect(columns.id.name).toBe('id');
-      expect(columns.gameId.name).toBe('game_id');
+      expect(columns.campaignId.name).toBe('campaign_id');
       expect(columns.userId.name).toBe('user_id');
       expect(columns.messageType.name).toBe('message_type');
     });

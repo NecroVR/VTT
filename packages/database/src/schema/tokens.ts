@@ -1,5 +1,5 @@
 import { pgTable, text, timestamp, uuid, boolean, real, jsonb } from 'drizzle-orm/pg-core';
-import { games } from './games.js';
+import { campaigns } from './campaigns.js';
 import { scenes } from './scenes.js';
 import { actors } from './actors.js';
 import { users } from './users.js';

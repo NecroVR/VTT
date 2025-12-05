@@ -1,16 +1,16 @@
 import { describe, it, expect } from 'vitest';
 import { getTableColumns, getTableName } from 'drizzle-orm';
-import { games } from './games.js';
+import { campaigns } from './campaigns.js';
 
-describe('games schema', () => {
+describe('campaigns schema', () => {
   describe('table structure', () => {
     it('should have correct table name', () => {
-      const tableName = getTableName(games);
-      expect(tableName).toBe('games');
+      const tableName = getTableName(campaigns);
+      expect(tableName).toBe('campaigns');
     });
 
     it('should have all required columns', () => {
-      const columns = getTableColumns(games);
+      const columns = getTableColumns(campaigns);
       expect(columns.id).toBeDefined();
       expect(columns.name).toBeDefined();
       expect(columns.ownerId).toBeDefined();
@@ -20,7 +20,7 @@ describe('games schema', () => {
     });
 
     it('should have correct column types', () => {
-      const columns = getTableColumns(games);
+      const columns = getTableColumns(campaigns);
       // UUID columns have 'string' dataType in Drizzle
       expect(columns.id.dataType).toBe('string');
       expect(columns.name.dataType).toBe('string');
@@ -31,12 +31,12 @@ describe('games schema', () => {
     });
 
     it('should have primary key on id column', () => {
-      const columns = getTableColumns(games);
+      const columns = getTableColumns(campaigns);
       expect(columns.id.primary).toBe(true);
     });
 
     it('should have not null constraints on required fields', () => {
-      const columns = getTableColumns(games);
+      const columns = getTableColumns(campaigns);
       expect(columns.name.notNull).toBe(true);
       expect(columns.ownerId.notNull).toBe(true);
       expect(columns.settings.notNull).toBe(true);
@@ -45,7 +45,7 @@ describe('games schema', () => {
     });
 
     it('should have default values configured', () => {
-      const columns = getTableColumns(games);
+      const columns = getTableColumns(campaigns);
       expect(columns.id.hasDefault).toBe(true);
       expect(columns.settings.hasDefault).toBe(true);
       expect(columns.createdAt.hasDefault).toBe(true);
@@ -53,7 +53,7 @@ describe('games schema', () => {
     });
 
     it('should have correct column names in database', () => {
-      const columns = getTableColumns(games);
+      const columns = getTableColumns(campaigns);
       expect(columns.id.name).toBe('id');
       expect(columns.name.name).toBe('name');
       expect(columns.ownerId.name).toBe('owner_id');
@@ -61,7 +61,7 @@ describe('games schema', () => {
     });
 
     it('should have settings as JSONB column', () => {
-      const columns = getTableColumns(games);
+      const columns = getTableColumns(campaigns);
       expect(columns.settings.dataType).toBe('json');
     });
   });

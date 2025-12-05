@@ -1,10 +1,10 @@
 import { pgTable, text, timestamp, uuid, boolean, jsonb } from 'drizzle-orm/pg-core';
-import { games } from './games.js';
+import { campaigns } from './campaigns.js';
 import { users } from './users.js';
 
 export const chatMessages = pgTable('chat_messages', {
   id: uuid('id').primaryKey().defaultRandom(),
-  gameId: uuid('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
+  campaignId: uuid('campaign_id').notNull().references(() => campaigns.id, { onDelete: 'cascade' }),
   userId: uuid('user_id').references(() => users.id),
   // Content
   content: text('content').notNull(),

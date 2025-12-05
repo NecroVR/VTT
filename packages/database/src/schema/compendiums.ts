@@ -1,5 +1,5 @@
 import { pgTable, text, timestamp, uuid, integer, boolean, jsonb, index } from 'drizzle-orm/pg-core';
-import { games } from './games.js';
+import { campaigns } from './campaigns.js';
 import { sql } from 'drizzle-orm';
 
 /**
@@ -8,8 +8,8 @@ import { sql } from 'drizzle-orm';
  */
 export const compendiums = pgTable('compendiums', {
   id: uuid('id').primaryKey().defaultRandom(),
-  // null gameId = system-wide compendium available to all games
-  gameId: uuid('game_id').references(() => games.id, { onDelete: 'cascade' }),
+  // null campaignId = system-wide compendium available to all campaigns
+  campaignId: uuid('campaign_id').references(() => campaigns.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
   label: text('label').notNull(),
   // Entity type this compendium holds: Actor, Item, JournalEntry, Scene

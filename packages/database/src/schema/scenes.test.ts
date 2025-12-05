@@ -12,7 +12,7 @@ describe('scenes schema', () => {
     it('should have all required columns', () => {
       const columns = getTableColumns(scenes);
       expect(columns.id).toBeDefined();
-      expect(columns.gameId).toBeDefined();
+      expect(columns.campaignId).toBeDefined();
       expect(columns.name).toBeDefined();
       expect(columns.active).toBeDefined();
       expect(columns.backgroundImage).toBeDefined();
@@ -51,7 +51,7 @@ describe('scenes schema', () => {
       const columns = getTableColumns(scenes);
       // UUID columns have 'string' dataType in Drizzle
       expect(columns.id.dataType).toBe('string');
-      expect(columns.gameId.dataType).toBe('string');
+      expect(columns.campaignId.dataType).toBe('string');
       expect(columns.name.dataType).toBe('string');
       expect(columns.active.dataType).toBe('boolean');
       expect(columns.gridSize.dataType).toBe('number');
@@ -65,7 +65,7 @@ describe('scenes schema', () => {
 
     it('should have not null constraints on required fields', () => {
       const columns = getTableColumns(scenes);
-      expect(columns.gameId.notNull).toBe(true);
+      expect(columns.campaignId.notNull).toBe(true);
       expect(columns.name.notNull).toBe(true);
       expect(columns.active.notNull).toBe(true);
       expect(columns.gridType.notNull).toBe(true);
@@ -93,7 +93,7 @@ describe('scenes schema', () => {
     it('should have correct column names in database', () => {
       const columns = getTableColumns(scenes);
       expect(columns.id.name).toBe('id');
-      expect(columns.gameId.name).toBe('game_id');
+      expect(columns.campaignId.name).toBe('campaign_id');
       expect(columns.name.name).toBe('name');
       expect(columns.gridType.name).toBe('grid_type');
     });
