@@ -1,6 +1,9 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-  import type { Token } from '@vtt/shared';
+  import type { Token, RulerMeasurement } from '@vtt/shared';
+  import MeasurementLayer from './scene/MeasurementLayer.svelte';
+  import TemplateConfig from './scene/TemplateConfig.svelte';
+  import { templatesStore } from '$lib/stores/templates';
 
   // Props
   export let tokens: Map<string, Token> = new Map();
@@ -8,7 +11,12 @@
   export let onTokenClick: (tokenId: string) => void = () => {};
   export let onTokenMove: (tokenId: string, x: number, y: number) => void = () => {};
   export let gridSize: number = 50;
+  export let gridDistance: number = 5;
+  export let gridUnits: string = 'ft';
   export let showGrid: boolean = true;
+  export let activeTool: string = 'select';
+  export let sceneId: string = '';
+  export let userId: string = '';
 
   // Canvas state
   let canvas: HTMLCanvasElement;
@@ -22,6 +30,15 @@
   let dragStartY = 0;
   let dragOffsetX = 0;
   let dragOffsetY = 0;
+
+  // Ruler state
+  let isDrawingRuler = false;
+  let rulerColor = '#00ff00';
+
+  // Template state
+  let showTemplateConfig = false;
+  let templatePlacementX = 0;
+  let templatePlacementY = 0;
 
   onMount(() => {
     if (!canvas) return;
@@ -176,81 +193,155 @@
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
+    const gridX = x / gridSize;
+    const gridY = y / gridSize;
 
-    const tokenId = getTokenAtPosition(x, y);
+    // Handle ruler tool
+    if (activeTool === 'ruler') {
+      if (!isDrawingRuler) {
+        // Start new ruler measurement
+        isDrawingRuler = true;
+        const ruler: RulerMeasurement = {
+          userId,
+          sceneId,
+          waypoints: [{ x: gridX, y: gridY }],
+          color: rulerColor,
+        };
+        templatesStore.setActiveRuler(ruler);
+      } else if (event.shiftKey) {
+        // Add waypoint on shift+click
+        templatesStore.addRulerWaypoint(gridX, gridY);
+      } else {
+        // End ruler on normal click
+        isDrawingRuler = false;
+        templatesStore.setActiveRuler(null);
+      }
+      return;
+    }
 
-    if (tokenId) {
-      const token = tokens.get(tokenId);
-      if (!token) return;
+    // Handle template tool
+    if (activeTool === 'template') {
+      templatePlacementX = gridX;
+      templatePlacementY = gridY;
+      showTemplateConfig = true;
+      return;
+    }
 
-      draggingTokenId = tokenId;
-      dragStartX = x;
-      dragStartY = y;
-      dragOffsetX = x - token.x * gridSize;
-      dragOffsetY = y - token.y * gridSize;
+    // Handle select tool (token interaction)
+    if (activeTool === 'select') {
+      const tokenId = getTokenAtPosition(x, y);
 
-      onTokenClick(tokenId);
+      if (tokenId) {
+        const token = tokens.get(tokenId);
+        if (!token) return;
+
+        draggingTokenId = tokenId;
+        dragStartX = x;
+        dragStartY = y;
+        dragOffsetX = x - token.x * gridSize;
+        dragOffsetY = y - token.y * gridSize;
+
+        onTokenClick(tokenId);
+      }
     }
   }
 
   function handleMouseMove(event: MouseEvent) {
-    if (!draggingTokenId) return;
-
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
+    const gridX = x / gridSize;
+    const gridY = y / gridSize;
 
-    const token = tokens.get(draggingTokenId);
-    if (!token) return;
-
-    // Calculate new grid position
-    const newPixelX = x - dragOffsetX;
-    const newPixelY = y - dragOffsetY;
-    const newGridX = Math.round(newPixelX / gridSize);
-    const newGridY = Math.round(newPixelY / gridSize);
-
-    // Update token position locally for smooth dragging
-    token.x = newGridX;
-    token.y = newGridY;
-
-    render();
-  }
-
-  function handleMouseUp(event: MouseEvent) {
-    if (!draggingTokenId) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-
-    const token = tokens.get(draggingTokenId);
-    if (!token) {
-      draggingTokenId = null;
+    // Update ruler measurement while drawing
+    if (activeTool === 'ruler' && isDrawingRuler) {
+      templatesStore.updateLastRulerWaypoint(gridX, gridY);
       return;
     }
 
-    // Calculate final grid position
-    const newPixelX = x - dragOffsetX;
-    const newPixelY = y - dragOffsetY;
-    const newGridX = Math.max(0, Math.round(newPixelX / gridSize));
-    const newGridY = Math.max(0, Math.round(newPixelY / gridSize));
+    // Handle token dragging
+    if (activeTool === 'select' && draggingTokenId) {
+      const token = tokens.get(draggingTokenId);
+      if (!token) return;
 
-    // Send move event
-    onTokenMove(draggingTokenId, newGridX, newGridY);
+      // Calculate new grid position
+      const newPixelX = x - dragOffsetX;
+      const newPixelY = y - dragOffsetY;
+      const newGridX = Math.round(newPixelX / gridSize);
+      const newGridY = Math.round(newPixelY / gridSize);
 
-    draggingTokenId = null;
+      // Update token position locally for smooth dragging
+      token.x = newGridX;
+      token.y = newGridY;
+
+      render();
+    }
+  }
+
+  function handleMouseUp(event: MouseEvent) {
+    if (activeTool === 'select' && draggingTokenId) {
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      const token = tokens.get(draggingTokenId);
+      if (!token) {
+        draggingTokenId = null;
+        return;
+      }
+
+      // Calculate final grid position
+      const newPixelX = x - dragOffsetX;
+      const newPixelY = y - dragOffsetY;
+      const newGridX = Math.max(0, Math.round(newPixelX / gridSize));
+      const newGridY = Math.max(0, Math.round(newPixelY / gridSize));
+
+      // Send move event
+      onTokenMove(draggingTokenId, newGridX, newGridY);
+
+      draggingTokenId = null;
+    }
+  }
+
+  function handleTemplateConfigClose() {
+    showTemplateConfig = false;
   }
 </script>
 
-<canvas
-  bind:this={canvas}
-  on:mousedown={handleMouseDown}
-  on:mousemove={handleMouseMove}
-  on:mouseup={handleMouseUp}
-  class="game-canvas"
+<div class="canvas-container">
+  <canvas
+    bind:this={canvas}
+    on:mousedown={handleMouseDown}
+    on:mousemove={handleMouseMove}
+    on:mouseup={handleMouseUp}
+    class="game-canvas"
+  />
+
+  <MeasurementLayer
+    {sceneId}
+    {gridSize}
+    {gridDistance}
+    {gridUnits}
+    {canvasWidth}
+    {canvasHeight}
+  />
+</div>
+
+<TemplateConfig
+  isOpen={showTemplateConfig}
+  {sceneId}
+  x={templatePlacementX}
+  y={templatePlacementY}
+  onClose={handleTemplateConfigClose}
 />
 
 <style>
+  .canvas-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
   .game-canvas {
     width: 100%;
     height: 100%;

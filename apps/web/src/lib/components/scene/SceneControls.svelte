@@ -13,8 +13,9 @@
     { id: 'select', label: 'Select', icon: '⬆', gmOnly: false, shortcut: '1' },
     { id: 'wall', label: 'Wall', icon: '▬', gmOnly: true, shortcut: '2' },
     { id: 'light', label: 'Light', icon: '💡', gmOnly: true, shortcut: '3' },
-    { id: 'measure', label: 'Measure', icon: '📏', gmOnly: false, shortcut: '4' },
-    { id: 'ping', label: 'Ping', icon: '📍', gmOnly: false, shortcut: '5' },
+    { id: 'ruler', label: 'Ruler', icon: '📏', gmOnly: false, shortcut: '4' },
+    { id: 'template', label: 'Template', icon: '⭕', gmOnly: false, shortcut: '5' },
+    { id: 'ping', label: 'Ping', icon: '📍', gmOnly: false, shortcut: '6' },
   ];
 
   function handleToolClick(toolId: string) {
