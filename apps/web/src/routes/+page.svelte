@@ -3,39 +3,39 @@
   import { authStore } from '$lib/stores/auth';
   import { onMount } from 'svelte';
 
-  let gameId = '';
+  let campaignId = '';
 
   onMount(() => {
     // Check if user has an active session
     authStore.checkSession();
   });
 
-  function createGame() {
+  function createCampaign() {
     if (!$authStore.user) {
       goto('/login');
       return;
     }
-    // Generate a random game ID
+    // Generate a random campaign ID
     const id = Math.random().toString(36).substring(2, 10);
-    goto(`/game/${id}`);
+    goto(`/campaign/${id}`);
   }
 
-  function joinGame() {
+  function joinCampaign() {
     if (!$authStore.user) {
       goto('/login');
       return;
     }
-    if (gameId.trim()) {
-      goto(`/game/${gameId}`);
+    if (campaignId.trim()) {
+      goto(`/campaign/${campaignId}`);
     }
   }
 
-  function viewMyGames() {
+  function viewMyCampaigns() {
     if (!$authStore.user) {
       goto('/login');
       return;
     }
-    goto('/games');
+    goto('/campaigns');
   }
 
   function handleLogin() {
@@ -58,7 +58,7 @@
 
     {#if !$authStore.user}
       <div class="auth-prompt">
-        <p class="auth-message">Sign in to create and manage your game sessions</p>
+        <p class="auth-message">Sign in to create and manage your campaign sessions</p>
         <div class="auth-buttons">
           <button class="btn btn-primary" on:click={handleLogin}>Login</button>
           <button class="btn btn-secondary" on:click={handleRegister}>Register</button>
@@ -72,27 +72,27 @@
 
     <div class="actions">
       <div class="card">
-        <h2>My Games</h2>
-        <p>View and manage your game sessions</p>
-        <button class="btn" on:click={viewMyGames}>View My Games</button>
+        <h2>My Campaigns</h2>
+        <p>View and manage your campaign sessions</p>
+        <button class="btn" on:click={viewMyCampaigns}>View My Campaigns</button>
       </div>
 
       <div class="card">
-        <h2>Create New Game</h2>
-        <p>Start a new game session and invite your players</p>
-        <button class="btn" on:click={createGame}>Create Game</button>
+        <h2>Create New Campaign</h2>
+        <p>Start a new campaign session and invite your players</p>
+        <button class="btn" on:click={createCampaign}>Create Campaign</button>
       </div>
 
       <div class="card">
-        <h2>Join Game</h2>
-        <p>Enter a game ID to join an existing session</p>
+        <h2>Join Campaign</h2>
+        <p>Enter a campaign ID to join an existing session</p>
         <input
           type="text"
-          bind:value={gameId}
-          placeholder="Enter game ID"
-          on:keydown={(e) => e.key === 'Enter' && joinGame()}
+          bind:value={campaignId}
+          placeholder="Enter campaign ID"
+          on:keydown={(e) => e.key === 'Enter' && joinCampaign()}
         />
-        <button class="btn" on:click={joinGame} disabled={!gameId.trim()}>Join Game</button>
+        <button class="btn" on:click={joinCampaign} disabled={!campaignId.trim()}>Join Campaign</button>
       </div>
     </div>
   </div>
