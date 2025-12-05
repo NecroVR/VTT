@@ -10,6 +10,7 @@
   import { wallsStore } from '$lib/stores/walls';
   import SceneCanvas from '$lib/components/SceneCanvas.svelte';
   import SceneControls from '$lib/components/scene/SceneControls.svelte';
+  import SceneManagementModal from '$lib/components/scene/SceneManagementModal.svelte';
   import ChatPanel from '$lib/components/chat/ChatPanel.svelte';
   import CombatTracker from '$lib/components/combat/CombatTracker.svelte';
   import ActorSheet from '$lib/components/actor/ActorSheet.svelte';
@@ -24,6 +25,7 @@
   let selectedActorId: string | null = null;
   let showTokenConfig = false;
   let selectedToken: Token | null = null;
+  let showSceneModal = false;
 
   // Use auto-subscription with $ prefix - Svelte handles cleanup automatically
   $: gameId = $page.params.id;
@@ -204,6 +206,15 @@
     showActorSheet = false;
     selectedActorId = null;
   }
+
+  function handleSceneCreated(scene: Scene) {
+    showSceneModal = false;
+    // Scene will be added to store automatically through WebSocket events
+    // Set as active scene if it's the first scene
+    if (scenes.length === 0) {
+      scenesStore.setActiveScene(scene.id);
+    }
+  }
 </script>
 
 <svelte:head>
@@ -229,6 +240,12 @@
             {/each}
           </select>
         </div>
+      {/if}
+
+      {#if isGM}
+        <button class="btn btn-primary create-scene-btn" on:click={() => showSceneModal = true}>
+          Create Scene
+        </button>
       {/if}
     </div>
     <div class="connection-status">
@@ -271,7 +288,13 @@
       {:else}
         <div class="placeholder">
           <p>No Scene Available</p>
-          <p class="placeholder-text">Create a scene to get started</p>
+          {#if isGM}
+            <button class="btn btn-primary" on:click={() => showSceneModal = true}>
+              Create Scene
+            </button>
+          {:else}
+            <p class="placeholder-text">Waiting for GM to create a scene</p>
+          {/if}
         </div>
       {/if}
     </div>
@@ -309,6 +332,13 @@
       on:delete={handleDeleteToken}
     />
   {/if}
+
+  <SceneManagementModal
+    isOpen={showSceneModal}
+    {gameId}
+    onClose={() => showSceneModal = false}
+    onSceneCreated={handleSceneCreated}
+  />
 </div>
 
 <style>
@@ -369,6 +399,12 @@
   .scene-selector select:focus {
     outline: none;
     border-color: #4a90e2;
+  }
+
+  .create-scene-btn {
+    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: var(--font-size-sm);
+    white-space: nowrap;
   }
 
   .connection-status {

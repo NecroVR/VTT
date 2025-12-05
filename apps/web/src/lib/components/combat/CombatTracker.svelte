@@ -70,14 +70,30 @@
 
   async function loadCombat() {
     try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        console.error('No auth token found');
+        return;
+      }
+
       // Fetch active combat for this game
-      const response = await fetch(`/api/v1/games/${gameId}/combats?active=true`);
+      const response = await fetch(`/api/v1/games/${gameId}/combats?active=true`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
       if (response.ok) {
         const data = await response.json();
         if (data.combats && data.combats.length > 0) {
           combat = data.combats[0];
           await loadCombatants(combat.id);
         }
+      } else if (response.status === 401) {
+        console.error('Unauthorized: Invalid or expired token');
+      } else {
+        console.error('Failed to load combat:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Failed to load combat:', error);
@@ -86,10 +102,26 @@
 
   async function loadCombatants(combatId: string) {
     try {
-      const response = await fetch(`/api/v1/combats/${combatId}/combatants`);
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        console.error('No auth token found');
+        return;
+      }
+
+      const response = await fetch(`/api/v1/combats/${combatId}/combatants`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
       if (response.ok) {
         const data = await response.json();
         combatants = data.combatants || [];
+      } else if (response.status === 401) {
+        console.error('Unauthorized: Invalid or expired token');
+      } else {
+        console.error('Failed to load combatants:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Failed to load combatants:', error);

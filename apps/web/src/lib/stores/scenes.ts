@@ -151,6 +151,127 @@ function createScenesStore() {
     },
 
     /**
+     * Create a new scene via API
+     */
+    async createScene(
+      gameId: string,
+      name: string,
+      options?: {
+        gridSize?: number;
+        gridColor?: string;
+        backgroundColor?: string;
+      }
+    ): Promise<Scene | null> {
+      if (!browser) return null;
+
+      try {
+        const token = localStorage.getItem('vtt_session_id') || sessionStorage.getItem('vtt_session_id');
+
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+
+        const response = await fetch(`${API_BASE_URL}/api/v1/games/${gameId}/scenes`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name,
+            gameId,
+            gridSize: options?.gridSize,
+            gridColor: options?.gridColor,
+            // Note: backgroundColor would be backgroundImage or other scene properties
+            // For now, only passing through the supported options
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to create scene: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        const newScene: Scene = data.scene;
+
+        // Add scene to local state
+        update(state => {
+          const newScenes = new Map(state.scenes);
+          newScenes.set(newScene.id, newScene);
+          return {
+            ...state,
+            scenes: newScenes,
+            activeSceneId: newScene.id, // Set new scene as active
+          };
+        });
+
+        return newScene;
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to create scene';
+        update(state => ({
+          ...state,
+          error: errorMessage,
+        }));
+        console.error('Error creating scene:', error);
+        return null;
+      }
+    },
+
+    /**
+     * Delete a scene via API
+     */
+    async deleteScene(sceneId: string): Promise<boolean> {
+      if (!browser) return false;
+
+      try {
+        const token = localStorage.getItem('vtt_session_id') || sessionStorage.getItem('vtt_session_id');
+
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+
+        const response = await fetch(`${API_BASE_URL}/api/v1/scenes/${sceneId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to delete scene: ${response.statusText}`);
+        }
+
+        // Remove scene from local state
+        update(state => {
+          const newScenes = new Map(state.scenes);
+          newScenes.delete(sceneId);
+
+          // If deleted scene was active, switch to another scene or null
+          let newActiveSceneId = state.activeSceneId;
+          if (state.activeSceneId === sceneId) {
+            newActiveSceneId = newScenes.size > 0 ? newScenes.values().next().value.id : null;
+          }
+
+          return {
+            ...state,
+            scenes: newScenes,
+            activeSceneId: newActiveSceneId,
+          };
+        });
+
+        return true;
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to delete scene';
+        update(state => ({
+          ...state,
+          error: errorMessage,
+        }));
+        console.error('Error deleting scene:', error);
+        return false;
+      }
+    },
+
+    /**
      * Clear all scenes (useful when leaving a game)
      */
     clear(): void {

@@ -1,6 +1,6 @@
 import type { FastifyPluginAsync } from 'fastify';
 import { combats, combatants, games } from '@vtt/database';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import type {
   Combat,
   Combatant,
@@ -22,8 +22,9 @@ const combatsRoute: FastifyPluginAsync = async (fastify) => {
   /**
    * GET /api/v1/games/:gameId/combats - List all combats for a game
    * Returns combats for a specific game
+   * Optional query parameter: active (boolean) - filter by active status
    */
-  fastify.get<{ Params: { gameId: string } }>(
+  fastify.get<{ Params: { gameId: string }; Querystring: { active?: string } }>(
     '/games/:gameId/combats',
     { preHandler: authenticate },
     async (request, reply) => {
@@ -32,6 +33,7 @@ const combatsRoute: FastifyPluginAsync = async (fastify) => {
       }
 
       const { gameId } = request.params;
+      const { active } = request.query;
 
       try {
         // Verify game exists and user has access to it
@@ -47,11 +49,20 @@ const combatsRoute: FastifyPluginAsync = async (fastify) => {
 
         // TODO: Check if user is a participant in the game
 
-        // Fetch all combats for the game
+        // Build where conditions based on query parameters
+        const whereConditions = [eq(combats.gameId, gameId)];
+
+        // Add active filter if provided
+        if (active !== undefined) {
+          const activeValue = active === 'true';
+          whereConditions.push(eq(combats.active, activeValue));
+        }
+
+        // Fetch combats for the game with optional active filter
         const gameCombats = await fastify.db
           .select()
           .from(combats)
-          .where(eq(combats.gameId, gameId));
+          .where(and(...whereConditions));
 
         // Convert to Combat interface
         const formattedCombats: Combat[] = gameCombats.map(combat => ({
