@@ -14,3 +14,6 @@ export * from './fogExploration.js';
 export * from './journal.js';
 export * from './template.js';
 export * from './drawing.js';
+export * from './tile.js';
+export * from './region.js';
+export * from './scenePin.js';

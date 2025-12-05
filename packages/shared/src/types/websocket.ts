@@ -5,6 +5,9 @@ import type { AmbientLight } from './ambientLight.js';
 import type { ActiveEffect } from './activeEffect.js';
 import type { MeasurementTemplate, RulerMeasurement } from './template.js';
 import type { Drawing, DrawingPoint } from './drawing.js';
+import type { Tile } from './tile.js';
+import type { Region, RegionPoint } from './region.js';
+import type { ScenePin } from './scenePin.js';
 
 export type WSMessageType =
   | 'ping' | 'pong'
@@ -26,6 +29,9 @@ export type WSMessageType =
   | 'measure:start' | 'measure:started' | 'measure:update' | 'measure:updated' | 'measure:end' | 'measure:ended'
   | 'template:place' | 'template:placed' | 'template:update' | 'template:updated' | 'template:remove' | 'template:removed'
   | 'drawing:create' | 'drawing:created' | 'drawing:update' | 'drawing:updated' | 'drawing:delete' | 'drawing:deleted' | 'drawing:stream' | 'drawing:streamed'
+  | 'tile:add' | 'tile:added' | 'tile:update' | 'tile:updated' | 'tile:remove' | 'tile:removed'
+  | 'region:add' | 'region:added' | 'region:update' | 'region:updated' | 'region:remove' | 'region:removed' | 'region:enter' | 'region:exit'
+  | 'pin:add' | 'pin:added' | 'pin:update' | 'pin:updated' | 'pin:remove' | 'pin:removed' | 'pin:click' | 'pin:opened'
   | 'error';
 
 export interface WSMessage<T = unknown> {
@@ -925,4 +931,146 @@ export interface DrawingStreamPayload {
 export interface DrawingStreamedPayload {
   drawingId: string;
   points: DrawingPoint[];
+}
+
+// Tile payloads
+export interface TileAddPayload {
+  sceneId: string;
+  img: string;
+  x?: number;
+  y?: number;
+  z?: number;
+  width: number;
+  height: number;
+  rotation?: number;
+  tint?: string;
+  alpha?: number;
+  hidden?: boolean;
+  locked?: boolean;
+  overhead?: boolean;
+  roof?: boolean;
+  occlusion?: Record<string, unknown>;
+  data?: Record<string, unknown>;
+}
+
+export interface TileAddedPayload {
+  tile: Tile;
+}
+
+export interface TileUpdatePayload {
+  tileId: string;
+  updates: Partial<Omit<Tile, 'id' | 'sceneId' | 'createdAt' | 'updatedAt'>>;
+}
+
+export interface TileUpdatedPayload {
+  tile: Tile;
+}
+
+export interface TileRemovePayload {
+  tileId: string;
+}
+
+export interface TileRemovedPayload {
+  tileId: string;
+}
+
+// Region payloads
+export interface RegionAddPayload {
+  sceneId: string;
+  name: string;
+  shape?: 'rectangle' | 'circle' | 'ellipse' | 'polygon';
+  x: number;
+  y: number;
+  width?: number;
+  height?: number;
+  radius?: number;
+  points?: RegionPoint[];
+  color?: string;
+  alpha?: number;
+  hidden?: boolean;
+  locked?: boolean;
+  triggerType?: string;
+  triggerAction?: string;
+  triggerData?: Record<string, unknown>;
+  data?: Record<string, unknown>;
+}
+
+export interface RegionAddedPayload {
+  region: Region;
+}
+
+export interface RegionUpdatePayload {
+  regionId: string;
+  updates: Partial<Omit<Region, 'id' | 'sceneId' | 'createdAt' | 'updatedAt'>>;
+}
+
+export interface RegionUpdatedPayload {
+  region: Region;
+}
+
+export interface RegionRemovePayload {
+  regionId: string;
+}
+
+export interface RegionRemovedPayload {
+  regionId: string;
+}
+
+export interface RegionEnterPayload {
+  regionId: string;
+  tokenId: string;
+}
+
+export interface RegionExitPayload {
+  regionId: string;
+  tokenId: string;
+}
+
+// Scene Pin payloads
+export interface PinAddPayload {
+  sceneId: string;
+  x: number;
+  y: number;
+  icon?: string;
+  iconSize?: number;
+  iconTint?: string;
+  text?: string;
+  fontSize?: number;
+  textAnchor?: 'top' | 'bottom' | 'left' | 'right';
+  textColor?: string;
+  journalId?: string;
+  pageId?: string;
+  global?: boolean;
+  data?: Record<string, unknown>;
+}
+
+export interface PinAddedPayload {
+  pin: ScenePin;
+}
+
+export interface PinUpdatePayload {
+  pinId: string;
+  updates: Partial<Omit<ScenePin, 'id' | 'sceneId' | 'createdAt' | 'updatedAt'>>;
+}
+
+export interface PinUpdatedPayload {
+  pin: ScenePin;
+}
+
+export interface PinRemovePayload {
+  pinId: string;
+}
+
+export interface PinRemovedPayload {
+  pinId: string;
+}
+
+export interface PinClickPayload {
+  pinId: string;
+}
+
+export interface PinOpenedPayload {
+  pinId: string;
+  journalId?: string | null;
+  pageId?: string | null;
 }

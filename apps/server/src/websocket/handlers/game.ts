@@ -68,6 +68,16 @@ import type {
   DrawingUpdatePayload,
   DrawingDeletePayload,
   DrawingStreamPayload,
+  TileAddPayload,
+  TileUpdatePayload,
+  TileRemovePayload,
+  RegionAddPayload,
+  RegionUpdatePayload,
+  RegionRemovePayload,
+  PinAddPayload,
+  PinUpdatePayload,
+  PinRemovePayload,
+  PinClickPayload,
   ErrorPayload
 } from '@vtt/shared';
 import { parseDiceNotation, type DiceGroup } from '@vtt/shared/dice';
@@ -126,6 +136,22 @@ import {
   handleDrawingDelete,
   handleDrawingStream,
 } from './drawings.js';
+import {
+  handleTileAdd,
+  handleTileUpdate,
+  handleTileRemove,
+} from './tiles.js';
+import {
+  handleRegionAdd,
+  handleRegionUpdate,
+  handleRegionRemove,
+} from './regions.js';
+import {
+  handlePinAdd,
+  handlePinUpdate,
+  handlePinRemove,
+  handlePinClick,
+} from './pins.js';
 
 /**
  * Game session WebSocket handler
@@ -347,6 +373,46 @@ export async function handleGameWebSocket(
 
         case 'drawing:stream':
           await handleDrawingStream(socket, message as WSMessage<DrawingStreamPayload>, request);
+          break;
+
+        case 'tile:add':
+          await handleTileAdd(socket, message as WSMessage<TileAddPayload>, request);
+          break;
+
+        case 'tile:update':
+          await handleTileUpdate(socket, message as WSMessage<TileUpdatePayload>, request);
+          break;
+
+        case 'tile:remove':
+          await handleTileRemove(socket, message as WSMessage<TileRemovePayload>, request);
+          break;
+
+        case 'region:add':
+          await handleRegionAdd(socket, message as WSMessage<RegionAddPayload>, request);
+          break;
+
+        case 'region:update':
+          await handleRegionUpdate(socket, message as WSMessage<RegionUpdatePayload>, request);
+          break;
+
+        case 'region:remove':
+          await handleRegionRemove(socket, message as WSMessage<RegionRemovePayload>, request);
+          break;
+
+        case 'pin:add':
+          await handlePinAdd(socket, message as WSMessage<PinAddPayload>, request);
+          break;
+
+        case 'pin:update':
+          await handlePinUpdate(socket, message as WSMessage<PinUpdatePayload>, request);
+          break;
+
+        case 'pin:remove':
+          await handlePinRemove(socket, message as WSMessage<PinRemovePayload>, request);
+          break;
+
+        case 'pin:click':
+          await handlePinClick(socket, message as WSMessage<PinClickPayload>, request);
           break;
 
         default:

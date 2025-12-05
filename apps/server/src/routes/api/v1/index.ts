@@ -16,6 +16,9 @@ import fogRoute from './fog.js';
 import journalsRoute from './journals.js';
 import templatesRoute from './templates.js';
 import drawingsRoute from './drawings.js';
+import tilesRoute from './tiles.js';
+import regionsRoute from './regions.js';
+import pinsRoute from './pins.js';
 
 /**
  * API v1 routes
@@ -48,6 +51,9 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
         pages: '/api/v1/journals/:journalId/pages',
         templates: '/api/v1/scenes/:sceneId/templates',
         drawings: '/api/v1/scenes/:sceneId/drawings',
+        tiles: '/api/v1/scenes/:sceneId/tiles',
+        regions: '/api/v1/scenes/:sceneId/regions',
+        pins: '/api/v1/scenes/:sceneId/pins',
       },
     };
   });
@@ -70,6 +76,9 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
   await fastify.register(journalsRoute);
   await fastify.register(templatesRoute);
   await fastify.register(drawingsRoute);
+  await fastify.register(tilesRoute);
+  await fastify.register(regionsRoute);
+  await fastify.register(pinsRoute);
 };
 
 export default apiV1Routes;
