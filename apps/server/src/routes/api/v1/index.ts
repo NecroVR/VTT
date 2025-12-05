@@ -10,6 +10,7 @@ import combatsRoute from './combats.js';
 import chatRoute from './chat.js';
 import wallsRoute from './walls.js';
 import lightsRoute from './lights.js';
+import effectsRoute from './effects.js';
 
 /**
  * API v1 routes
@@ -34,6 +35,7 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
         chat: '/api/v1/games/:gameId/chat',
         walls: '/api/v1/walls',
         lights: '/api/v1/lights',
+        effects: '/api/v1/effects',
       },
     };
   });
@@ -50,6 +52,7 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
   await fastify.register(chatRoute);
   await fastify.register(wallsRoute);
   await fastify.register(lightsRoute);
+  await fastify.register(effectsRoute);
 };
 
 export default apiV1Routes;

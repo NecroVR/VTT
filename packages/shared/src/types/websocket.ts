@@ -2,6 +2,7 @@ import type { Token } from './game';
 import type { Scene } from './scene';
 import type { Wall } from './wall';
 import type { AmbientLight } from './ambientLight';
+import type { ActiveEffect } from './activeEffect';
 
 export type WSMessageType =
   | 'ping' | 'pong'
@@ -14,6 +15,7 @@ export type WSMessageType =
   | 'combat:start' | 'combat:started' | 'combat:end' | 'combat:ended' | 'combat:update' | 'combat:updated'
   | 'combatant:add' | 'combatant:added' | 'combatant:update' | 'combatant:updated' | 'combatant:remove' | 'combatant:removed'
   | 'combat:next-turn' | 'combat:turn-changed'
+  | 'effect:add' | 'effect:added' | 'effect:update' | 'effect:updated' | 'effect:remove' | 'effect:removed' | 'effect:toggle' | 'effect:toggled' | 'effects:expired'
   | 'dice:roll' | 'dice:result'
   | 'chat:message' | 'chat:delete' | 'chat:deleted' | 'chat:whisper'
   | 'error';
@@ -501,4 +503,70 @@ export interface ChatWhisperMessage {
   userId: string;
   username: string;
   targetUserIds: string[];
+}
+
+// Active Effect payloads
+export interface EffectAddPayload {
+  gameId: string;
+  actorId?: string | null;
+  tokenId?: string | null;
+  name: string;
+  icon?: string | null;
+  description?: string | null;
+  effectType?: string;
+  durationType?: string;
+  duration?: number | null;
+  startRound?: number | null;
+  startTurn?: number | null;
+  remaining?: number | null;
+  sourceActorId?: string | null;
+  sourceItemId?: string | null;
+  enabled?: boolean;
+  hidden?: boolean;
+  changes?: Array<{
+    key: string;
+    mode: string;
+    value: number | string | boolean;
+    priority: number;
+  }>;
+  priority?: number;
+  transfer?: boolean;
+  data?: Record<string, unknown>;
+  sort?: number;
+}
+
+export interface EffectAddedPayload {
+  effect: ActiveEffect;
+}
+
+export interface EffectUpdatePayload {
+  effectId: string;
+  updates: Partial<Omit<ActiveEffect, 'id' | 'gameId' | 'createdAt' | 'updatedAt'>>;
+}
+
+export interface EffectUpdatedPayload {
+  effect: ActiveEffect;
+}
+
+export interface EffectRemovePayload {
+  effectId: string;
+}
+
+export interface EffectRemovedPayload {
+  effectId: string;
+}
+
+export interface EffectTogglePayload {
+  effectId: string;
+  enabled: boolean;
+}
+
+export interface EffectToggledPayload {
+  effect: ActiveEffect;
+}
+
+export interface EffectsExpiredPayload {
+  effectIds: string[];
+  actorId?: string | null;
+  tokenId?: string | null;
 }

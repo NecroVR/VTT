@@ -8,3 +8,4 @@ export * from './actors';
 export * from './items';
 export * from './combats';
 export * from './chatMessages';
+export * from './activeEffects';

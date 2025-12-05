@@ -193,3 +193,42 @@ CREATE TABLE IF NOT EXISTS "chat_messages" (
   CONSTRAINT "chat_messages_game_id_games_id_fk" FOREIGN KEY ("game_id") REFERENCES "games"("id") ON DELETE cascade,
   CONSTRAINT "chat_messages_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "users"("id")
 );
+
+-- Create active_effects table
+CREATE TABLE IF NOT EXISTS "active_effects" (
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+  "game_id" uuid NOT NULL,
+  "actor_id" uuid,
+  "token_id" uuid,
+  "name" text NOT NULL,
+  "icon" text,
+  "description" text,
+  "effect_type" text DEFAULT 'buff' NOT NULL,
+  "duration_type" text DEFAULT 'permanent' NOT NULL,
+  "duration" integer,
+  "start_round" integer,
+  "start_turn" integer,
+  "remaining" integer,
+  "source_actor_id" uuid,
+  "source_item_id" uuid,
+  "enabled" boolean DEFAULT true NOT NULL,
+  "hidden" boolean DEFAULT false NOT NULL,
+  "changes" jsonb DEFAULT '[]'::jsonb NOT NULL,
+  "priority" integer DEFAULT 0 NOT NULL,
+  "transfer" boolean DEFAULT false NOT NULL,
+  "data" jsonb DEFAULT '{}'::jsonb NOT NULL,
+  "sort" integer DEFAULT 0 NOT NULL,
+  "created_at" timestamp DEFAULT now() NOT NULL,
+  "updated_at" timestamp DEFAULT now() NOT NULL,
+  CONSTRAINT "active_effects_game_id_games_id_fk" FOREIGN KEY ("game_id") REFERENCES "games"("id") ON DELETE cascade,
+  CONSTRAINT "active_effects_actor_id_actors_id_fk" FOREIGN KEY ("actor_id") REFERENCES "actors"("id") ON DELETE cascade,
+  CONSTRAINT "active_effects_token_id_tokens_id_fk" FOREIGN KEY ("token_id") REFERENCES "tokens"("id") ON DELETE cascade,
+  CONSTRAINT "active_effects_source_actor_id_actors_id_fk" FOREIGN KEY ("source_actor_id") REFERENCES "actors"("id"),
+  CONSTRAINT "active_effects_source_item_id_items_id_fk" FOREIGN KEY ("source_item_id") REFERENCES "items"("id")
+);
+
+-- Create indexes for active_effects
+CREATE INDEX IF NOT EXISTS "active_effects_game_id_idx" ON "active_effects" ("game_id");
+CREATE INDEX IF NOT EXISTS "active_effects_actor_id_idx" ON "active_effects" ("actor_id");
+CREATE INDEX IF NOT EXISTS "active_effects_token_id_idx" ON "active_effects" ("token_id");
+CREATE INDEX IF NOT EXISTS "active_effects_enabled_idx" ON "active_effects" ("enabled");
