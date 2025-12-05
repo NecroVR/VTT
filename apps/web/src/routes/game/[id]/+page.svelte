@@ -15,6 +15,7 @@
   import CombatTracker from '$lib/components/combat/CombatTracker.svelte';
   import ActorSheet from '$lib/components/actor/ActorSheet.svelte';
   import TokenConfig from '$lib/components/TokenConfig.svelte';
+  import TokenBrowser from '$lib/components/game/TokenBrowser.svelte';
   import TabbedSidebar, { type Tab } from '$lib/components/game/TabbedSidebar.svelte';
   import ResizableDivider from '$lib/components/game/ResizableDivider.svelte';
   import type { Scene, Token, Wall } from '@vtt/shared';
@@ -64,6 +65,12 @@
       id: 'combat',
       label: 'Combat',
       component: CombatTracker,
+      props: { gameId, isGM }
+    },
+    {
+      id: 'tokens',
+      label: 'Tokens',
+      component: TokenBrowser,
       props: { gameId, isGM }
     }
   ] as Tab[];
@@ -159,6 +166,25 @@
 
   function handleTokenMove(tokenId: string, x: number, y: number) {
     websocket.sendTokenMove({ tokenId, x, y });
+  }
+
+  function handleTokenAdd(tokenData: any) {
+    if (!activeScene) {
+      console.error('Cannot add token: no active scene');
+      return;
+    }
+
+    websocket.sendTokenAdd({
+      sceneId: activeScene.id,
+      name: tokenData.name,
+      x: tokenData.x,
+      y: tokenData.y,
+      width: tokenData.width || 1,
+      height: tokenData.height || 1,
+      imageUrl: tokenData.imageUrl || null,
+      visible: tokenData.visible !== undefined ? tokenData.visible : true,
+      actorId: tokenData.actorId || null
+    });
   }
 
   function handleTokenSelect(tokenId: string | null) {
@@ -294,6 +320,7 @@
           {activeTool}
           {gridSnap}
           onTokenMove={handleTokenMove}
+          onTokenAdd={handleTokenAdd}
           onTokenSelect={handleTokenSelect}
           onTokenDoubleClick={handleTokenDoubleClick}
           onWallAdd={handleWallAdd}

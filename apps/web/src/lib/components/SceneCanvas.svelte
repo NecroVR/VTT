@@ -17,6 +17,7 @@
   export let onWallAdd: ((wall: { x1: number; y1: number; x2: number; y2: number }) => void) | undefined = undefined;
   export let onWallRemove: ((wallId: string) => void) | undefined = undefined;
   export let onWallUpdate: ((wallId: string, updates: Partial<Wall>) => void) | undefined = undefined;
+  export let onTokenAdd: ((tokenData: any) => void) | undefined = undefined;
 
   // Canvas refs
   let canvasContainer: HTMLDivElement;
@@ -62,6 +63,9 @@
   let lastClickTime = 0;
   let lastClickTokenId: string | null = null;
   const DOUBLE_CLICK_THRESHOLD = 300; // ms
+
+  // Drag-and-drop state
+  let isDragOver = false;
 
   // Background image state
   let backgroundImage: HTMLImageElement | null = null;
@@ -1842,6 +1846,54 @@
       e.preventDefault();
     }
   }
+
+  // Drag-and-drop handlers
+  function handleDragOver(e: DragEvent) {
+    e.preventDefault();
+    if (e.dataTransfer) {
+      e.dataTransfer.dropEffect = 'copy';
+    }
+    isDragOver = true;
+  }
+
+  function handleDragLeave(e: DragEvent) {
+    e.preventDefault();
+    isDragOver = false;
+  }
+
+  function handleDrop(e: DragEvent) {
+    e.preventDefault();
+    isDragOver = false;
+
+    if (!e.dataTransfer || !onTokenAdd) {
+      return;
+    }
+
+    try {
+      // Parse token data from dataTransfer
+      const tokenDataString = e.dataTransfer.getData('application/json');
+      if (!tokenDataString) {
+        return;
+      }
+
+      const tokenData = JSON.parse(tokenDataString);
+
+      // Get drop position in screen coordinates
+      const worldPos = screenToWorld(e.clientX, e.clientY);
+
+      // Apply grid snapping if enabled
+      const finalPos = gridSnap ? snapToGrid(worldPos.x, worldPos.y) : worldPos;
+
+      // Call onTokenAdd with token data including position
+      onTokenAdd({
+        ...tokenData,
+        x: finalPos.x,
+        y: finalPos.y
+      });
+    } catch (error) {
+      console.error('Failed to handle token drop:', error);
+    }
+  }
 </script>
 
 <div class="scene-canvas-container" bind:this={canvasContainer}>
@@ -1859,6 +1911,7 @@
     class="canvas-layer canvas-interactive"
     class:cursor-crosshair={activeTool === 'wall'}
     class:cursor-grab={activeTool === 'select'}
+    class:drag-over={isDragOver}
     bind:this={controlsCanvas}
     on:mousedown={handleMouseDown}
     on:mousemove={handleMouseMove}
@@ -1866,6 +1919,9 @@
     on:mouseleave={handleMouseUp}
     on:wheel={handleWheel}
     on:contextmenu={handleContextMenu}
+    on:dragover={handleDragOver}
+    on:dragleave={handleDragLeave}
+    on:drop={handleDrop}
   ></canvas>
 
   <div class="canvas-controls">
@@ -1932,5 +1988,9 @@
     border-radius: 4px;
     font-size: 14px;
     font-weight: 500;
+  }
+
+  .canvas-interactive.drag-over {
+    background-color: rgba(74, 144, 226, 0.1);
   }
 </style>
