@@ -251,10 +251,6 @@
 </script>
 
 <div class="chat-panel">
-  <div class="chat-header">
-    <h3>Chat</h3>
-  </div>
-
   <div
     class="messages-container"
     bind:this={messagesContainer}
@@ -295,20 +291,6 @@
     flex-direction: column;
     height: 100%;
     background-color: #1f2937;
-    border-left: 1px solid #374151;
-  }
-
-  .chat-header {
-    padding: 1rem;
-    border-bottom: 1px solid #374151;
-    background-color: #111827;
-  }
-
-  .chat-header h3 {
-    margin: 0;
-    color: #f9fafb;
-    font-size: 1.125rem;
-    font-weight: 600;
   }
 
   .messages-container {

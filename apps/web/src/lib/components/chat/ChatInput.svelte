@@ -4,7 +4,7 @@
   export let onSend: (text: string) => void;
 
   let inputValue = '';
-  let inputElement: HTMLInputElement;
+  let textareaElement: HTMLTextAreaElement;
 
   function handleSubmit() {
     const text = inputValue.trim();
@@ -13,9 +13,10 @@
     onSend(text);
     inputValue = '';
 
-    // Refocus input after sending
-    if (inputElement) {
-      inputElement.focus();
+    // Reset textarea height after sending
+    if (textareaElement) {
+      textareaElement.style.height = 'auto';
+      textareaElement.focus();
     }
   }
 
@@ -25,17 +26,27 @@
       handleSubmit();
     }
   }
+
+  function handleInput() {
+    // Auto-resize textarea
+    if (textareaElement) {
+      textareaElement.style.height = 'auto';
+      const newHeight = Math.min(textareaElement.scrollHeight, 120); // Max 120px (about 5 lines)
+      textareaElement.style.height = newHeight + 'px';
+    }
+  }
 </script>
 
 <div class="chat-input">
-  <input
-    bind:this={inputElement}
+  <textarea
+    bind:this={textareaElement}
     bind:value={inputValue}
     on:keydown={handleKeydown}
-    type="text"
+    on:input={handleInput}
     placeholder="Type a message or /roll 2d6..."
     class="input-field"
-  />
+    rows="1"
+  ></textarea>
   <button
     on:click={handleSubmit}
     disabled={inputValue.trim().length === 0}
@@ -48,8 +59,9 @@
 <style>
   .chat-input {
     display: flex;
+    align-items: flex-end;
     gap: 0.5rem;
-    padding: 1rem;
+    padding: 0.5rem;
     background-color: #111827;
     border-top: 1px solid #374151;
   }
@@ -59,10 +71,16 @@
     background-color: #374151;
     border: 1px solid #4b5563;
     border-radius: 0.375rem;
-    padding: 0.625rem 0.875rem;
+    padding: 0.375rem 0.5rem;
     color: #f9fafb;
     font-size: 0.875rem;
+    font-family: inherit;
+    line-height: 1.4;
     outline: none;
+    resize: none;
+    overflow-y: hidden;
+    min-height: 1.4em;
+    max-height: 120px;
     transition: border-color 0.2s, background-color 0.2s;
   }
 
@@ -80,11 +98,13 @@
     color: #ffffff;
     border: none;
     border-radius: 0.375rem;
-    padding: 0.625rem 1.25rem;
-    font-size: 0.875rem;
-    font-weight: 600;
+    padding: 0.375rem 0.625rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
     cursor: pointer;
     transition: background-color 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
   .send-button:hover:not(:disabled) {
