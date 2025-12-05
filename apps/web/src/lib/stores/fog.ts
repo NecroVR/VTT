@@ -1,6 +1,7 @@
 import { writable } from 'svelte/store';
 import type { FogExploration, FogGrid } from '@vtt/shared';
 import { browser } from '$app/environment';
+import { API_BASE_URL } from '$lib/config/api';
 
 interface FogState {
   fog: Map<string, FogExploration>; // sceneId -> FogExploration
@@ -33,7 +34,7 @@ function createFogStore() {
           throw new Error('No authentication token found');
         }
 
-        const response = await fetch(`http://localhost:3000/api/v1/scenes/${sceneId}/fog`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/scenes/${sceneId}/fog`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -78,7 +79,7 @@ function createFogStore() {
           throw new Error('No authentication token found');
         }
 
-        const response = await fetch(`http://localhost:3000/api/v1/scenes/${sceneId}/fog/explore`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/scenes/${sceneId}/fog/explore`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -124,7 +125,7 @@ function createFogStore() {
           throw new Error('No authentication token found');
         }
 
-        const response = await fetch(`http://localhost:3000/api/v1/scenes/${sceneId}/fog/reveal`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/scenes/${sceneId}/fog/reveal`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -162,7 +163,7 @@ function createFogStore() {
           throw new Error('No authentication token found');
         }
 
-        const response = await fetch(`http://localhost:3000/api/v1/scenes/${sceneId}/fog/hide`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/scenes/${sceneId}/fog/hide`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -200,7 +201,7 @@ function createFogStore() {
           throw new Error('No authentication token found');
         }
 
-        const response = await fetch(`http://localhost:3000/api/v1/scenes/${sceneId}/fog/reset`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/scenes/${sceneId}/fog/reset`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,

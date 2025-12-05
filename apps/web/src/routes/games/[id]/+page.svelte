@@ -5,6 +5,7 @@
   import { tokensStore } from '$lib/stores/tokens';
   import GameCanvas from '$lib/components/GameCanvas.svelte';
   import { browser } from '$app/environment';
+  import { getWebSocketUrl } from '/config/api';
 
   // Get game ID from route params
   $: gameId = $page.params.id;
@@ -43,7 +44,7 @@
 
     // Connect to WebSocket if not already connected
     if (!wsState.connected) {
-      const wsUrl = `ws://localhost:3000/ws`;
+      const wsUrl = getWebSocketUrl();
       websocket.connect(wsUrl);
     }
 

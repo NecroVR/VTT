@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import { websocket } from '$lib';
+  import { getWebSocketUrl } from '/config/api';
   import type { WSMessage, DiceResultPayload, TokenMovePayload } from '$lib';
 
   let wsState: { connected: boolean; reconnecting: boolean; error: string | null };
@@ -22,9 +23,7 @@
 
   onMount(() => {
     // Connect to WebSocket
-    const wsUrl = import.meta.env.DEV
-      ? 'ws://localhost:3000/ws'
-      : `ws://${window.location.host}/ws`;
+    const wsUrl = getWebSocketUrl();
 
     websocket.connect(wsUrl);
 

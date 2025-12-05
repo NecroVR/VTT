@@ -1,6 +1,7 @@
 import { writable } from 'svelte/store';
 import type { Scene } from '@vtt/shared';
 import { browser } from '$app/environment';
+import { API_BASE_URL } from '$lib/config/api';
 
 interface ScenesState {
   scenes: Map<string, Scene>;
@@ -35,7 +36,7 @@ function createScenesStore() {
           throw new Error('No authentication token found');
         }
 
-        const response = await fetch(`http://localhost:3000/api/v1/games/${gameId}/scenes`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/games/${gameId}/scenes`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },

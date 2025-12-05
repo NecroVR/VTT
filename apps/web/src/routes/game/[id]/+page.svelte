@@ -15,6 +15,7 @@
   import ActorSheet from '$lib/components/actor/ActorSheet.svelte';
   import TokenConfig from '$lib/components/TokenConfig.svelte';
   import type { Scene, Token, Wall } from '@vtt/shared';
+  import { getWebSocketUrl } from '$lib/config/api';
 
   let wsState: { connected: boolean; reconnecting: boolean; error: string | null };
   let activeTool = 'select';
@@ -57,9 +58,7 @@
     await gamesStore.fetchGame(gameId);
 
     // Connect to WebSocket
-    const wsUrl = import.meta.env.DEV
-      ? 'ws://localhost:3000/ws'
-      : `ws://${window.location.host}/ws`;
+    const wsUrl = getWebSocketUrl();
 
     websocket.connect(wsUrl);
 

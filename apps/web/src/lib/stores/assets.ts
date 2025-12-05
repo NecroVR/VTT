@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store';
 import type { Asset, AssetType } from '@vtt/shared';
+import { API_BASE_URL } from '$lib/config/api';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
 interface AssetsState {
   assets: Map<string, Asset>;
