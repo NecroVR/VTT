@@ -15,6 +15,8 @@
   import CombatTracker from '$lib/components/combat/CombatTracker.svelte';
   import ActorSheet from '$lib/components/actor/ActorSheet.svelte';
   import TokenConfig from '$lib/components/TokenConfig.svelte';
+  import TabbedSidebar, { type Tab } from '$lib/components/game/TabbedSidebar.svelte';
+  import ResizableDivider from '$lib/components/game/ResizableDivider.svelte';
   import type { Scene, Token, Wall } from '@vtt/shared';
   import { getWebSocketUrl } from '$lib/config/api';
 
@@ -26,6 +28,8 @@
   let showTokenConfig = false;
   let selectedToken: Token | null = null;
   let showSceneModal = false;
+  let sidebarWidth = 350;
+  let activeTabId = 'chat';
 
   // Use auto-subscription with $ prefix - Svelte handles cleanup automatically
   $: gameId = $page.params.id;
@@ -47,6 +51,22 @@
   $: isGM = currentGame && currentUser
     ? currentGame.ownerId === currentUser.id || (currentGame.gmUserIds || []).includes(currentUser.id)
     : false;
+
+  // Define sidebar tabs
+  $: tabs = [
+    {
+      id: 'chat',
+      label: 'Chat',
+      component: ChatPanel,
+      props: { gameId }
+    },
+    {
+      id: 'combat',
+      label: 'Combat',
+      component: CombatTracker,
+      props: { gameId, isGM }
+    }
+  ] as Tab[];
 
   onMount(async () => {
     // Check if user is authenticated
@@ -215,6 +235,10 @@
       scenesStore.setActiveScene(scene.id);
     }
   }
+
+  function handleSidebarWidthChange(event: CustomEvent<number>) {
+    sidebarWidth = event.detail;
+  }
 </script>
 
 <svelte:head>
@@ -299,15 +323,19 @@
       {/if}
     </div>
 
-    <aside class="sidebar">
-      <div class="sidebar-section">
-        <ChatPanel {gameId} />
-      </div>
+    <ResizableDivider
+      initialWidth={350}
+      minWidth={250}
+      maxWidth={600}
+      storageKey="vtt-sidebar-width"
+      on:widthChange={handleSidebarWidthChange}
+    />
 
-      <div class="sidebar-section">
-        <CombatTracker {gameId} {isGM} />
-      </div>
-    </aside>
+    <TabbedSidebar
+      {tabs}
+      bind:activeTabId
+      {sidebarWidth}
+    />
   </div>
 
   {#if showActorSheet && selectedActorId}
@@ -436,8 +464,7 @@
 
   .game-content {
     flex: 1;
-    display: grid;
-    grid-template-columns: 1fr 300px;
+    display: flex;
     overflow: hidden;
   }
 
@@ -445,6 +472,8 @@
     position: relative;
     background-color: var(--color-bg-primary);
     overflow: hidden;
+    flex: 1;
+    min-width: 0;
   }
 
   .scene-controls-overlay {
@@ -475,37 +504,6 @@
     color: var(--color-text-secondary);
   }
 
-  .sidebar {
-    background-color: var(--color-bg-secondary);
-    border-left: 1px solid var(--color-border);
-    padding: var(--spacing-md);
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-md);
-    overflow-y: auto;
-  }
-
-  .sidebar .card {
-    flex-shrink: 0;
-  }
-
-  .sidebar h2 {
-    font-size: var(--font-size-md);
-    font-weight: 600;
-    margin-bottom: var(--spacing-sm);
-  }
-
-  .sidebar-section {
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .sidebar-section:not(:last-child) {
-    border-bottom: 1px solid var(--color-border);
-  }
-
   .actor-sheet-overlay {
     position: fixed;
     top: 0;
@@ -532,11 +530,7 @@
 
   @media (max-width: 768px) {
     .game-content {
-      grid-template-columns: 1fr;
-    }
-
-    .sidebar {
-      display: none;
+      flex-direction: column;
     }
   }
 </style>
