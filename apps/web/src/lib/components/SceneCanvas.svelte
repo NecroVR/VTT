@@ -404,6 +404,11 @@
       const tokenImage = token.imageUrl ? tokenImageCache.get(token.imageUrl) : null;
       const imageState = token.imageUrl ? tokenImageLoadingState.get(token.imageUrl) : null;
 
+      // Render vision indicator before the token (if selected)
+      if (selectedTokenId === token.id) {
+        renderTokenVision(tokensCtx, token);
+      }
+
       // Create circular clipping path
       tokensCtx.save();
       tokensCtx.beginPath();
@@ -625,6 +630,134 @@
     ctx.restore();
   }
 
+  function renderTokenLight(ctx: CanvasRenderingContext2D, token: Token, time: number) {
+    // Skip if token doesn't emit light
+    if (token.lightBright <= 0 && token.lightDim <= 0) return;
+
+    const gridSize = scene.gridSize;
+    const width = token.width || 50;
+    const height = token.height || 50;
+
+    // Token center position
+    const x = token.x + width / 2;
+    const y = token.y + height / 2;
+
+    // Convert light ranges from grid units to pixels
+    const bright = token.lightBright * gridSize;
+    const dim = token.lightDim * gridSize;
+    const color = token.lightColor || '#ffffff';
+    const angle = token.lightAngle || 360;
+
+    ctx.save();
+
+    // If cone light, clip to cone shape
+    if (angle < 360) {
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      const rotation = token.rotation || 0; // Use token rotation for light direction
+      const startAngle = (rotation - angle / 2) * Math.PI / 180;
+      const endAngle = (rotation + angle / 2) * Math.PI / 180;
+      ctx.arc(x, y, dim, startAngle, endAngle);
+      ctx.closePath();
+      ctx.clip();
+    }
+
+    // Create radial gradient
+    const gradient = ctx.createRadialGradient(x, y, 0, x, y, dim);
+
+    // Parse color with alpha (using default 0.8 alpha for token lights)
+    const baseColor = hexToRgba(color, 0.8);
+    const dimColor = hexToRgba(color, 0);
+
+    // Bright zone (0 to bright radius)
+    gradient.addColorStop(0, baseColor);
+    if (bright > 0 && dim > 0) {
+      gradient.addColorStop(Math.min(1, bright / dim), baseColor);
+    }
+    // Dim zone (bright to dim radius)
+    gradient.addColorStop(1, dimColor);
+
+    ctx.fillStyle = gradient;
+    if (angle < 360) {
+      ctx.fill();
+    } else {
+      ctx.beginPath();
+      ctx.arc(x, y, dim, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.restore();
+  }
+
+  function renderTokenVision(ctx: CanvasRenderingContext2D, token: Token) {
+    // Skip if token doesn't have vision
+    if (!token.vision || token.visionRange <= 0) return;
+
+    const gridSize = scene.gridSize;
+    const width = token.width || 50;
+    const height = token.height || 50;
+
+    // Token center position
+    const x = token.x + width / 2;
+    const y = token.y + height / 2;
+
+    // Convert vision range from grid units to pixels
+    const visionRadius = token.visionRange * gridSize;
+
+    ctx.save();
+
+    // Draw vision range indicator (subtle circle for selected tokens)
+    const isSelected = selectedTokenId === token.id;
+
+    if (isSelected) {
+      // Draw a subtle vision range circle
+      ctx.strokeStyle = '#60a5fa'; // Light blue
+      ctx.lineWidth = 2 / scale;
+      ctx.globalAlpha = 0.4;
+      ctx.setLineDash([10 / scale, 5 / scale]);
+
+      ctx.beginPath();
+      ctx.arc(x, y, visionRadius, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 1.0;
+    }
+
+    ctx.restore();
+  }
+
+  function renderTokenVisionArea(ctx: CanvasRenderingContext2D, token: Token) {
+    // This renders the actual vision area when tokenVision is enabled
+    if (!token.vision || token.visionRange <= 0) return;
+
+    const gridSize = scene.gridSize;
+    const width = token.width || 50;
+    const height = token.height || 50;
+
+    // Token center position
+    const x = token.x + width / 2;
+    const y = token.y + height / 2;
+
+    // Convert vision range from grid units to pixels
+    const visionRadius = token.visionRange * gridSize;
+
+    ctx.save();
+
+    // Create radial gradient for vision area
+    const gradient = ctx.createRadialGradient(x, y, 0, x, y, visionRadius);
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+    gradient.addColorStop(0.8, 'rgba(255, 255, 255, 0.8)');
+    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(x, y, visionRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
   function renderLights() {
     if (!lightingCtx || !lightingCanvas) return;
 
@@ -656,10 +789,26 @@
         // Set composite mode to lighten (lights add together)
         tempCtx.globalCompositeOperation = 'lighten';
 
-        // Render all lights on temp canvas
+        // Render all ambient lights on temp canvas
         lights.forEach(light => {
           renderLight(tempCtx, light, animationTime);
         });
+
+        // Render token lights on temp canvas
+        tokens.forEach(token => {
+          if (token.visible) {
+            renderTokenLight(tempCtx, token, animationTime);
+          }
+        });
+
+        // If tokenVision is enabled, also render vision areas
+        if (scene.tokenVision) {
+          tokens.forEach(token => {
+            if (token.visible && token.vision) {
+              renderTokenVisionArea(tempCtx, token);
+            }
+          });
+        }
 
         tempCtx.restore();
 
@@ -680,6 +829,13 @@
         renderLight(lightingCtx, light, animationTime);
       });
 
+      // Render token lights even without darkness
+      tokens.forEach(token => {
+        if (token.visible) {
+          renderTokenLight(lightingCtx, token, animationTime);
+        }
+      });
+
       lightingCtx.globalCompositeOperation = 'source-over';
     }
 
@@ -690,12 +846,17 @@
     const animate = (timestamp: number) => {
       animationTime = timestamp;
 
-      // Only re-render lights if there are animated lights
+      // Only re-render lights if there are animated lights or token lights
       const hasAnimatedLights = lights.some(light =>
         light.animationType === 'torch' || light.animationType === 'pulse'
       );
 
-      if (hasAnimatedLights) {
+      // Check if any tokens emit light (for now we always re-render if they exist)
+      const hasTokenLights = tokens.some(token =>
+        token.visible && (token.lightBright > 0 || token.lightDim > 0)
+      );
+
+      if (hasAnimatedLights || hasTokenLights) {
         renderLights();
       }
 
