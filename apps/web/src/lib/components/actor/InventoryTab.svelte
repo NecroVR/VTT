@@ -5,7 +5,7 @@
 
   // Props
   export let actorId: string;
-  export let gameId: string;
+  export let campaignId: string;
 
   // State
   let items: Item[] = [];
@@ -173,7 +173,7 @@
     isOpen={showItemSheet}
     item={selectedItem}
     {actorId}
-    {gameId}
+    {campaignId}
     on:close={closeItemSheet}
     on:save={handleItemSave}
     on:delete={handleItemDelete}

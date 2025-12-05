@@ -36,7 +36,7 @@ const wallsRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Scene not found' });
         }
 
-        // TODO: Check if user is a participant in the game (for now, any authenticated user can access)
+        // TODO: Check if user is a participant in the campaign (for now, any authenticated user can access)
 
         // Fetch all walls for the scene
         const sceneWalls = await fastify.db
@@ -165,7 +165,7 @@ const wallsRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Scene not found' });
         }
 
-        // TODO: Check if user is the game owner or has permission to create walls
+        // TODO: Check if user is the campaign owner or has permission to create walls
 
         // Create wall in database
         const newWalls = await fastify.db

@@ -6,7 +6,7 @@ import type { Actor } from '@vtt/shared';
 describe('ActorHeader', () => {
   const mockActor: Actor = {
     id: 'actor-1',
-    gameId: 'game-1',
+    campaignId: 'campaign-1',
     name: 'Gandalf',
     actorType: 'pc',
     img: 'https://example.com/gandalf.jpg',

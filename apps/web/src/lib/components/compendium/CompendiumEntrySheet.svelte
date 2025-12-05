@@ -4,7 +4,7 @@
   import { compendiumsStore } from '$lib/stores/compendiums';
 
   export let entry: CompendiumEntry | null;
-  export let gameId: string;
+  export let campaignId: string;
   export let isGM: boolean = false;
   export let isLocked: boolean = false;
 
@@ -53,7 +53,7 @@
     if (!entry) return;
 
     const request: CompendiumInstantiateRequest = {
-      gameId,
+      campaignId,
     };
 
     const entityId = await compendiumsStore.instantiateEntry(entry.id, request);
@@ -62,7 +62,7 @@
       dispatch('instantiated', entityId);
       handleClose();
     } else {
-      alert('Failed to add entry to game');
+      alert('Failed to add entry to campaign');
     }
   }
 
@@ -176,7 +176,7 @@
               Close
             </button>
             <button class="button-primary" on:click={handleInstantiate}>
-              Add to Game
+              Add to campaign
             </button>
           {/if}
         </div>

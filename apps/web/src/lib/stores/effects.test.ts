@@ -8,7 +8,7 @@ global.fetch = vi.fn();
 
 const mockEffect: ActiveEffect = {
   id: 'effect-1',
-  gameId: 'game-1',
+  campaignId: 'campaign-1',
   actorId: 'actor-1',
   tokenId: null,
   name: 'Bless',
@@ -192,7 +192,7 @@ describe('effectsStore', () => {
     });
   });
 
-  it('loads effects for game from API successfully', async () => {
+  it('loads effects for campaign from API successfully', async () => {
     const mockResponse = {
       effects: [mockEffect],
     };
@@ -202,14 +202,14 @@ describe('effectsStore', () => {
       json: async () => mockResponse,
     });
 
-    await effectsStore.loadForGame('game-1', 'test-token');
+    await effectsStore.loadForCampaign('campaign-1', 'test-token');
 
     const state = get(effectsStore);
     expect(state.effects.size).toBe(1);
     expect(state.loading).toBe(false);
     expect(state.error).toBeNull();
 
-    expect(global.fetch).toHaveBeenCalledWith('/api/v1/games/game-1/effects', {
+    expect(global.fetch).toHaveBeenCalledWith('/api/v1/campaigns/campaign-1/effects', {
       headers: {
         Authorization: 'Bearer test-token',
       },

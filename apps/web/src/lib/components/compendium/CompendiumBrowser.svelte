@@ -8,7 +8,7 @@
   import CompendiumConfig from './CompendiumConfig.svelte';
   import CompendiumImport from './CompendiumImport.svelte';
 
-  export let gameId: string;
+  export let campaignId: string;
   export let isGM: boolean = false;
   export let isOpen: boolean = false;
   export let fullPage: boolean = false;
@@ -316,7 +316,7 @@
 {#if showEntrySheet && selectedEntry}
   <CompendiumEntrySheet
     entry={selectedEntry}
-    {gameId}
+    {campaignId}
     {isGM}
     isLocked={selectedCompendium?.locked || false}
     on:close={handleEntrySheetClose}
@@ -326,7 +326,7 @@
 {#if showCompendiumConfig}
   <CompendiumConfig
     compendium={compendiumToEdit}
-    {gameId}
+    {campaignId}
     on:close={handleCompendiumConfigClose}
     on:created={handleCompendiumCreated}
   />

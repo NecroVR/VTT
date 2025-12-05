@@ -6,7 +6,7 @@ import type { Scene } from '@vtt/shared';
 describe('scenes store', () => {
   const mockScene1: Scene = {
     id: 'scene-1',
-    gameId: 'game-1',
+    campaignId: 'campaign-1',
     name: 'Test Scene 1',
     width: 1000,
     height: 1000,
@@ -19,7 +19,7 @@ describe('scenes store', () => {
 
   const mockScene2: Scene = {
     id: 'scene-2',
-    gameId: 'game-1',
+    campaignId: 'campaign-1',
     name: 'Test Scene 2',
     width: 1200,
     height: 800,
@@ -57,10 +57,10 @@ describe('scenes store', () => {
         json: async () => ({ scenes: [mockScene1, mockScene2] }),
       } as Response);
 
-      await scenesStore.loadScenes('game-1');
+      await scenesStore.loadScenes('campaign-1');
 
       expect(global.fetch).toHaveBeenCalledWith(
-        'http://localhost:3000/api/v1/games/game-1/scenes',
+        'http://localhost:3000/api/v1/campaigns/campaign-1/scenes',
         expect.objectContaining({
           headers: {
             Authorization: 'Bearer session-token-123',
@@ -82,7 +82,7 @@ describe('scenes store', () => {
         json: async () => ({ scenes: [mockScene1, mockScene2] }),
       } as Response);
 
-      await scenesStore.loadScenes('game-1');
+      await scenesStore.loadScenes('campaign-1');
 
       const state = get(scenesStore);
       expect(state.activeSceneId).toBe('scene-1'); // mockScene1 has active: true
@@ -97,7 +97,7 @@ describe('scenes store', () => {
         json: async () => ({ scenes: [scene1NoActive, scene2NoActive] }),
       } as Response);
 
-      await scenesStore.loadScenes('game-1');
+      await scenesStore.loadScenes('campaign-1');
 
       const state = get(scenesStore);
       expect(state.activeSceneId).toBe('scene-1'); // First scene is default
@@ -107,7 +107,7 @@ describe('scenes store', () => {
       global.localStorage.getItem = vi.fn().mockReturnValue(null);
       global.sessionStorage.getItem = vi.fn().mockReturnValue(null);
 
-      await scenesStore.loadScenes('game-1');
+      await scenesStore.loadScenes('campaign-1');
 
       const state = get(scenesStore);
       expect(state.loading).toBe(false);
@@ -121,7 +121,7 @@ describe('scenes store', () => {
         statusText: 'Not Found',
       } as Response);
 
-      await scenesStore.loadScenes('game-1');
+      await scenesStore.loadScenes('campaign-1');
 
       const state = get(scenesStore);
       expect(state.loading).toBe(false);
@@ -131,7 +131,7 @@ describe('scenes store', () => {
     it('should handle network error', async () => {
       global.fetch = vi.fn().mockRejectedValueOnce(new Error('Network error'));
 
-      await scenesStore.loadScenes('game-1');
+      await scenesStore.loadScenes('campaign-1');
 
       const state = get(scenesStore);
       expect(state.loading).toBe(false);
@@ -147,10 +147,10 @@ describe('scenes store', () => {
         json: async () => ({ scenes: [mockScene1] }),
       } as Response);
 
-      await scenesStore.loadScenes('game-1');
+      await scenesStore.loadScenes('campaign-1');
 
       expect(global.fetch).toHaveBeenCalledWith(
-        'http://localhost:3000/api/v1/games/game-1/scenes',
+        'http://localhost:3000/api/v1/campaigns/campaign-1/scenes',
         expect.objectContaining({
           headers: {
             Authorization: 'Bearer session-storage-token',

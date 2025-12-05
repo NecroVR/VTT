@@ -36,7 +36,7 @@ const templatesRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Scene not found' });
         }
 
-        // TODO: Check if user has access to this scene's game
+        // TODO: Check if user has access to this scene's campaign
 
         // Fetch all templates for the scene
         const sceneTemplates = await fastify.db

@@ -12,11 +12,11 @@ import type {
   TokenRemovedPayload,
   DiceRollPayload,
   DiceResultPayload,
-  GameJoinPayload,
-  GameLeavePayload,
-  GamePlayersPayload,
-  GamePlayerJoinedPayload,
-  GamePlayerLeftPayload,
+  CampaignJoinPayload,
+  CampaignLeavePayload,
+  CampaignPlayersPayload,
+  CampaignPlayerJoinedPayload,
+  CampaignPlayerLeftPayload,
   ChatMessagePayload,
   PlayerInfo,
   SceneSwitchPayload,
@@ -297,17 +297,17 @@ class WebSocketStore {
   }
 
   /**
-   * Game room methods
+   * campaign room methods
    */
-  joinGame(gameId: string, token: string): void {
-    const payload: GameJoinPayload = { gameId, token };
-    this.send('game:join', payload);
-    this.state.update(s => ({ ...s, currentRoom: gameId }));
+  joinCampaign(campaignId: string, token: string): void {
+    const payload: CampaignJoinPayload = { campaignId, token };
+    this.send('campaign:join', payload);
+    this.state.update(s => ({ ...s, currentRoom: campaignId }));
   }
 
-  leaveGame(gameId: string): void {
-    const payload: GameLeavePayload = { gameId };
-    this.send('game:leave', payload);
+  leaveCampaign(campaignId: string): void {
+    const payload: CampaignLeavePayload = { campaignId };
+    this.send('campaign:leave', payload);
     this.state.update(s => ({ ...s, currentRoom: null, players: [] }));
   }
 
@@ -321,16 +321,16 @@ class WebSocketStore {
     this.send('chat:message', payload);
   }
 
-  onGamePlayers(handler: TypedMessageHandler<GamePlayersPayload>): () => void {
-    return this.on('game:players', handler);
+  onCampaignPlayers(handler: TypedMessageHandler<CampaignPlayersPayload>): () => void {
+    return this.on('campaign:players', handler);
   }
 
-  onPlayerJoined(handler: TypedMessageHandler<GamePlayerJoinedPayload>): () => void {
-    return this.on('game:player-joined', handler);
+  onPlayerJoined(handler: TypedMessageHandler<CampaignPlayerJoinedPayload>): () => void {
+    return this.on('campaign:player-joined', handler);
   }
 
-  onPlayerLeft(handler: TypedMessageHandler<GamePlayerLeftPayload>): () => void {
-    return this.on('game:player-left', handler);
+  onPlayerLeft(handler: TypedMessageHandler<CampaignPlayerLeftPayload>): () => void {
+    return this.on('campaign:player-left', handler);
   }
 
   onChatMessage(handler: TypedMessageHandler<ChatMessagePayload>): () => void {
@@ -449,7 +449,7 @@ class WebSocketStore {
           error: null
         }));
         this.startHeartbeat();
-        this.setupGameHandlers();
+        this.setupCampaignHandlers();
       };
 
       this.ws.onmessage = (event) => {
@@ -532,16 +532,16 @@ class WebSocketStore {
   }
 
   /**
-   * Setup handlers for game-related messages
+   * Setup handlers for campaign-related messages
    */
-  private setupGameHandlers(): void {
+  private setupCampaignHandlers(): void {
     // Handle initial player list
-    this.on<GamePlayersPayload>('game:players', (payload) => {
+    this.on<CampaignPlayersPayload>('campaign:players', (payload) => {
       this.state.update(s => ({ ...s, players: payload.players }));
     });
 
     // Handle player joined
-    this.on<GamePlayerJoinedPayload>('game:player-joined', (payload) => {
+    this.on<CampaignPlayerJoinedPayload>('campaign:player-joined', (payload) => {
       this.state.update(s => ({
         ...s,
         players: [...s.players, payload.player]
@@ -549,7 +549,7 @@ class WebSocketStore {
     });
 
     // Handle player left
-    this.on<GamePlayerLeftPayload>('game:player-left', (payload) => {
+    this.on<CampaignPlayerLeftPayload>('campaign:player-left', (payload) => {
       this.state.update(s => ({
         ...s,
         players: s.players.filter(p => p.userId !== payload.userId)

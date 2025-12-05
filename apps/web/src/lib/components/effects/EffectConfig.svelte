@@ -6,7 +6,7 @@
   export let isOpen: boolean = false;
   export let effect: ActiveEffect | null = null;
   export let actorId: string;
-  export let gameId: string;
+  export let campaignId: string;
   export let token: string = '';
 
   const dispatch = createEventDispatcher<{
@@ -79,7 +79,7 @@
   async function handleSave() {
     try {
       const effectData = {
-        gameId,
+        campaignId,
         actorId,
         name: formData.name.trim(),
         icon: formData.icon.trim() || null,

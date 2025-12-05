@@ -7,7 +7,7 @@
 
   // Props
   export let actorId: string;
-  export let gameId: string;
+  export let campaignId: string;
   export let isGM: boolean = false;
   export let token: string = '';
 
@@ -269,7 +269,7 @@
   isOpen={showEffectConfig}
   effect={selectedEffect}
   {actorId}
-  {gameId}
+  {campaignId}
   {token}
   on:close={handleCloseModal}
   on:save={handleEffectSaved}

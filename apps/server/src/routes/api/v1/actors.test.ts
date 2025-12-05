@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { buildApp } from '../../../app.js';
 import type { FastifyInstance } from 'fastify';
 import { createDb } from '@vtt/database';
-import { users, sessions, games, actors } from '@vtt/database';
+import { users, sessions, campaigns, actors } from '@vtt/database';
 import { eq } from 'drizzle-orm';
 
 describe('Actors Routes', () => {
@@ -33,7 +33,7 @@ describe('Actors Routes', () => {
   beforeEach(async () => {
     // Clean up test data before each test
     await db.delete(actors);
-    await db.delete(games);
+    await db.delete(campaigns);
     await db.delete(sessions);
     await db.delete(users);
 
@@ -52,23 +52,23 @@ describe('Actors Routes', () => {
     sessionId = registerBody.sessionId;
     userId = registerBody.user.id;
 
-    // Create a test game
-    const gameResponse = await app.inject({
+    // Create a test campaign
+    const campaignResponse = await app.inject({
       method: 'POST',
-      url: '/api/v1/games',
+      url: '/api/v1/campaigns',
       headers: {
         authorization: `Bearer ${sessionId}`,
       },
       payload: {
-        name: 'Test Game',
+        name: 'Test Campaign',
       },
     });
 
-    const gameBody = JSON.parse(gameResponse.body);
-    gameId = gameBody.game.id;
+    const campaignBody = JSON.parse(campaignResponse.body);
+    campaignId = campaignBody.campaign.id;
   });
 
-  describe('GET /api/v1/games/:campaignId/actors', () => {
+  describe('GET /api/v1/campaigns/:campaignId/actors', () => {
     beforeEach(async () => {
       // Create test actors directly in database
       await db.insert(actors).values([
@@ -96,10 +96,10 @@ describe('Actors Routes', () => {
       ]);
     });
 
-    it('should list all actors for a game', async () => {
+    it('should list all actors for a campaign', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/actors`,
+        url: `/api/v1/campaigns/${campaignId}/actors`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -110,14 +110,14 @@ describe('Actors Routes', () => {
       expect(body.actors).toHaveLength(2);
       expect(body.actors[0].name).toBe('Fighter Character');
       expect(body.actors[1].name).toBe('Goblin Enemy');
-      expect(body.actors[0].gameId).toBe(gameId);
-      expect(body.actors[1].gameId).toBe(gameId);
+      expect(body.actors[0].campaignId).toBe(gameId);
+      expect(body.actors[1].campaignId).toBe(gameId);
     });
 
     it('should return actor with all properties', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/actors`,
+        url: `/api/v1/campaigns/${campaignId}/actors`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -145,7 +145,7 @@ describe('Actors Routes', () => {
     it('should return actor with correct values', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/actors`,
+        url: `/api/v1/campaigns/${campaignId}/actors`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -165,12 +165,12 @@ describe('Actors Routes', () => {
       expect(actor.data).toEqual({ level: 5, class: 'Fighter' });
     });
 
-    it('should return empty array if game has no actors', async () => {
+    it('should return empty array if campaign has no actors', async () => {
       await db.delete(actors);
 
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/actors`,
+        url: `/api/v1/campaigns/${campaignId}/actors`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -181,10 +181,10 @@ describe('Actors Routes', () => {
       expect(body.actors).toHaveLength(0);
     });
 
-    it('should return 404 if game does not exist', async () => {
+    it('should return 404 if campaign does not exist', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: '/api/v1/games/00000000-0000-0000-0000-000000000000/actors',
+        url: '/api/v1/campaigns/00000000-0000-0000-0000-000000000000/actors',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -198,7 +198,7 @@ describe('Actors Routes', () => {
     it('should return 401 without authorization header', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/actors`,
+        url: `/api/v1/campaigns/${campaignId}/actors`,
       });
 
       expect(response.statusCode).toBe(401);
@@ -207,7 +207,7 @@ describe('Actors Routes', () => {
     it('should return 401 with invalid session', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/actors`,
+        url: `/api/v1/campaigns/${campaignId}/actors`,
         headers: {
           authorization: 'Bearer invalid-session-id',
         },
@@ -220,7 +220,7 @@ describe('Actors Routes', () => {
       // Use an invalid game ID format that might cause database errors
       const response = await app.inject({
         method: 'GET',
-        url: '/api/v1/games/invalid-uuid-format/actors',
+        url: '/api/v1/campaigns/invalid-uuid-format/actors',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -264,7 +264,7 @@ describe('Actors Routes', () => {
       const body = JSON.parse(response.body);
       expect(body.actor.id).toBe(actorId);
       expect(body.actor.name).toBe('Test Actor');
-      expect(body.actor.gameId).toBe(gameId);
+      expect(body.actor.campaignId).toBe(gameId);
       expect(body.actor.actorType).toBe('character');
     });
 
@@ -282,7 +282,7 @@ describe('Actors Routes', () => {
       const actor = body.actor;
 
       expect(actor.id).toBe(actorId);
-      expect(actor.gameId).toBe(gameId);
+      expect(actor.campaignId).toBe(gameId);
       expect(actor.name).toBe('Test Actor');
       expect(actor.attributes).toEqual({ str: 10, dex: 10, con: 10 });
       expect(actor.abilities).toEqual({ skill: 'value' });
@@ -341,11 +341,11 @@ describe('Actors Routes', () => {
     });
   });
 
-  describe('POST /api/v1/games/:campaignId/actors', () => {
+  describe('POST /api/v1/campaigns/:campaignId/actors', () => {
     it('should create a new actor', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/actors`,
+        url: `/api/v1/campaigns/${campaignId}/actors`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -363,7 +363,7 @@ describe('Actors Routes', () => {
       const body = JSON.parse(response.body);
       expect(body.actor.name).toBe('New Character');
       expect(body.actor.actorType).toBe('character');
-      expect(body.actor.gameId).toBe(gameId);
+      expect(body.actor.campaignId).toBe(gameId);
       expect(body.actor.img).toBe('/images/character.png');
       expect(body.actor.attributes).toEqual({ str: 16, dex: 14 });
       expect(body.actor.abilities).toEqual({ attack: 3 });
@@ -373,7 +373,7 @@ describe('Actors Routes', () => {
     it('should create actor with minimal fields', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/actors`,
+        url: `/api/v1/campaigns/${campaignId}/actors`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -387,7 +387,7 @@ describe('Actors Routes', () => {
       const body = JSON.parse(response.body);
       expect(body.actor.name).toBe('Simple Actor');
       expect(body.actor.actorType).toBe('npc');
-      expect(body.actor.gameId).toBe(gameId);
+      expect(body.actor.campaignId).toBe(gameId);
       expect(body.actor.attributes).toEqual({});
       expect(body.actor.abilities).toEqual({});
       expect(body.actor.data).toEqual({});
@@ -397,7 +397,7 @@ describe('Actors Routes', () => {
     it('should return 400 if name is missing', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/actors`,
+        url: `/api/v1/campaigns/${campaignId}/actors`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -414,7 +414,7 @@ describe('Actors Routes', () => {
     it('should return 400 if name is empty', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/actors`,
+        url: `/api/v1/campaigns/${campaignId}/actors`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -432,7 +432,7 @@ describe('Actors Routes', () => {
     it('should return 400 if actorType is missing', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/actors`,
+        url: `/api/v1/campaigns/${campaignId}/actors`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -449,7 +449,7 @@ describe('Actors Routes', () => {
     it('should return 400 if actorType is empty', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/actors`,
+        url: `/api/v1/campaigns/${campaignId}/actors`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -464,10 +464,10 @@ describe('Actors Routes', () => {
       expect(body.error).toBe('Actor type is required');
     });
 
-    it('should return 404 if game does not exist', async () => {
+    it('should return 404 if campaign does not exist', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: '/api/v1/games/00000000-0000-0000-0000-000000000000/actors',
+        url: '/api/v1/campaigns/00000000-0000-0000-0000-000000000000/actors',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -485,7 +485,7 @@ describe('Actors Routes', () => {
     it('should return 401 without authorization header', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/actors`,
+        url: `/api/v1/campaigns/${campaignId}/actors`,
         payload: {
           name: 'Test Actor',
           actorType: 'character',
@@ -498,7 +498,7 @@ describe('Actors Routes', () => {
     it('should return 401 with invalid session', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/actors`,
+        url: `/api/v1/campaigns/${campaignId}/actors`,
         headers: {
           authorization: 'Bearer invalid-session-id',
         },

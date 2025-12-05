@@ -20,9 +20,9 @@ function createActorsStore() {
     subscribe,
 
     /**
-     * Load actors for a game from the API
+     * Load actors for a campaign from the API
      */
-    async loadActors(gameId: string): Promise<void> {
+    async loadActors(campaignId: string): Promise<void> {
       if (!browser) return;
 
       update(state => ({ ...state, loading: true, error: null }));
@@ -34,7 +34,7 @@ function createActorsStore() {
           throw new Error('No authentication token found');
         }
 
-        const response = await fetch(`${API_BASE_URL}/api/v1/games/${gameId}/actors`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/campaigns/${campaignId}/actors`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -125,7 +125,7 @@ function createActorsStore() {
     },
 
     /**
-     * Clear all actors (useful when leaving a game)
+     * Clear all actors (useful when leaving a campaign)
      */
     clear(): void {
       set({

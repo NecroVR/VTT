@@ -5,7 +5,7 @@
   import FolderTree from '../folder/FolderTree.svelte';
 
   // Props
-  export let gameId: string;
+  export let campaignId: string;
   export let isGM: boolean = false;
   export let onJournalSelect: ((journalId: string) => void) | null = null;
 
@@ -33,8 +33,8 @@
 
   async function loadData() {
     await Promise.all([
-      journalsStore.loadJournals(gameId),
-      journalsStore.loadFolders(gameId, 'journal'),
+      journalsStore.loadJournals(campaignId),
+      journalsStore.loadFolders(campaignId, 'journal'),
     ]);
   }
 

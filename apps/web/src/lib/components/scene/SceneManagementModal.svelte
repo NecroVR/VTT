@@ -6,7 +6,7 @@
 
   // Props
   export let isOpen: boolean;
-  export let gameId: string;
+  export let campaignId: string;
   export let onClose: () => void;
   export let onSceneCreated: (scene: Scene) => void;
 
@@ -57,14 +57,14 @@
         throw new Error('No authentication token found');
       }
 
-      const response = await fetch(`${API_BASE_URL}/api/v1/games/${gameId}/scenes`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/campaigns/${campaignId}/scenes`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          gameId,
+          campaignId,
           name: formData.name.trim(),
           gridSize: formData.gridSize,
           gridColor: formData.gridColor,

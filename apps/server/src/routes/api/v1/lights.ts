@@ -36,7 +36,7 @@ const lightsRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Scene not found' });
         }
 
-        // TODO: Check if user has access to this scene's game
+        // TODO: Check if user has access to this scene's campaign
 
         // Fetch all lights for the scene
         const sceneLights = await fastify.db

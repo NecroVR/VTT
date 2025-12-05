@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { buildApp } from '../../../app.js';
 import type { FastifyInstance } from 'fastify';
 import { createDb } from '@vtt/database';
-import { users, sessions, games, scenes } from '@vtt/database';
+import { users, sessions, campaigns, scenes } from '@vtt/database';
 import { eq } from 'drizzle-orm';
 
 describe('Scenes Routes', () => {
@@ -33,7 +33,7 @@ describe('Scenes Routes', () => {
   beforeEach(async () => {
     // Clean up test data before each test
     await db.delete(scenes);
-    await db.delete(games);
+    await db.delete(campaigns);
     await db.delete(sessions);
     await db.delete(users);
 
@@ -52,27 +52,27 @@ describe('Scenes Routes', () => {
     sessionId = registerBody.sessionId;
     userId = registerBody.user.id;
 
-    // Create a test game
-    const gameResponse = await app.inject({
+    // Create a test campaign
+    const campaignResponse = await app.inject({
       method: 'POST',
-      url: '/api/v1/games',
+      url: '/api/v1/campaigns',
       headers: {
         authorization: `Bearer ${sessionId}`,
       },
       payload: {
-        name: 'Test Game',
+        name: 'Test Campaign',
       },
     });
 
-    const gameBody = JSON.parse(gameResponse.body);
-    gameId = gameBody.game.id;
+    const campaignBody = JSON.parse(campaignResponse.body);
+    campaignId = campaignBody.campaign.id;
   });
 
-  describe('POST /api/v1/games/:campaignId/scenes', () => {
+  describe('POST /api/v1/campaigns/:campaignId/scenes', () => {
     it('should create a new scene with minimal data', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/scenes`,
+        url: `/api/v1/campaigns/${campaignId}/scenes`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -85,7 +85,7 @@ describe('Scenes Routes', () => {
       const body = JSON.parse(response.body);
       expect(body).toHaveProperty('scene');
       expect(body.scene.name).toBe('Test Scene');
-      expect(body.scene.gameId).toBe(gameId);
+      expect(body.scene.campaignId).toBe(gameId);
       expect(body.scene.active).toBe(false);
       expect(body.scene.gridType).toBe('square');
       expect(body.scene.gridSize).toBe(100);
@@ -94,7 +94,7 @@ describe('Scenes Routes', () => {
     it('should create a scene with full data', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/scenes`,
+        url: `/api/v1/campaigns/${campaignId}/scenes`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -146,10 +146,10 @@ describe('Scenes Routes', () => {
       expect(body.scene.data).toEqual({ custom: 'value' });
     });
 
-    it('should return 404 if game does not exist', async () => {
+    it('should return 404 if campaign does not exist', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: '/api/v1/games/00000000-0000-0000-0000-000000000000/scenes',
+        url: '/api/v1/campaigns/00000000-0000-0000-0000-000000000000/scenes',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -166,7 +166,7 @@ describe('Scenes Routes', () => {
     it('should return 401 without authorization header', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/scenes`,
+        url: `/api/v1/campaigns/${campaignId}/scenes`,
         payload: {
           name: 'Test Scene',
         },
@@ -178,7 +178,7 @@ describe('Scenes Routes', () => {
     it('should return 401 with invalid session', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/scenes`,
+        url: `/api/v1/campaigns/${campaignId}/scenes`,
         headers: {
           authorization: 'Bearer invalid-session-id',
         },
@@ -191,12 +191,12 @@ describe('Scenes Routes', () => {
     });
   });
 
-  describe('GET /api/v1/games/:campaignId/scenes', () => {
+  describe('GET /api/v1/campaigns/:campaignId/scenes', () => {
     beforeEach(async () => {
       // Create test scenes
       await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/scenes`,
+        url: `/api/v1/campaigns/${campaignId}/scenes`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -207,7 +207,7 @@ describe('Scenes Routes', () => {
 
       await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/scenes`,
+        url: `/api/v1/campaigns/${campaignId}/scenes`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -218,10 +218,10 @@ describe('Scenes Routes', () => {
       });
     });
 
-    it('should list all scenes for a game', async () => {
+    it('should list all scenes for a campaign', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/scenes`,
+        url: `/api/v1/campaigns/${campaignId}/scenes`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -232,16 +232,16 @@ describe('Scenes Routes', () => {
       expect(body.scenes).toHaveLength(2);
       expect(body.scenes[0].name).toBe('Scene 1');
       expect(body.scenes[1].name).toBe('Scene 2');
-      expect(body.scenes[0].gameId).toBe(gameId);
-      expect(body.scenes[1].gameId).toBe(gameId);
+      expect(body.scenes[0].campaignId).toBe(gameId);
+      expect(body.scenes[1].campaignId).toBe(gameId);
     });
 
-    it('should return empty array if game has no scenes', async () => {
+    it('should return empty array if campaign has no scenes', async () => {
       await db.delete(scenes);
 
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/scenes`,
+        url: `/api/v1/campaigns/${campaignId}/scenes`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -252,10 +252,10 @@ describe('Scenes Routes', () => {
       expect(body.scenes).toHaveLength(0);
     });
 
-    it('should return 404 if game does not exist', async () => {
+    it('should return 404 if campaign does not exist', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: '/api/v1/games/00000000-0000-0000-0000-000000000000/scenes',
+        url: '/api/v1/campaigns/00000000-0000-0000-0000-000000000000/scenes',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -269,7 +269,7 @@ describe('Scenes Routes', () => {
     it('should return 401 without authorization header', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/scenes`,
+        url: `/api/v1/campaigns/${campaignId}/scenes`,
       });
 
       expect(response.statusCode).toBe(401);
@@ -278,7 +278,7 @@ describe('Scenes Routes', () => {
     it('should return 401 with invalid session', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/scenes`,
+        url: `/api/v1/campaigns/${campaignId}/scenes`,
         headers: {
           authorization: 'Bearer invalid-session-id',
         },
@@ -295,7 +295,7 @@ describe('Scenes Routes', () => {
       // Create a test scene
       const sceneResponse = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/scenes`,
+        url: `/api/v1/campaigns/${campaignId}/scenes`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -322,7 +322,7 @@ describe('Scenes Routes', () => {
       const body = JSON.parse(response.body);
       expect(body.scene.id).toBe(sceneId);
       expect(body.scene.name).toBe('Test Scene');
-      expect(body.scene.gameId).toBe(gameId);
+      expect(body.scene.campaignId).toBe(gameId);
       expect(body.scene.active).toBe(true);
     });
 
@@ -369,7 +369,7 @@ describe('Scenes Routes', () => {
       // Create a test scene
       const sceneResponse = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/scenes`,
+        url: `/api/v1/campaigns/${campaignId}/scenes`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -517,7 +517,7 @@ describe('Scenes Routes', () => {
       // Create a test scene
       const sceneResponse = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/scenes`,
+        url: `/api/v1/campaigns/${campaignId}/scenes`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },

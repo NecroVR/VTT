@@ -92,7 +92,7 @@ describe('CombatTracker', () => {
   });
 
   it('should render no active combat state for player', async () => {
-    render(CombatTracker, { props: { gameId: 'test-game', isGM: false } });
+    render(CombatTracker, { props: { campaignId: 'test-campaign', isGM: false } });
 
     await waitFor(() => {
       expect(screen.getByText('No active combat.')).toBeInTheDocument();
@@ -100,7 +100,7 @@ describe('CombatTracker', () => {
   });
 
   it('should render no active combat state with Start button for GM', async () => {
-    render(CombatTracker, { props: { gameId: 'test-game', isGM: true } });
+    render(CombatTracker, { props: { campaignId: 'test-campaign', isGM: true } });
 
     await waitFor(() => {
       expect(screen.getByText('No active combat.')).toBeInTheDocument();
@@ -109,7 +109,7 @@ describe('CombatTracker', () => {
   });
 
   it('should start combat when GM clicks Start Combat button', async () => {
-    render(CombatTracker, { props: { gameId: 'test-game', isGM: true } });
+    render(CombatTracker, { props: { campaignId: 'test-campaign', isGM: true } });
 
     await waitFor(() => {
       expect(screen.getByText('Start Combat')).toBeInTheDocument();
@@ -119,7 +119,7 @@ describe('CombatTracker', () => {
     await fireEvent.click(startButton);
 
     expect(websocket.sendCombatStart).toHaveBeenCalledWith({
-      gameId: 'test-game',
+      campaignId: 'test-campaign',
       sceneId: null,
       combatants: [],
     });

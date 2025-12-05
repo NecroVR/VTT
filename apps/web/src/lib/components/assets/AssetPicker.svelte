@@ -6,7 +6,7 @@
 
   // Props
   export let isOpen: boolean = false;
-  export let gameId: string | undefined = undefined;
+  export let campaignId: string | undefined = undefined;
   export let allowedTypes: AssetType[] | undefined = undefined;
   export let title: string = 'Select Asset';
 
@@ -70,7 +70,7 @@
       <div class="modal-body">
         <AssetBrowser
           bind:this={browserComponent}
-          {gameId}
+          {campaignId}
           selectionMode={true}
           {allowedTypes}
         />

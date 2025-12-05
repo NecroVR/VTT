@@ -96,18 +96,18 @@ function createCompendiumsStore() {
     },
 
     /**
-     * Load compendiums for a specific game
+     * Load compendiums for a specific campaign
      */
-    async loadGameCompendiums(gameId: string): Promise<void> {
+    async loadCampaignCompendiums(campaignId: string): Promise<void> {
       if (!browser) return;
 
       update(state => ({ ...state, loading: true, error: null }));
 
       try {
-        const response = await authFetch(`${API_BASE_URL}/api/v1/games/${gameId}/compendiums`);
+        const response = await authFetch(`${API_BASE_URL}/api/v1/campaigns/${campaignId}/compendiums`);
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch game compendiums: ${response.statusText}`);
+          throw new Error(`Failed to fetch campaign compendiums: ${response.statusText}`);
         }
 
         const data = await response.json();
@@ -125,25 +125,25 @@ function createCompendiumsStore() {
           loading: false,
         }));
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to load game compendiums';
+        const errorMessage = error instanceof Error ? error.message : 'Failed to load campaign compendiums';
         update(state => ({
           ...state,
           loading: false,
           error: errorMessage,
         }));
-        console.error('Error loading game compendiums:', error);
+        console.error('Error loading campaign compendiums:', error);
       }
     },
 
     /**
      * Create a new compendium
      */
-    async createCompendium(gameId: string, data: CreateCompendiumRequest): Promise<Compendium | null> {
+    async createCompendium(campaignId: string, data: CreateCompendiumRequest): Promise<Compendium | null> {
       if (!browser) return null;
 
       try {
         const response = await authFetch(
-          `${API_BASE_URL}/api/v1/games/${gameId}/compendiums`,
+          `${API_BASE_URL}/api/v1/campaigns/${campaignId}/compendiums`,
           {
             method: 'POST',
             body: JSON.stringify(data),
@@ -527,7 +527,7 @@ function createCompendiumsStore() {
     },
 
     /**
-     * Instantiate an entry as a game entity
+     * Instantiate an entry as a campaign entity
      */
     async instantiateEntry(entryId: string, request: CompendiumInstantiateRequest): Promise<string | null> {
       if (!browser) return null;
@@ -669,7 +669,7 @@ function createCompendiumsStore() {
     },
 
     /**
-     * Clear all data (useful when leaving a game)
+     * Clear all data (useful when leaving a campaign)
      */
     clear(): void {
       set({

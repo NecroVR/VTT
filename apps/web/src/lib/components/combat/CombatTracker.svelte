@@ -16,7 +16,7 @@
   import TurnControls from './TurnControls.svelte';
 
   // Props
-  export let gameId: string;
+  export let campaignId: string;
   export let isGM: boolean = false;
 
   // Combat state
@@ -76,8 +76,8 @@
         return;
       }
 
-      // Fetch active combat for this game
-      const response = await fetch(`/api/v1/games/${gameId}/combats?active=true`, {
+      // Fetch active combat for this campaign
+      const response = await fetch(`/api/v1/campaigns/${campaignId}/combats?active=true`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -129,7 +129,7 @@
   }
 
   function handleCombatStarted(payload: CombatStartedPayload) {
-    if (payload.combat.gameId === gameId) {
+    if (payload.combat.campaignId === campaignId) {
       combat = payload.combat;
       combatants = payload.combatants;
     }
@@ -175,7 +175,7 @@
   function startCombat() {
     if (!isGM) return;
     websocket.sendCombatStart({
-      gameId,
+      campaignId,
       sceneId: null,
       combatants: []
     });

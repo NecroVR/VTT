@@ -8,7 +8,7 @@
   import ChatInput from './ChatInput.svelte';
 
   // Props
-  export let gameId: string;
+  export let campaignId: string;
 
   // Message state
   interface DisplayMessage {

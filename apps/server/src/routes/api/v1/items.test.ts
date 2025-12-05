@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { buildApp } from '../../../app.js';
 import type { FastifyInstance } from 'fastify';
 import { createDb } from '@vtt/database';
-import { users, sessions, games, actors, items } from '@vtt/database';
+import { users, sessions, campaigns, actors, items } from '@vtt/database';
 import { eq } from 'drizzle-orm';
 
 describe('Items Routes', () => {
@@ -35,7 +35,7 @@ describe('Items Routes', () => {
     // Clean up test data before each test
     await db.delete(items);
     await db.delete(actors);
-    await db.delete(games);
+    await db.delete(campaigns);
     await db.delete(sessions);
     await db.delete(users);
 
@@ -54,20 +54,20 @@ describe('Items Routes', () => {
     sessionId = registerBody.sessionId;
     userId = registerBody.user.id;
 
-    // Create a test game
-    const gameResponse = await app.inject({
+    // Create a test campaign
+    const campaignResponse = await app.inject({
       method: 'POST',
-      url: '/api/v1/games',
+      url: '/api/v1/campaigns',
       headers: {
         authorization: `Bearer ${sessionId}`,
       },
       payload: {
-        name: 'Test Game',
+        name: 'Test Campaign',
       },
     });
 
-    const gameBody = JSON.parse(gameResponse.body);
-    gameId = gameBody.game.id;
+    const campaignBody = JSON.parse(campaignResponse.body);
+    campaignId = campaignBody.campaign.id;
 
     // Create a test actor
     const [actor] = await db.insert(actors).values({
@@ -150,7 +150,7 @@ describe('Items Routes', () => {
       const item = body.items[0];
 
       expect(item).toHaveProperty('id');
-      expect(item).toHaveProperty('gameId');
+      expect(item).toHaveProperty('campaignId');
       expect(item).toHaveProperty('actorId');
       expect(item).toHaveProperty('name');
       expect(item).toHaveProperty('itemType');
@@ -293,7 +293,7 @@ describe('Items Routes', () => {
       const body = JSON.parse(response.body);
       expect(body.item.id).toBe(itemId);
       expect(body.item.name).toBe('Test Item');
-      expect(body.item.gameId).toBe(gameId);
+      expect(body.item.campaignId).toBe(campaignId);
       expect(body.item.actorId).toBe(actorId);
       expect(body.item.itemType).toBe('equipment');
     });
@@ -312,7 +312,7 @@ describe('Items Routes', () => {
       const item = body.item;
 
       expect(item.id).toBe(itemId);
-      expect(item.gameId).toBe(gameId);
+      expect(item.campaignId).toBe(campaignId);
       expect(item.actorId).toBe(actorId);
       expect(item.name).toBe('Test Item');
       expect(item.description).toBe('Test description');
@@ -400,7 +400,7 @@ describe('Items Routes', () => {
       const body = JSON.parse(response.body);
       expect(body.item.name).toBe('New Sword');
       expect(body.item.itemType).toBe('weapon');
-      expect(body.item.gameId).toBe(gameId);
+      expect(body.item.campaignId).toBe(campaignId);
       expect(body.item.actorId).toBe(actorId);
       expect(body.item.img).toBe('/images/sword.png');
       expect(body.item.description).toBe('A new sword');
@@ -429,7 +429,7 @@ describe('Items Routes', () => {
       const body = JSON.parse(response.body);
       expect(body.item.name).toBe('Simple Item');
       expect(body.item.itemType).toBe('misc');
-      expect(body.item.gameId).toBe(gameId);
+      expect(body.item.campaignId).toBe(campaignId);
       expect(body.item.actorId).toBe(actorId);
       expect(body.item.quantity).toBe(1);
       expect(body.item.weight).toBe(0);
@@ -513,7 +513,7 @@ describe('Items Routes', () => {
       expect(body.error).toBe('Item type is required');
     });
 
-    it('should return 400 if gameId is missing', async () => {
+    it('should return 400 if campaignId is missing', async () => {
       const response = await app.inject({
         method: 'POST',
         url: `/api/v1/actors/${actorId}/items`,
@@ -528,7 +528,7 @@ describe('Items Routes', () => {
 
       expect(response.statusCode).toBe(400);
       const body = JSON.parse(response.body);
-      expect(body.error).toBe('Game ID is required');
+      expect(body.error).toBe('Campaign ID is required');
     });
 
     it('should return 404 if actor does not exist', async () => {
@@ -550,7 +550,7 @@ describe('Items Routes', () => {
       expect(body.error).toBe('Actor not found');
     });
 
-    it('should return 404 if game does not exist', async () => {
+    it('should return 404 if campaign does not exist', async () => {
       const response = await app.inject({
         method: 'POST',
         url: `/api/v1/actors/${actorId}/items`,

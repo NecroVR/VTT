@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { buildApp } from '../../../app.js';
 import type { FastifyInstance } from 'fastify';
 import { createDb } from '@vtt/database';
-import { users, sessions, games, combats, combatants, actors } from '@vtt/database';
+import { users, sessions, campaigns, combats, combatants, actors } from '@vtt/database';
 import { eq } from 'drizzle-orm';
 
 describe('Combats Routes', () => {
@@ -35,7 +35,7 @@ describe('Combats Routes', () => {
     await db.delete(combatants);
     await db.delete(combats);
     await db.delete(actors);
-    await db.delete(games);
+    await db.delete(campaigns);
     await db.delete(sessions);
     await db.delete(users);
 
@@ -54,25 +54,25 @@ describe('Combats Routes', () => {
     sessionId = registerBody.sessionId;
     userId = registerBody.user.id;
 
-    // Create a test game
-    const gameResponse = await app.inject({
+    // Create a test campaign
+    const campaignResponse = await app.inject({
       method: 'POST',
-      url: '/api/v1/games',
+      url: '/api/v1/campaigns',
       headers: {
         authorization: `Bearer ${sessionId}`,
       },
       payload: {
-        name: 'Test Game',
+        name: 'Test Campaign',
       },
     });
 
-    const gameBody = JSON.parse(gameResponse.body);
-    gameId = gameBody.game.id;
+    const campaignBody = JSON.parse(campaignResponse.body);
+    campaignId = campaignBody.campaign.id;
   });
 
   // ==================== COMBAT ROUTES ====================
 
-  describe('GET /api/v1/games/:campaignId/combats', () => {
+  describe('GET /api/v1/campaigns/:campaignId/combats', () => {
     beforeEach(async () => {
       // Create test combats directly in database
       await db.insert(combats).values([
@@ -97,10 +97,10 @@ describe('Combats Routes', () => {
       ]);
     });
 
-    it('should list all combats for a game', async () => {
+    it('should list all combats for a campaign', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/combats`,
+        url: `/api/v1/campaigns/${campaignId}/combats`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -109,14 +109,14 @@ describe('Combats Routes', () => {
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
       expect(body.combats).toHaveLength(2);
-      expect(body.combats[0].gameId).toBe(gameId);
-      expect(body.combats[1].gameId).toBe(gameId);
+      expect(body.combats[0].campaignId).toBe(campaignId);
+      expect(body.combats[1].campaignId).toBe(campaignId);
     });
 
     it('should return combat with all properties', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/combats`,
+        url: `/api/v1/campaigns/${campaignId}/combats`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -127,7 +127,7 @@ describe('Combats Routes', () => {
       const combat = body.combats[0];
 
       expect(combat).toHaveProperty('id');
-      expect(combat).toHaveProperty('gameId');
+      expect(combat).toHaveProperty('campaignId');
       expect(combat).toHaveProperty('sceneId');
       expect(combat).toHaveProperty('active');
       expect(combat).toHaveProperty('round');
@@ -141,7 +141,7 @@ describe('Combats Routes', () => {
     it('should return combat with correct values', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/combats`,
+        url: `/api/v1/campaigns/${campaignId}/combats`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -151,7 +151,7 @@ describe('Combats Routes', () => {
       const body = JSON.parse(response.body);
       const combat = body.combats[0];
 
-      expect(combat.gameId).toBe(gameId);
+      expect(combat.campaignId).toBe(campaignId);
       expect(combat.active).toBe(true);
       expect(combat.round).toBe(3);
       expect(combat.turn).toBe(1);
@@ -159,12 +159,12 @@ describe('Combats Routes', () => {
       expect(combat.data).toEqual({ difficulty: 'medium' });
     });
 
-    it('should return empty array if game has no combats', async () => {
+    it('should return empty array if campaign has no combats', async () => {
       await db.delete(combats);
 
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/combats`,
+        url: `/api/v1/campaigns/${campaignId}/combats`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -175,10 +175,10 @@ describe('Combats Routes', () => {
       expect(body.combats).toHaveLength(0);
     });
 
-    it('should return 404 if game does not exist', async () => {
+    it('should return 404 if campaign does not exist', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: '/api/v1/games/00000000-0000-0000-0000-000000000000/combats',
+        url: '/api/v1/campaigns/00000000-0000-0000-0000-000000000000/combats',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -192,7 +192,7 @@ describe('Combats Routes', () => {
     it('should return 401 without authorization header', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/combats`,
+        url: `/api/v1/campaigns/${campaignId}/combats`,
       });
 
       expect(response.statusCode).toBe(401);
@@ -201,7 +201,7 @@ describe('Combats Routes', () => {
     it('should return 401 with invalid session', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/combats`,
+        url: `/api/v1/campaigns/${campaignId}/combats`,
         headers: {
           authorization: 'Bearer invalid-session-id',
         },
@@ -214,7 +214,7 @@ describe('Combats Routes', () => {
       // Use an invalid game ID format that might cause database errors
       const response = await app.inject({
         method: 'GET',
-        url: '/api/v1/games/invalid-uuid-format/combats',
+        url: '/api/v1/campaigns/invalid-uuid-format/combats',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -293,7 +293,7 @@ describe('Combats Routes', () => {
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
       expect(body.combat.id).toBe(combatId);
-      expect(body.combat.gameId).toBe(gameId);
+      expect(body.combat.campaignId).toBe(campaignId);
       expect(body.combat.active).toBe(true);
       expect(body.combat.round).toBe(2);
       expect(body.combatants).toHaveLength(2);
@@ -313,7 +313,7 @@ describe('Combats Routes', () => {
       const combat = body.combat;
 
       expect(combat.id).toBe(combatId);
-      expect(combat.gameId).toBe(gameId);
+      expect(combat.campaignId).toBe(campaignId);
       expect(combat.active).toBe(true);
       expect(combat.round).toBe(2);
       expect(combat.turn).toBe(0);
@@ -395,11 +395,11 @@ describe('Combats Routes', () => {
     });
   });
 
-  describe('POST /api/v1/games/:campaignId/combats', () => {
+  describe('POST /api/v1/campaigns/:campaignId/combats', () => {
     it('should create a new combat', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/combats`,
+        url: `/api/v1/campaigns/${campaignId}/combats`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -415,7 +415,7 @@ describe('Combats Routes', () => {
 
       expect(response.statusCode).toBe(201);
       const body = JSON.parse(response.body);
-      expect(body.combat.gameId).toBe(gameId);
+      expect(body.combat.campaignId).toBe(campaignId);
       expect(body.combat.active).toBe(true);
       expect(body.combat.round).toBe(1);
       expect(body.combat.turn).toBe(0);
@@ -425,7 +425,7 @@ describe('Combats Routes', () => {
     it('should create combat with minimal fields', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/combats`,
+        url: `/api/v1/campaigns/${campaignId}/combats`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -434,7 +434,7 @@ describe('Combats Routes', () => {
 
       expect(response.statusCode).toBe(201);
       const body = JSON.parse(response.body);
-      expect(body.combat.gameId).toBe(gameId);
+      expect(body.combat.campaignId).toBe(campaignId);
       expect(body.combat.active).toBe(false);
       expect(body.combat.round).toBe(0);
       expect(body.combat.turn).toBe(0);
@@ -442,10 +442,10 @@ describe('Combats Routes', () => {
       expect(body.combat.data).toEqual({});
     });
 
-    it('should return 404 if game does not exist', async () => {
+    it('should return 404 if campaign does not exist', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: '/api/v1/games/00000000-0000-0000-0000-000000000000/combats',
+        url: '/api/v1/campaigns/00000000-0000-0000-0000-000000000000/combats',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -460,7 +460,7 @@ describe('Combats Routes', () => {
     it('should return 401 without authorization header', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/combats`,
+        url: `/api/v1/campaigns/${campaignId}/combats`,
         payload: {},
       });
 
@@ -470,7 +470,7 @@ describe('Combats Routes', () => {
     it('should return 401 with invalid session', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/combats`,
+        url: `/api/v1/campaigns/${campaignId}/combats`,
         headers: {
           authorization: 'Bearer invalid-session-id',
         },

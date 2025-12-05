@@ -44,14 +44,14 @@ describe('ChatPanel', () => {
   });
 
   it('should render empty state with no messages', () => {
-    render(ChatPanel, { props: { gameId: 'test-game' } });
+    render(ChatPanel, { props: { campaignId: 'test-campaign' } });
 
     expect(screen.getByText(/No messages yet/i)).toBeInTheDocument();
     expect(screen.getByText(/Tip: Use/i)).toBeInTheDocument();
   });
 
   it('should display chat messages when received', async () => {
-    render(ChatPanel, { props: { gameId: 'test-game' } });
+    render(ChatPanel, { props: { campaignId: 'test-campaign' } });
 
     // Simulate receiving a chat message
     const chatPayload: ChatMessagePayload = {
@@ -71,7 +71,7 @@ describe('ChatPanel', () => {
   });
 
   it('should display dice roll results when received', async () => {
-    render(ChatPanel, { props: { gameId: 'test-game' } });
+    render(ChatPanel, { props: { campaignId: 'test-campaign' } });
 
     // Simulate receiving a dice roll result
     const dicePayload: DiceResultPayload = {
@@ -102,7 +102,7 @@ describe('ChatPanel', () => {
   });
 
   it('should send chat message when user types and presses enter', async () => {
-    render(ChatPanel, { props: { gameId: 'test-game' } });
+    render(ChatPanel, { props: { campaignId: 'test-campaign' } });
 
     const input = screen.getByPlaceholderText(/Type a message/i);
     await fireEvent.input(input, { target: { value: 'Test message' } });
@@ -114,7 +114,7 @@ describe('ChatPanel', () => {
   });
 
   it('should send dice roll when user types /roll command', async () => {
-    render(ChatPanel, { props: { gameId: 'test-game' } });
+    render(ChatPanel, { props: { campaignId: 'test-campaign' } });
 
     const input = screen.getByPlaceholderText(/Type a message/i);
     await fireEvent.input(input, { target: { value: '/roll 2d6+3' } });
@@ -127,7 +127,7 @@ describe('ChatPanel', () => {
   });
 
   it('should clear input after sending message', async () => {
-    render(ChatPanel, { props: { gameId: 'test-game' } });
+    render(ChatPanel, { props: { campaignId: 'test-campaign' } });
 
     const input = screen.getByPlaceholderText(/Type a message/i) as HTMLInputElement;
     await fireEvent.input(input, { target: { value: 'Test message' } });
@@ -141,7 +141,7 @@ describe('ChatPanel', () => {
   });
 
   it('should handle dice roll with label', async () => {
-    render(ChatPanel, { props: { gameId: 'test-game' } });
+    render(ChatPanel, { props: { campaignId: 'test-campaign' } });
 
     const dicePayload: DiceResultPayload = {
       notation: '1d20+5',
@@ -171,7 +171,7 @@ describe('ChatPanel', () => {
   });
 
   it('should handle dice roll with keep highest', async () => {
-    render(ChatPanel, { props: { gameId: 'test-game' } });
+    render(ChatPanel, { props: { campaignId: 'test-campaign' } });
 
     const dicePayload: DiceResultPayload = {
       notation: '4d6kh3',
@@ -201,7 +201,7 @@ describe('ChatPanel', () => {
   });
 
   it('should display multiple messages in order', async () => {
-    render(ChatPanel, { props: { gameId: 'test-game' } });
+    render(ChatPanel, { props: { campaignId: 'test-campaign' } });
 
     // Send first message
     const chatPayload1: ChatMessagePayload = {
@@ -237,7 +237,7 @@ describe('ChatPanel', () => {
   });
 
   it('should not send empty messages', async () => {
-    render(ChatPanel, { props: { gameId: 'test-game' } });
+    render(ChatPanel, { props: { campaignId: 'test-campaign' } });
 
     const input = screen.getByPlaceholderText(/Type a message/i);
     await fireEvent.input(input, { target: { value: '   ' } });
@@ -258,7 +258,7 @@ describe('ChatPanel', () => {
     vi.mocked(websocket.onChatMessage).mockReturnValue(unsubscribeChatMessage);
     vi.mocked(websocket.onDiceResult).mockReturnValue(unsubscribeDiceResult);
 
-    const { unmount } = render(ChatPanel, { props: { gameId: 'test-game' } });
+    const { unmount } = render(ChatPanel, { props: { campaignId: 'test-campaign' } });
 
     expect(websocket.onChatMessage).toHaveBeenCalled();
     expect(websocket.onDiceResult).toHaveBeenCalled();

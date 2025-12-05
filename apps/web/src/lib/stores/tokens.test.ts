@@ -6,7 +6,7 @@ import type { Token } from '@vtt/shared';
 describe('tokens store', () => {
   const mockToken1: Token = {
     id: 'token-1',
-    gameId: 'game-1',
+    campaignId: 'campaign-1',
     sceneId: 'scene-1',
     name: 'Hero Token',
     x: 100,
@@ -20,7 +20,7 @@ describe('tokens store', () => {
 
   const mockToken2: Token = {
     id: 'token-2',
-    gameId: 'game-1',
+    campaignId: 'campaign-1',
     sceneId: 'scene-1',
     name: 'Monster Token',
     x: 300,
@@ -59,10 +59,10 @@ describe('tokens store', () => {
         json: async () => ({ tokens: [mockToken1, mockToken2] }),
       } as Response);
 
-      await tokensStore.loadTokens('game-1');
+      await tokensStore.loadTokens('campaign-1');
 
       expect(global.fetch).toHaveBeenCalledWith(
-        'http://localhost:3000/api/v1/games/game-1/tokens',
+        'http://localhost:3000/api/v1/campaigns/campaign-1/tokens',
         expect.objectContaining({
           headers: {
             Authorization: 'Bearer session-token-123',
@@ -82,7 +82,7 @@ describe('tokens store', () => {
       global.localStorage.getItem = vi.fn().mockReturnValue(null);
       global.sessionStorage.getItem = vi.fn().mockReturnValue(null);
 
-      await tokensStore.loadTokens('game-1');
+      await tokensStore.loadTokens('campaign-1');
 
       const state = get(tokensStore);
       expect(state.loading).toBe(false);
@@ -96,7 +96,7 @@ describe('tokens store', () => {
         statusText: 'Not Found',
       } as Response);
 
-      await tokensStore.loadTokens('game-1');
+      await tokensStore.loadTokens('campaign-1');
 
       const state = get(tokensStore);
       expect(state.loading).toBe(false);
@@ -106,7 +106,7 @@ describe('tokens store', () => {
     it('should handle network error', async () => {
       global.fetch = vi.fn().mockRejectedValueOnce(new Error('Network error'));
 
-      await tokensStore.loadTokens('game-1');
+      await tokensStore.loadTokens('campaign-1');
 
       const state = get(tokensStore);
       expect(state.loading).toBe(false);
@@ -122,10 +122,10 @@ describe('tokens store', () => {
         json: async () => ({ tokens: [mockToken1] }),
       } as Response);
 
-      await tokensStore.loadTokens('game-1');
+      await tokensStore.loadTokens('campaign-1');
 
       expect(global.fetch).toHaveBeenCalledWith(
-        'http://localhost:3000/api/v1/games/game-1/tokens',
+        'http://localhost:3000/api/v1/campaigns/campaign-1/tokens',
         expect.objectContaining({
           headers: {
             Authorization: 'Bearer session-storage-token',
@@ -140,7 +140,7 @@ describe('tokens store', () => {
         json: async () => ({ tokens: [] }),
       } as Response);
 
-      await tokensStore.loadTokens('game-1');
+      await tokensStore.loadTokens('campaign-1');
 
       const state = get(tokensStore);
       expect(state.tokens.size).toBe(0);

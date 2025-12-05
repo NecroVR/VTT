@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest';
 import { buildApp } from '../app.js';
 import type { FastifyInstance } from 'fastify';
-import { users, sessions, games } from '@vtt/database';
+import { users, sessions, campaigns } from '@vtt/database';
 import { eq } from 'drizzle-orm';
 import { validateSession, extractSessionToken } from './auth.js';
 
@@ -33,7 +33,7 @@ describe('WebSocket Auth Module', () => {
   beforeEach(async () => {
     // Clean up test data in correct order (delete children first)
     await app.db.delete(sessions);
-    await app.db.delete(games);
+    await app.db.delete(campaigns);
     await app.db.delete(users);
   });
 

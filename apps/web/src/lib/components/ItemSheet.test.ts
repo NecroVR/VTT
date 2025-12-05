@@ -8,7 +8,7 @@ global.fetch = vi.fn();
 
 const mockItem: Item = {
   id: 'item-123',
-  gameId: 'game-123',
+  campaignId: 'campaign-123',
   actorId: 'actor-123',
   name: 'Longsword',
   itemType: 'weapon',
@@ -42,7 +42,7 @@ describe('ItemSheet component', () => {
           isOpen: true,
           item: null,
           actorId: 'actor-123',
-          gameId: 'game-123'
+          campaignId: 'campaign-123'
         }
       });
 
@@ -55,7 +55,7 @@ describe('ItemSheet component', () => {
           isOpen: false,
           item: null,
           actorId: 'actor-123',
-          gameId: 'game-123'
+          campaignId: 'campaign-123'
         }
       });
 
@@ -68,7 +68,7 @@ describe('ItemSheet component', () => {
           isOpen: true,
           item: mockItem,
           actorId: 'actor-123',
-          gameId: 'game-123'
+          campaignId: 'campaign-123'
         }
       });
 
@@ -81,7 +81,7 @@ describe('ItemSheet component', () => {
           isOpen: true,
           item: null,
           actorId: 'actor-123',
-          gameId: 'game-123'
+          campaignId: 'campaign-123'
         }
       });
 
@@ -100,7 +100,7 @@ describe('ItemSheet component', () => {
           isOpen: true,
           item: null,
           actorId: 'actor-123',
-          gameId: 'game-123'
+          campaignId: 'campaign-123'
         }
       });
 
@@ -121,7 +121,7 @@ describe('ItemSheet component', () => {
           isOpen: true,
           item: mockItem,
           actorId: 'actor-123',
-          gameId: 'game-123'
+          campaignId: 'campaign-123'
         }
       });
 
@@ -141,7 +141,7 @@ describe('ItemSheet component', () => {
           isOpen: true,
           item: null,
           actorId: 'actor-123',
-          gameId: 'game-123'
+          campaignId: 'campaign-123'
         }
       });
 
@@ -155,7 +155,7 @@ describe('ItemSheet component', () => {
           isOpen: true,
           item: mockItem,
           actorId: 'actor-123',
-          gameId: 'game-123'
+          campaignId: 'campaign-123'
         }
       });
 
@@ -171,7 +171,7 @@ describe('ItemSheet component', () => {
           isOpen: true,
           item: mockItem,
           actorId: 'actor-123',
-          gameId: 'game-123'
+          campaignId: 'campaign-123'
         }
       });
 
@@ -188,7 +188,7 @@ describe('ItemSheet component', () => {
           isOpen: true,
           item: armorItem,
           actorId: 'actor-123',
-          gameId: 'game-123'
+          campaignId: 'campaign-123'
         }
       });
 
@@ -205,7 +205,7 @@ describe('ItemSheet component', () => {
           isOpen: true,
           item: consumableItem,
           actorId: 'actor-123',
-          gameId: 'game-123'
+          campaignId: 'campaign-123'
         }
       });
 
@@ -223,7 +223,7 @@ describe('ItemSheet component', () => {
           isOpen: true,
           item: spellItem,
           actorId: 'actor-123',
-          gameId: 'game-123'
+          campaignId: 'campaign-123'
         }
       });
 
@@ -241,7 +241,7 @@ describe('ItemSheet component', () => {
           isOpen: true,
           item: null,
           actorId: 'actor-123',
-          gameId: 'game-123'
+          campaignId: 'campaign-123'
         }
       });
 
@@ -273,7 +273,7 @@ describe('ItemSheet component', () => {
           isOpen: true,
           item: null,
           actorId: 'actor-123',
-          gameId: 'game-123'
+          campaignId: 'campaign-123'
         }
       });
 
@@ -316,7 +316,7 @@ describe('ItemSheet component', () => {
           isOpen: true,
           item: mockItem,
           actorId: 'actor-123',
-          gameId: 'game-123'
+          campaignId: 'campaign-123'
         }
       });
 
@@ -355,7 +355,7 @@ describe('ItemSheet component', () => {
           isOpen: true,
           item: mockItem,
           actorId: 'actor-123',
-          gameId: 'game-123'
+          campaignId: 'campaign-123'
         }
       });
 
@@ -382,7 +382,7 @@ describe('ItemSheet component', () => {
           isOpen: true,
           item: null,
           actorId: 'actor-123',
-          gameId: 'game-123'
+          campaignId: 'campaign-123'
         }
       });
 
@@ -392,7 +392,7 @@ describe('ItemSheet component', () => {
         isOpen: true,
         item: mockItem,
         actorId: 'actor-123',
-        gameId: 'game-123'
+        campaignId: 'campaign-123'
       });
 
       expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
@@ -411,7 +411,7 @@ describe('ItemSheet component', () => {
           isOpen: true,
           item: mockItem,
           actorId: 'actor-123',
-          gameId: 'game-123'
+          campaignId: 'campaign-123'
         }
       });
 
@@ -445,7 +445,7 @@ describe('ItemSheet component', () => {
           isOpen: true,
           item: mockItem,
           actorId: 'actor-123',
-          gameId: 'game-123'
+          campaignId: 'campaign-123'
         }
       });
 
@@ -475,7 +475,7 @@ describe('ItemSheet component', () => {
           isOpen: true,
           item: mockItem,
           actorId: 'actor-123',
-          gameId: 'game-123'
+          campaignId: 'campaign-123'
         }
       });
 
@@ -500,7 +500,7 @@ describe('ItemSheet component', () => {
           isOpen: true,
           item: mockItem,
           actorId: 'actor-123',
-          gameId: 'game-123'
+          campaignId: 'campaign-123'
         }
       });
 

@@ -36,7 +36,7 @@ const effectsRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Actor not found' });
         }
 
-        // TODO: Check if user has access to this actor's game
+        // TODO: Check if user has access to this actor's campaign
 
         // Fetch all effects for the actor
         const actorEffects = await fastify.db
@@ -106,7 +106,7 @@ const effectsRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Token not found' });
         }
 
-        // TODO: Check if user has access to this token's game
+        // TODO: Check if user has access to this token's campaign
 
         // Fetch all effects for the token
         const tokenEffects = await fastify.db
@@ -246,7 +246,7 @@ const effectsRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Effect not found' });
         }
 
-        // TODO: Check if user has access to this effect's game
+        // TODO: Check if user has access to this effect's campaign
 
         // Convert to ActiveEffect interface
         const formattedEffect: ActiveEffect = {
@@ -305,7 +305,7 @@ const effectsRoute: FastifyPluginAsync = async (fastify) => {
       }
 
       if (!effectData.campaignId || effectData.campaignId.trim() === '') {
-        return reply.status(400).send({ error: 'Game ID is required' });
+        return reply.status(400).send({ error: 'Campaign ID is required' });
       }
 
       try {
@@ -420,7 +420,7 @@ const effectsRoute: FastifyPluginAsync = async (fastify) => {
       }
 
       if (!effectData.campaignId || effectData.campaignId.trim() === '') {
-        return reply.status(400).send({ error: 'Game ID is required' });
+        return reply.status(400).send({ error: 'Campaign ID is required' });
       }
 
       try {

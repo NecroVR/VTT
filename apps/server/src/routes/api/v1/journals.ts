@@ -51,7 +51,7 @@ const journalsRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Campaign not found' });
         }
 
-        // TODO: Check if user has access to this game
+        // TODO: Check if user has access to this campaign
 
         // Fetch folders for the campaign
         let gameFolders;
@@ -124,7 +124,7 @@ const journalsRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Campaign not found' });
         }
 
-        // TODO: Check if user has permission to create folders in this game
+        // TODO: Check if user has permission to create folders in this campaign
 
         // Create folder in database
         const newFolders = await fastify.db
@@ -326,7 +326,7 @@ const journalsRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Campaign not found' });
         }
 
-        // TODO: Check if user has access to this game
+        // TODO: Check if user has access to this campaign
 
         // Fetch journals for the campaign
         let gameJournals;
@@ -391,7 +391,7 @@ const journalsRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Journal not found' });
         }
 
-        // TODO: Check if user has access to this journal's game
+        // TODO: Check if user has access to this journal's campaign
 
         // Fetch all pages for this journal
         const pages = await fastify.db
@@ -470,7 +470,7 @@ const journalsRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Campaign not found' });
         }
 
-        // TODO: Check if user has permission to create journals in this game
+        // TODO: Check if user has permission to create journals in this campaign
 
         // Create journal in database
         const newJournals = await fastify.db

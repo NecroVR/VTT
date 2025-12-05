@@ -6,7 +6,7 @@
 
   // Props
   export let isOpen: boolean;
-  export let gameId: string;
+  export let campaignId: string;
   export let onClose: () => void;
   export let onActorCreated: (actor: Actor) => void;
 
@@ -59,7 +59,7 @@
       }
 
       const payload: any = {
-        gameId,
+        campaignId,
         name: formData.name.trim(),
         actorType: formData.actorType,
       };
@@ -69,7 +69,7 @@
         payload.img = formData.img.trim();
       }
 
-      const response = await fetch(`${API_BASE_URL}/api/v1/games/${gameId}/actors`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/campaigns/${campaignId}/actors`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

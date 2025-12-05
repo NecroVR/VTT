@@ -8,7 +8,7 @@
   // Props
   export let isOpen: boolean;
   export let journalId: string | null;
-  export let gameId: string;
+  export let campaignId: string;
   export let isGM: boolean = false;
 
   const dispatch = createEventDispatcher<{

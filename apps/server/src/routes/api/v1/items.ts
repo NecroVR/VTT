@@ -36,7 +36,7 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Actor not found' });
         }
 
-        // TODO: Check if user has access to this actor's game
+        // TODO: Check if user has access to this actor's campaign
 
         // Fetch all items for the actor
         const actorItems = await fastify.db
@@ -97,7 +97,7 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Item not found' });
         }
 
-        // TODO: Check if user has access to this item's game
+        // TODO: Check if user has access to this item's campaign
 
         // Convert to Item interface
         const formattedItem: Item = {
@@ -151,7 +151,7 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
       }
 
       if (!itemData.campaignId || itemData.campaignId.trim() === '') {
-        return reply.status(400).send({ error: 'Game ID is required' });
+        return reply.status(400).send({ error: 'Campaign ID is required' });
       }
 
       try {

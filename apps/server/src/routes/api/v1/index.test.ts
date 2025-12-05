@@ -46,7 +46,7 @@ describe('API v1 Index Route', () => {
       expect(body.endpoints.websocket).toBe('/ws');
       expect(body.endpoints.users).toBe('/api/v1/users');
       expect(body.endpoints.auth).toBe('/api/v1/auth');
-      expect(body.endpoints.games).toBe('/api/v1/games');
+      expect(body.endpoints.campaigns).toBe('/api/v1/campaigns');
       expect(body.endpoints.scenes).toBe('/api/v1/scenes');
     });
 
@@ -66,7 +66,7 @@ describe('API v1 Index Route', () => {
       expect(body.endpoints).toHaveProperty('websocket');
       expect(body.endpoints).toHaveProperty('users');
       expect(body.endpoints).toHaveProperty('auth');
-      expect(body.endpoints).toHaveProperty('games');
+      expect(body.endpoints).toHaveProperty('campaigns');
       expect(body.endpoints).toHaveProperty('scenes');
     });
   });

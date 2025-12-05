@@ -5,7 +5,7 @@
   import AssetUploader from './AssetUploader.svelte';
 
   // Props
-  export let gameId: string | undefined = undefined;
+  export let campaignId: string | undefined = undefined;
   export let selectionMode: boolean = false;
   export let allowedTypes: AssetType[] | undefined = undefined;
 
@@ -51,7 +51,7 @@
   ];
 
   onMount(async () => {
-    await assetsStore.loadAssets({ gameId });
+    await assetsStore.loadAssets({ campaignId });
   });
 
   function handleUpload(event: CustomEvent<Asset>) {
@@ -119,7 +119,7 @@
     <div class="uploader-container">
       <AssetUploader
         assetType={filterType === 'all' ? 'other' : filterType}
-        {gameId}
+        {campaignId}
         on:upload={handleUpload}
         on:error={handleUploadError}
       />

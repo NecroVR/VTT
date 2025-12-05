@@ -9,7 +9,7 @@ global.fetch = vi.fn();
 describe('ActorSheet', () => {
   const mockActor: Actor = {
     id: 'actor-1',
-    gameId: 'game-1',
+    campaignId: 'campaign-1',
     name: 'Test Character',
     actorType: 'pc',
     img: null,
@@ -53,7 +53,7 @@ describe('ActorSheet', () => {
     render(ActorSheet, {
       props: {
         actorId: 'actor-1',
-        gameId: 'game-1',
+        campaignId: 'campaign-1',
         isGM: false,
       },
     });
@@ -74,7 +74,7 @@ describe('ActorSheet', () => {
     render(ActorSheet, {
       props: {
         actorId: 'actor-1',
-        gameId: 'game-1',
+        campaignId: 'campaign-1',
         isGM: false,
       },
     });
@@ -102,7 +102,7 @@ describe('ActorSheet', () => {
     render(ActorSheet, {
       props: {
         actorId: 'actor-1',
-        gameId: 'game-1',
+        campaignId: 'campaign-1',
         isGM: false,
       },
     });
@@ -132,7 +132,7 @@ describe('ActorSheet', () => {
     render(ActorSheet, {
       props: {
         actorId: 'actor-1',
-        gameId: 'game-1',
+        campaignId: 'campaign-1',
         isGM: false,
       },
     });
@@ -169,7 +169,7 @@ describe('ActorSheet', () => {
     render(ActorSheet, {
       props: {
         actorId: 'actor-1',
-        gameId: 'game-1',
+        campaignId: 'campaign-1',
         isGM: false,
       },
     });
@@ -198,7 +198,7 @@ describe('ActorSheet', () => {
     render(ActorSheet, {
       props: {
         actorId: 'actor-1',
-        gameId: 'game-1',
+        campaignId: 'campaign-1',
         isGM: false,
       },
     });
@@ -239,7 +239,7 @@ describe('ActorSheet', () => {
     render(ActorSheet, {
       props: {
         actorId: 'actor-1',
-        gameId: 'game-1',
+        campaignId: 'campaign-1',
         isGM: false,
         onClose,
       },
@@ -270,7 +270,7 @@ describe('ActorSheet', () => {
     render(ActorSheet, {
       props: {
         actorId: 'actor-1',
-        gameId: 'game-1',
+        campaignId: 'campaign-1',
         isGM: false,
         onClose,
       },
@@ -301,7 +301,7 @@ describe('ActorSheet', () => {
     render(ActorSheet, {
       props: {
         actorId: 'actor-1',
-        gameId: 'game-1',
+        campaignId: 'campaign-1',
         isGM: false,
       },
     });
@@ -328,7 +328,7 @@ describe('ActorSheet', () => {
     render(ActorSheet, {
       props: {
         actorId: 'actor-1',
-        gameId: 'game-1',
+        campaignId: 'campaign-1',
         isGM: true,
       },
     });
@@ -362,7 +362,7 @@ describe('ActorSheet', () => {
     render(ActorSheet, {
       props: {
         actorId: 'actor-1',
-        gameId: 'game-1',
+        campaignId: 'campaign-1',
         isGM: false,
       },
     });

@@ -112,7 +112,7 @@ const combatsRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Combat not found' });
         }
 
-        // TODO: Check if user has access to this combat's game
+        // TODO: Check if user has access to this combat's campaign
 
         // Fetch combatants for this combat
         const combatCombatants = await fastify.db

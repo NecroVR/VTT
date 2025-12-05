@@ -45,7 +45,7 @@ const compendiumsRoute: FastifyPluginAsync = async (fastify) => {
           .from(compendiums)
           .where(isNull(compendiums.campaignId));
 
-        // TODO: Get compendiums from user's games
+        // TODO: Get compendiums from user's campaigns
         // For now, just return system compendiums
 
         const formattedCompendiums: Compendium[] = systemCompendiums.map(formatCompendium);
@@ -84,7 +84,7 @@ const compendiumsRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Campaign not found' });
         }
 
-        // TODO: Check if user has access to this game
+        // TODO: Check if user has access to this campaign
 
         // Get system-wide and game-specific compendiums
         const gameCompendiums = await fastify.db
@@ -849,7 +849,7 @@ const compendiumsRoute: FastifyPluginAsync = async (fastify) => {
       const { campaignId, sceneId, actorId } = request.body;
 
       if (!campaignId) {
-        return reply.status(400).send({ error: 'Game ID is required' });
+        return reply.status(400).send({ error: 'Campaign ID is required' });
       }
 
       try {
@@ -875,7 +875,7 @@ const compendiumsRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Campaign not found' });
         }
 
-        // TODO: Check if user has access to this game
+        // TODO: Check if user has access to this campaign
 
         let entityId: string;
         const entityData = entry.entityData as Record<string, unknown>;

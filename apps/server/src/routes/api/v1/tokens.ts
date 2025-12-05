@@ -36,8 +36,8 @@ const tokensRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Scene not found' });
         }
 
-        // TODO: Check if user is a participant in the game (for now, any authenticated user can access)
-        // This could be enhanced with a game_participants table
+        // TODO: Check if user is a participant in the campaign (for now, any authenticated user can access)
+        // This could be enhanced with a campaign_participants table
 
         // Fetch all tokens for the scene
         const sceneTokens = await fastify.db
@@ -202,7 +202,7 @@ const tokensRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Scene not found' });
         }
 
-        // TODO: Check if user has access to this scene's game
+        // TODO: Check if user has access to this scene's campaign
 
         // Fetch actor's tokenSize if actorId is provided
         let tokenSize = 1;

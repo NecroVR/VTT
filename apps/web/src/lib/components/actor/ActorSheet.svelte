@@ -10,7 +10,7 @@
 
   // Props
   export let actorId: string;
-  export let gameId: string;
+  export let campaignId: string;
   export let isGM: boolean = false;
   export let onClose: (() => void) | null = null;
   export let token: string = '';
@@ -166,11 +166,11 @@
           {#if activeTab === 'stats'}
             <StatsTab {actor} onUpdate={updateActor} />
           {:else if activeTab === 'inventory'}
-            <InventoryTab {actorId} {gameId} />
+            <InventoryTab {actorId} {campaignId} />
           {:else if activeTab === 'notes'}
             <NotesTab {actor} {isGM} onUpdate={updateActor} />
           {:else if activeTab === 'effects'}
-            <EffectsList {actorId} {gameId} {isGM} {token} />
+            <EffectsList {actorId} {campaignId} {isGM} {token} />
           {/if}
         </div>
       </div>

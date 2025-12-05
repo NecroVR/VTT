@@ -4,7 +4,7 @@
   import { compendiumsStore } from '$lib/stores/compendiums';
 
   export let compendium: Compendium | null = null;
-  export let gameId: string;
+  export let campaignId: string;
 
   const dispatch = createEventDispatcher<{
     close: void;
@@ -79,7 +79,7 @@
       }
     } else {
       // Create new compendium
-      const newCompendium = await compendiumsStore.createCompendium(gameId, {
+      const newCompendium = await compendiumsStore.createCompendium(campaignId, {
         name: formData.name,
         label: formData.label,
         entityType: formData.entityType,
@@ -172,7 +172,7 @@
 
           <!-- System -->
           <section class="form-section">
-            <h3>Game System (Optional)</h3>
+            <h3>campaign System (Optional)</h3>
 
             <div class="form-row">
               <label for="compendium-system">
@@ -198,7 +198,7 @@
               <input type="checkbox" bind:checked={formData.private} />
               <div class="checkbox-content">
                 <div class="checkbox-label">Private</div>
-                <div class="checkbox-description">Only visible to game members</div>
+                <div class="checkbox-description">Only visible to campaign members</div>
               </div>
             </label>
           </div>

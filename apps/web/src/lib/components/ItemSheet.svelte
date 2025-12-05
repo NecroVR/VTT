@@ -6,7 +6,7 @@
   export let isOpen: boolean;
   export let item: Item | null = null;
   export let actorId: string;
-  export let gameId: string;
+  export let campaignId: string;
 
   const dispatch = createEventDispatcher<{
     close: void;
@@ -95,7 +95,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            gameId,
+            campaignId,
             actorId,
             name: formData.name.trim(),
             itemType: formData.itemType,

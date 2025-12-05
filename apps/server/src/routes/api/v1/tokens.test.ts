@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { buildApp } from '../../../app.js';
 import type { FastifyInstance } from 'fastify';
 import { createDb } from '@vtt/database';
-import { users, sessions, games, scenes, tokens } from '@vtt/database';
+import { users, sessions, campaigns, scenes, tokens } from '@vtt/database';
 import { eq } from 'drizzle-orm';
 
 describe('Tokens Routes', () => {
@@ -35,7 +35,7 @@ describe('Tokens Routes', () => {
     // Clean up test data before each test
     await db.delete(tokens);
     await db.delete(scenes);
-    await db.delete(games);
+    await db.delete(campaigns);
     await db.delete(sessions);
     await db.delete(users);
 
@@ -54,25 +54,25 @@ describe('Tokens Routes', () => {
     sessionId = registerBody.sessionId;
     userId = registerBody.user.id;
 
-    // Create a test game
-    const gameResponse = await app.inject({
+    // Create a test campaign
+    const campaignResponse = await app.inject({
       method: 'POST',
-      url: '/api/v1/games',
+      url: '/api/v1/campaigns',
       headers: {
         authorization: `Bearer ${sessionId}`,
       },
       payload: {
-        name: 'Test Game',
+        name: 'Test Campaign',
       },
     });
 
-    const gameBody = JSON.parse(gameResponse.body);
-    gameId = gameBody.game.id;
+    const campaignBody = JSON.parse(campaignResponse.body);
+    campaignId = campaignBody.campaign.id;
 
     // Create a test scene
     const sceneResponse = await app.inject({
       method: 'POST',
-      url: `/api/v1/games/${gameId}/scenes`,
+      url: `/api/v1/campaigns/${campaignId}/scenes`,
       headers: {
         authorization: `Bearer ${sessionId}`,
       },
@@ -378,7 +378,7 @@ describe('Tokens Routes', () => {
       // Create another scene
       const otherSceneResponse = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/scenes`,
+        url: `/api/v1/campaigns/${campaignId}/scenes`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },

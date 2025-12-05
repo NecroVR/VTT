@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { buildApp } from '../../../app.js';
 import type { FastifyInstance } from 'fastify';
 import { createDb } from '@vtt/database';
-import { users, sessions, games, chatMessages } from '@vtt/database';
+import { users, sessions, campaigns, chatMessages } from '@vtt/database';
 import { eq } from 'drizzle-orm';
 
 describe('Chat Routes', () => {
@@ -34,7 +34,7 @@ describe('Chat Routes', () => {
   beforeEach(async () => {
     // Clean up test data before each test
     await db.delete(chatMessages);
-    await db.delete(games);
+    await db.delete(campaigns);
     await db.delete(sessions);
     await db.delete(users);
 
@@ -53,24 +53,24 @@ describe('Chat Routes', () => {
     sessionId = registerBody.sessionId;
     userId = registerBody.user.id;
 
-    // Create a test game
-    const gameResponse = await app.inject({
+    // Create a test campaign
+    const campaignResponse = await app.inject({
       method: 'POST',
-      url: '/api/v1/games',
+      url: '/api/v1/campaigns',
       headers: {
         authorization: `Bearer ${sessionId}`,
       },
       payload: {
-        name: 'Test Game',
+        name: 'Test Campaign',
       },
     });
 
-    const gameBody = JSON.parse(gameResponse.body);
-    gameId = gameBody.game.id;
+    const campaignBody = JSON.parse(campaignResponse.body);
+    campaignId = campaignBody.campaign.id;
     gameOwnerId = userId;
   });
 
-  describe('GET /api/v1/games/:campaignId/chat', () => {
+  describe('GET /api/v1/campaigns/:campaignId/chat', () => {
     beforeEach(async () => {
       // Create test chat messages directly in database
       await db.insert(chatMessages).values([
@@ -110,10 +110,10 @@ describe('Chat Routes', () => {
       ]);
     });
 
-    it('should list all chat messages for a game', async () => {
+    it('should list all chat messages for a campaign', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/chat`,
+        url: `/api/v1/campaigns/${campaignId}/chat`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -122,7 +122,7 @@ describe('Chat Routes', () => {
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
       expect(body.chatMessages).toHaveLength(3);
-      expect(body.chatMessages[0].gameId).toBe(gameId);
+      expect(body.chatMessages[0].campaignId).toBe(campaignId);
       expect(body.pagination).toHaveProperty('limit');
       expect(body.pagination).toHaveProperty('offset');
       expect(body.pagination).toHaveProperty('total');
@@ -131,7 +131,7 @@ describe('Chat Routes', () => {
     it('should return chat message with all properties', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/chat`,
+        url: `/api/v1/campaigns/${campaignId}/chat`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -142,7 +142,7 @@ describe('Chat Routes', () => {
       const message = body.chatMessages[0];
 
       expect(message).toHaveProperty('id');
-      expect(message).toHaveProperty('gameId');
+      expect(message).toHaveProperty('campaignId');
       expect(message).toHaveProperty('userId');
       expect(message).toHaveProperty('content');
       expect(message).toHaveProperty('messageType');
@@ -157,7 +157,7 @@ describe('Chat Routes', () => {
     it('should return messages in descending order by timestamp', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/chat`,
+        url: `/api/v1/campaigns/${campaignId}/chat`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -180,7 +180,7 @@ describe('Chat Routes', () => {
     it('should respect pagination limit', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/chat?limit=1`,
+        url: `/api/v1/campaigns/${campaignId}/chat?limit=1`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -195,7 +195,7 @@ describe('Chat Routes', () => {
     it('should respect pagination offset', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/chat?offset=1`,
+        url: `/api/v1/campaigns/${campaignId}/chat?offset=1`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -210,7 +210,7 @@ describe('Chat Routes', () => {
     it('should filter messages by type', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/chat?type=roll`,
+        url: `/api/v1/campaigns/${campaignId}/chat?type=roll`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -226,7 +226,7 @@ describe('Chat Routes', () => {
     it('should enforce maximum limit of 100', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/chat?limit=200`,
+        url: `/api/v1/campaigns/${campaignId}/chat?limit=200`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -240,7 +240,7 @@ describe('Chat Routes', () => {
     it('should use default limit of 50 if not specified', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/chat`,
+        url: `/api/v1/campaigns/${campaignId}/chat`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -251,12 +251,12 @@ describe('Chat Routes', () => {
       expect(body.pagination.limit).toBe(50);
     });
 
-    it('should return empty array if game has no messages', async () => {
+    it('should return empty array if campaign has no messages', async () => {
       await db.delete(chatMessages);
 
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/chat`,
+        url: `/api/v1/campaigns/${campaignId}/chat`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -300,7 +300,7 @@ describe('Chat Routes', () => {
 
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/chat`,
+        url: `/api/v1/campaigns/${campaignId}/chat`,
         headers: {
           authorization: `Bearer ${otherUserSession}`,
         },
@@ -316,7 +316,7 @@ describe('Chat Routes', () => {
     it('should show blind messages to game owner', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/chat`,
+        url: `/api/v1/campaigns/${campaignId}/chat`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -328,10 +328,10 @@ describe('Chat Routes', () => {
       expect(blindMessages).toHaveLength(1);
     });
 
-    it('should return 404 if game does not exist', async () => {
+    it('should return 404 if campaign does not exist', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: '/api/v1/games/00000000-0000-0000-0000-000000000000/chat',
+        url: '/api/v1/campaigns/00000000-0000-0000-0000-000000000000/chat',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -345,7 +345,7 @@ describe('Chat Routes', () => {
     it('should return 401 without authorization header', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/chat`,
+        url: `/api/v1/campaigns/${campaignId}/chat`,
       });
 
       expect(response.statusCode).toBe(401);
@@ -354,7 +354,7 @@ describe('Chat Routes', () => {
     it('should return 401 with invalid session', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: `/api/v1/games/${gameId}/chat`,
+        url: `/api/v1/campaigns/${campaignId}/chat`,
         headers: {
           authorization: 'Bearer invalid-session-id',
         },
@@ -367,7 +367,7 @@ describe('Chat Routes', () => {
       // Use an invalid game ID format that might cause database errors
       const response = await app.inject({
         method: 'GET',
-        url: '/api/v1/games/invalid-uuid-format/chat',
+        url: '/api/v1/campaigns/invalid-uuid-format/chat',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -378,11 +378,11 @@ describe('Chat Routes', () => {
     });
   });
 
-  describe('POST /api/v1/games/:campaignId/chat', () => {
+  describe('POST /api/v1/campaigns/:campaignId/chat', () => {
     it('should create a new chat message', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/chat`,
+        url: `/api/v1/campaigns/${campaignId}/chat`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -396,7 +396,7 @@ describe('Chat Routes', () => {
 
       expect(response.statusCode).toBe(201);
       const body = JSON.parse(response.body);
-      expect(body.chatMessage.gameId).toBe(gameId);
+      expect(body.chatMessage.campaignId).toBe(campaignId);
       expect(body.chatMessage.userId).toBe(userId);
       expect(body.chatMessage.content).toBe('Hello world!');
       expect(body.chatMessage.messageType).toBe('chat');
@@ -407,7 +407,7 @@ describe('Chat Routes', () => {
     it('should create message with minimal fields', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/chat`,
+        url: `/api/v1/campaigns/${campaignId}/chat`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -430,7 +430,7 @@ describe('Chat Routes', () => {
     it('should create roll message with roll data', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/chat`,
+        url: `/api/v1/campaigns/${campaignId}/chat`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -450,7 +450,7 @@ describe('Chat Routes', () => {
     it('should create whisper message', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/chat`,
+        url: `/api/v1/campaigns/${campaignId}/chat`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -470,7 +470,7 @@ describe('Chat Routes', () => {
     it('should create blind roll message', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/chat`,
+        url: `/api/v1/campaigns/${campaignId}/chat`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -491,7 +491,7 @@ describe('Chat Routes', () => {
     it('should trim whitespace from content', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/chat`,
+        url: `/api/v1/campaigns/${campaignId}/chat`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -508,7 +508,7 @@ describe('Chat Routes', () => {
     it('should return 400 if content is missing', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/chat`,
+        url: `/api/v1/campaigns/${campaignId}/chat`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -525,7 +525,7 @@ describe('Chat Routes', () => {
     it('should return 400 if content is empty', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/chat`,
+        url: `/api/v1/campaigns/${campaignId}/chat`,
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -539,10 +539,10 @@ describe('Chat Routes', () => {
       expect(body.error).toBe('Message content is required');
     });
 
-    it('should return 404 if game does not exist', async () => {
+    it('should return 404 if campaign does not exist', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: '/api/v1/games/00000000-0000-0000-0000-000000000000/chat',
+        url: '/api/v1/campaigns/00000000-0000-0000-0000-000000000000/chat',
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
@@ -559,7 +559,7 @@ describe('Chat Routes', () => {
     it('should return 401 without authorization header', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/chat`,
+        url: `/api/v1/campaigns/${campaignId}/chat`,
         payload: {
           content: 'Test message',
         },
@@ -571,7 +571,7 @@ describe('Chat Routes', () => {
     it('should return 401 with invalid session', async () => {
       const response = await app.inject({
         method: 'POST',
-        url: `/api/v1/games/${gameId}/chat`,
+        url: `/api/v1/campaigns/${campaignId}/chat`,
         headers: {
           authorization: 'Bearer invalid-session-id',
         },

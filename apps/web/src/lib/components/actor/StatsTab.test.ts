@@ -6,7 +6,7 @@ import type { Actor } from '@vtt/shared';
 describe('StatsTab', () => {
   const mockActor: Actor = {
     id: 'actor-1',
-    gameId: 'game-1',
+    campaignId: 'campaign-1',
     name: 'Test Character',
     actorType: 'pc',
     img: null,

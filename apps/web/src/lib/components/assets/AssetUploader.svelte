@@ -5,7 +5,7 @@
 
   // Props
   export let assetType: AssetType = 'other';
-  export let gameId: string | undefined = undefined;
+  export let campaignId: string | undefined = undefined;
   export let maxSizeMB: number = 10;
 
   const dispatch = createEventDispatcher<{
@@ -91,7 +91,7 @@
 
       const asset = await assetsStore.uploadAsset(file, {
         assetType,
-        gameId,
+        campaignId,
         name: file.name,
       });
 

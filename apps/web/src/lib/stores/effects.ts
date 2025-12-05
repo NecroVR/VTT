@@ -100,13 +100,13 @@ function createEffectsStore() {
     },
 
     /**
-     * Load effects for a game
+     * Load effects for a campaign
      */
-    async loadForGame(gameId: string, token: string): Promise<void> {
+    async loadForCampaign(campaignId: string, token: string): Promise<void> {
       update(state => ({ ...state, loading: true, error: null }));
 
       try {
-        const response = await fetch(`/api/v1/games/${gameId}/effects`, {
+        const response = await fetch(`/api/v1/campaigns/${campaignId}/effects`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -213,7 +213,7 @@ function createEffectsStore() {
     },
 
     /**
-     * Clear all effects (useful when switching actors or leaving a game)
+     * Clear all effects (useful when switching actors or leaving a campaign)
      */
     clear(): void {
       set({

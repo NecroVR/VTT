@@ -22,9 +22,9 @@ function createScenesStore() {
     subscribe,
 
     /**
-     * Load scenes for a game from the API
+     * Load scenes for a campaign from the API
      */
-    async loadScenes(gameId: string): Promise<void> {
+    async loadScenes(campaignId: string): Promise<void> {
       if (!browser) return;
 
       update(state => ({ ...state, loading: true, error: null }));
@@ -36,7 +36,7 @@ function createScenesStore() {
           throw new Error('No authentication token found');
         }
 
-        const response = await fetch(`${API_BASE_URL}/api/v1/games/${gameId}/scenes`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/campaigns/${campaignId}/scenes`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -154,7 +154,7 @@ function createScenesStore() {
      * Create a new scene via API
      */
     async createScene(
-      gameId: string,
+      campaignId: string,
       name: string,
       options?: {
         gridSize?: number;
@@ -171,7 +171,7 @@ function createScenesStore() {
           throw new Error('No authentication token found');
         }
 
-        const response = await fetch(`${API_BASE_URL}/api/v1/games/${gameId}/scenes`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/campaigns/${campaignId}/scenes`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -179,7 +179,7 @@ function createScenesStore() {
           },
           body: JSON.stringify({
             name,
-            gameId,
+            campaignId,
             gridSize: options?.gridSize,
             gridColor: options?.gridColor,
             // Note: backgroundColor would be backgroundImage or other scene properties
@@ -272,7 +272,7 @@ function createScenesStore() {
     },
 
     /**
-     * Clear all scenes (useful when leaving a game)
+     * Clear all scenes (useful when leaving a campaign)
      */
     clear(): void {
       set({

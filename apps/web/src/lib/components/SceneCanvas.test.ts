@@ -64,7 +64,7 @@ describe('SceneCanvas component', () => {
     mockScene = {
       id: 'scene1',
       name: 'Test Scene',
-      gameId: 'game1',
+      campaignId: 'game1',
       gridSize: 50,
       gridType: 'square',
       gridColor: '#333333',

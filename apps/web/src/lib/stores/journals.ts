@@ -28,9 +28,9 @@ function createJournalsStore() {
     subscribe,
 
     /**
-     * Load journals for a game from the API
+     * Load journals for a campaign from the API
      */
-    async loadJournals(gameId: string): Promise<void> {
+    async loadJournals(campaignId: string): Promise<void> {
       if (!browser) return;
 
       update(state => ({ ...state, loading: true, error: null }));
@@ -42,7 +42,7 @@ function createJournalsStore() {
           throw new Error('No authentication token found');
         }
 
-        const response = await fetch(`${API_BASE_URL}/api/v1/games/${gameId}/journals`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/campaigns/${campaignId}/journals`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -78,9 +78,9 @@ function createJournalsStore() {
     },
 
     /**
-     * Load folders for a game
+     * Load folders for a campaign
      */
-    async loadFolders(gameId: string, folderType: string = 'journal'): Promise<void> {
+    async loadFolders(campaignId: string, folderType: string = 'journal'): Promise<void> {
       if (!browser) return;
 
       try {
@@ -90,7 +90,7 @@ function createJournalsStore() {
           throw new Error('No authentication token found');
         }
 
-        const response = await fetch(`${API_BASE_URL}/api/v1/games/${gameId}/folders?type=${folderType}`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/campaigns/${campaignId}/folders?type=${folderType}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -362,7 +362,7 @@ function createJournalsStore() {
     },
 
     /**
-     * Clear all data (useful when leaving a game)
+     * Clear all data (useful when leaving a campaign)
      */
     clear(): void {
       set({

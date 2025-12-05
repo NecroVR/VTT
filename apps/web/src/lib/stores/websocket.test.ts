@@ -12,7 +12,7 @@ import type {
   WallAddPayload,
   WallUpdatePayload,
   WallRemovePayload,
-  GameJoinPayload,
+  CampaignJoinPayload,
   ChatMessagePayload,
 } from '@vtt/shared';
 
@@ -397,7 +397,7 @@ describe('websocket store', () => {
       const payload: TokenAddPayload = {
         token: {
           id: 'token-1',
-          gameId: 'game-1',
+          campaignId: 'campaign-1',
           sceneId: 'scene-1',
           name: 'Hero',
           x: 100,
@@ -563,21 +563,21 @@ describe('websocket store', () => {
     });
   });
 
-  describe('game room methods', () => {
-    it('should join game and update state', () => {
+  describe('campaign room methods', () => {
+    it('should join campaign and update state', () => {
       connectAndOpen();
 
-      websocket.joinGame('game-1', 'token-123');
+      websocket.joinCampaign('campaign-1', 'token-123');
 
       const state = get(websocket.state);
-      expect(state.currentRoom).toBe('game-1');
+      expect(state.currentRoom).toBe('campaign-1');
     });
 
-    it('should leave game and clear state', () => {
+    it('should leave campaign and clear state', () => {
       connectAndOpen();
 
-      websocket.joinGame('game-1', 'token-123');
-      websocket.leaveGame('game-1');
+      websocket.joinCampaign('campaign-1', 'token-123');
+      websocket.leaveCampaign('campaign-1');
 
       const state = get(websocket.state);
       expect(state.currentRoom).toBeNull();
@@ -590,9 +590,9 @@ describe('websocket store', () => {
       expect(() => websocket.sendChatMessage('Hello world!')).not.toThrow();
     });
 
-    it('should handle game players message', () => {
+    it('should handle campaign players message', () => {
       const handler = vi.fn();
-      websocket.onGamePlayers(handler);
+      websocket.onCampaignPlayers(handler);
 
       websocket.connect('ws://localhost:3000/ws');
 
@@ -602,7 +602,7 @@ describe('websocket store', () => {
 
       if (onMessageCallback) {
         const message = {
-          type: 'game:players',
+          type: 'campaign:players',
           payload: {
             players: [
               { userId: 'user-1', username: 'Player1', role: 'gm' },
@@ -634,7 +634,7 @@ describe('websocket store', () => {
 
       if (onMessageCallback) {
         const message = {
-          type: 'game:player-joined',
+          type: 'campaign:player-joined',
           payload: {
             player: { userId: 'user-3', username: 'Player3', role: 'player' },
           },
@@ -660,7 +660,7 @@ describe('websocket store', () => {
       // First add a player
       if (onMessageCallback) {
         const message = {
-          type: 'game:players',
+          type: 'campaign:players',
           payload: {
             players: [{ userId: 'user-1', username: 'Player1', role: 'player' }],
           },
@@ -672,7 +672,7 @@ describe('websocket store', () => {
       // Then remove the player
       if (onMessageCallback) {
         const message = {
-          type: 'game:player-left',
+          type: 'campaign:player-left',
           payload: { userId: 'user-1' },
           timestamp: Date.now(),
         };

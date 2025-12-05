@@ -26,7 +26,7 @@ vi.mock('$lib/stores/websocket', () => ({
 
 const mockEffect: ActiveEffect = {
   id: 'effect-1',
-  gameId: 'game-1',
+  campaignId: 'campaign-1',
   actorId: 'actor-1',
   tokenId: null,
   name: 'Bless',
@@ -67,7 +67,7 @@ describe('EffectsList', () => {
     const { container } = render(EffectsList, {
       props: {
         actorId: 'actor-1',
-        gameId: 'game-1',
+        campaignId: 'campaign-1',
         isGM: false,
         token: 'test-token',
       },
@@ -80,7 +80,7 @@ describe('EffectsList', () => {
     const { container } = render(EffectsList, {
       props: {
         actorId: 'actor-1',
-        gameId: 'game-1',
+        campaignId: 'campaign-1',
         isGM: true,
         token: 'test-token',
       },
@@ -93,7 +93,7 @@ describe('EffectsList', () => {
     const { container } = render(EffectsList, {
       props: {
         actorId: 'actor-1',
-        gameId: 'game-1',
+        campaignId: 'campaign-1',
         isGM: false,
         token: 'test-token',
       },

@@ -213,7 +213,7 @@ const chatRoute: FastifyPluginAsync = async (fastify) => {
           data: newMessage.data as Record<string, unknown>,
         };
 
-        // TODO: Broadcast message via WebSocket to game room
+        // TODO: Broadcast message via WebSocket to campaign room
 
         return reply.status(201).send({ chatMessage: formattedMessage });
       } catch (error) {
@@ -268,7 +268,7 @@ const chatRoute: FastifyPluginAsync = async (fastify) => {
           .delete(chatMessages)
           .where(eq(chatMessages.id, messageId));
 
-        // TODO: Broadcast deletion via WebSocket to game room
+        // TODO: Broadcast deletion via WebSocket to campaign room
 
         return reply.status(204).send();
       } catch (error) {

@@ -7,7 +7,7 @@
 
   // Props
   export let token: Token;
-  export let gameId: string;
+  export let campaignId: string;
   export let isGM: boolean = false;
 
   const dispatch = createEventDispatcher<{
@@ -45,7 +45,7 @@
 
   // Load actors on mount
   onMount(async () => {
-    await actorsStore.loadActors(gameId);
+    await actorsStore.loadActors(campaignId);
   });
 
   function handleSave() {
@@ -410,7 +410,7 @@
 <!-- Asset Picker Modal -->
 <AssetPicker
   bind:isOpen={showAssetPicker}
-  {gameId}
+  {campaignId}
   allowedTypes={['token', 'portrait']}
   title="Select Token Image"
   on:select={handleAssetSelect}

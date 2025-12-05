@@ -11,7 +11,7 @@ interface AssetsState {
 
 interface UploadOptions {
   assetType?: AssetType;
-  gameId?: string;
+  campaignId?: string;
   name?: string;
   description?: string;
   tags?: string[];
@@ -20,7 +20,7 @@ interface UploadOptions {
 
 interface LoadAssetsFilters {
   assetType?: AssetType;
-  gameId?: string;
+  campaignId?: string;
   search?: string;
 }
 
@@ -63,8 +63,8 @@ function createAssetsStore() {
         if (filters?.assetType) {
           params.append('assetType', filters.assetType);
         }
-        if (filters?.gameId) {
-          params.append('gameId', filters.gameId);
+        if (filters?.campaignId) {
+          params.append('campaignId', filters.campaignId);
         }
         if (filters?.search) {
           params.append('search', filters.search);
@@ -123,8 +123,8 @@ function createAssetsStore() {
         if (options?.assetType) {
           formData.append('assetType', options.assetType);
         }
-        if (options?.gameId) {
-          formData.append('gameId', options.gameId);
+        if (options?.campaignId) {
+          formData.append('campaignId', options.campaignId);
         }
         if (options?.name) {
           formData.append('name', options.name);
