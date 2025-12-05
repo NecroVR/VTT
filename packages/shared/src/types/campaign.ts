@@ -1,13 +1,13 @@
-export interface Game {
+export interface Campaign {
   id: string;
   name: string;
   ownerId: string;
   gmUserIds: string[];
   createdAt: Date;
-  settings: GameSettings;
+  settings: CampaignSettings;
 }
 
-export interface GameSettings {
+export interface CampaignSettings {
   gridType: 'square' | 'hex' | 'none';
   gridSize: number;
   snapToGrid: boolean;
@@ -104,30 +104,30 @@ export interface TokensListResponse {
 
 export interface MapLayer {
   id: string;
-  gameId: string;
+  campaignId: string;
   name: string;
   type: 'background' | 'tokens' | 'gm' | 'effects';
   visible: boolean;
   order: number;
 }
 
-// Game CRUD API Types
-export interface CreateGameRequest {
+// Campaign CRUD API Types
+export interface CreateCampaignRequest {
   name: string;
-  settings?: Partial<GameSettings>;
+  settings?: Partial<CampaignSettings>;
 }
 
-export interface UpdateGameRequest {
+export interface UpdateCampaignRequest {
   name?: string;
-  settings?: Partial<GameSettings>;
+  settings?: Partial<CampaignSettings>;
 }
 
-export interface GameResponse {
-  game: Game;
+export interface CampaignResponse {
+  campaign: Campaign;
 }
 
-export interface GamesListResponse {
-  games: Game[];
+export interface CampaignsListResponse {
+  campaigns: Campaign[];
 }
 
 // GM Management API Types

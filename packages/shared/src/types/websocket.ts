@@ -1,4 +1,4 @@
-import type { Token } from './game.js';
+import type { Token } from './campaign.js';
 import type { Scene } from './scene.js';
 import type { Wall } from './wall.js';
 import type { AmbientLight } from './ambientLight.js';
@@ -11,7 +11,7 @@ import type { ScenePin } from './scenePin.js';
 
 export type WSMessageType =
   | 'ping' | 'pong'
-  | 'game:join' | 'game:leave' | 'game:state' | 'game:players' | 'game:player-joined' | 'game:player-left'
+  | 'campaign:join' | 'campaign:leave' | 'campaign:state' | 'campaign:players' | 'campaign:player-joined' | 'campaign:player-left'
   | 'token:move' | 'token:add' | 'token:added' | 'token:update' | 'token:updated' | 'token:remove' | 'token:removed'
   | 'scene:switch' | 'scene:switched' | 'scene:update' | 'scene:updated'
   | 'wall:add' | 'wall:added' | 'wall:update' | 'wall:updated' | 'wall:remove' | 'wall:removed'
@@ -48,30 +48,30 @@ export interface PlayerInfo {
   username: string;
 }
 
-// Game room payloads
-export interface GameJoinPayload {
-  gameId: string;
+// Campaign room payloads
+export interface CampaignJoinPayload {
+  campaignId: string;
   token: string;
 }
 
-export interface GameLeavePayload {
-  gameId: string;
+export interface CampaignLeavePayload {
+  campaignId: string;
 }
 
-export interface GamePlayersPayload {
+export interface CampaignPlayersPayload {
   players: PlayerInfo[];
 }
 
-export interface GamePlayerJoinedPayload {
+export interface CampaignPlayerJoinedPayload {
   player: PlayerInfo;
 }
 
-export interface GamePlayerLeftPayload {
+export interface CampaignPlayerLeftPayload {
   userId: string;
 }
 
 // Token payloads
-// Note: Token interface is defined in ./game.ts
+// Note: Token interface is defined in ./campaign.ts
 export interface TokenMovePayload {
   tokenId: string;
   x: number;
@@ -268,7 +268,7 @@ export interface ErrorPayload {
 
 // Actor payloads
 export interface ActorCreatePayload {
-  gameId: string;
+  campaignId: string;
   name: string;
   actorType: string;
   img?: string | null;
@@ -283,7 +283,7 @@ export interface ActorCreatePayload {
 export interface ActorCreatedPayload {
   actor: {
     id: string;
-    gameId: string;
+    campaignId: string;
     name: string;
     actorType: string;
     img?: string | null;
@@ -316,7 +316,7 @@ export interface ActorUpdatePayload {
 export interface ActorUpdatedPayload {
   actor: {
     id: string;
-    gameId: string;
+    campaignId: string;
     name: string;
     actorType: string;
     img?: string | null;
@@ -341,7 +341,7 @@ export interface ActorDeletedPayload {
 
 // Combat payloads
 export interface CombatStartPayload {
-  gameId: string;
+  campaignId: string;
   sceneId?: string | null;
   combatants?: Array<{
     actorId?: string | null;
@@ -358,7 +358,7 @@ export interface CombatStartedPayload {
   combat: {
     id: string;
     sceneId?: string | null;
-    gameId: string;
+    campaignId: string;
     active: boolean;
     round: number;
     turn: number;
@@ -405,7 +405,7 @@ export interface CombatUpdatedPayload {
   combat: {
     id: string;
     sceneId?: string | null;
-    gameId: string;
+    campaignId: string;
     active: boolean;
     round: number;
     turn: number;
@@ -486,7 +486,7 @@ export interface CombatTurnChangedPayload {
   combat: {
     id: string;
     sceneId?: string | null;
-    gameId: string;
+    campaignId: string;
     active: boolean;
     round: number;
     turn: number;
@@ -523,7 +523,7 @@ export interface ChatWhisperMessage {
 
 // Active Effect payloads
 export interface EffectAddPayload {
-  gameId: string;
+  campaignId: string;
   actorId?: string | null;
   tokenId?: string | null;
   name: string;
@@ -589,7 +589,7 @@ export interface EffectsExpiredPayload {
 
 // Journal payloads
 export interface JournalCreatePayload {
-  gameId: string;
+  campaignId: string;
   name: string;
   img?: string | null;
   folderId?: string | null;
@@ -602,7 +602,7 @@ export interface JournalCreatePayload {
 export interface JournalCreatedPayload {
   journal: {
     id: string;
-    gameId: string;
+    campaignId: string;
     name: string;
     img?: string | null;
     folderId?: string | null;
@@ -631,7 +631,7 @@ export interface JournalUpdatePayload {
 export interface JournalUpdatedPayload {
   journal: {
     id: string;
-    gameId: string;
+    campaignId: string;
     name: string;
     img?: string | null;
     folderId?: string | null;
@@ -660,7 +660,7 @@ export interface JournalShowPayload {
 export interface JournalShownPayload {
   journal: {
     id: string;
-    gameId: string;
+    campaignId: string;
     name: string;
     img?: string | null;
     folderId?: string | null;
@@ -755,7 +755,7 @@ export interface PageDeletedPayload {
 
 // Folder payloads
 export interface FolderCreatePayload {
-  gameId: string;
+  campaignId: string;
   name: string;
   folderType: string;
   parentId?: string | null;
@@ -767,7 +767,7 @@ export interface FolderCreatePayload {
 export interface FolderCreatedPayload {
   folder: {
     id: string;
-    gameId: string;
+    campaignId: string;
     name: string;
     folderType: string;
     parentId?: string | null;
@@ -792,7 +792,7 @@ export interface FolderUpdatePayload {
 export interface FolderUpdatedPayload {
   folder: {
     id: string;
-    gameId: string;
+    campaignId: string;
     name: string;
     folderType: string;
     parentId?: string | null;

@@ -25,17 +25,17 @@ describe('Index Exports', () => {
       expect(session).toBeDefined();
     });
 
-    it('should export Game type', () => {
-      type TestGame = shared.Game;
-      const game: TestGame = {
-        id: 'game1',
-        name: 'Test Game',
+    it('should export Campaign type', () => {
+      type TestCampaign = shared.Campaign;
+      const campaign: TestCampaign = {
+        id: 'campaign1',
+        name: 'Test Campaign',
         ownerId: 'user1',
         gmUserIds: [],
         createdAt: new Date(),
         settings: { gridType: 'square', gridSize: 50, snapToGrid: true },
       };
-      expect(game).toBeDefined();
+      expect(campaign).toBeDefined();
     });
 
     it('should export Scene type', () => {

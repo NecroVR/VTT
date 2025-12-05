@@ -3,11 +3,11 @@ import type {
   WSMessageType,
   WSMessage,
   PlayerInfo,
-  GameJoinPayload,
-  GameLeavePayload,
-  GamePlayersPayload,
-  GamePlayerJoinedPayload,
-  GamePlayerLeftPayload,
+  CampaignJoinPayload,
+  CampaignLeavePayload,
+  CampaignPlayersPayload,
+  CampaignPlayerJoinedPayload,
+  CampaignPlayerLeftPayload,
   TokenMovePayload,
   TokenAddPayload,
   TokenAddedPayload,
@@ -56,18 +56,18 @@ describe('WebSocket Types', () => {
     });
 
     it('should handle typed payload', () => {
-      const payload: GameJoinPayload = {
-        gameId: 'game123',
+      const payload: CampaignJoinPayload = {
+        campaignId: 'campaign123',
         token: 'token123',
       };
 
-      const message: WSMessage<GameJoinPayload> = {
-        type: 'game:join',
+      const message: WSMessage<CampaignJoinPayload> = {
+        type: 'campaign:join',
         payload,
         timestamp: Date.now(),
       };
 
-      expect(message.payload.gameId).toBe('game123');
+      expect(message.payload.campaignId).toBe('campaign123');
       expect(message.payload.token).toBe('token123');
     });
 
@@ -94,27 +94,27 @@ describe('WebSocket Types', () => {
     });
   });
 
-  describe('Game Room Payloads', () => {
-    it('should validate GameJoinPayload', () => {
-      const payload: GameJoinPayload = {
-        gameId: 'game123',
+  describe('Campaign Room Payloads', () => {
+    it('should validate CampaignJoinPayload', () => {
+      const payload: CampaignJoinPayload = {
+        campaignId: 'campaign123',
         token: 'auth-token-xyz',
       };
 
-      expect(payload.gameId).toBe('game123');
+      expect(payload.campaignId).toBe('campaign123');
       expect(payload.token).toBe('auth-token-xyz');
     });
 
-    it('should validate GameLeavePayload', () => {
-      const payload: GameLeavePayload = {
-        gameId: 'game123',
+    it('should validate CampaignLeavePayload', () => {
+      const payload: CampaignLeavePayload = {
+        campaignId: 'campaign123',
       };
 
-      expect(payload.gameId).toBe('game123');
+      expect(payload.campaignId).toBe('campaign123');
     });
 
-    it('should validate GamePlayersPayload', () => {
-      const payload: GamePlayersPayload = {
+    it('should validate CampaignPlayersPayload', () => {
+      const payload: CampaignPlayersPayload = {
         players: [
           { userId: 'user1', username: 'Player1' },
           { userId: 'user2', username: 'Player2' },
@@ -125,16 +125,16 @@ describe('WebSocket Types', () => {
       expect(payload.players[0].username).toBe('Player1');
     });
 
-    it('should validate GamePlayerJoinedPayload', () => {
-      const payload: GamePlayerJoinedPayload = {
+    it('should validate CampaignPlayerJoinedPayload', () => {
+      const payload: CampaignPlayerJoinedPayload = {
         player: { userId: 'user3', username: 'Player3' },
       };
 
       expect(payload.player.userId).toBe('user3');
     });
 
-    it('should validate GamePlayerLeftPayload', () => {
-      const payload: GamePlayerLeftPayload = {
+    it('should validate CampaignPlayerLeftPayload', () => {
+      const payload: CampaignPlayerLeftPayload = {
         userId: 'user2',
       };
 
@@ -639,12 +639,12 @@ describe('WebSocket Types', () => {
       const validTypes: WSMessageType[] = [
         'ping',
         'pong',
-        'game:join',
-        'game:leave',
-        'game:state',
-        'game:players',
-        'game:player-joined',
-        'game:player-left',
+        'campaign:join',
+        'campaign:leave',
+        'campaign:state',
+        'campaign:players',
+        'campaign:player-joined',
+        'campaign:player-left',
         'token:move',
         'token:add',
         'token:added',

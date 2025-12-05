@@ -1,23 +1,23 @@
 import { describe, it, expect } from 'vitest';
 import type {
-  Game,
-  GameSettings,
+  Campaign,
+  CampaignSettings,
   Token,
   CreateTokenRequest,
   UpdateTokenRequest,
   TokenResponse,
   TokensListResponse,
   MapLayer,
-  CreateGameRequest,
-  UpdateGameRequest,
-  GameResponse,
-  GamesListResponse,
-} from './game.js';
+  CreateCampaignRequest,
+  UpdateCampaignRequest,
+  CampaignResponse,
+  CampaignsListResponse,
+} from './campaign.js';
 
-describe('Game Types', () => {
-  describe('GameSettings', () => {
+describe('Campaign Types', () => {
+  describe('CampaignSettings', () => {
     it('should have correct structure with square grid', () => {
-      const settings: GameSettings = {
+      const settings: CampaignSettings = {
         gridType: 'square',
         gridSize: 50,
         snapToGrid: true,
@@ -29,7 +29,7 @@ describe('Game Types', () => {
     });
 
     it('should support hex grid type', () => {
-      const settings: GameSettings = {
+      const settings: CampaignSettings = {
         gridType: 'hex',
         gridSize: 60,
         snapToGrid: false,
@@ -39,7 +39,7 @@ describe('Game Types', () => {
     });
 
     it('should support none grid type', () => {
-      const settings: GameSettings = {
+      const settings: CampaignSettings = {
         gridType: 'none',
         gridSize: 0,
         snapToGrid: false,
@@ -49,7 +49,7 @@ describe('Game Types', () => {
     });
 
     it('should handle various grid sizes', () => {
-      const settings: GameSettings = {
+      const settings: CampaignSettings = {
         gridType: 'square',
         gridSize: 100,
         snapToGrid: true,
@@ -59,10 +59,10 @@ describe('Game Types', () => {
     });
   });
 
-  describe('Game', () => {
-    it('should have correct structure for valid game', () => {
-      const game: Game = {
-        id: 'game123',
+  describe('Campaign', () => {
+    it('should have correct structure for valid campaign', () => {
+      const campaign: Campaign = {
+        id: 'campaign123',
         name: 'My Campaign',
         ownerId: 'user123',
         gmUserIds: [],
@@ -74,16 +74,16 @@ describe('Game Types', () => {
         },
       };
 
-      expect(game.id).toBe('game123');
-      expect(game.name).toBe('My Campaign');
-      expect(game.ownerId).toBe('user123');
-      expect(game.gmUserIds).toEqual([]);
-      expect(game.createdAt).toBeInstanceOf(Date);
-      expect(game.settings).toBeDefined();
+      expect(campaign.id).toBe('campaign123');
+      expect(campaign.name).toBe('My Campaign');
+      expect(campaign.ownerId).toBe('user123');
+      expect(campaign.gmUserIds).toEqual([]);
+      expect(campaign.createdAt).toBeInstanceOf(Date);
+      expect(campaign.settings).toBeDefined();
     });
 
-    it('should handle different game names', () => {
-      const game: Game = {
+    it('should handle different campaign names', () => {
+      const campaign: Campaign = {
         id: '1',
         name: 'Test Campaign: Episode 1',
         ownerId: 'owner1',
@@ -92,7 +92,7 @@ describe('Game Types', () => {
         settings: { gridType: 'hex', gridSize: 40, snapToGrid: false },
       };
 
-      expect(game.name).toBe('Test Campaign: Episode 1');
+      expect(campaign.name).toBe('Test Campaign: Episode 1');
     });
   });
 
@@ -477,7 +477,7 @@ describe('Game Types', () => {
     it('should have correct structure for background layer', () => {
       const layer: MapLayer = {
         id: 'layer123',
-        gameId: 'game123',
+        campaignId: 'campaign123',
         name: 'Background',
         type: 'background',
         visible: true,
@@ -492,7 +492,7 @@ describe('Game Types', () => {
     it('should support tokens layer type', () => {
       const layer: MapLayer = {
         id: 'layer2',
-        gameId: 'game1',
+        campaignId: 'campaign1',
         name: 'Tokens',
         type: 'tokens',
         visible: true,
@@ -505,7 +505,7 @@ describe('Game Types', () => {
     it('should support gm layer type', () => {
       const layer: MapLayer = {
         id: 'layer3',
-        gameId: 'game1',
+        campaignId: 'campaign1',
         name: 'GM Layer',
         type: 'gm',
         visible: false,
@@ -519,7 +519,7 @@ describe('Game Types', () => {
     it('should support effects layer type', () => {
       const layer: MapLayer = {
         id: 'layer4',
-        gameId: 'game1',
+        campaignId: 'campaign1',
         name: 'Effects',
         type: 'effects',
         visible: true,
@@ -530,9 +530,9 @@ describe('Game Types', () => {
     });
   });
 
-  describe('CreateGameRequest', () => {
+  describe('CreateCampaignRequest', () => {
     it('should have correct structure with minimal fields', () => {
-      const request: CreateGameRequest = {
+      const request: CreateCampaignRequest = {
         name: 'New Campaign',
       };
 
@@ -540,7 +540,7 @@ describe('Game Types', () => {
     });
 
     it('should handle optional settings', () => {
-      const request: CreateGameRequest = {
+      const request: CreateCampaignRequest = {
         name: 'Campaign with Settings',
         settings: {
           gridType: 'hex',
@@ -554,7 +554,7 @@ describe('Game Types', () => {
     });
 
     it('should handle partial settings', () => {
-      const request: CreateGameRequest = {
+      const request: CreateCampaignRequest = {
         name: 'Campaign',
         settings: {
           gridSize: 40,
@@ -565,9 +565,9 @@ describe('Game Types', () => {
     });
   });
 
-  describe('UpdateGameRequest', () => {
+  describe('UpdateCampaignRequest', () => {
     it('should allow updating name only', () => {
-      const request: UpdateGameRequest = {
+      const request: UpdateCampaignRequest = {
         name: 'Updated Campaign Name',
       };
 
@@ -575,7 +575,7 @@ describe('Game Types', () => {
     });
 
     it('should allow updating settings only', () => {
-      const request: UpdateGameRequest = {
+      const request: UpdateCampaignRequest = {
         settings: {
           gridType: 'none',
         },
@@ -585,7 +585,7 @@ describe('Game Types', () => {
     });
 
     it('should allow updating both name and settings', () => {
-      const request: UpdateGameRequest = {
+      const request: UpdateCampaignRequest = {
         name: 'New Name',
         settings: {
           gridSize: 70,
@@ -598,12 +598,12 @@ describe('Game Types', () => {
     });
   });
 
-  describe('GameResponse', () => {
+  describe('CampaignResponse', () => {
     it('should have correct structure', () => {
-      const response: GameResponse = {
-        game: {
-          id: 'game123',
-          name: 'My Game',
+      const response: CampaignResponse = {
+        campaign: {
+          id: 'campaign123',
+          name: 'My Campaign',
           ownerId: 'user123',
           gmUserIds: [],
           createdAt: new Date(),
@@ -615,25 +615,25 @@ describe('Game Types', () => {
         },
       };
 
-      expect(response.game).toBeDefined();
-      expect(response.game.id).toBe('game123');
+      expect(response.campaign).toBeDefined();
+      expect(response.campaign.id).toBe('campaign123');
     });
   });
 
-  describe('GamesListResponse', () => {
+  describe('CampaignsListResponse', () => {
     it('should have correct structure with empty array', () => {
-      const response: GamesListResponse = {
-        games: [],
+      const response: CampaignsListResponse = {
+        campaigns: [],
       };
 
-      expect(response.games).toHaveLength(0);
+      expect(response.campaigns).toHaveLength(0);
     });
 
-    it('should have correct structure with multiple games', () => {
-      const response: GamesListResponse = {
-        games: [
+    it('should have correct structure with multiple campaigns', () => {
+      const response: CampaignsListResponse = {
+        campaigns: [
           {
-            id: 'game1',
+            id: 'campaign1',
             name: 'Campaign 1',
             ownerId: 'user1',
             gmUserIds: [],
@@ -641,7 +641,7 @@ describe('Game Types', () => {
             settings: { gridType: 'square', gridSize: 50, snapToGrid: true },
           },
           {
-            id: 'game2',
+            id: 'campaign2',
             name: 'Campaign 2',
             ownerId: 'user1',
             gmUserIds: [],
@@ -651,9 +651,9 @@ describe('Game Types', () => {
         ],
       };
 
-      expect(response.games).toHaveLength(2);
-      expect(response.games[0].id).toBe('game1');
-      expect(response.games[1].id).toBe('game2');
+      expect(response.campaigns).toHaveLength(2);
+      expect(response.campaigns[0].id).toBe('campaign1');
+      expect(response.campaigns[1].id).toBe('campaign2');
     });
   });
 });
