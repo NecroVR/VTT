@@ -5,7 +5,7 @@ import type {
   UpdateWallRequest,
   WallResponse,
   WallsListResponse,
-} from './wall';
+} from './wall.js';
 
 describe('Wall Types', () => {
   describe('Wall', () => {

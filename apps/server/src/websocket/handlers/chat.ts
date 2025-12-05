@@ -8,7 +8,7 @@ import type {
   ChatWhisperPayload,
   ChatWhisperMessage,
 } from '@vtt/shared';
-import { roomManager } from '../rooms';
+import { roomManager } from '../rooms.js';
 import { chatMessages } from '@vtt/database';
 import { eq } from 'drizzle-orm';
 

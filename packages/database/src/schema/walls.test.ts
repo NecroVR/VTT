@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { getTableColumns, getTableName } from 'drizzle-orm';
-import { walls } from './walls';
+import { walls } from './walls.js';
 
 describe('walls schema', () => {
   describe('table structure', () => {

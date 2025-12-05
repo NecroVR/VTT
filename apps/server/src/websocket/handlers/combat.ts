@@ -17,7 +17,7 @@ import type {
   CombatNextTurnPayload,
   CombatTurnChangedPayload,
 } from '@vtt/shared';
-import { roomManager } from '../rooms';
+import { roomManager } from '../rooms.js';
 import { combats, combatants } from '@vtt/database';
 import { eq, and } from 'drizzle-orm';
 

@@ -1,8 +1,8 @@
 import { pgTable, text, timestamp, uuid, boolean, real, jsonb } from 'drizzle-orm/pg-core';
-import { games } from './games';
-import { scenes } from './scenes';
-import { actors } from './actors';
-import { users } from './users';
+import { games } from './games.js';
+import { scenes } from './scenes.js';
+import { actors } from './actors.js';
+import { users } from './users.js';
 
 export const tokens = pgTable('tokens', {
   id: uuid('id').primaryKey().defaultRandom(),

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { randomInt, rollDie, rollDice } from './random';
+import { randomInt, rollDie, rollDice } from './random.js';
 
 describe('Random Number Generator', () => {
   describe('randomInt', () => {

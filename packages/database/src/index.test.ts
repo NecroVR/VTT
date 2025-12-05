@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { createDb } from './index';
+import { createDb } from './index.js';
 import * as schema from './schema';
 
 // Mock the postgres module
@@ -79,7 +79,7 @@ describe('index module', () => {
 
   describe('schema exports', () => {
     it('should export all schema tables', async () => {
-      const exports = await import('./index');
+      const exports = await import('./index.js');
 
       expect(exports.users).toBeDefined();
       expect(exports.sessions).toBeDefined();
@@ -96,7 +96,7 @@ describe('index module', () => {
     });
 
     it('should export Database type', async () => {
-      const exports = await import('./index');
+      const exports = await import('./index.js');
 
       // Check that the module exports include Database type
       // TypeScript types are compile-time only, so we check the function exists
@@ -105,7 +105,7 @@ describe('index module', () => {
     });
 
     it('should export createDb function', async () => {
-      const { createDb } = await import('./index');
+      const { createDb } = await import('./index.js');
 
       expect(createDb).toBeDefined();
       expect(typeof createDb).toBe('function');

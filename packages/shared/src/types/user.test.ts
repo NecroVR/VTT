@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { User, Session, AuthResponse, LoginRequest, RegisterRequest } from './user';
+import type { User, Session, AuthResponse, LoginRequest, RegisterRequest } from './user.js';
 
 describe('User Types', () => {
   describe('User', () => {

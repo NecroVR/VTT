@@ -1,5 +1,5 @@
 import { pgTable, text, timestamp, uuid, real, boolean, integer, jsonb } from 'drizzle-orm/pg-core';
-import { scenes } from './scenes';
+import { scenes } from './scenes.js';
 
 export const ambientLights = pgTable('ambient_lights', {
   id: uuid('id').primaryKey().defaultRandom(),

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { getTableColumns, getTableName } from 'drizzle-orm';
-import { users, sessions } from './users';
+import { users, sessions } from './users.js';
 
 describe('users schema', () => {
   describe('table structure', () => {

@@ -1,5 +1,5 @@
 import { pgTable, text, timestamp, uuid, boolean, integer, real, jsonb } from 'drizzle-orm/pg-core';
-import { games } from './games';
+import { games } from './games.js';
 
 export const scenes = pgTable('scenes', {
   id: uuid('id').primaryKey().defaultRandom(),

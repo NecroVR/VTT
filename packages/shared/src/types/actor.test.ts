@@ -5,7 +5,7 @@ import type {
   UpdateActorRequest,
   ActorResponse,
   ActorsListResponse,
-} from './actor';
+} from './actor.js';
 
 describe('Actor Types', () => {
   describe('Actor', () => {

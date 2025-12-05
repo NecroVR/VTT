@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateId, generateGameId } from './id';
+import { generateId, generateGameId } from './id.js';
 
 describe('ID Generation', () => {
   describe('generateId', () => {

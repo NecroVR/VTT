@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { getTableColumns, getTableName } from 'drizzle-orm';
-import { fogExploration } from './fogExploration';
+import { fogExploration } from './fogExploration.js';
 
 describe('fogExploration schema', () => {
   describe('table structure', () => {

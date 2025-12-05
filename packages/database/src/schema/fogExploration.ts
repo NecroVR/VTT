@@ -1,6 +1,6 @@
 import { pgTable, uuid, integer, jsonb, timestamp } from 'drizzle-orm/pg-core';
-import { scenes } from './scenes';
-import { users } from './users';
+import { scenes } from './scenes.js';
+import { users } from './users.js';
 
 /**
  * Fog exploration table

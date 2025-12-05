@@ -9,7 +9,7 @@ import type {
   ActorDeletePayload,
   ActorDeletedPayload,
 } from '@vtt/shared';
-import { roomManager } from '../rooms';
+import { roomManager } from '../rooms.js';
 import { actors } from '@vtt/database';
 import { eq } from 'drizzle-orm';
 

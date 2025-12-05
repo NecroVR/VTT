@@ -51,15 +51,15 @@ import type {
   ErrorPayload
 } from '@vtt/shared';
 import { parseDiceNotation, type DiceGroup } from '@vtt/shared/dice';
-import { roomManager } from '../rooms';
-import { validateSession, extractSessionToken } from '../auth';
+import { roomManager } from '../rooms.js';
+import { validateSession, extractSessionToken } from '../auth.js';
 import { tokens, scenes, walls } from '@vtt/database';
 import { eq } from 'drizzle-orm';
 import {
   handleActorCreate,
   handleActorUpdate,
   handleActorDelete,
-} from './actors';
+} from './actors.js';
 import {
   handleCombatStart,
   handleCombatEnd,
@@ -68,18 +68,18 @@ import {
   handleCombatantUpdate,
   handleCombatantRemove,
   handleCombatNextTurn,
-} from './combat';
+} from './combat.js';
 import {
   handleChatMessage as handleChatMessageHandler,
   handleChatDelete,
   handleChatWhisper,
-} from './chat';
+} from './chat.js';
 import {
   handleEffectAdd,
   handleEffectUpdate,
   handleEffectRemove,
   handleEffectToggle,
-} from './effects';
+} from './effects.js';
 
 /**
  * Game session WebSocket handler

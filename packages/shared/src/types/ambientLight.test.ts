@@ -5,7 +5,7 @@ import type {
   UpdateAmbientLightRequest,
   AmbientLightResponse,
   AmbientLightsListResponse,
-} from './ambientLight';
+} from './ambientLight.js';
 
 describe('AmbientLight Types', () => {
   describe('AmbientLight', () => {

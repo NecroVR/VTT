@@ -1,8 +1,8 @@
-import type { Token } from './game';
-import type { Scene } from './scene';
-import type { Wall } from './wall';
-import type { AmbientLight } from './ambientLight';
-import type { ActiveEffect } from './activeEffect';
+import type { Token } from './game.js';
+import type { Scene } from './scene.js';
+import type { Wall } from './wall.js';
+import type { AmbientLight } from './ambientLight.js';
+import type { ActiveEffect } from './activeEffect.js';
 
 export type WSMessageType =
   | 'ping' | 'pong'

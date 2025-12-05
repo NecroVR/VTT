@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { getTableColumns, getTableName } from 'drizzle-orm';
-import { chatMessages } from './chatMessages';
+import { chatMessages } from './chatMessages.js';
 
 describe('chatMessages schema', () => {
   describe('table structure', () => {

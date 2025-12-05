@@ -1,4 +1,4 @@
-import { rollDice, rollDie } from './random';
+import { rollDice, rollDie } from './random.js';
 
 /**
  * Represents a single dice group in a roll
@@ -363,4 +363,4 @@ function generateBreakdown(groups: DiceGroup[], modifier: number, total: number)
 /**
  * Export for use in WebSocket handler
  */
-export { rollDice, rollDie } from './random';
+export { rollDice, rollDie } from './random.js';

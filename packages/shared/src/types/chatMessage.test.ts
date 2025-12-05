@@ -4,7 +4,7 @@ import type {
   CreateChatMessageRequest,
   ChatMessageResponse,
   ChatMessagesListResponse,
-} from './chatMessage';
+} from './chatMessage.js';
 
 describe('ChatMessage Types', () => {
   describe('ChatMessage', () => {

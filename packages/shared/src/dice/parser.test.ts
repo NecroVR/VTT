@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { parseDiceNotation } from './parser';
+import { parseDiceNotation } from './parser.js';
 import * as random from './random';
 
 describe('Dice Parser', () => {

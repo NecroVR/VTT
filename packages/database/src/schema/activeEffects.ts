@@ -1,8 +1,8 @@
 import { pgTable, text, timestamp, uuid, integer, boolean, jsonb } from 'drizzle-orm/pg-core';
-import { games } from './games';
-import { actors } from './actors';
-import { tokens } from './tokens';
-import { items } from './items';
+import { games } from './games.js';
+import { actors } from './actors.js';
+import { tokens } from './tokens.js';
+import { items } from './items.js';
 
 export const activeEffects = pgTable('active_effects', {
   id: uuid('id').primaryKey().defaultRandom(),

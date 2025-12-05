@@ -14,7 +14,7 @@ import type {
   DurationType,
   EffectChange,
 } from '@vtt/shared';
-import { roomManager } from '../rooms';
+import { roomManager } from '../rooms.js';
 import { activeEffects } from '@vtt/database';
 import { eq } from 'drizzle-orm';
 

@@ -30,7 +30,7 @@ import type {
   WallRemovePayload,
   WallRemovedPayload,
   ErrorPayload,
-} from './websocket';
+} from './websocket.js';
 
 describe('WebSocket Types', () => {
   describe('WSMessage', () => {

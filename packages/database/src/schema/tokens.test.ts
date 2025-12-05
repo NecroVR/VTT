@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { getTableColumns, getTableName } from 'drizzle-orm';
-import { tokens } from './tokens';
+import { tokens } from './tokens.js';
 
 describe('tokens schema', () => {
   describe('table structure', () => {

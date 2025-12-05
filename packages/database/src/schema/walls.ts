@@ -1,5 +1,5 @@
 import { pgTable, text, timestamp, uuid, real, jsonb } from 'drizzle-orm/pg-core';
-import { scenes } from './scenes';
+import { scenes } from './scenes.js';
 
 export const walls = pgTable('walls', {
   id: uuid('id').primaryKey().defaultRandom(),

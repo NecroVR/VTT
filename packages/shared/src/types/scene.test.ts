@@ -5,7 +5,7 @@ import type {
   UpdateSceneRequest,
   SceneResponse,
   ScenesListResponse,
-} from './scene';
+} from './scene.js';
 
 describe('Scene Types', () => {
   describe('Scene', () => {

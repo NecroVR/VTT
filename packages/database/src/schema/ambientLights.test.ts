@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { getTableColumns, getTableName } from 'drizzle-orm';
-import { ambientLights } from './ambientLights';
+import { ambientLights } from './ambientLights.js';
 
 describe('ambientLights schema', () => {
   describe('table structure', () => {

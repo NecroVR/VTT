@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { getTableColumns, getTableName } from 'drizzle-orm';
-import { actors } from './actors';
+import { actors } from './actors.js';
 
 describe('actors schema', () => {
   describe('table structure', () => {

@@ -5,7 +5,7 @@ import type {
   UpdateItemRequest,
   ItemResponse,
   ItemsListResponse,
-} from './item';
+} from './item.js';
 
 describe('Item Types', () => {
   describe('Item', () => {

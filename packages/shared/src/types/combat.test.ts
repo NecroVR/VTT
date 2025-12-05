@@ -10,7 +10,7 @@ import type {
   CombatsListResponse,
   CombatantResponse,
   CombatantsListResponse,
-} from './combat';
+} from './combat.js';
 
 describe('Combat Types', () => {
   describe('Combat', () => {

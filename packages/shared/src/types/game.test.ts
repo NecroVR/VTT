@@ -12,7 +12,7 @@ import type {
   UpdateGameRequest,
   GameResponse,
   GamesListResponse,
-} from './game';
+} from './game.js';
 
 describe('Game Types', () => {
   describe('GameSettings', () => {
