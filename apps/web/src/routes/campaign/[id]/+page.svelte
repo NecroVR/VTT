@@ -8,6 +8,7 @@
   import { scenesStore } from '$lib/stores/scenes';
   import { tokensStore } from '$lib/stores/tokens';
   import { wallsStore } from '$lib/stores/walls';
+  import { lightsStore } from '$lib/stores/lights';
   import { actorsStore } from '$lib/stores/actors';
   import SceneCanvas from '$lib/components/SceneCanvas.svelte';
   import SceneControls from '$lib/components/scene/SceneControls.svelte';
@@ -160,6 +161,19 @@
       wallsStore.removeWall(payload.wallId);
     });
 
+    // Subscribe to light events
+    const unsubscribeLightAdded = websocket.onLightAdded((payload) => {
+      lightsStore.addLight(payload.light);
+    });
+
+    const unsubscribeLightUpdated = websocket.onLightUpdated((payload) => {
+      lightsStore.updateLight(payload.light.id, payload.light);
+    });
+
+    const unsubscribeLightRemoved = websocket.onLightRemoved((payload) => {
+      lightsStore.removeLight(payload.lightId);
+    });
+
     // Join campaign room
     const token = localStorage.getItem('vtt_session_id') || sessionStorage.getItem('vtt_session_id') || '';
     websocket.joinCampaign(campaignId, token);
@@ -176,11 +190,15 @@
       unsubscribeWallAdded();
       unsubscribeWallUpdated();
       unsubscribeWallRemoved();
+      unsubscribeLightAdded();
+      unsubscribeLightUpdated();
+      unsubscribeLightRemoved();
 
       campaignsStore.clearCurrentCampaign();
       scenesStore.clear();
       tokensStore.clear();
       wallsStore.clear();
+      lightsStore.clear();
       actorsStore.clear();
       websocket.disconnect();
     };

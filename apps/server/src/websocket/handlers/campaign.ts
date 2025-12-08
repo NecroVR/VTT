@@ -6,6 +6,7 @@ import type {
   Token,
   Scene,
   Wall,
+  AmbientLight,
   TokenMovePayload,
   TokenAddPayload,
   TokenAddedPayload,
@@ -32,6 +33,12 @@ import type {
   WallUpdatedPayload,
   WallRemovePayload,
   WallRemovedPayload,
+  LightAddPayload,
+  LightAddedPayload,
+  LightUpdatePayload,
+  LightUpdatedPayload,
+  LightRemovePayload,
+  LightRemovedPayload,
   ActorCreatePayload,
   ActorUpdatePayload,
   ActorDeletePayload,
@@ -89,7 +96,7 @@ import type {
 import { parseDiceNotation, type DiceGroup } from '@vtt/shared/dice';
 import { roomManager } from '../rooms.js';
 import { validateSession, extractSessionToken } from '../auth.js';
-import { tokens, scenes, walls } from '@vtt/database';
+import { tokens, scenes, walls, ambientLights } from '@vtt/database';
 import { eq } from 'drizzle-orm';
 import {
   handleActorCreate,
@@ -291,6 +298,18 @@ export async function handleCampaignWebSocket(
 
         case 'wall:remove':
           await handleWallRemove(socket, message as WSMessage<WallRemovePayload>, request);
+          break;
+
+        case 'light:add':
+          await handleLightAdd(socket, message as WSMessage<LightAddPayload>, request);
+          break;
+
+        case 'light:update':
+          await handleLightUpdate(socket, message as WSMessage<LightUpdatePayload>, request);
+          break;
+
+        case 'light:remove':
+          await handleLightRemove(socket, message as WSMessage<LightRemovePayload>, request);
           break;
 
         case 'effect:add':
@@ -1352,5 +1371,217 @@ async function handleWallRemove(
   } catch (error) {
     request.log.error({ error, wallId }, 'Error removing wall');
     sendMessage(socket, 'error', { message: 'Failed to remove wall' });
+  }
+}
+
+/**
+ * Handle light add request
+ */
+async function handleLightAdd(
+  socket: WebSocket,
+  message: WSMessage<LightAddPayload>,
+  request: FastifyRequest
+): Promise<void> {
+  request.log.debug({ payload: message.payload }, 'Light add');
+
+  const campaignId = roomManager.getRoomForSocket(socket);
+
+  if (!campaignId) {
+    sendMessage(socket, 'error', { message: 'Not in a campaign room' });
+    return;
+  }
+
+  try {
+    const {
+      sceneId,
+      x,
+      y,
+      rotation = 0,
+      bright = 20,
+      dim = 40,
+      angle = 360,
+      color = '#ffffff',
+      alpha = 0.5,
+      animationType = null,
+      animationSpeed = 5,
+      animationIntensity = 5,
+      walls = true,
+      vision = false,
+      data = {},
+    } = message.payload;
+
+    // Create light in database
+    const newLights = await request.server.db
+      .insert(ambientLights)
+      .values({
+        sceneId,
+        x,
+        y,
+        rotation,
+        bright,
+        dim,
+        angle,
+        color,
+        alpha,
+        animationType,
+        animationSpeed,
+        animationIntensity,
+        walls,
+        vision,
+        data,
+      })
+      .returning();
+
+    const newLight = newLights[0];
+
+    // Convert to AmbientLight interface
+    const lightPayload: AmbientLight = {
+      id: newLight.id,
+      sceneId: newLight.sceneId,
+      x: newLight.x,
+      y: newLight.y,
+      rotation: newLight.rotation,
+      bright: newLight.bright,
+      dim: newLight.dim,
+      angle: newLight.angle,
+      color: newLight.color,
+      alpha: newLight.alpha,
+      animationType: newLight.animationType,
+      animationSpeed: newLight.animationSpeed,
+      animationIntensity: newLight.animationIntensity,
+      walls: newLight.walls,
+      vision: newLight.vision,
+      data: newLight.data as Record<string, unknown>,
+      createdAt: newLight.createdAt,
+    };
+
+    // Broadcast to all players
+    const addedPayload: LightAddedPayload = { light: lightPayload };
+    roomManager.broadcast(campaignId, {
+      type: 'light:added',
+      payload: addedPayload,
+      timestamp: Date.now(),
+    });
+
+    request.log.info({ lightId: newLight.id, sceneId, campaignId }, 'Light created');
+  } catch (error) {
+    request.log.error({ error }, 'Error creating light');
+    sendMessage(socket, 'error', { message: 'Failed to create light' });
+  }
+}
+
+/**
+ * Handle light update request
+ */
+async function handleLightUpdate(
+  socket: WebSocket,
+  message: WSMessage<LightUpdatePayload>,
+  request: FastifyRequest
+): Promise<void> {
+  request.log.debug({ payload: message.payload }, 'Light update');
+
+  const { lightId, updates } = message.payload;
+
+  const campaignId = roomManager.getRoomForSocket(socket);
+
+  if (!campaignId) {
+    sendMessage(socket, 'error', { message: 'Not in a campaign room' });
+    return;
+  }
+
+  try {
+    // Update light in database
+    const updatedLights = await request.server.db
+      .update(ambientLights)
+      .set(updates)
+      .where(eq(ambientLights.id, lightId))
+      .returning();
+
+    if (updatedLights.length === 0) {
+      sendMessage(socket, 'error', { message: 'Light not found' });
+      return;
+    }
+
+    const updatedLight = updatedLights[0];
+
+    // Convert to AmbientLight interface
+    const lightPayload: AmbientLight = {
+      id: updatedLight.id,
+      sceneId: updatedLight.sceneId,
+      x: updatedLight.x,
+      y: updatedLight.y,
+      rotation: updatedLight.rotation,
+      bright: updatedLight.bright,
+      dim: updatedLight.dim,
+      angle: updatedLight.angle,
+      color: updatedLight.color,
+      alpha: updatedLight.alpha,
+      animationType: updatedLight.animationType,
+      animationSpeed: updatedLight.animationSpeed,
+      animationIntensity: updatedLight.animationIntensity,
+      walls: updatedLight.walls,
+      vision: updatedLight.vision,
+      data: updatedLight.data as Record<string, unknown>,
+      createdAt: updatedLight.createdAt,
+    };
+
+    // Broadcast to all players
+    const updatedPayload: LightUpdatedPayload = { light: lightPayload };
+    roomManager.broadcast(campaignId, {
+      type: 'light:updated',
+      payload: updatedPayload,
+      timestamp: Date.now(),
+    });
+
+    request.log.info({ lightId, campaignId }, 'Light updated');
+  } catch (error) {
+    request.log.error({ error, lightId }, 'Error updating light');
+    sendMessage(socket, 'error', { message: 'Failed to update light' });
+  }
+}
+
+/**
+ * Handle light remove request
+ */
+async function handleLightRemove(
+  socket: WebSocket,
+  message: WSMessage<LightRemovePayload>,
+  request: FastifyRequest
+): Promise<void> {
+  request.log.debug({ payload: message.payload }, 'Light remove');
+
+  const { lightId } = message.payload;
+
+  const campaignId = roomManager.getRoomForSocket(socket);
+
+  if (!campaignId) {
+    sendMessage(socket, 'error', { message: 'Not in a campaign room' });
+    return;
+  }
+
+  try {
+    // Delete light from database
+    const deletedLights = await request.server.db
+      .delete(ambientLights)
+      .where(eq(ambientLights.id, lightId))
+      .returning();
+
+    if (deletedLights.length === 0) {
+      sendMessage(socket, 'error', { message: 'Light not found' });
+      return;
+    }
+
+    // Broadcast to all players
+    const removedPayload: LightRemovedPayload = { lightId };
+    roomManager.broadcast(campaignId, {
+      type: 'light:removed',
+      payload: removedPayload,
+      timestamp: Date.now(),
+    });
+
+    request.log.info({ lightId, campaignId }, 'Light removed');
+  } catch (error) {
+    request.log.error({ error, lightId }, 'Error removing light');
+    sendMessage(socket, 'error', { message: 'Failed to remove light' });
   }
 }

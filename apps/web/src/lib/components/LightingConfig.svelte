@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import type { AmbientLight } from '@vtt/shared';
+  import { websocket } from '$stores/websocket';
 
   // Props
   export let isOpen: boolean = false;
@@ -53,7 +54,7 @@
       };
 
       if (isNewLight) {
-        // Create new light
+        // Create new light via REST API
         const response = await fetch(`/api/v1/scenes/${sceneId}/lights`, {
           method: 'POST',
           headers: {
@@ -68,9 +69,13 @@
         }
 
         const data = await response.json();
+
+        // Broadcast via WebSocket for real-time sync
+        websocket.sendLightAdd(lightData);
+
         dispatch('save', data.ambientLight);
       } else {
-        // Update existing light
+        // Update existing light via REST API
         const response = await fetch(`/api/v1/lights/${light!.id}`, {
           method: 'PATCH',
           headers: {
@@ -85,6 +90,13 @@
         }
 
         const data = await response.json();
+
+        // Broadcast via WebSocket for real-time sync
+        websocket.sendLightUpdate({
+          lightId: light!.id,
+          updates: formData,
+        });
+
         dispatch('save', data.ambientLight);
       }
 
@@ -114,6 +126,9 @@
         if (!response.ok) {
           throw new Error('Failed to delete light');
         }
+
+        // Broadcast via WebSocket for real-time sync
+        websocket.sendLightRemove({ lightId: light.id });
 
         dispatch('delete', light.id);
         dispatch('close');
