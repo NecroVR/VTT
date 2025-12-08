@@ -203,7 +203,6 @@
 
   // Watch for light changes
   $: if (lights) {
-    visibilityCacheValid = false;  // Invalidate for new lights too
     renderLights();
   }
 
@@ -897,7 +896,7 @@
     const t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom;
     const u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / denom;
 
-    if (u >= 0 && u <= 1) {
+    if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
       return {
         x: x1 + t * (x2 - x1),
         y: y1 + t * (y2 - y1)
@@ -1261,8 +1260,8 @@
       }
 
       // Outer edge (fully transparent)
-      }
       gradient.addColorStop(1, dimColor);
+      }
 
       ctx.fillStyle = gradient;
       if (angle < 360) {
