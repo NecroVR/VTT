@@ -169,6 +169,12 @@
     gridNeedsUpdate = true;
   }
 
+  // Watch for scene ID changes (clear caches when switching scenes)
+  $: if (scene.id) {
+    invalidateVisibilityCache();
+    visibilityCache.clear();  // Force clear the entire cache on scene switch
+  }
+
   // Watch for other scene changes (re-render without reloading image)
   $: if (scene) {
     render();
