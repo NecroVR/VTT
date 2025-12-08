@@ -88,6 +88,9 @@
   let deleteDialogTitle = '';
   let deleteDialogMessage = '';
 
+  // DEBUG: Track light visibility state for logging
+  const debugLightState: Map<string, { redVisible: boolean; polygonLength: number; lightPos: { x: number; y: number } }> = new Map();
+
   // Drag-and-drop state
   let isDragOver = false;
 
@@ -1090,8 +1093,37 @@
     source: Point,
     maxRadius: number,
     visibilityPolygon: Point[],
-    renderCallback: () => void
+    renderCallback: () => void,
+    lightId?: string
   ) {
+    // DEBUG: Check if light center is inside visibility polygon
+    const isSourceInPolygon = visibilityPolygon.length > 0 && isPointInPolygon(source, visibilityPolygon);
+
+    // DEBUG: Track state changes
+    if (lightId) {
+      const prevState = debugLightState.get(lightId);
+      const newState = {
+        redVisible: isSourceInPolygon,
+        polygonLength: visibilityPolygon.length,
+        lightPos: { x: source.x, y: source.y }
+      };
+
+      if (!prevState) {
+        console.log(`[LIGHT ${lightId}] Initial state: redVisible=${isSourceInPolygon}, polygonPoints=${visibilityPolygon.length}, pos=(${source.x.toFixed(1)}, ${source.y.toFixed(1)})`);
+      } else if (prevState.redVisible !== isSourceInPolygon) {
+        console.log(`[LIGHT ${lightId}] STATE CHANGE: ${prevState.redVisible ? 'RED->BLUE' : 'BLUE->RED'} | polygonPoints: ${prevState.polygonLength}->${visibilityPolygon.length} | pos=(${source.x.toFixed(1)}, ${source.y.toFixed(1)})`);
+        if (!isSourceInPolygon && visibilityPolygon.length > 0) {
+          // Log polygon bounds when red disappears
+          const minX = Math.min(...visibilityPolygon.map(p => p.x));
+          const maxX = Math.max(...visibilityPolygon.map(p => p.x));
+          const minY = Math.min(...visibilityPolygon.map(p => p.y));
+          const maxY = Math.max(...visibilityPolygon.map(p => p.y));
+          console.log(`[LIGHT ${lightId}] Polygon bounds: x=[${minX.toFixed(1)}, ${maxX.toFixed(1)}], y=[${minY.toFixed(1)}, ${maxY.toFixed(1)}]`);
+        }
+      }
+      debugLightState.set(lightId, newState);
+    }
+
     if (visibilityPolygon.length === 0) return;
 
     ctx.save();
@@ -1307,7 +1339,7 @@
 
     // Render light with or without wall occlusion based on light.walls property
     if (wallsEnabled && visibilityPolygon) {
-      renderClippedLight(ctx, { x, y }, animatedDim, visibilityPolygon, renderLightGradient);
+      renderClippedLight(ctx, { x, y }, animatedDim, visibilityPolygon, renderLightGradient, light.id);
     } else {
       renderLightGradient();
     }
