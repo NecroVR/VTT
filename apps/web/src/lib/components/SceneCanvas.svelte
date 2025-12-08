@@ -954,36 +954,7 @@
       return effectiveProps.sense === 'block';
     });
 
-    if (blockingWalls.length === 0) {
-      // No blocking walls, return full circle
-      const points: Point[] = [];
-      const steps = 32;
-      for (let i = 0; i < steps; i++) {
-        const angle = (i / steps) * Math.PI * 2;
-        points.push({
-          x: source.x + Math.cos(angle) * maxRadius,
-          y: source.y + Math.sin(angle) * maxRadius
-        });
-      }
-      return points;
-    }
-
-    // Collect all unique angles to wall endpoints
-    const angles: number[] = [];
-
-    for (const wall of blockingWalls) {
-      // Add angles to each wall endpoint, plus slightly offset angles
-      const angle1 = Math.atan2(wall.y1 - source.y, wall.x1 - source.x);
-      const angle2 = Math.atan2(wall.y2 - source.y, wall.x2 - source.x);
-
-      angles.push(angle1 - 0.0001, angle1, angle1 + 0.0001);
-      angles.push(angle2 - 0.0001, angle2, angle2 + 0.0001);
-    }
-
-    // Sort angles
-    angles.sort((a, b) => a - b);
-
-    // Cast rays at each angle and build visibility polygon
+    // Convert walls to segments for ray casting
     const segments: Segment[] = blockingWalls.map(w => ({
       x1: w.x1,
       y1: w.y1,
@@ -991,8 +962,34 @@
       y2: w.y2
     }));
 
+    // Collect ALL angles to cast rays
+    const angles: number[] = [];
+    const EPSILON = 0.0001;
+
+    // 1. Add boundary angles for full 360-degree coverage
+    const BOUNDARY_STEPS = 72; // Every 5 degrees
+    for (let i = 0; i < BOUNDARY_STEPS; i++) {
+      angles.push((i / BOUNDARY_STEPS) * Math.PI * 2 - Math.PI);
+    }
+
+    // 2. Add wall endpoint angles with epsilon offsets for precision
+    for (const wall of blockingWalls) {
+      const angle1 = Math.atan2(wall.y1 - source.y, wall.x1 - source.x);
+      const angle2 = Math.atan2(wall.y2 - source.y, wall.x2 - source.x);
+
+      angles.push(angle1 - EPSILON, angle1, angle1 + EPSILON);
+      angles.push(angle2 - EPSILON, angle2, angle2 + EPSILON);
+    }
+
+    // 3. Sort and remove near-duplicates
+    angles.sort((a, b) => a - b);
+    const uniqueAngles = angles.filter((angle, i) =>
+      i === 0 || Math.abs(angle - angles[i - 1]) > EPSILON / 2
+    );
+
+    // 4. Cast rays at each angle and build visibility polygon
     const points: Point[] = [];
-    for (const angle of angles) {
+    for (const angle of uniqueAngles) {
       const point = castRay(source, angle, segments, maxRadius);
       points.push(point);
     }
