@@ -274,7 +274,7 @@
       y2: wall.y2,
       wallType: 'wall',
       move: 'none',
-      sense: 'none',
+      sense: 'block',
       sound: 'none',
       door: 'none',
       doorState: 'closed'
