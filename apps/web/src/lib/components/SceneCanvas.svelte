@@ -1728,14 +1728,14 @@
           const tokenWidth = (token.width || 1) * scene.gridSize;
           const tokenHeight = (token.height || 1) * scene.gridSize;
 
-          // Snap token center to grid cell center
-          // 1. Find which cell the token center is in
-          // 2. Calculate that cell's center position
-          // 3. Position token so its center aligns with cell center
+          // Snap token to grid cell boundaries
+          // Find which cell the token center is in - this becomes the top-left cell
+          // Token's top-left corner aligns with that cell's top-left corner
+          // This ensures larger tokens (2x2, 3x3, etc.) fill complete grid cells
           const cellX = Math.floor((newX + tokenWidth / 2) / scene.gridSize);
           const cellY = Math.floor((newY + tokenHeight / 2) / scene.gridSize);
-          newX = cellX * scene.gridSize + (scene.gridSize - tokenWidth) / 2;
-          newY = cellY * scene.gridSize + (scene.gridSize - tokenHeight) / 2;
+          newX = cellX * scene.gridSize;
+          newY = cellY * scene.gridSize;
         }
       }
 
