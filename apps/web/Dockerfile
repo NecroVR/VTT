@@ -26,7 +26,8 @@ COPY turbo.json ./
 COPY certs ./certs
 
 # Build the application
-RUN pnpm --filter @vtt/shared build
+# Run tsc directly using the PATH that includes root node_modules/.bin
+RUN cd packages/shared && tsc --project tsconfig.json
 RUN pnpm --filter @vtt/web build
 
 # Stage 2: Production

@@ -1131,11 +1131,12 @@
     ctx.save();
 
     // Create clipping path from visibility polygon
-    // Use floor + 0.5 to center on pixels (consistent with light source positioning)
+    // Use polygon points directly - they were computed from the adjusted source center
+    // Do NOT apply Math.floor + 0.5 here - that distorts polygon points and can exclude the light center
     ctx.beginPath();
-    ctx.moveTo(Math.floor(visibilityPolygon[0].x) + 0.5, Math.floor(visibilityPolygon[0].y) + 0.5);
+    ctx.moveTo(visibilityPolygon[0].x, visibilityPolygon[0].y);
     for (let i = 1; i < visibilityPolygon.length; i++) {
-      ctx.lineTo(Math.floor(visibilityPolygon[i].x) + 0.5, Math.floor(visibilityPolygon[i].y) + 0.5);
+      ctx.lineTo(visibilityPolygon[i].x, visibilityPolygon[i].y);
     }
     ctx.closePath();
     ctx.clip();
