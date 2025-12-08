@@ -48,11 +48,12 @@
   $: activeScene = $scenesStore.activeSceneId
     ? $scenesStore.scenes.get($scenesStore.activeSceneId)
     : null;
-  // Load tokens and lights when active scene changes
+  // Load tokens, lights, and walls when active scene changes
   $: if (activeScene?.id) {
     tokensStore.loadTokens(activeScene.id);
     const token = localStorage.getItem('vtt_session_id') || sessionStorage.getItem('vtt_session_id') || '';
     lightsStore.loadLights(activeScene.id, token);
+    wallsStore.loadWalls(activeScene.id, token);
   }
   $: tokens = Array.from($tokensStore.tokens.values()).filter(
     token => activeScene && token.sceneId === activeScene.id

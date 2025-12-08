@@ -20,23 +20,45 @@ function createWallsStore() {
     subscribe,
 
     /**
-     * Load walls for a scene
-     * Note: For MVP, walls are managed locally and synced via WebSocket
-     * In the future, this could fetch from an API endpoint
+     * Load walls for a scene from the API
      */
-    loadWalls(sceneId: string, wallsArray: Wall[]): void {
-      const walls = new Map<string, Wall>();
-      wallsArray
-        .filter(wall => wall.sceneId === sceneId)
-        .forEach(wall => {
-          walls.set(wall.id, wall);
+    async loadWalls(sceneId: string, token: string): Promise<void> {
+      update(state => ({ ...state, loading: true, error: null }));
+
+      try {
+        const response = await fetch(`/api/v1/scenes/${sceneId}/walls`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
 
-      update(state => ({
-        ...state,
-        walls,
-        loading: false,
-      }));
+        if (!response.ok) {
+          throw new Error(`Failed to fetch walls: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        const walls = new Map<string, Wall>();
+
+        if (data.walls && Array.isArray(data.walls)) {
+          data.walls.forEach((wall: Wall) => {
+            walls.set(wall.id, wall);
+          });
+        }
+
+        update(state => ({
+          ...state,
+          walls,
+          loading: false,
+        }));
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        update(state => ({
+          ...state,
+          loading: false,
+          error: message,
+        }));
+        console.error('Failed to load walls:', error);
+      }
     },
 
     /**
