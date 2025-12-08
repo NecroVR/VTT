@@ -1001,6 +1001,82 @@
     return points;
   }
 
+  /**
+   * Convert hex color to HSL
+   */
+  function hexToHSL(hex: string): { h: number; s: number; l: number } {
+    hex = hex.replace(/^#/, "");
+    const r = parseInt(hex.slice(0, 2), 16) / 255;
+    const g = parseInt(hex.slice(2, 4), 16) / 255;
+    const b = parseInt(hex.slice(4, 6), 16) / 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const diff = max - min;
+    let h = 0;
+    let s = 0;
+    const l = (max + min) / 2;
+    if (diff !== 0) {
+      s = l > 0.5 ? diff / (2 - max - min) : diff / (max + min);
+      switch (max) {
+        case r:
+          h = ((g - b) / diff + (g < b ? 6 : 0)) / 6;
+          break;
+        case g:
+          h = ((b - r) / diff + 2) / 6;
+          break;
+        case b:
+          h = ((r - g) / diff + 4) / 6;
+          break;
+      }
+    }
+    return { h, s, l };
+  }
+
+  /**
+   * Convert HSL to RGB
+   */
+  function hslToRgb(h: number, s: number, l: number): { r: number; g: number; b: number } {
+    let r, g, b;
+    if (s === 0) {
+      r = g = b = l;
+    } else {
+      const hue2rgb = (p: number, q: number, t: number) => {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1/6) return p + (q - p) * 6 * t;
+        if (t < 1/2) return q;
+        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+        return p;
+      };
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1/3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1/3);
+    }
+    return {
+      r: Math.round(r * 255),
+      g: Math.round(g * 255),
+      b: Math.round(b * 255)
+    };
+  }
+
+  /**
+   * Shift hue by specified amount (0-1 range)
+   */
+  function shiftHue(hexColor: string, hueShift: number): string {
+    const hsl = hexToHSL(hexColor);
+    let newHue = (hsl.h + hueShift) % 1;
+    if (newHue < 0) newHue += 1;
+    const rgb = hslToRgb(newHue, hsl.s, hsl.l);
+    const toHex = (n: number) => {
+      const hex = n.toString(16);
+      return hex.length === 1 ? "0" + hex : hex;
+    };
+    return `#${toHex(rgb.r)}${toHex(rgb.g)}${toHex(rgb.b)}`;
+  }
+
+
   function renderClippedLight(
     ctx: CanvasRenderingContext2D,
     source: Point,
@@ -1028,7 +1104,22 @@
   }
 
   function renderLight(ctx: CanvasRenderingContext2D, light: AmbientLight, time: number) {
-    const { x, y, bright, dim, color, alpha, angle, rotation, animationType, animationSpeed, animationIntensity, walls: wallsEnabled } = light;
+    const { x, y, bright, dim, color, alpha, angle, rotation, animationType, animationSpeed, animationIntensity, walls: wallsEnabled, hidden, negative } = light;
+
+    // Skip hidden lights
+    if (hidden) {
+      return;
+    }
+
+    // Check darkness activation range
+    const darknessMin = light.darknessMin ?? 0;
+    const darknessMax = light.darknessMax ?? 1;
+    const sceneDarkness = scene.darkness ?? 0;
+
+    // Skip if scene darkness is outside this light's activation range
+    if (sceneDarkness < darknessMin || sceneDarkness > darknessMax) {
+      return;
+    }
 
     // Performance optimization: Cull lights outside viewport
     if (!isInViewport(x - dim, y - dim, dim * 2, dim * 2)) {
@@ -1053,6 +1144,12 @@
       const intensity = animationIntensity / 100;
       animatedBright = bright * (1 + pulse * intensity * 0.3);
       animatedDim = dim * (1 + pulse * intensity * 0.3);
+    } else if (animationType === "chroma") {
+      // Chroma animation - color cycling effect
+      // Speed and intensity remain unchanged, color will be modified below
+    } else if (animationType === "wave") {
+      // Wave animation - ripple effect
+      // Speed and intensity will be used in gradient rendering below
     }
 
     // Determine if we should apply wall occlusion based on light.walls property
@@ -1060,9 +1157,18 @@
       ? getVisibilityPolygon(`light-${light.id}`, x, y, animatedDim)
       : null;
 
+    // Determine if this is a darkness source (negative light)
+    const isNegative = negative === true;
+
     // Define the rendering function for the light
     const renderLightGradient = () => {
       ctx.save();
+
+      // Set composite operation based on light type
+      if (isNegative) {
+        // Darkness sources cut out existing light
+        ctx.globalCompositeOperation = 'destination-out';
+      }
 
       // If cone light, clip to cone shape
       if (angle < 360) {
@@ -1075,19 +1181,87 @@
         ctx.clip();
       }
 
-      // Create radial gradient
+      // Create radial gradient with attenuation-based falloff
       const gradient = ctx.createRadialGradient(x, y, 0, x, y, animatedDim);
 
-      // Parse color and add alpha
-      const baseColor = hexToRgba(color, alpha);
-      const dimColor = hexToRgba(color, 0);
-
-      // Bright zone (0 to bright radius)
-      gradient.addColorStop(0, baseColor);
-      if (animatedBright > 0 && animatedDim > 0) {
-        gradient.addColorStop(Math.min(1, animatedBright / animatedDim), baseColor);
+      // Apply chroma animation - shift hue over time
+      let effectiveColor = color;
+      if (animationType === "chroma") {
+        const speed = animationSpeed / 5;
+        const intensity = animationIntensity / 10;
+        const hueShift = (time * speed * 0.001) % 1;
+        effectiveColor = shiftHue(color, hueShift * intensity);
       }
-      // Dim zone (bright to dim radius)
+
+      // Parse color and add alpha
+      const baseColor = hexToRgba(effectiveColor, alpha);
+      const dimColor = hexToRgba(effectiveColor, 0);
+
+      // Get attenuation value (default 0.5 for smooth falloff)
+      const attenuation = light.attenuation ?? 0.5;
+
+      // Calculate normalized bright radius (0-1 range within dim radius)
+      const brightStop = animatedBright > 0 && animatedDim > 0
+        ? Math.min(1, animatedBright / animatedDim)
+        : 0;
+
+      // Wave animation overrides normal gradient
+      if (animationType === "wave") {
+        const speed = animationSpeed / 5;
+        const intensity = animationIntensity / 10;
+        const wavePhase = (time * speed * 0.002) % 1;
+        
+        // Add base gradient stops first
+        gradient.addColorStop(0, baseColor);
+        gradient.addColorStop(1, dimColor);
+        
+        // Create multiple wave rings on top
+        const numRings = 3;
+        for (let i = 0; i < numRings; i++) {
+          const ringPhase = (wavePhase + i / numRings) % 1;
+          const ringAlpha = Math.abs(Math.sin(ringPhase * Math.PI)) * intensity;
+          
+          if (ringPhase > 0 && ringPhase < 1) {
+            const waveColor = hexToRgba(effectiveColor, alpha * ringAlpha * 2);
+            gradient.addColorStop(ringPhase, waveColor);
+          }
+        }
+      } else {
+      // Create gradient stops based on attenuation
+      // - attenuation = 0: Sharp transition (step function)
+      // - attenuation = 0.5: Default gradual fade
+      // - attenuation = 1: Very smooth/soft transition
+
+      // Inner bright zone (full brightness from center to bright radius)
+      gradient.addColorStop(0, baseColor);
+
+      if (brightStop > 0) {
+        // Maintain full brightness up to bright radius
+        // Lower attenuation = more stops clustered near bright edge (sharper)
+        // Higher attenuation = more distributed stops (smoother)
+        const transitionStart = brightStop * (1 - attenuation * 0.3);
+        gradient.addColorStop(transitionStart, baseColor);
+
+        // Transition zone - use attenuation to control the curve
+        if (attenuation < 0.3) {
+          // Sharp falloff - add intermediate stop close to bright edge
+          const midAlpha = alpha * 0.5;
+          gradient.addColorStop(brightStop, hexToRgba(effectiveColor, midAlpha));
+          gradient.addColorStop(brightStop + (1 - brightStop) * 0.3, hexToRgba(effectiveColor, midAlpha * 0.3));
+        } else if (attenuation > 0.7) {
+          // Soft falloff - distributed stops for smooth gradient
+          gradient.addColorStop(brightStop, hexToRgba(effectiveColor, alpha * 0.85));
+          gradient.addColorStop(brightStop + (1 - brightStop) * 0.4, hexToRgba(effectiveColor, alpha * 0.5));
+          gradient.addColorStop(brightStop + (1 - brightStop) * 0.7, hexToRgba(effectiveColor, alpha * 0.2));
+        } else {
+          // Medium falloff - default smooth transition
+          gradient.addColorStop(brightStop, hexToRgba(effectiveColor, alpha * 0.7));
+          gradient.addColorStop(brightStop + (1 - brightStop) * 0.5, hexToRgba(effectiveColor, alpha * 0.3));
+        }
+      }
+
+      // Outer edge (fully transparent)
+      }
       gradient.addColorStop(1, dimColor);
 
       ctx.fillStyle = gradient;
@@ -1162,15 +1336,36 @@
 
       // Parse color with alpha (using default 0.8 alpha for token lights)
       const baseColor = hexToRgba(color, 0.8);
-      const dimColor = hexToRgba(color, 0);
+      const dimColor = hexToRgba(effectiveColor, 0);
 
-      // Bright zone (0 to bright radius)
-      gradient.addColorStop(0, baseColor);
+        // Wave animation - create ripple effect with multiple rings
+        if (animationType === "wave") {
+          const speed = animationSpeed / 5;
+          const intensity = animationIntensity / 10;
+          const wavePhase = (time * speed * 0.002) % 1;
+          
+          // Create multiple wave rings
+          const numRings = 3;
+          for (let i = 0; i < numRings; i++) {
+            const ringPhase = (wavePhase + i / numRings) % 1;
+            const ringPos = ringPhase;
+            const ringAlpha = Math.abs(Math.sin(ringPhase * Math.PI)) * intensity;
+            
+            if (ringPos > 0 && ringPos < 1) {
+              const waveColor = hexToRgba(effectiveColor, alpha * ringAlpha);
+              gradient.addColorStop(ringPos, waveColor);
+            }
+          }
+        } else {
+          // Normal gradient (non-wave animations)
+          gradient.addColorStop(0, baseColor);
+          if (animatedBright > 0 && animatedDim > 0) {
+            gradient.addColorStop(Math.min(1, animatedBright / animatedDim), baseColor);
+          }
+          gradient.addColorStop(1, dimColor);
+        }
       if (bright > 0 && dim > 0) {
-        gradient.addColorStop(Math.min(1, bright / dim), baseColor);
       }
-      // Dim zone (bright to dim radius)
-      gradient.addColorStop(1, dimColor);
 
       ctx.fillStyle = gradient;
       if (angle < 360) {
@@ -1251,9 +1446,6 @@
 
       // Create radial gradient for vision area
       const gradient = ctx.createRadialGradient(x, y, 0, x, y, visionRadius);
-      gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-      gradient.addColorStop(0.8, 'rgba(255, 255, 255, 0.8)');
-      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
 
       ctx.fillStyle = gradient;
       ctx.beginPath();
@@ -1584,7 +1776,7 @@
 
       // Only re-render lights if there are animated lights or token lights
       const hasAnimatedLights = lights.some(light =>
-        light.animationType === 'torch' || light.animationType === 'pulse'
+        light.animationType === 'torch' || light.animationType === 'pulse' || light.animationType === 'chroma' || light.animationType === 'wave'
       );
 
       // Check if any tokens emit light (for now we always re-render if they exist)

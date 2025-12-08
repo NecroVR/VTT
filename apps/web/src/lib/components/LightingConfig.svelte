@@ -33,9 +33,23 @@
     animationType: light?.animationType ?? null,
     animationSpeed: light?.animationSpeed ?? 5,
     animationIntensity: light?.animationIntensity ?? 5,
+    animationReverse: light?.animationReverse ?? false,
     walls: light?.walls ?? true,
     vision: light?.vision ?? false,
     snapToGrid: light?.snapToGrid ?? false,
+    // Foundry VTT Advanced Settings
+    hidden: light?.hidden ?? false,
+    elevation: light?.elevation ?? 0,
+    priority: light?.priority ?? 0,
+    negative: light?.negative ?? false,
+    attenuation: light?.attenuation ?? 0.5,
+    luminosity: light?.luminosity ?? 0.5,
+    saturation: light?.saturation ?? 0,
+    contrast: light?.contrast ?? 0,
+    shadows: light?.shadows ?? 0,
+    coloration: light?.coloration ?? 1,
+    darknessMin: light?.darknessMin ?? 0,
+    darknessMax: light?.darknessMax ?? 1,
   };
 
   // Animation types
@@ -45,6 +59,20 @@
     { value: 'pulse', label: 'Pulse' },
     { value: 'chroma', label: 'Chroma' },
     { value: 'wave', label: 'Wave' },
+  ];
+
+  // Coloration modes
+  const colorationModes = [
+    { value: 0, label: 'Legacy' },
+    { value: 1, label: 'Additive' },
+    { value: 2, label: 'Screen' },
+    { value: 3, label: 'Overlay' },
+    { value: 4, label: 'Color Dodge' },
+    { value: 5, label: 'Color Burn' },
+    { value: 6, label: 'Hard Light' },
+    { value: 7, label: 'Soft Light' },
+    { value: 8, label: 'Difference' },
+    { value: 9, label: 'Exclusion' },
   ];
 
   async function handleSave() {
@@ -306,6 +334,18 @@
             </div>
           </section>
 
+          <!-- Light Type -->
+          <section class="form-section">
+            <h3>Light Type</h3>
+
+            <div class="form-row-checkbox">
+              <label>
+                <input type="checkbox" bind:checked={formData.negative} />
+                Darkness Source
+              </label>
+            </div>
+          </section>
+
           <!-- Animation -->
           <section class="form-section">
             <h3>Animation (Optional)</h3>
@@ -347,7 +387,128 @@
                   />
                 </label>
               </div>
+
+              <div class="form-row-checkbox">
+                <label>
+                  <input type="checkbox" bind:checked={formData.animationReverse} />
+                  Reverse animation
+                </label>
+              </div>
             {/if}
+          </section>
+
+          <!-- Advanced Effects -->
+          <section class="form-section">
+            <h3>Advanced Effects</h3>
+
+            <div class="form-row">
+              <label for="light-attenuation">
+                Falloff: {formData.attenuation.toFixed(1)}
+                <input
+                  id="light-attenuation"
+                  type="range"
+                  bind:value={formData.attenuation}
+                  min="0"
+                  max="1"
+                  step="0.1"
+                />
+              </label>
+            </div>
+
+            <div class="form-row-split">
+              <label for="light-luminosity">
+                Luminosity
+                <input
+                  id="light-luminosity"
+                  type="range"
+                  bind:value={formData.luminosity}
+                  min="0"
+                  max="1"
+                  step="0.1"
+                />
+              </label>
+
+              <label for="light-saturation">
+                Saturation
+                <input
+                  id="light-saturation"
+                  type="range"
+                  bind:value={formData.saturation}
+                  min="-1"
+                  max="1"
+                  step="0.1"
+                />
+              </label>
+            </div>
+
+            <div class="form-row-split">
+              <label for="light-contrast">
+                Contrast
+                <input
+                  id="light-contrast"
+                  type="range"
+                  bind:value={formData.contrast}
+                  min="-1"
+                  max="1"
+                  step="0.1"
+                />
+              </label>
+
+              <label for="light-shadows">
+                Shadows
+                <input
+                  id="light-shadows"
+                  type="range"
+                  bind:value={formData.shadows}
+                  min="0"
+                  max="1"
+                  step="0.1"
+                />
+              </label>
+            </div>
+
+            <div class="form-row">
+              <label for="light-coloration">
+                Coloration Mode
+                <select id="light-coloration" bind:value={formData.coloration}>
+                  {#each colorationModes as mode}
+                    <option value={mode.value}>{mode.label}</option>
+                  {/each}
+                </select>
+              </label>
+            </div>
+          </section>
+
+          <!-- Darkness Activation -->
+          <section class="form-section">
+            <h3>Darkness Activation</h3>
+            <span class="help-text">Light only active when scene darkness is in this range</span>
+
+            <div class="form-row-split">
+              <label for="light-darkness-min">
+                Min: {formData.darknessMin.toFixed(2)}
+                <input
+                  id="light-darkness-min"
+                  type="range"
+                  bind:value={formData.darknessMin}
+                  min="0"
+                  max="1"
+                  step="0.05"
+                />
+              </label>
+
+              <label for="light-darkness-max">
+                Max: {formData.darknessMax.toFixed(2)}
+                <input
+                  id="light-darkness-max"
+                  type="range"
+                  bind:value={formData.darknessMax}
+                  min="0"
+                  max="1"
+                  step="0.05"
+                />
+              </label>
+            </div>
           </section>
 
           <!-- Settings -->
@@ -372,6 +533,37 @@
               <label>
                 <input type="checkbox" bind:checked={formData.snapToGrid} />
                 Snap to grid (center of cell)
+              </label>
+            </div>
+
+            <div class="form-row-checkbox">
+              <label>
+                <input type="checkbox" bind:checked={formData.hidden} />
+                Hidden (GM only)
+              </label>
+            </div>
+
+            <div class="form-row-split">
+              <label for="light-elevation">
+                Elevation
+                <input
+                  id="light-elevation"
+                  type="number"
+                  bind:value={formData.elevation}
+                  step="1"
+                />
+              </label>
+
+              <label for="light-priority">
+                Priority
+                <input
+                  id="light-priority"
+                  type="number"
+                  bind:value={formData.priority}
+                  min="0"
+                  max="100"
+                  step="1"
+                />
               </label>
             </div>
           </section>
@@ -549,6 +741,35 @@
     width: 1.25rem;
     height: 1.25rem;
     cursor: pointer;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    height: 0.5rem;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--color-border, #333);
+    border-radius: 4px;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: #4a90e2;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: #4a90e2;
+    cursor: pointer;
+    border: none;
   }
 
   .color-input-wrapper {

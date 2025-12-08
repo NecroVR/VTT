@@ -59,9 +59,22 @@ const lightsRoute: FastifyPluginAsync = async (fastify) => {
           animationType: light.animationType,
           animationSpeed: light.animationSpeed,
           animationIntensity: light.animationIntensity,
+          animationReverse: light.animationReverse ?? false,
           walls: light.walls,
           vision: light.vision,
           snapToGrid: light.snapToGrid ?? false,
+          negative: light.negative ?? false,
+          priority: light.priority ?? 0,
+          luminosity: light.luminosity ?? 0.5,
+          saturation: light.saturation ?? 0,
+          contrast: light.contrast ?? 0,
+          shadows: light.shadows ?? 0,
+          attenuation: light.attenuation ?? 0.5,
+          coloration: light.coloration ?? 1,
+          darknessMin: light.darknessMin ?? 0,
+          darknessMax: light.darknessMax ?? 1,
+          hidden: light.hidden ?? false,
+          elevation: light.elevation ?? 0,
           data: light.data as Record<string, unknown>,
           createdAt: light.createdAt,
         }));
@@ -117,9 +130,22 @@ const lightsRoute: FastifyPluginAsync = async (fastify) => {
           animationType: light.animationType,
           animationSpeed: light.animationSpeed,
           animationIntensity: light.animationIntensity,
+          animationReverse: light.animationReverse ?? false,
           walls: light.walls,
           vision: light.vision,
           snapToGrid: light.snapToGrid ?? false,
+          negative: light.negative ?? false,
+          priority: light.priority ?? 0,
+          luminosity: light.luminosity ?? 0.5,
+          saturation: light.saturation ?? 0,
+          contrast: light.contrast ?? 0,
+          shadows: light.shadows ?? 0,
+          attenuation: light.attenuation ?? 0.5,
+          coloration: light.coloration ?? 1,
+          darknessMin: light.darknessMin ?? 0,
+          darknessMax: light.darknessMax ?? 1,
+          hidden: light.hidden ?? false,
+          elevation: light.elevation ?? 0,
           data: light.data as Record<string, unknown>,
           createdAt: light.createdAt,
         };
@@ -186,9 +212,22 @@ const lightsRoute: FastifyPluginAsync = async (fastify) => {
             animationType: lightData.animationType ?? null,
             animationSpeed: lightData.animationSpeed ?? 5,
             animationIntensity: lightData.animationIntensity ?? 5,
+            animationReverse: lightData.animationReverse ?? false,
             walls: lightData.walls ?? true,
             vision: lightData.vision ?? false,
             snapToGrid: lightData.snapToGrid ?? false,
+            negative: lightData.negative ?? false,
+            priority: lightData.priority ?? 0,
+            luminosity: lightData.luminosity ?? 0.5,
+            saturation: lightData.saturation ?? 0,
+            contrast: lightData.contrast ?? 0,
+            shadows: lightData.shadows ?? 0,
+            attenuation: lightData.attenuation ?? 0.5,
+            coloration: lightData.coloration ?? 1,
+            darknessMin: lightData.darknessMin ?? 0,
+            darknessMax: lightData.darknessMax ?? 1,
+            hidden: lightData.hidden ?? false,
+            elevation: lightData.elevation ?? 0,
             data: lightData.data ?? {},
           })
           .returning();
@@ -210,9 +249,22 @@ const lightsRoute: FastifyPluginAsync = async (fastify) => {
           animationType: newLight.animationType,
           animationSpeed: newLight.animationSpeed,
           animationIntensity: newLight.animationIntensity,
+          animationReverse: newLight.animationReverse ?? false,
           walls: newLight.walls,
           vision: newLight.vision,
           snapToGrid: newLight.snapToGrid ?? false,
+          negative: newLight.negative ?? false,
+          priority: newLight.priority ?? 0,
+          luminosity: newLight.luminosity ?? 0.5,
+          saturation: newLight.saturation ?? 0,
+          contrast: newLight.contrast ?? 0,
+          shadows: newLight.shadows ?? 0,
+          attenuation: newLight.attenuation ?? 0.5,
+          coloration: newLight.coloration ?? 1,
+          darknessMin: newLight.darknessMin ?? 0,
+          darknessMax: newLight.darknessMax ?? 1,
+          hidden: newLight.hidden ?? false,
+          elevation: newLight.elevation ?? 0,
           data: newLight.data as Record<string, unknown>,
           createdAt: newLight.createdAt,
         };
@@ -290,6 +342,9 @@ const lightsRoute: FastifyPluginAsync = async (fastify) => {
         if (updates.animationIntensity !== undefined) {
           updateData.animationIntensity = updates.animationIntensity;
         }
+        if (updates.animationReverse !== undefined) {
+          updateData.animationReverse = updates.animationReverse;
+        }
         if (updates.walls !== undefined) {
           updateData.walls = updates.walls;
         }
@@ -298,6 +353,42 @@ const lightsRoute: FastifyPluginAsync = async (fastify) => {
         }
         if (updates.snapToGrid !== undefined) {
           updateData.snapToGrid = updates.snapToGrid;
+        }
+        if (updates.negative !== undefined) {
+          updateData.negative = updates.negative;
+        }
+        if (updates.priority !== undefined) {
+          updateData.priority = updates.priority;
+        }
+        if (updates.luminosity !== undefined) {
+          updateData.luminosity = updates.luminosity;
+        }
+        if (updates.saturation !== undefined) {
+          updateData.saturation = updates.saturation;
+        }
+        if (updates.contrast !== undefined) {
+          updateData.contrast = updates.contrast;
+        }
+        if (updates.shadows !== undefined) {
+          updateData.shadows = updates.shadows;
+        }
+        if (updates.attenuation !== undefined) {
+          updateData.attenuation = updates.attenuation;
+        }
+        if (updates.coloration !== undefined) {
+          updateData.coloration = updates.coloration;
+        }
+        if (updates.darknessMin !== undefined) {
+          updateData.darknessMin = updates.darknessMin;
+        }
+        if (updates.darknessMax !== undefined) {
+          updateData.darknessMax = updates.darknessMax;
+        }
+        if (updates.hidden !== undefined) {
+          updateData.hidden = updates.hidden;
+        }
+        if (updates.elevation !== undefined) {
+          updateData.elevation = updates.elevation;
         }
         if (updates.data !== undefined) {
           updateData.data = updates.data;
@@ -327,9 +418,22 @@ const lightsRoute: FastifyPluginAsync = async (fastify) => {
           animationType: updatedLight.animationType,
           animationSpeed: updatedLight.animationSpeed,
           animationIntensity: updatedLight.animationIntensity,
+          animationReverse: updatedLight.animationReverse ?? false,
           walls: updatedLight.walls,
           vision: updatedLight.vision,
           snapToGrid: updatedLight.snapToGrid ?? false,
+          negative: updatedLight.negative ?? false,
+          priority: updatedLight.priority ?? 0,
+          luminosity: updatedLight.luminosity ?? 0.5,
+          saturation: updatedLight.saturation ?? 0,
+          contrast: updatedLight.contrast ?? 0,
+          shadows: updatedLight.shadows ?? 0,
+          attenuation: updatedLight.attenuation ?? 0.5,
+          coloration: updatedLight.coloration ?? 1,
+          darknessMin: updatedLight.darknessMin ?? 0,
+          darknessMax: updatedLight.darknessMax ?? 1,
+          hidden: updatedLight.hidden ?? false,
+          elevation: updatedLight.elevation ?? 0,
           data: updatedLight.data as Record<string, unknown>,
           createdAt: updatedLight.createdAt,
         };

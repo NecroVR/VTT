@@ -15,10 +15,24 @@ export interface AmbientLight {
   animationType?: string | null;
   animationSpeed: number;
   animationIntensity: number;
+  animationReverse: boolean;
   // Settings
   walls: boolean;
   vision: boolean;
   snapToGrid: boolean;
+  // Foundry-aligned fields
+  negative: boolean;
+  priority: number;
+  luminosity: number;
+  saturation: number;
+  contrast: number;
+  shadows: number;
+  attenuation: number;
+  coloration: number;
+  darknessMin: number;
+  darknessMax: number;
+  hidden: boolean;
+  elevation: number;
   // Metadata
   data: Record<string, unknown>;
   createdAt: Date;
@@ -37,9 +51,22 @@ export interface CreateAmbientLightRequest {
   animationType?: string | null;
   animationSpeed?: number;
   animationIntensity?: number;
+  animationReverse?: boolean;
   walls?: boolean;
   vision?: boolean;
   snapToGrid?: boolean;
+  negative?: boolean;
+  priority?: number;
+  luminosity?: number;
+  saturation?: number;
+  contrast?: number;
+  shadows?: number;
+  attenuation?: number;
+  coloration?: number;
+  darknessMin?: number;
+  darknessMax?: number;
+  hidden?: boolean;
+  elevation?: number;
   data?: Record<string, unknown>;
 }
 
@@ -55,9 +82,22 @@ export interface UpdateAmbientLightRequest {
   animationType?: string | null;
   animationSpeed?: number;
   animationIntensity?: number;
+  animationReverse?: boolean;
   walls?: boolean;
   vision?: boolean;
   snapToGrid?: boolean;
+  negative?: boolean;
+  priority?: number;
+  luminosity?: number;
+  saturation?: number;
+  contrast?: number;
+  shadows?: number;
+  attenuation?: number;
+  coloration?: number;
+  darknessMin?: number;
+  darknessMax?: number;
+  hidden?: boolean;
+  elevation?: number;
   data?: Record<string, unknown>;
 }
 
