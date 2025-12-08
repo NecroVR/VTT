@@ -21,6 +21,7 @@ export const ambientLights = pgTable('ambient_lights', {
   // Settings
   walls: boolean('walls').notNull().default(true),
   vision: boolean('vision').notNull().default(false),
+  snapToGrid: boolean('snap_to_grid').notNull().default(false),
   // Metadata
   data: jsonb('data').notNull().default({}),
   createdAt: timestamp('created_at').defaultNow().notNull(),

@@ -26,6 +26,7 @@ describe('AmbientLight Types', () => {
         animationIntensity: 5,
         walls: true,
         vision: true,
+        snapToGrid: false,
         data: {},
         createdAt: new Date(),
       };
@@ -53,6 +54,7 @@ describe('AmbientLight Types', () => {
         animationIntensity: 5,
         walls: true,
         vision: true,
+        snapToGrid: false,
         data: {},
         createdAt: new Date(),
       };
@@ -78,6 +80,7 @@ describe('AmbientLight Types', () => {
         animationIntensity: 5,
         walls: true,
         vision: true,
+        snapToGrid: false,
         data: {},
         createdAt: new Date(),
       };
@@ -103,6 +106,7 @@ describe('AmbientLight Types', () => {
         animationIntensity: 5,
         walls: true,
         vision: true,
+        snapToGrid: false,
         data: {},
         createdAt: new Date(),
       };
@@ -128,6 +132,7 @@ describe('AmbientLight Types', () => {
         animationIntensity: 3,
         walls: true,
         vision: true,
+        snapToGrid: false,
         data: {},
         createdAt: new Date(),
       };
@@ -157,6 +162,7 @@ describe('AmbientLight Types', () => {
           animationIntensity: 5,
           walls: true,
           vision: true,
+          snapToGrid: false,
           data: {},
           createdAt: new Date(),
         };
@@ -182,6 +188,7 @@ describe('AmbientLight Types', () => {
         animationIntensity: 0,
         walls: true,
         vision: true,
+        snapToGrid: false,
         data: {},
         createdAt: new Date(),
       };
@@ -208,6 +215,7 @@ describe('AmbientLight Types', () => {
         animationIntensity: 5,
         walls: true,
         vision: true,
+        snapToGrid: false,
         data: {},
         createdAt: new Date(),
       };
@@ -232,6 +240,7 @@ describe('AmbientLight Types', () => {
         animationIntensity: 5,
         walls: false,
         vision: true,
+        snapToGrid: false,
         data: {},
         createdAt: new Date(),
       };
@@ -256,6 +265,7 @@ describe('AmbientLight Types', () => {
         animationIntensity: 5,
         walls: true,
         vision: false,
+        snapToGrid: false,
         data: {},
         createdAt: new Date(),
       };
@@ -280,6 +290,7 @@ describe('AmbientLight Types', () => {
         animationIntensity: 5,
         walls: true,
         vision: true,
+        snapToGrid: false,
         data: {},
         createdAt: new Date(),
       };
@@ -305,6 +316,7 @@ describe('AmbientLight Types', () => {
         animationIntensity: 5,
         walls: true,
         vision: true,
+        snapToGrid: false,
         data: { source: 'magical', dispellable: true },
         createdAt: new Date(),
       };
@@ -545,6 +557,7 @@ describe('AmbientLight Types', () => {
           animationIntensity: 5,
           walls: true,
           vision: true,
+          snapToGrid: false,
           data: {},
           createdAt: new Date(),
         },
@@ -583,6 +596,7 @@ describe('AmbientLight Types', () => {
             animationIntensity: 5,
             walls: true,
             vision: true,
+            snapToGrid: false,
             data: {},
             createdAt: new Date(),
           },
@@ -602,6 +616,7 @@ describe('AmbientLight Types', () => {
             animationIntensity: 3,
             walls: true,
             vision: true,
+            snapToGrid: false,
             data: {},
             createdAt: new Date(),
           },

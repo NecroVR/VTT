@@ -1661,10 +1661,10 @@
 
     // Handle light tool
     if (activeTool === 'light' && isGM) {
-      // Place light at clicked position
+      // Place light at clicked position (no snapping by default)
       onLightAdd?.({
-        x: snappedPos.x,
-        y: snappedPos.y
+        x: worldPos.x,
+        y: worldPos.y
       });
       return;
     }
@@ -1908,9 +1908,10 @@
       let newX = worldPos.x + dragOffsetX;
       let newY = worldPos.y + dragOffsetY;
 
-      // Apply grid snapping if enabled
-      if (gridSnap) {
-        const snappedPos = snapToGrid(newX, newY);
+      // Apply grid snapping if the light has it enabled
+      const light = lights.find(l => l.id === draggedLightId);
+      if (light?.snapToGrid) {
+        const snappedPos = snapToGridCenter(newX, newY);
         newX = snappedPos.x;
         newY = snappedPos.y;
       }
@@ -1999,6 +2000,15 @@
     return {
       x: Math.round(x / gridSize) * gridSize,
       y: Math.round(y / gridSize) * gridSize,
+    };
+  }
+
+  function snapToGridCenter(x: number, y: number): { x: number; y: number } {
+    const gridSize = scene.gridSize;
+    // Snap to center of cell (add half grid size after rounding to corner)
+    return {
+      x: Math.floor(x / gridSize) * gridSize + gridSize / 2,
+      y: Math.floor(y / gridSize) * gridSize + gridSize / 2,
     };
   }
 

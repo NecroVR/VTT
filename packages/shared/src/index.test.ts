@@ -210,6 +210,7 @@ describe('Index Exports', () => {
         animationIntensity: 5,
         walls: true,
         vision: true,
+        snapToGrid: false,
         data: {},
         createdAt: new Date(),
       };

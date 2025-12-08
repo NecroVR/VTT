@@ -18,6 +18,7 @@ export interface AmbientLight {
   // Settings
   walls: boolean;
   vision: boolean;
+  snapToGrid: boolean;
   // Metadata
   data: Record<string, unknown>;
   createdAt: Date;
@@ -38,6 +39,7 @@ export interface CreateAmbientLightRequest {
   animationIntensity?: number;
   walls?: boolean;
   vision?: boolean;
+  snapToGrid?: boolean;
   data?: Record<string, unknown>;
 }
 
@@ -55,6 +57,7 @@ export interface UpdateAmbientLightRequest {
   animationIntensity?: number;
   walls?: boolean;
   vision?: boolean;
+  snapToGrid?: boolean;
   data?: Record<string, unknown>;
 }
 

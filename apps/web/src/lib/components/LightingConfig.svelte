@@ -35,6 +35,7 @@
     animationIntensity: light?.animationIntensity ?? 5,
     walls: light?.walls ?? true,
     vision: light?.vision ?? false,
+    snapToGrid: light?.snapToGrid ?? false,
   };
 
   // Animation types
@@ -364,6 +365,13 @@
               <label>
                 <input type="checkbox" bind:checked={formData.vision} />
                 Provides vision (players can see by this light)
+              </label>
+            </div>
+
+            <div class="form-row-checkbox">
+              <label>
+                <input type="checkbox" bind:checked={formData.snapToGrid} />
+                Snap to grid (center of cell)
               </label>
             </div>
           </section>
