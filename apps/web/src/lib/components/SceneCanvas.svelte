@@ -201,9 +201,9 @@
     renderLights();
   }
 
-  // Watch for light changes
+  // Watch for light changes - render without full cache invalidation
+  // (new lights get cache miss by ID, moved lights get cache miss by position)
   $: if (lights) {
-    invalidateVisibilityCache();
     renderLights();
   }
 
@@ -537,14 +537,18 @@
 
   /**
    * Performance optimization: Get cached visibility polygon
+   * Cache key includes position and radius so moved lights get fresh polygons
    */
   function getVisibilityPolygon(sourceId: string, x: number, y: number, radius: number): Point[] {
-    if (visibilityCacheValid && visibilityCache.has(sourceId)) {
-      return visibilityCache.get(sourceId)!;
+    // Include position in cache key so moved lights don't use stale polygons
+    const cacheKey = `${sourceId}-${Math.round(x)}-${Math.round(y)}-${Math.round(radius)}`;
+
+    if (visibilityCacheValid && visibilityCache.has(cacheKey)) {
+      return visibilityCache.get(cacheKey)!;
     }
 
     const polygon = computeVisibilityPolygon({ x, y }, walls, radius);
-    visibilityCache.set(sourceId, polygon);
+    visibilityCache.set(cacheKey, polygon);
 
     return polygon;
   }
@@ -1081,7 +1085,9 @@
     visibilityPolygon: Point[],
     renderCallback: () => void
   ) {
-    if (visibilityPolygon.length === 0) return;
+    if (visibilityPolygon.length === 0) {
+      return;
+    }
 
     ctx.save();
 
@@ -1492,7 +1498,7 @@
         tempCtx.globalCompositeOperation = 'lighten';
 
         // Render all ambient lights on temp canvas
-        lights.forEach(light => {
+        lights.forEach((light) => {
           renderLight(tempCtx, light, animationTime);
         });
 
@@ -1527,7 +1533,7 @@
       // No darkness - just render lights normally with additive blending
       lightingCtx.globalCompositeOperation = 'lighten';
 
-      lights.forEach(light => {
+      lights.forEach((light) => {
         renderLight(lightingCtx, light, animationTime);
       });
 
