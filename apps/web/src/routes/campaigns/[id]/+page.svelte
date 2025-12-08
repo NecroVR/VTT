@@ -48,7 +48,7 @@
     // Wait for connection, then join campaign
     const unsubscribe = websocket.state.subscribe((state) => {
       if (state.connected && state.currentRoom !== campaignId) {
-        websocket.joinGame(campaignId, token);
+        websocket.joinCampaign(campaignId, token);
       }
     });
 

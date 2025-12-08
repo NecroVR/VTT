@@ -67,13 +67,13 @@
       id: 'chat',
       label: 'Chat',
       component: ChatPanel,
-      props: { gameId: campaignId }
+      props: { campaignId: campaignId }
     },
     {
       id: 'combat',
       label: 'Combat',
       component: CombatTracker,
-      props: { gameId: campaignId, isGM }
+      props: { campaignId: campaignId, isGM }
     },
     {
       id: 'actors',
@@ -155,7 +155,7 @@
 
     // Join campaign room
     const token = localStorage.getItem('vtt_session_id') || sessionStorage.getItem('vtt_session_id') || '';
-    websocket.joinGame(campaignId, token);
+    websocket.joinCampaign(campaignId, token);
 
     // Return cleanup function that will be called when component is destroyed
     return () => {
@@ -270,11 +270,9 @@
 
   function handleSceneCreated(scene: Scene) {
     showSceneModal = false;
-    // Scene will be added to store automatically through WebSocket events
-    // Set as active scene if it's the first scene
-    if (scenes.length === 0) {
-      scenesStore.setActiveScene(scene.id);
-    }
+    // Add the scene to the store and set it as active
+    scenesStore.addScene(scene);
+    scenesStore.setActiveScene(scene.id);
   }
 
   function handleSidebarWidthChange(event: CustomEvent<number>) {
@@ -408,7 +406,7 @@
       <div class="actor-sheet-modal">
         <ActorSheet
           actorId={selectedActorId}
-          gameId={campaignId}
+          campaignId={campaignId}
           {isGM}
           onClose={handleCloseActorSheet}
         />
@@ -419,7 +417,7 @@
   {#if showTokenConfig && selectedToken}
     <TokenConfig
       token={selectedToken}
-      gameId={campaignId}
+      campaignId={campaignId}
       {isGM}
       on:close={handleCloseTokenConfig}
       on:delete={handleDeleteToken}
@@ -428,14 +426,14 @@
 
   <SceneManagementModal
     isOpen={showSceneModal}
-    gameId={campaignId}
+    campaignId={campaignId}
     onClose={() => showSceneModal = false}
     onSceneCreated={handleSceneCreated}
   />
 
   <ActorCreateModal
     isOpen={showActorCreateModal}
-    gameId={campaignId}
+    campaignId={campaignId}
     onClose={() => showActorCreateModal = false}
     onActorCreated={handleActorCreated}
   />
