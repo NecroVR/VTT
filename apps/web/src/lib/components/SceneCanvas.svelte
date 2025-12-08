@@ -1706,8 +1706,10 @@
       lastMouseX = e.clientX;
       lastMouseY = e.clientY;
 
-      // Performance optimization: Invalidate visibility cache on pan
+      // Invalidate caches on pan
       invalidateVisibilityCache();
+      gridNeedsUpdate = true;
+      backgroundNeedsUpdate = true;
 
       render();
     }
@@ -1749,8 +1751,10 @@
       viewX = worldX - mouseX / scale;
       viewY = worldY - mouseY / scale;
 
-      // Performance optimization: Invalidate visibility cache on zoom
+      // Invalidate caches on zoom
       invalidateVisibilityCache();
+      gridNeedsUpdate = true;
+      backgroundNeedsUpdate = true;
 
       render();
     }
