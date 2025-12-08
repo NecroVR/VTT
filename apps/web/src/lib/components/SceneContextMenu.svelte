@@ -47,21 +47,24 @@
       }
     }
 
-    // Add event listeners
-    document.addEventListener('click', handleClickOutside);
+    // Add event listeners - listen for both click and mousedown to catch canvas interactions
+    document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('keydown', handleKeyDown);
   });
 
   onDestroy(() => {
     // Remove event listeners
-    document.removeEventListener('click', handleClickOutside);
+    document.removeEventListener('mousedown', handleClickOutside);
     document.removeEventListener('keydown', handleKeyDown);
   });
 
   function handleClickOutside(event: MouseEvent) {
-    if (menuElement && !menuElement.contains(event.target as Node)) {
-      close();
-    }
+    // Use setTimeout to allow the menu's own click handlers to fire first
+    setTimeout(() => {
+      if (menuElement && !menuElement.contains(event.target as Node)) {
+        close();
+      }
+    }, 0);
   }
 
   function handleKeyDown(event: KeyboardEvent) {
