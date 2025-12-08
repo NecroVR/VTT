@@ -90,6 +90,8 @@
 
   // DEBUG: Track light visibility state for logging
   const debugLightState: Map<string, { redVisible: boolean; polygonLength: number; lightPos: { x: number; y: number } }> = new Map();
+  // DEBUG: Track render calls for each light
+  const debugRenderState: Map<string, { rendered: boolean; reason: string }> = new Map();
 
   // Drag-and-drop state
   let isDragOver = false;
@@ -1157,8 +1159,18 @@
     const y = Math.floor(light.y) + 0.5;
     const { bright, dim, color, alpha, angle, rotation, animationType, animationSpeed, animationIntensity, walls: wallsEnabled, hidden, negative } = light;
 
+    // DEBUG: Helper to track render state changes
+    const trackRender = (rendered: boolean, reason: string) => {
+      const prev = debugRenderState.get(light.id);
+      if (!prev || prev.rendered !== rendered || prev.reason !== reason) {
+        console.log(`[LIGHT ${light.id}] RENDER: ${rendered ? 'YES' : 'NO'} | reason: ${reason} | pos=(${x.toFixed(1)}, ${y.toFixed(1)}) | rawPos=(${light.x.toFixed(1)}, ${light.y.toFixed(1)})`);
+        debugRenderState.set(light.id, { rendered, reason });
+      }
+    };
+
     // Skip hidden lights
     if (hidden) {
+      trackRender(false, 'hidden');
       return;
     }
 
@@ -1169,11 +1181,13 @@
 
     // Skip if scene darkness is outside this light's activation range
     if (sceneDarkness < darknessMin || sceneDarkness > darknessMax) {
+      trackRender(false, 'darkness-range');
       return;
     }
 
     // Performance optimization: Cull lights outside viewport
     if (!isInViewport(x - dim, y - dim, dim * 2, dim * 2)) {
+      trackRender(false, 'viewport-culled');
       return;
     }
 
@@ -1339,8 +1353,10 @@
 
     // Render light with or without wall occlusion based on light.walls property
     if (wallsEnabled && visibilityPolygon) {
+      trackRender(true, `clipped-${visibilityPolygon.length}pts`);
       renderClippedLight(ctx, { x, y }, animatedDim, visibilityPolygon, renderLightGradient, light.id);
     } else {
+      trackRender(true, wallsEnabled ? 'no-polygon' : 'walls-disabled');
       renderLightGradient();
     }
   }
