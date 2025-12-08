@@ -201,9 +201,9 @@
     renderLights();
   }
 
-  // Watch for light changes
+  // Watch for light changes - render without full cache invalidation
+  // (new lights get cache miss by ID, moved lights get cache miss by position)
   $: if (lights) {
-    invalidateVisibilityCache();
     renderLights();
   }
 
@@ -537,14 +537,25 @@
 
   /**
    * Performance optimization: Get cached visibility polygon
+   * Cache key includes position and radius so moved lights get fresh polygons
    */
   function getVisibilityPolygon(sourceId: string, x: number, y: number, radius: number): Point[] {
-    if (visibilityCacheValid && visibilityCache.has(sourceId)) {
-      return visibilityCache.get(sourceId)!;
+    // Use floor + 0.5 to center on pixel - MUST match renderLight and renderClippedLight
+    // This ensures consistent coordinates across visibility computation, clipping, and rendering
+    const adjustedX = Math.floor(x) + 0.5;
+    const adjustedY = Math.floor(y) + 0.5;
+    const roundedRadius = Math.round(radius);
+
+    // Cache key uses floor values (all positions in same pixel share visibility polygon)
+    const cacheKey = `${sourceId}-${Math.floor(x)}-${Math.floor(y)}-${roundedRadius}`;
+
+    if (visibilityCacheValid && visibilityCache.has(cacheKey)) {
+      return visibilityCache.get(cacheKey)!;
     }
 
-    const polygon = computeVisibilityPolygon({ x, y }, walls, radius);
-    visibilityCache.set(sourceId, polygon);
+    // Use adjusted coordinates for polygon computation
+    const polygon = computeVisibilityPolygon({ x: adjustedX, y: adjustedY }, walls, roundedRadius);
+    visibilityCache.set(cacheKey, polygon);
 
     return polygon;
   }
@@ -1086,10 +1097,11 @@
     ctx.save();
 
     // Create clipping path from visibility polygon
+    // Use floor + 0.5 to center on pixels (consistent with light source positioning)
     ctx.beginPath();
-    ctx.moveTo(visibilityPolygon[0].x, visibilityPolygon[0].y);
+    ctx.moveTo(Math.floor(visibilityPolygon[0].x) + 0.5, Math.floor(visibilityPolygon[0].y) + 0.5);
     for (let i = 1; i < visibilityPolygon.length; i++) {
-      ctx.lineTo(visibilityPolygon[i].x, visibilityPolygon[i].y);
+      ctx.lineTo(Math.floor(visibilityPolygon[i].x) + 0.5, Math.floor(visibilityPolygon[i].y) + 0.5);
     }
     ctx.closePath();
     ctx.clip();
@@ -1098,10 +1110,20 @@
     renderCallback();
 
     ctx.restore();
+
+    // DEBUG: Draw a blue marker OUTSIDE the clip to verify canvas is functional
+    ctx.fillStyle = '#0000ff';
+    ctx.beginPath();
+    ctx.arc(source.x, source.y - 30, 8, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   function renderLight(ctx: CanvasRenderingContext2D, light: AmbientLight, time: number) {
-    const { x, y, bright, dim, color, alpha, angle, rotation, animationType, animationSpeed, animationIntensity, walls: wallsEnabled, hidden, negative } = light;
+    // Use floor + 0.5 to center on pixel and avoid exact grid boundaries
+    // This prevents edge cases when light is at grid cell corners
+    const x = Math.floor(light.x) + 0.5;
+    const y = Math.floor(light.y) + 0.5;
+    const { bright, dim, color, alpha, angle, rotation, animationType, animationSpeed, animationIntensity, walls: wallsEnabled, hidden, negative } = light;
 
     // Skip hidden lights
     if (hidden) {
@@ -1148,6 +1170,10 @@
       // Wave animation - ripple effect
       // Speed and intensity will be used in gradient rendering below
     }
+
+    // Round animated radii to fix canvas rendering issues with sub-pixel precision
+    animatedBright = Math.round(animatedBright);
+    animatedDim = Math.round(animatedDim);
 
     // Determine if we should apply wall occlusion based on light.walls property
     const visibilityPolygon = wallsEnabled
@@ -1269,6 +1295,12 @@
         ctx.arc(x, y, animatedDim, 0, Math.PI * 2);
         ctx.fill();
       }
+
+      // DEBUG: Add red marker at light center to test if anything renders inside clip
+      ctx.fillStyle = '#ff0000';
+      ctx.beginPath();
+      ctx.arc(x, y, 15, 0, Math.PI * 2);
+      ctx.fill();
 
       ctx.restore();
     };
