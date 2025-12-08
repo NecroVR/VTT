@@ -1904,48 +1904,48 @@
 
   function handleMouseUp(e: MouseEvent) {
     if (isDraggingLight && draggedLightId) {
-      const worldPos = screenToWorld(e.clientX, e.clientY);
-      let newX = worldPos.x + dragOffsetX;
-      let newY = worldPos.y + dragOffsetY;
-
-      // Apply grid snapping if the light has it enabled
       const light = lights.find(l => l.id === draggedLightId);
-      if (light?.snapToGrid) {
-        const snappedPos = snapToGridCenter(newX, newY);
-        newX = snappedPos.x;
-        newY = snappedPos.y;
-      }
+      if (light) {
+        const worldPos = screenToWorld(e.clientX, e.clientY);
+        let newX = worldPos.x + dragOffsetX;
+        let newY = worldPos.y + dragOffsetY;
 
-      // Send light move event
-      onLightMove?.(draggedLightId, newX, newY);
+        // Apply grid snapping if the light has it enabled
+        if (light.snapToGrid) {
+          const snappedPos = snapToGridCenter(newX, newY);
+          newX = snappedPos.x;
+          newY = snappedPos.y;
+        }
+
+        // Only send move event if position actually changed
+        const positionChanged = Math.abs(newX - light.x) > 1 || Math.abs(newY - light.y) > 1;
+        if (positionChanged) {
+          onLightMove?.(draggedLightId, newX, newY);
+        }
+      }
 
       isDraggingLight = false;
       draggedLightId = null;
     } else if (isDraggingToken && draggedTokenId) {
-      const worldPos = screenToWorld(e.clientX, e.clientY);
-      let newX = worldPos.x + dragOffsetX;
-      let newY = worldPos.y + dragOffsetY;
+      const token = tokens.find(t => t.id === draggedTokenId);
+      if (token) {
+        const worldPos = screenToWorld(e.clientX, e.clientY);
+        let newX = worldPos.x + dragOffsetX;
+        let newY = worldPos.y + dragOffsetY;
 
-      // Apply grid snapping if enabled
-      if (gridSnap) {
-        const token = tokens.find(t => t.id === draggedTokenId);
-        if (token) {
-          const tokenWidth = (token.width || 1) * scene.gridSize;
-          const tokenHeight = (token.height || 1) * scene.gridSize;
+        // Apply grid snapping if enabled
+        if (gridSnap) {
+          // Snap the token's top-left corner to the nearest grid intersection
+          newX = Math.round(newX / scene.gridSize) * scene.gridSize;
+          newY = Math.round(newY / scene.gridSize) * scene.gridSize;
+        }
 
-          // Snap token to grid cell boundaries
-          // Find which cell the token center is in - this becomes the top-left cell
-          // Token's top-left corner aligns with that cell's top-left corner
-          // This ensures larger tokens (2x2, 3x3, etc.) fill complete grid cells
-          const cellX = Math.floor((newX + tokenWidth / 2) / scene.gridSize);
-          const cellY = Math.floor((newY + tokenHeight / 2) / scene.gridSize);
-          newX = cellX * scene.gridSize;
-          newY = cellY * scene.gridSize;
+        // Only send move event if position actually changed
+        const positionChanged = Math.abs(newX - token.x) > 1 || Math.abs(newY - token.y) > 1;
+        if (positionChanged) {
+          onTokenMove?.(draggedTokenId, newX, newY);
         }
       }
-
-      // Send token move event
-      onTokenMove?.(draggedTokenId, newX, newY);
 
       isDraggingToken = false;
       draggedTokenId = null;
