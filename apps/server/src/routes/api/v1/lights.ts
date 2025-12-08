@@ -188,6 +188,7 @@ const lightsRoute: FastifyPluginAsync = async (fastify) => {
             animationIntensity: lightData.animationIntensity ?? 5,
             walls: lightData.walls ?? true,
             vision: lightData.vision ?? false,
+            snapToGrid: lightData.snapToGrid ?? false,
             data: lightData.data ?? {},
           })
           .returning();

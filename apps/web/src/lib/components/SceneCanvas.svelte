@@ -1268,9 +1268,10 @@
     if (!lightingCtx || !lightingCanvas) return;
 
     // Performance optimization: Pre-calculate visibility at start of frame
-    if (!visibilityCacheValid) {
+    // Capture whether cache needs clearing, but defer setting the flag until after rendering
+    const shouldClearCache = !visibilityCacheValid;
+    if (shouldClearCache) {
       visibilityCache.clear();
-      visibilityCacheValid = true;
     }
 
     lightingCtx.clearRect(0, 0, lightingCanvas.width, lightingCanvas.height);
@@ -1352,6 +1353,11 @@
     }
 
     lightingCtx.restore();
+
+    // Only mark cache as valid after all lights have been rendered
+    if (shouldClearCache) {
+      visibilityCacheValid = true;
+    }
   }
 
   /**
