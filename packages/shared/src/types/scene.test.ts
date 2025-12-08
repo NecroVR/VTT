@@ -424,6 +424,8 @@ describe('Scene Types', () => {
           gridSize: 50,
           gridColor: '#000000',
           gridAlpha: 0.2,
+          gridVisible: true,
+          gridLineWidth: 1,
           gridDistance: 5,
           gridUnits: 'ft',
           tokenVision: true,
