@@ -19,6 +19,7 @@
   import ActorCreateModal from '$lib/components/actor/ActorCreateModal.svelte';
   import TokenConfig from '$lib/components/TokenConfig.svelte';
   import TokenBrowser from '$lib/components/campaign/TokenBrowser.svelte';
+  import AdminPanel from '$lib/components/campaign/AdminPanel.svelte';
   import TabbedSidebar, { type Tab } from '$lib/components/campaign/TabbedSidebar.svelte';
   import ResizableDivider from '$lib/components/campaign/ResizableDivider.svelte';
   import type { Scene, Token, Wall } from '@vtt/shared';
@@ -26,7 +27,6 @@
 
   let wsState: { connected: boolean; reconnecting: boolean; error: string | null };
   let activeTool = 'select';
-  let gridSnap = false;
   let showActorSheet = false;
   let selectedActorId: string | null = null;
   let showTokenConfig = false;
@@ -86,7 +86,14 @@
       label: 'Tokens',
       component: TokenBrowser,
       props: { campaignId: campaignId, isGM }
-    }
+    },
+    // Admin tab - only visible to GMs
+    ...(isGM ? [{
+      id: 'admin',
+      label: 'Admin',
+      component: AdminPanel,
+      props: { campaignId: campaignId }
+    }] : [])
   ] as Tab[];
 
   onMount(async () => {
@@ -351,7 +358,7 @@
           {walls}
           {isGM}
           {activeTool}
-          {gridSnap}
+          gridSnap={currentCampaign?.settings?.snapToGrid ?? false}
           onTokenMove={handleTokenMove}
           onTokenAdd={handleTokenAdd}
           onTokenSelect={handleTokenSelect}

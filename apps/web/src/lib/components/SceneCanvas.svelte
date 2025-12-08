@@ -1718,8 +1718,22 @@
   function handleMouseUp(e: MouseEvent) {
     if (isDraggingToken && draggedTokenId) {
       const worldPos = screenToWorld(e.clientX, e.clientY);
-      const newX = worldPos.x + dragOffsetX;
-      const newY = worldPos.y + dragOffsetY;
+      let newX = worldPos.x + dragOffsetX;
+      let newY = worldPos.y + dragOffsetY;
+
+      // Apply grid snapping if enabled
+      if (gridSnap) {
+        const token = tokens.find(t => t.id === draggedTokenId);
+        if (token) {
+          const tokenWidth = (token.width || 1) * scene.gridSize;
+          const tokenHeight = (token.height || 1) * scene.gridSize;
+
+          // Calculate grid cell center position
+          // Formula: Round to nearest grid cell, then offset to center the token
+          newX = Math.round((newX + tokenWidth / 2) / scene.gridSize) * scene.gridSize - tokenWidth / 2;
+          newY = Math.round((newY + tokenHeight / 2) / scene.gridSize) * scene.gridSize - tokenHeight / 2;
+        }
+      }
 
       // Send token move event
       onTokenMove?.(draggedTokenId, newX, newY);
