@@ -169,10 +169,15 @@
     gridNeedsUpdate = true;
   }
 
+  // Track walls for reactivity - use JSON to detect content changes
+  let lastWallsJson = '';
+  $: wallsJson = JSON.stringify(walls.map(w => ({ id: w.id, x1: w.x1, y1: w.y1, x2: w.x2, y2: w.y2, sense: w.sense })));
+
   // Watch for scene ID changes (clear caches when switching scenes)
   $: if (scene.id) {
-    invalidateVisibilityCache();
-    visibilityCache.clear();  // Force clear the entire cache on scene switch
+    visibilityCache.clear();
+    visibilityCacheValid = false;
+    lastWallsJson = '';  // Reset wall tracking
   }
 
   // Watch for other scene changes (re-render without reloading image)
@@ -185,17 +190,20 @@
     renderTokens();
   }
 
-  // Watch for wall changes
-  $: if (walls) {
-    invalidateVisibilityCache();
+  // Watch for wall changes - detect any change in wall data
+  $: if (wallsJson !== lastWallsJson) {
+    lastWallsJson = wallsJson;
+    visibilityCache.clear();  // Force clear on any wall change
+    visibilityCacheValid = false;
     if (isGM) {
       renderWalls();
     }
-    renderLights();  // Re-render lights so wall occlusion updates
+    renderLights();
   }
 
   // Watch for light changes
   $: if (lights) {
+    visibilityCacheValid = false;  // Invalidate for new lights too
     renderLights();
   }
 
