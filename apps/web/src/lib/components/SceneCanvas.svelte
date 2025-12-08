@@ -180,9 +180,12 @@
   }
 
   // Watch for wall changes
-  $: if (walls && isGM) {
+  $: if (walls) {
     invalidateVisibilityCache();
-    renderWalls();
+    if (isGM) {
+      renderWalls();
+    }
+    renderLights();  // Re-render lights so wall occlusion updates
   }
 
   // Watch for light changes
