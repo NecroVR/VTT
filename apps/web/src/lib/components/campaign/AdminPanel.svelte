@@ -1,67 +1,31 @@
 <script lang="ts">
+  import { campaignsStore } from '$lib/stores/campaigns';
+
   export let campaignId: string;
 
-  let loading = false;
   let error: string | null = null;
-  let snapToGrid = false;
   let saving = false;
 
-  // Load campaign settings on mount
-  $: if (campaignId) {
-    loadSettings();
-  }
-
-  async function loadSettings() {
-    loading = true;
-    error = null;
-
-    try {
-      const token = localStorage.getItem('vtt_session_id') || sessionStorage.getItem('vtt_session_id') || '';
-      const response = await fetch(`/api/v1/campaigns/${campaignId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to load campaign settings');
-      }
-
-      const data = await response.json();
-      snapToGrid = data.campaign.settings?.snapToGrid ?? false;
-    } catch (err) {
-      console.error('Failed to load campaign settings:', err);
-      error = 'Failed to load settings';
-    } finally {
-      loading = false;
-    }
-  }
+  // Read settings from the campaigns store (reactive)
+  $: currentCampaign = $campaignsStore.currentCampaign;
+  $: snapToGrid = currentCampaign?.settings?.snapToGrid ?? false;
+  $: loading = $campaignsStore.loading;
 
   async function handleToggleSnapToGrid() {
     saving = true;
     error = null;
 
     try {
-      const token = localStorage.getItem('vtt_session_id') || sessionStorage.getItem('vtt_session_id') || '';
-      const response = await fetch(`/api/v1/campaigns/${campaignId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+      // Use the store's updateCampaign method - this updates currentCampaign
+      const success = await campaignsStore.updateCampaign(campaignId, {
+        settings: {
+          snapToGrid: !snapToGrid,
         },
-        body: JSON.stringify({
-          settings: {
-            snapToGrid: !snapToGrid,
-          },
-        }),
       });
 
-      if (!response.ok) {
+      if (!success) {
         throw new Error('Failed to update settings');
       }
-
-      const data = await response.json();
-      snapToGrid = data.campaign.settings.snapToGrid;
     } catch (err) {
       console.error('Failed to update settings:', err);
       error = 'Failed to save settings';
