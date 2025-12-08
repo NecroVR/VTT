@@ -18,6 +18,7 @@
   export let onWallRemove: ((wallId: string) => void) | undefined = undefined;
   export let onWallUpdate: ((wallId: string, updates: Partial<Wall>) => void) | undefined = undefined;
   export let onTokenAdd: ((tokenData: any) => void) | undefined = undefined;
+  export let onLightAdd: ((lightData: { x: number; y: number }) => void) | undefined = undefined;
 
   // Canvas refs
   let canvasContainer: HTMLDivElement;
@@ -1563,6 +1564,16 @@
       return;
     }
 
+    // Handle light tool
+    if (activeTool === 'light' && isGM) {
+      // Place light at clicked position
+      onLightAdd?.({
+        x: snappedPos.x,
+        y: snappedPos.y
+      });
+      return;
+    }
+
     // Handle select tool - check for wall/door selection
     if (activeTool === 'select' && isGM) {
       const wallId = findWallAtPoint(worldPos.x, worldPos.y);
@@ -1939,7 +1950,7 @@
   {/if}
   <canvas
     class="canvas-layer canvas-interactive"
-    class:cursor-crosshair={activeTool === 'wall'}
+    class:cursor-crosshair={activeTool === 'wall' || activeTool === 'light'}
     class:cursor-grab={activeTool === 'select'}
     class:drag-over={isDragOver}
     bind:this={controlsCanvas}

@@ -283,6 +283,26 @@
     websocket.sendWallUpdate({ wallId, updates });
   }
 
+  function handleLightAdd(lightData: { x: number; y: number }) {
+    if (!activeScene) return;
+    websocket.sendLightAdd({
+      sceneId: activeScene.id,
+      x: lightData.x,
+      y: lightData.y,
+      rotation: 0,
+      bright: 100,
+      dim: 200,
+      angle: 360,
+      color: '#ffffff',
+      alpha: 0.5,
+      animationType: null,
+      animationSpeed: 5,
+      animationIntensity: 5,
+      walls: true,
+      vision: false
+    });
+  }
+
   function handleOpenActorSheet(actorId: string) {
     selectedActorId = actorId;
     showActorSheet = true;
@@ -384,6 +404,7 @@
           onWallAdd={handleWallAdd}
           onWallRemove={handleWallRemove}
           onWallUpdate={handleWallUpdate}
+          onLightAdd={handleLightAdd}
         />
         {#if isGM}
           <div class="scene-controls-overlay">
