@@ -13,6 +13,7 @@
     edit: void;
     toggleVisibility: { currentState: boolean };
     delete: void;
+    close: void;
   }>();
 
   let menuElement: HTMLDivElement;
@@ -89,9 +90,8 @@
   }
 
   function close() {
-    // Dispatch a custom event that parent can listen to
-    const event = new CustomEvent('close');
-    menuElement?.dispatchEvent(event);
+    // Dispatch close event to parent using Svelte's event system
+    dispatch('close');
   }
 </script>
 

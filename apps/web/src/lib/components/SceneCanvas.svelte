@@ -1638,6 +1638,11 @@
       }
     }
 
+    // Close context menu on any mouse interaction (left-click, drag, etc.)
+    if (showContextMenu) {
+      showContextMenu = false;
+    }
+
     lastMouseX = e.clientX;
     lastMouseY = e.clientY;
 
