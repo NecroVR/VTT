@@ -6,6 +6,7 @@
   import { websocket } from '$lib/stores/websocket';
   import SceneContextMenu from './SceneContextMenu.svelte';
   import ConfirmDialog from './ConfirmDialog.svelte';
+  import { computeViewport } from 'visibility-polygon';
 
   // Props
   export let scene: Scene;
@@ -88,10 +89,6 @@
   let deleteDialogTitle = '';
   let deleteDialogMessage = '';
 
-  // DEBUG: Track light visibility state for logging
-  const debugLightState: Map<string, { redVisible: boolean; polygonLength: number; lightPos: { x: number; y: number } }> = new Map();
-  // DEBUG: Track render calls for each light
-  const debugRenderState: Map<string, { rendered: boolean; reason: string }> = new Map();
 
   // Drag-and-drop state
   let isDragOver = false;
@@ -546,10 +543,14 @@
    */
   function getVisibilityPolygon(sourceId: string, x: number, y: number, radius: number): Point[] {
     // Use floor + 0.5 to center on pixel - MUST match renderLight and renderClippedLight
-    // This ensures consistent coordinates across visibility computation, clipping, and rendering
     const adjustedX = Math.floor(x) + 0.5;
     const adjustedY = Math.floor(y) + 0.5;
     const roundedRadius = Math.round(radius);
+
+    // Early exit: if no walls are within range, skip polygon computation
+    if (!hasWallsInRange({ x: adjustedX, y: adjustedY }, walls, roundedRadius)) {
+      return [];
+    }
 
     // Cache key uses floor values (all positions in same pixel share visibility polygon)
     const cacheKey = `${sourceId}-${Math.floor(x)}-${Math.floor(y)}-${roundedRadius}`;
@@ -960,58 +961,77 @@
     return closestPoint;
   }
 
+  /**
+   * Check if any walls are within range of a point
+   * Used to skip visibility polygon computation when no walls affect the light
+   */
+  function hasWallsInRange(source: Point, walls: Wall[], maxRadius: number): boolean {
+    const radiusSq = maxRadius * maxRadius;
+
+    for (const wall of walls) {
+      // Check if wall has blocking sense
+      const effectiveProps = getEffectiveWallProperties(wall);
+      if (effectiveProps.sense !== 'block') continue;
+
+      // Check if either endpoint is within radius
+      const d1Sq = (wall.x1 - source.x) ** 2 + (wall.y1 - source.y) ** 2;
+      const d2Sq = (wall.x2 - source.x) ** 2 + (wall.y2 - source.y) ** 2;
+      if (d1Sq <= radiusSq || d2Sq <= radiusSq) return true;
+
+      // Check if wall segment passes through the circle
+      // Project source point onto wall line segment
+      const dx = wall.x2 - wall.x1;
+      const dy = wall.y2 - wall.y1;
+      const lengthSq = dx * dx + dy * dy;
+      if (lengthSq === 0) continue;
+
+      const t = Math.max(0, Math.min(1, ((source.x - wall.x1) * dx + (source.y - wall.y1) * dy) / lengthSq));
+      const closestX = wall.x1 + t * dx;
+      const closestY = wall.y1 + t * dy;
+      const distSq = (source.x - closestX) ** 2 + (source.y - closestY) ** 2;
+      if (distSq <= radiusSq) return true;
+    }
+
+    return false;
+  }
+
   function computeVisibilityPolygon(
     source: Point,
     walls: Wall[],
     maxRadius: number
   ): Point[] {
-    // Only consider walls with effective sense === 'block' (closed doors block, open doors don't)
+    // Filter walls to only blocking ones (respects door open/close state)
     const blockingWalls = walls.filter(w => {
       const effectiveProps = getEffectiveWallProperties(w);
       return effectiveProps.sense === 'block';
     });
 
-    // Convert walls to segments for ray casting
-    const segments: Segment[] = blockingWalls.map(w => ({
-      x1: w.x1,
-      y1: w.y1,
-      x2: w.x2,
-      y2: w.y2
-    }));
-
-    // Collect ALL angles to cast rays
-    const angles: number[] = [];
-    const EPSILON = 0.0001;
-
-    // 1. Add boundary angles for full 360-degree coverage
-    const BOUNDARY_STEPS = 72; // Every 5 degrees
-    for (let i = 0; i < BOUNDARY_STEPS; i++) {
-      angles.push((i / BOUNDARY_STEPS) * Math.PI * 2 - Math.PI);
+    // If no blocking walls, return empty array (caller should skip clipping)
+    if (blockingWalls.length === 0) {
+      return [];
     }
 
-    // 2. Add wall endpoint angles with epsilon offsets for precision
-    for (const wall of blockingWalls) {
-      const angle1 = Math.atan2(wall.y1 - source.y, wall.x1 - source.x);
-      const angle2 = Math.atan2(wall.y2 - source.y, wall.x2 - source.x);
+    // Convert walls to visibility-polygon segment format: [[x1, y1], [x2, y2]]
+    const segments: [number, number][][] = blockingWalls.map(w => [
+      [w.x1, w.y1] as [number, number],
+      [w.x2, w.y2] as [number, number]
+    ]);
 
-      angles.push(angle1 - EPSILON, angle1, angle1 + EPSILON);
-      angles.push(angle2 - EPSILON, angle2, angle2 + EPSILON);
-    }
+    // Define viewport bounds (light radius circle bounding box)
+    const viewportMin: [number, number] = [source.x - maxRadius, source.y - maxRadius];
+    const viewportMax: [number, number] = [source.x + maxRadius, source.y + maxRadius];
 
-    // 3. Sort and remove near-duplicates
-    angles.sort((a, b) => a - b);
-    const uniqueAngles = angles.filter((angle, i) =>
-      i === 0 || Math.abs(angle - angles[i - 1]) > EPSILON / 2
+    // Compute visibility polygon using the library
+    // computeViewport is faster when many segments are outside the viewport
+    const polygonTuples = computeViewport(
+      [source.x, source.y],
+      segments,
+      viewportMin,
+      viewportMax
     );
 
-    // 4. Cast rays at each angle and build visibility polygon
-    const points: Point[] = [];
-    for (const angle of uniqueAngles) {
-      const point = castRay(source, angle, segments, maxRadius);
-      points.push(point);
-    }
-
-    return points;
+    // Convert from [x, y] tuples back to {x, y} Point objects
+    return polygonTuples.map(([x, y]) => ({ x, y }));
   }
 
   /**
@@ -1098,66 +1118,56 @@
     renderCallback: () => void,
     lightId?: string
   ) {
-    // DEBUG: Check if light center is inside visibility polygon
-    const isSourceInPolygon = visibilityPolygon.length > 0 && isPointInPolygon(source, visibilityPolygon);
-
-    // DEBUG: Track state changes
-    if (lightId) {
-      const prevState = debugLightState.get(lightId);
-      const newState = {
-        redVisible: isSourceInPolygon,
-        polygonLength: visibilityPolygon.length,
-        lightPos: { x: source.x, y: source.y }
-      };
-
-      if (!prevState) {
-        console.log(`[LIGHT ${lightId}] Initial state: redVisible=${isSourceInPolygon}, polygonPoints=${visibilityPolygon.length}, pos=(${source.x.toFixed(1)}, ${source.y.toFixed(1)})`);
-      } else if (prevState.redVisible !== isSourceInPolygon) {
-        console.log(`[LIGHT ${lightId}] STATE CHANGE: ${prevState.redVisible ? 'RED->BLUE' : 'BLUE->RED'} | polygonPoints: ${prevState.polygonLength}->${visibilityPolygon.length} | pos=(${source.x.toFixed(1)}, ${source.y.toFixed(1)})`);
-        if (!isSourceInPolygon && visibilityPolygon.length > 0) {
-          // Log polygon bounds when red disappears
-          const minX = Math.min(...visibilityPolygon.map(p => p.x));
-          const maxX = Math.max(...visibilityPolygon.map(p => p.x));
-          const minY = Math.min(...visibilityPolygon.map(p => p.y));
-          const maxY = Math.max(...visibilityPolygon.map(p => p.y));
-          console.log(`[LIGHT ${lightId}] Polygon bounds: x=[${minX.toFixed(1)}, ${maxX.toFixed(1)}], y=[${minY.toFixed(1)}, ${maxY.toFixed(1)}]`);
-        }
-      }
-      debugLightState.set(lightId, newState);
-    }
-
     if (visibilityPolygon.length === 0) return;
 
     ctx.save();
 
-    // Create clipping path from visibility polygon
-    // Use polygon points directly - they were computed from the adjusted source center
-    // Do NOT apply Math.floor + 0.5 here - that distorts polygon points and can exclude the light center
+    // Expand the clipping polygon slightly outward from the light center
+    // This ensures the light center is always inside the clipping region
+    // while walls still properly occlude the light edges
+    const CLIP_EXPANSION = 0.5;
+
     ctx.beginPath();
-    ctx.moveTo(visibilityPolygon[0].x, visibilityPolygon[0].y);
+
+    // Calculate expanded vertex for the first point
+    const firstVertex = visibilityPolygon[0];
+    const firstDx = firstVertex.x - source.x;
+    const firstDy = firstVertex.y - source.y;
+    const firstDist = Math.sqrt(firstDx * firstDx + firstDy * firstDy);
+
+    if (firstDist > 0.1) {
+      const firstRatio = (firstDist + CLIP_EXPANSION) / firstDist;
+      const firstExpandedX = source.x + firstDx * firstRatio;
+      const firstExpandedY = source.y + firstDy * firstRatio;
+      ctx.moveTo(firstExpandedX, firstExpandedY);
+    } else {
+      ctx.moveTo(firstVertex.x, firstVertex.y);
+    }
+
+    // Expand and add remaining vertices
     for (let i = 1; i < visibilityPolygon.length; i++) {
-      ctx.lineTo(visibilityPolygon[i].x, visibilityPolygon[i].y);
+      const vertex = visibilityPolygon[i];
+      const dx = vertex.x - source.x;
+      const dy = vertex.y - source.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist > 0.1) {
+        const ratio = (dist + CLIP_EXPANSION) / dist;
+        const expandedX = source.x + dx * ratio;
+        const expandedY = source.y + dy * ratio;
+        ctx.lineTo(expandedX, expandedY);
+      } else {
+        ctx.lineTo(vertex.x, vertex.y);
+      }
     }
+
     ctx.closePath();
-
-    // DEBUG: Check if canvas path actually contains the source point
-    const canvasPathContainsSource = ctx.isPointInPath(source.x, source.y);
-    if (lightId && isSourceInPolygon !== canvasPathContainsSource) {
-      console.log(`[LIGHT ${lightId}] PATH MISMATCH! isPointInPolygon=${isSourceInPolygon}, ctx.isPointInPath=${canvasPathContainsSource}, pos=(${source.x.toFixed(1)}, ${source.y.toFixed(1)})`);
-    }
-
     ctx.clip();
 
     // Render light within clipped area
     renderCallback();
 
     ctx.restore();
-
-    // DEBUG: Draw a blue marker OUTSIDE the clip to verify canvas is functional
-    ctx.fillStyle = '#0000ff';
-    ctx.beginPath();
-    ctx.arc(source.x, source.y - 30, 8, 0, Math.PI * 2);
-    ctx.fill();
   }
 
   function renderLight(ctx: CanvasRenderingContext2D, light: AmbientLight, time: number) {
@@ -1167,18 +1177,8 @@
     const y = Math.floor(light.y) + 0.5;
     const { bright, dim, color, alpha, angle, rotation, animationType, animationSpeed, animationIntensity, walls: wallsEnabled, hidden, negative } = light;
 
-    // DEBUG: Helper to track render state changes
-    const trackRender = (rendered: boolean, reason: string) => {
-      const prev = debugRenderState.get(light.id);
-      if (!prev || prev.rendered !== rendered || prev.reason !== reason) {
-        console.log(`[LIGHT ${light.id}] RENDER: ${rendered ? 'YES' : 'NO'} | reason: ${reason} | pos=(${x.toFixed(1)}, ${y.toFixed(1)}) | rawPos=(${light.x.toFixed(1)}, ${light.y.toFixed(1)})`);
-        debugRenderState.set(light.id, { rendered, reason });
-      }
-    };
-
     // Skip hidden lights
     if (hidden) {
-      trackRender(false, 'hidden');
       return;
     }
 
@@ -1189,13 +1189,11 @@
 
     // Skip if scene darkness is outside this light's activation range
     if (sceneDarkness < darknessMin || sceneDarkness > darknessMax) {
-      trackRender(false, 'darkness-range');
       return;
     }
 
     // Performance optimization: Cull lights outside viewport
     if (!isInViewport(x - dim, y - dim, dim * 2, dim * 2)) {
-      trackRender(false, 'viewport-culled');
       return;
     }
 
@@ -1350,23 +1348,14 @@
         ctx.fill();
       }
 
-      // DEBUG: Add red marker at light center to test if anything renders inside clip
-      ctx.fillStyle = '#ff0000';
-      ctx.beginPath();
-      ctx.arc(x, y, 15, 0, Math.PI * 2);
-      ctx.fill();
-
       ctx.restore();
     };
 
     // Render light with or without wall occlusion based on light.walls property
-    // DEBUG: Temporarily skip clipping to test if it's causing the flicker - v2
-    const DEBUG_SKIP_CLIPPING = true;
-    if (wallsEnabled && visibilityPolygon && !DEBUG_SKIP_CLIPPING) {
-      trackRender(true, `clipped-${visibilityPolygon.length}pts`);
+    // Empty polygon means no walls are affecting this light - render without clipping
+    if (wallsEnabled && visibilityPolygon && visibilityPolygon.length > 0) {
       renderClippedLight(ctx, { x, y }, animatedDim, visibilityPolygon, renderLightGradient, light.id);
     } else {
-      trackRender(true, wallsEnabled ? (DEBUG_SKIP_CLIPPING ? 'skip-clip-debug' : 'no-polygon') : 'walls-disabled');
       renderLightGradient();
     }
   }
