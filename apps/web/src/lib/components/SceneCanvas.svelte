@@ -1139,6 +1139,13 @@
       ctx.lineTo(visibilityPolygon[i].x, visibilityPolygon[i].y);
     }
     ctx.closePath();
+
+    // DEBUG: Check if canvas path actually contains the source point
+    const canvasPathContainsSource = ctx.isPointInPath(source.x, source.y);
+    if (lightId && isSourceInPolygon !== canvasPathContainsSource) {
+      console.log(`[LIGHT ${lightId}] PATH MISMATCH! isPointInPolygon=${isSourceInPolygon}, ctx.isPointInPath=${canvasPathContainsSource}, pos=(${source.x.toFixed(1)}, ${source.y.toFixed(1)})`);
+    }
+
     ctx.clip();
 
     // Render light within clipped area
@@ -1353,11 +1360,13 @@
     };
 
     // Render light with or without wall occlusion based on light.walls property
-    if (wallsEnabled && visibilityPolygon) {
+    // DEBUG: Temporarily skip clipping to test if it's causing the flicker - v2
+    const DEBUG_SKIP_CLIPPING = true;
+    if (wallsEnabled && visibilityPolygon && !DEBUG_SKIP_CLIPPING) {
       trackRender(true, `clipped-${visibilityPolygon.length}pts`);
       renderClippedLight(ctx, { x, y }, animatedDim, visibilityPolygon, renderLightGradient, light.id);
     } else {
-      trackRender(true, wallsEnabled ? 'no-polygon' : 'walls-disabled');
+      trackRender(true, wallsEnabled ? (DEBUG_SKIP_CLIPPING ? 'skip-clip-debug' : 'no-polygon') : 'walls-disabled');
       renderLightGradient();
     }
   }
@@ -1600,8 +1609,13 @@
         lightingCtx.fillRect(0, 0, sceneWidth, sceneHeight);
 
         // Cut out lit areas using destination-out
+        // Must reset transform to draw tempCanvas at screen coordinates (0,0)
+        // since tempCanvas was rendered in screen space
         lightingCtx.globalCompositeOperation = 'destination-out';
+        lightingCtx.save();
+        lightingCtx.setTransform(1, 0, 0, 1, 0, 0);  // Reset to identity transform
         lightingCtx.drawImage(tempCanvas, 0, 0);
+        lightingCtx.restore();
         lightingCtx.globalCompositeOperation = 'source-over';
       }
     } else {
