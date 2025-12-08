@@ -61,6 +61,7 @@ const lightsRoute: FastifyPluginAsync = async (fastify) => {
           animationIntensity: light.animationIntensity,
           walls: light.walls,
           vision: light.vision,
+          snapToGrid: light.snapToGrid ?? false,
           data: light.data as Record<string, unknown>,
           createdAt: light.createdAt,
         }));
@@ -118,6 +119,7 @@ const lightsRoute: FastifyPluginAsync = async (fastify) => {
           animationIntensity: light.animationIntensity,
           walls: light.walls,
           vision: light.vision,
+          snapToGrid: light.snapToGrid ?? false,
           data: light.data as Record<string, unknown>,
           createdAt: light.createdAt,
         };
@@ -209,6 +211,7 @@ const lightsRoute: FastifyPluginAsync = async (fastify) => {
           animationIntensity: newLight.animationIntensity,
           walls: newLight.walls,
           vision: newLight.vision,
+          snapToGrid: newLight.snapToGrid ?? false,
           data: newLight.data as Record<string, unknown>,
           createdAt: newLight.createdAt,
         };
@@ -292,6 +295,9 @@ const lightsRoute: FastifyPluginAsync = async (fastify) => {
         if (updates.vision !== undefined) {
           updateData.vision = updates.vision;
         }
+        if (updates.snapToGrid !== undefined) {
+          updateData.snapToGrid = updates.snapToGrid;
+        }
         if (updates.data !== undefined) {
           updateData.data = updates.data;
         }
@@ -322,6 +328,7 @@ const lightsRoute: FastifyPluginAsync = async (fastify) => {
           animationIntensity: updatedLight.animationIntensity,
           walls: updatedLight.walls,
           vision: updatedLight.vision,
+          snapToGrid: updatedLight.snapToGrid ?? false,
           data: updatedLight.data as Record<string, unknown>,
           createdAt: updatedLight.createdAt,
         };

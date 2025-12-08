@@ -1451,6 +1451,7 @@ async function handleLightAdd(
       animationIntensity: newLight.animationIntensity,
       walls: newLight.walls,
       vision: newLight.vision,
+      snapToGrid: newLight.snapToGrid ?? false,
       data: newLight.data as Record<string, unknown>,
       createdAt: newLight.createdAt,
     };
@@ -1521,6 +1522,7 @@ async function handleLightUpdate(
       animationIntensity: updatedLight.animationIntensity,
       walls: updatedLight.walls,
       vision: updatedLight.vision,
+      snapToGrid: updatedLight.snapToGrid ?? false,
       data: updatedLight.data as Record<string, unknown>,
       createdAt: updatedLight.createdAt,
     };
