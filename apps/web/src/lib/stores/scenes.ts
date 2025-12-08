@@ -218,6 +218,57 @@ function createScenesStore() {
     },
 
     /**
+     * Update a scene via API
+     */
+    async updateSceneApi(sceneId: string, updates: Partial<Scene>): Promise<boolean> {
+      if (!browser) return false;
+
+      try {
+        const token = localStorage.getItem('vtt_session_id') || sessionStorage.getItem('vtt_session_id');
+
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+
+        const response = await fetch(`${API_BASE_URL}/api/v1/scenes/${sceneId}`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updates),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to update scene: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        const updatedScene: Scene = data.scene;
+
+        // Update scene in local state
+        update(state => {
+          const newScenes = new Map(state.scenes);
+          newScenes.set(sceneId, updatedScene);
+          return {
+            ...state,
+            scenes: newScenes,
+          };
+        });
+
+        return true;
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to update scene';
+        update(state => ({
+          ...state,
+          error: errorMessage,
+        }));
+        console.error('Error updating scene:', error);
+        return false;
+      }
+    },
+
+    /**
      * Delete a scene via API
      */
     async deleteScene(sceneId: string): Promise<boolean> {

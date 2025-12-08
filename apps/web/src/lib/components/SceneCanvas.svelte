@@ -141,7 +141,7 @@
   }
 
   // Watch for grid setting changes
-  $: if (scene.gridSize || scene.gridColor || scene.gridAlpha || scene.gridType) {
+  $: if (scene.gridSize || scene.gridColor || scene.gridAlpha || scene.gridType || scene.gridVisible !== undefined || scene.gridLineWidth) {
     gridNeedsUpdate = true;
   }
 
@@ -384,6 +384,14 @@
     }
 
     gridCtx.clearRect(0, 0, gridCanvas.width, gridCanvas.height);
+
+    // Check if grid should be visible
+    if (scene.gridVisible === false) {
+      gridCached = true;
+      gridNeedsUpdate = false;
+      return;
+    }
+
     gridCtx.save();
 
     // Apply transform
@@ -396,7 +404,7 @@
 
     gridCtx.strokeStyle = scene.gridColor;
     gridCtx.globalAlpha = scene.gridAlpha;
-    gridCtx.lineWidth = 1 / scale; // Keep line width constant in screen space
+    gridCtx.lineWidth = (scene.gridLineWidth || 1) / scale; // Use configurable line width, keep constant in screen space
 
     if (scene.gridType === 'square') {
       // Draw vertical lines

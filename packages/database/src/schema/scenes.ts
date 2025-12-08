@@ -15,6 +15,8 @@ export const scenes = pgTable('scenes', {
   gridSize: integer('grid_size').notNull().default(100),
   gridColor: text('grid_color').notNull().default('#000000'),
   gridAlpha: real('grid_alpha').notNull().default(0.2),
+  gridVisible: boolean('grid_visible').notNull().default(true),
+  gridLineWidth: real('grid_line_width').notNull().default(1),
   gridDistance: real('grid_distance').notNull().default(5),
   gridUnits: text('grid_units').notNull().default('ft'),
   // Vision settings

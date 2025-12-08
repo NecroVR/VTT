@@ -1,5 +1,6 @@
 <script lang="ts">
   import { campaignsStore } from '$lib/stores/campaigns';
+  import { scenesStore } from '$lib/stores/scenes';
 
   export let campaignId: string;
 
@@ -10,6 +11,18 @@
   $: currentCampaign = $campaignsStore.currentCampaign;
   $: snapToGrid = currentCampaign?.settings?.snapToGrid ?? false;
   $: loading = $campaignsStore.loading;
+
+  // Read active scene from scenes store (reactive)
+  $: activeScene = $scenesStore.activeSceneId
+    ? $scenesStore.scenes.get($scenesStore.activeSceneId)
+    : null;
+
+  // Scene grid settings (reactive)
+  $: gridVisible = activeScene?.gridVisible ?? true;
+  $: gridType = activeScene?.gridType ?? 'square';
+  $: gridColor = activeScene?.gridColor ?? '#000000';
+  $: gridLineWidth = activeScene?.gridLineWidth ?? 1;
+  $: gridAlpha = activeScene?.gridAlpha ?? 0.2;
 
   async function handleToggleSnapToGrid() {
     saving = true;
@@ -32,6 +45,50 @@
     } finally {
       saving = false;
     }
+  }
+
+  async function updateSceneGridSetting(updates: Record<string, any>) {
+    if (!activeScene) return;
+
+    saving = true;
+    error = null;
+
+    try {
+      const success = await scenesStore.updateSceneApi(activeScene.id, updates);
+
+      if (!success) {
+        throw new Error('Failed to update scene settings');
+      }
+    } catch (err) {
+      console.error('Failed to update scene settings:', err);
+      error = 'Failed to save scene settings';
+    } finally {
+      saving = false;
+    }
+  }
+
+  async function handleToggleGridVisible() {
+    await updateSceneGridSetting({ gridVisible: !gridVisible });
+  }
+
+  async function handleGridTypeChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    await updateSceneGridSetting({ gridType: target.value });
+  }
+
+  async function handleGridColorChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+    await updateSceneGridSetting({ gridColor: target.value });
+  }
+
+  async function handleGridLineWidthChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+    await updateSceneGridSetting({ gridLineWidth: parseFloat(target.value) });
+  }
+
+  async function handleGridOpacityChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+    await updateSceneGridSetting({ gridAlpha: parseFloat(target.value) / 100 });
   }
 </script>
 
@@ -67,6 +124,118 @@
             <span class="slider"></span>
           </label>
         </div>
+      </section>
+
+      <section class="settings-section">
+        <h3>Scene Settings</h3>
+
+        {#if !activeScene}
+          <div class="no-scene-message">
+            No active scene selected. Please select or create a scene to configure its settings.
+          </div>
+        {:else}
+          <div class="scene-header">
+            <h4>{activeScene.name}</h4>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <label for="grid-visible">Grid Visible</label>
+              <p class="setting-description">
+                Show or hide the grid overlay on the scene
+              </p>
+            </div>
+            <label class="toggle-switch">
+              <input
+                id="grid-visible"
+                type="checkbox"
+                checked={gridVisible}
+                disabled={saving}
+                on:change={handleToggleGridVisible}
+              />
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <label for="grid-type">Grid Shape</label>
+              <p class="setting-description">
+                Choose between square or hexagonal grid
+              </p>
+            </div>
+            <select
+              id="grid-type"
+              class="setting-select"
+              value={gridType}
+              disabled={saving || !gridVisible}
+              on:change={handleGridTypeChange}
+            >
+              <option value="square">Square</option>
+              <option value="hex">Hexagonal</option>
+            </select>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <label for="grid-color">Grid Color</label>
+              <p class="setting-description">
+                Color of the grid lines
+              </p>
+            </div>
+            <input
+              id="grid-color"
+              type="color"
+              class="setting-color"
+              value={gridColor}
+              disabled={saving || !gridVisible}
+              on:change={handleGridColorChange}
+            />
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <label for="grid-line-width">Grid Line Width</label>
+              <p class="setting-description">
+                Thickness of the grid lines (1-5 pixels)
+              </p>
+            </div>
+            <input
+              id="grid-line-width"
+              type="number"
+              class="setting-number"
+              min="1"
+              max="5"
+              step="0.5"
+              value={gridLineWidth}
+              disabled={saving || !gridVisible}
+              on:change={handleGridLineWidthChange}
+            />
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <label for="grid-opacity">Grid Opacity</label>
+              <p class="setting-description">
+                Transparency of the grid lines (0-100%)
+              </p>
+            </div>
+            <div class="setting-range-container">
+              <input
+                id="grid-opacity"
+                type="range"
+                class="setting-range"
+                min="0"
+                max="100"
+                step="1"
+                value={gridAlpha * 100}
+                disabled={saving || !gridVisible}
+                on:input={handleGridOpacityChange}
+              />
+              <span class="setting-range-value">{Math.round(gridAlpha * 100)}%</span>
+            </div>
+          </div>
+        {/if}
       </section>
     {/if}
   </div>
@@ -224,5 +393,150 @@
 
   input:checked + .slider:hover {
     background-color: #2563eb;
+  }
+
+  /* Scene Settings Styles */
+  .no-scene-message {
+    padding: 1rem;
+    text-align: center;
+    color: #9ca3af;
+    font-size: 0.875rem;
+    font-style: italic;
+  }
+
+  .scene-header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #374151;
+  }
+
+  .scene-header h4 {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #60a5fa;
+  }
+
+  .setting-select {
+    padding: 0.5rem;
+    background-color: #111827;
+    border: 1px solid #374151;
+    border-radius: 4px;
+    color: #f3f4f6;
+    font-size: 0.875rem;
+    cursor: pointer;
+    min-width: 120px;
+  }
+
+  .setting-select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .setting-select:hover:not(:disabled) {
+    border-color: #4b5563;
+  }
+
+  .setting-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+
+  .setting-color {
+    width: 60px;
+    height: 36px;
+    padding: 2px;
+    background-color: #111827;
+    border: 1px solid #374151;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .setting-color:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .setting-color:hover:not(:disabled) {
+    border-color: #4b5563;
+  }
+
+  .setting-number {
+    width: 80px;
+    padding: 0.5rem;
+    background-color: #111827;
+    border: 1px solid #374151;
+    border-radius: 4px;
+    color: #f3f4f6;
+    font-size: 0.875rem;
+  }
+
+  .setting-number:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .setting-number:hover:not(:disabled) {
+    border-color: #4b5563;
+  }
+
+  .setting-number:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+
+  .setting-range-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .setting-range {
+    flex: 1;
+    height: 6px;
+    background-color: #374151;
+    border-radius: 3px;
+    outline: none;
+    -webkit-appearance: none;
+  }
+
+  .setting-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background-color: #3b82f6;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .setting-range::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background-color: #3b82f6;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+  }
+
+  .setting-range:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .setting-range:disabled::-webkit-slider-thumb {
+    cursor: not-allowed;
+  }
+
+  .setting-range:disabled::-moz-range-thumb {
+    cursor: not-allowed;
+  }
+
+  .setting-range-value {
+    min-width: 45px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #f3f4f6;
+    text-align: right;
   }
 </style>

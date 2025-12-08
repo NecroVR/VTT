@@ -12,6 +12,8 @@ export interface Scene {
   gridSize: number;
   gridColor: string;
   gridAlpha: number;
+  gridVisible: boolean;
+  gridLineWidth: number;
   gridDistance: number;
   gridUnits: string;
   // Vision settings
@@ -41,6 +43,8 @@ export interface CreateSceneRequest {
   gridSize?: number;
   gridColor?: string;
   gridAlpha?: number;
+  gridVisible?: boolean;
+  gridLineWidth?: number;
   gridDistance?: number;
   gridUnits?: string;
   tokenVision?: boolean;
@@ -64,6 +68,8 @@ export interface UpdateSceneRequest {
   gridSize?: number;
   gridColor?: string;
   gridAlpha?: number;
+  gridVisible?: boolean;
+  gridLineWidth?: number;
   gridDistance?: number;
   gridUnits?: string;
   tokenVision?: boolean;
