@@ -1011,7 +1011,7 @@
   }
 
   function renderLight(ctx: CanvasRenderingContext2D, light: AmbientLight, time: number) {
-    const { x, y, bright, dim, color, alpha, angle, rotation, animationType, animationSpeed, animationIntensity } = light;
+    const { x, y, bright, dim, color, alpha, angle, rotation, animationType, animationSpeed, animationIntensity, walls: wallsEnabled } = light;
 
     // Performance optimization: Cull lights outside viewport
     if (!isInViewport(x - dim, y - dim, dim * 2, dim * 2)) {
@@ -1038,16 +1038,13 @@
       animatedDim = dim * (1 + pulse * intensity * 0.3);
     }
 
-    // Performance optimization: Get cached visibility polygon
-    const visibilityPolygon = getVisibilityPolygon(
-      `light-${light.id}`,
-      x,
-      y,
-      animatedDim
-    );
+    // Determine if we should apply wall occlusion based on light.walls property
+    const visibilityPolygon = wallsEnabled
+      ? getVisibilityPolygon(`light-${light.id}`, x, y, animatedDim)
+      : null;
 
-    // Render light with wall occlusion
-    renderClippedLight(ctx, { x, y }, animatedDim, visibilityPolygon, () => {
+    // Define the rendering function for the light
+    const renderLightGradient = () => {
       ctx.save();
 
       // If cone light, clip to cone shape
@@ -1086,7 +1083,14 @@
       }
 
       ctx.restore();
-    });
+    };
+
+    // Render light with or without wall occlusion based on light.walls property
+    if (wallsEnabled && visibilityPolygon) {
+      renderClippedLight(ctx, { x, y }, animatedDim, visibilityPolygon, renderLightGradient);
+    } else {
+      renderLightGradient();
+    }
   }
 
   function renderTokenLight(ctx: CanvasRenderingContext2D, token: Token, time: number) {
@@ -1873,6 +1877,8 @@
       if (light) {
         light.x = newX;
         light.y = newY;
+        // Invalidate visibility cache so radiance updates during drag
+        invalidateVisibilityCache();
         // Re-render both lights and controls
         renderLights();
         renderControls();
