@@ -19,6 +19,9 @@
   export let onWallUpdate: ((wallId: string, updates: Partial<Wall>) => void) | undefined = undefined;
   export let onTokenAdd: ((tokenData: any) => void) | undefined = undefined;
   export let onLightAdd: ((lightData: { x: number; y: number }) => void) | undefined = undefined;
+  export let onLightSelect: ((lightId: string | null) => void) | undefined = undefined;
+  export let onLightDoubleClick: ((lightId: string) => void) | undefined = undefined;
+  export let onLightMove: ((lightId: string, x: number, y: number) => void) | undefined = undefined;
 
   // Canvas refs
   let canvasContainer: HTMLDivElement;
@@ -46,10 +49,13 @@
   // Interaction state
   let isPanning = false;
   let isDraggingToken = false;
+  let isDraggingLight = false;
   let lastMouseX = 0;
   let lastMouseY = 0;
   let selectedTokenId: string | null = null;
+  let selectedLightId: string | null = null;
   let draggedTokenId: string | null = null;
+  let draggedLightId: string | null = null;
   let dragOffsetX = 0;
   let dragOffsetY = 0;
 
@@ -63,6 +69,7 @@
   // Double-click detection
   let lastClickTime = 0;
   let lastClickTokenId: string | null = null;
+  let lastClickLightId: string | null = null;
   const DOUBLE_CLICK_THRESHOLD = 300; // ms
 
   // Drag-and-drop state
@@ -1310,6 +1317,74 @@
     lightingCtx.restore();
   }
 
+  /**
+   * Render light handles/indicators for interactive light sources
+   * Shows a visible icon at each light's position that can be selected and dragged
+   */
+  function renderLightHandles() {
+    if (!controlsCtx || !controlsCanvas || !isGM) return;
+
+    controlsCtx.save();
+
+    // Apply transform
+    controlsCtx.translate(-viewX * scale, -viewY * scale);
+    controlsCtx.scale(scale, scale);
+
+    // Performance optimization: Filter to only visible lights in viewport
+    const visibleLights = lights.filter(light => {
+      const radius = light.dim || 100;
+      return isInViewport(light.x - radius, light.y - radius, radius * 2, radius * 2);
+    });
+
+    visibleLights.forEach(light => {
+      const isSelected = selectedLightId === light.id;
+      const handleRadius = 12 / scale; // Keep constant size in screen space
+
+      // Draw outer glow for selection
+      if (isSelected) {
+        controlsCtx.fillStyle = 'rgba(251, 191, 36, 0.3)'; // Amber glow
+        controlsCtx.beginPath();
+        controlsCtx.arc(light.x, light.y, handleRadius * 1.8, 0, Math.PI * 2);
+        controlsCtx.fill();
+      }
+
+      // Draw light handle circle
+      controlsCtx.fillStyle = isSelected ? '#fbbf24' : light.color;
+      controlsCtx.strokeStyle = '#ffffff';
+      controlsCtx.lineWidth = 2 / scale;
+
+      controlsCtx.beginPath();
+      controlsCtx.arc(light.x, light.y, handleRadius, 0, Math.PI * 2);
+      controlsCtx.fill();
+      controlsCtx.stroke();
+
+      // Draw light icon (sun rays)
+      controlsCtx.strokeStyle = '#ffffff';
+      controlsCtx.lineWidth = 1.5 / scale;
+      const rayLength = handleRadius * 0.6;
+      const numRays = 8;
+
+      for (let i = 0; i < numRays; i++) {
+        const angle = (i / numRays) * Math.PI * 2;
+        const startRadius = handleRadius * 0.5;
+        const endRadius = handleRadius * 0.9;
+
+        controlsCtx.beginPath();
+        controlsCtx.moveTo(
+          light.x + Math.cos(angle) * startRadius,
+          light.y + Math.sin(angle) * startRadius
+        );
+        controlsCtx.lineTo(
+          light.x + Math.cos(angle) * endRadius,
+          light.y + Math.sin(angle) * endRadius
+        );
+        controlsCtx.stroke();
+      }
+    });
+
+    controlsCtx.restore();
+  }
+
   function renderFog() {
     if (!fogCtx || !fogCanvas || !scene.fogExploration || isGM) return;
     if (!fogData) return;
@@ -1495,7 +1570,11 @@
     if (!controlsCtx || !controlsCanvas) return;
 
     controlsCtx.clearRect(0, 0, controlsCanvas.width, controlsCanvas.height);
-    // Controls like selection boxes, drawing tools, etc. can be rendered here
+
+    // Render light handles for GM
+    if (isGM) {
+      renderLightHandles();
+    }
   }
 
   /**
@@ -1574,77 +1653,137 @@
       return;
     }
 
-    // Handle select tool - check for wall/door selection
-    if (activeTool === 'select' && isGM) {
-      const wallId = findWallAtPoint(worldPos.x, worldPos.y);
-      if (wallId) {
-        // Check if this is a door and if we clicked near the center (for toggling)
-        const wall = walls.find(w => w.id === wallId);
-        if (wall && wall.door !== 'none') {
-          const centerX = (wall.x1 + wall.x2) / 2;
-          const centerY = (wall.y1 + wall.y2) / 2;
-          const distToCenter = Math.hypot(worldPos.x - centerX, worldPos.y - centerY);
-          const clickThreshold = 20 / scale;
+    // Handle select tool - check for light/wall/door/token selection
+    if (activeTool === 'select') {
+      // Check for light selection first (GM only)
+      if (isGM) {
+        const lightId = findLightAtPoint(worldPos.x, worldPos.y);
+        if (lightId) {
+          // Check for double-click on light
+          const currentTime = Date.now();
+          const timeSinceLastClick = currentTime - lastClickTime;
+          const isDoubleClick = timeSinceLastClick < DOUBLE_CLICK_THRESHOLD && lastClickLightId === lightId;
 
-          if (distToCenter <= clickThreshold) {
-            // Clicking near door center - toggle door
-            toggleDoor(wall);
+          if (isDoubleClick) {
+            // Double-click detected - open light config
+            onLightDoubleClick?.(lightId);
+            lastClickTime = 0;
+            lastClickLightId = null;
             return;
+          } else {
+            // Single click - prepare for drag
+            const light = lights.find(l => l.id === lightId);
+            if (light) {
+              selectedLightId = lightId;
+              selectedTokenId = null;
+              selectedWallId = null;
+              draggedLightId = lightId;
+              isDraggingLight = true;
+              dragOffsetX = light.x - worldPos.x;
+              dragOffsetY = light.y - worldPos.y;
+              onLightSelect?.(lightId);
+              onTokenSelect?.(null);
+              renderControls();
+
+              // Store click time and light for double-click detection
+              lastClickTime = currentTime;
+              lastClickLightId = lightId;
+              lastClickTokenId = null;
+              return;
+            }
           }
         }
 
-        // Regular wall selection
-        selectedWallId = wallId;
-        selectedTokenId = null;
-        onTokenSelect?.(null);
-        renderWalls();
-        return;
-      } else {
-        selectedWallId = null;
+        // Check for wall/door selection
+        const wallId = findWallAtPoint(worldPos.x, worldPos.y);
+        if (wallId) {
+          // Check if this is a door and if we clicked near the center (for toggling)
+          const wall = walls.find(w => w.id === wallId);
+          if (wall && wall.door !== 'none') {
+            const centerX = (wall.x1 + wall.x2) / 2;
+            const centerY = (wall.y1 + wall.y2) / 2;
+            const distToCenter = Math.hypot(worldPos.x - centerX, worldPos.y - centerY);
+            const clickThreshold = 20 / scale;
+
+            if (distToCenter <= clickThreshold) {
+              // Clicking near door center - toggle door
+              toggleDoor(wall);
+              return;
+            }
+          }
+
+          // Regular wall selection
+          selectedWallId = wallId;
+          selectedTokenId = null;
+          selectedLightId = null;
+          onTokenSelect?.(null);
+          onLightSelect?.(null);
+          renderWalls();
+          return;
+        } else {
+          selectedWallId = null;
+        }
       }
-    }
 
-    // Check if clicking on a token
-    const clickedToken = tokens.find(token => {
-      const width = (token.width || 1) * scene.gridSize;
-      const height = (token.height || 1) * scene.gridSize;
-      const dx = worldPos.x - (token.x + width / 2);
-      const dy = worldPos.y - (token.y + height / 2);
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      return distance <= width / 2;
-    });
+      // Check if clicking on a token
+      const clickedToken = tokens.find(token => {
+        const width = (token.width || 1) * scene.gridSize;
+        const height = (token.height || 1) * scene.gridSize;
+        const dx = worldPos.x - (token.x + width / 2);
+        const dy = worldPos.y - (token.y + height / 2);
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        return distance <= width / 2;
+      });
 
-    if (clickedToken) {
-      // Check for double-click
-      const currentTime = Date.now();
-      const timeSinceLastClick = currentTime - lastClickTime;
-      const isDoubleClick = timeSinceLastClick < DOUBLE_CLICK_THRESHOLD && lastClickTokenId === clickedToken.id;
+      if (clickedToken) {
+        // Check for double-click
+        const currentTime = Date.now();
+        const timeSinceLastClick = currentTime - lastClickTime;
+        const isDoubleClick = timeSinceLastClick < DOUBLE_CLICK_THRESHOLD && lastClickTokenId === clickedToken.id;
 
-      if (isDoubleClick) {
-        // Double-click detected - open token config
-        onTokenDoubleClick?.(clickedToken.id);
-        lastClickTime = 0; // Reset to prevent triple-click
-        lastClickTokenId = null;
+        if (isDoubleClick) {
+          // Double-click detected - open token config
+          onTokenDoubleClick?.(clickedToken.id);
+          lastClickTime = 0; // Reset to prevent triple-click
+          lastClickTokenId = null;
+        } else {
+          // Single click - prepare for drag
+          selectedTokenId = clickedToken.id;
+          selectedLightId = null;
+          draggedTokenId = clickedToken.id;
+          isDraggingToken = true;
+          dragOffsetX = clickedToken.x - worldPos.x;
+          dragOffsetY = clickedToken.y - worldPos.y;
+          onTokenSelect?.(clickedToken.id);
+          onLightSelect?.(null);
+          renderControls();
+
+          // Store click time and token for double-click detection
+          lastClickTime = currentTime;
+          lastClickTokenId = clickedToken.id;
+          lastClickLightId = null;
+        }
       } else {
-        // Single click - prepare for drag
-        selectedTokenId = clickedToken.id;
-        draggedTokenId = clickedToken.id;
-        isDraggingToken = true;
-        dragOffsetX = clickedToken.x - worldPos.x;
-        dragOffsetY = clickedToken.y - worldPos.y;
-        onTokenSelect?.(clickedToken.id);
-        renderControls();
-
-        // Store click time and token for double-click detection
-        lastClickTime = currentTime;
-        lastClickTokenId = clickedToken.id;
+        // Clicking on empty space - clear selections and start panning
+        selectedTokenId = null;
+        selectedLightId = null;
+        onTokenSelect?.(null);
+        onLightSelect?.(null);
+        isPanning = true;
+        lastClickTime = 0;
+        lastClickTokenId = null;
+        lastClickLightId = null;
       }
     } else {
+      // Non-select tool - clear selections and start panning if clicking empty space
       selectedTokenId = null;
+      selectedLightId = null;
       onTokenSelect?.(null);
+      onLightSelect?.(null);
       isPanning = true;
       lastClickTime = 0;
       lastClickTokenId = null;
+      lastClickLightId = null;
     }
   }
 
@@ -1696,7 +1835,7 @@
     }
 
     // Update wall hover
-    if (activeTool === 'select' && isGM && !isDraggingToken && !isPanning) {
+    if (activeTool === 'select' && isGM && !isDraggingToken && !isDraggingLight && !isPanning) {
       const wallId = findWallAtPoint(worldPos.x, worldPos.y);
       if (wallId !== hoveredWallId) {
         hoveredWallId = wallId;
@@ -1704,7 +1843,20 @@
       }
     }
 
-    if (isDraggingToken && draggedTokenId) {
+    if (isDraggingLight && draggedLightId) {
+      const newX = worldPos.x + dragOffsetX;
+      const newY = worldPos.y + dragOffsetY;
+
+      // Update light position locally for immediate feedback
+      const light = lights.find(l => l.id === draggedLightId);
+      if (light) {
+        light.x = newX;
+        light.y = newY;
+        // Re-render both lights and controls
+        renderLights();
+        renderControls();
+      }
+    } else if (isDraggingToken && draggedTokenId) {
       const newX = worldPos.x + dragOffsetX;
       const newY = worldPos.y + dragOffsetY;
 
@@ -1735,7 +1887,24 @@
   }
 
   function handleMouseUp(e: MouseEvent) {
-    if (isDraggingToken && draggedTokenId) {
+    if (isDraggingLight && draggedLightId) {
+      const worldPos = screenToWorld(e.clientX, e.clientY);
+      let newX = worldPos.x + dragOffsetX;
+      let newY = worldPos.y + dragOffsetY;
+
+      // Apply grid snapping if enabled
+      if (gridSnap) {
+        const snappedPos = snapToGrid(newX, newY);
+        newX = snappedPos.x;
+        newY = snappedPos.y;
+      }
+
+      // Send light move event
+      onLightMove?.(draggedLightId, newX, newY);
+
+      isDraggingLight = false;
+      draggedLightId = null;
+    } else if (isDraggingToken && draggedTokenId) {
       const worldPos = screenToWorld(e.clientX, e.clientY);
       let newX = worldPos.x + dragOffsetX;
       let newY = worldPos.y + dragOffsetY;
@@ -1851,6 +2020,24 @@
       const distance = distanceToLineSegment(worldX, worldY, wall.x1, wall.y1, wall.x2, wall.y2);
       if (distance <= threshold) {
         return wall.id;
+      }
+    }
+
+    return null;
+  }
+
+  function findLightAtPoint(worldX: number, worldY: number): string | null {
+    const handleRadius = 12 / scale; // Match the render size
+
+    // Check lights in reverse order (top-most first)
+    for (let i = lights.length - 1; i >= 0; i--) {
+      const light = lights[i];
+      const dx = worldX - light.x;
+      const dy = worldY - light.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance <= handleRadius) {
+        return light.id;
       }
     }
 

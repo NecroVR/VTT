@@ -21,6 +21,7 @@
   import TokenConfig from '$lib/components/TokenConfig.svelte';
   import TokenBrowser from '$lib/components/campaign/TokenBrowser.svelte';
   import AdminPanel from '$lib/components/campaign/AdminPanel.svelte';
+  import LightingConfig from '$lib/components/LightingConfig.svelte';
   import TabbedSidebar, { type Tab } from '$lib/components/campaign/TabbedSidebar.svelte';
   import ResizableDivider from '$lib/components/campaign/ResizableDivider.svelte';
   import type { Scene, Token, Wall } from '@vtt/shared';
@@ -32,6 +33,8 @@
   let selectedActorId: string | null = null;
   let showTokenConfig = false;
   let selectedToken: Token | null = null;
+  let showLightConfig = false;
+  let selectedLightId: string | null = null;
   let showSceneModal = false;
   let showActorCreateModal = false;
   let sidebarWidth = 350;
@@ -45,9 +48,11 @@
   $: activeScene = $scenesStore.activeSceneId
     ? $scenesStore.scenes.get($scenesStore.activeSceneId)
     : null;
-  // Load tokens when active scene changes
+  // Load tokens and lights when active scene changes
   $: if (activeScene?.id) {
     tokensStore.loadTokens(activeScene.id);
+    const token = localStorage.getItem('vtt_session_id') || sessionStorage.getItem('vtt_session_id') || '';
+    lightsStore.loadLights(activeScene.id, token);
   }
   $: tokens = Array.from($tokensStore.tokens.values()).filter(
     token => activeScene && token.sceneId === activeScene.id
@@ -303,6 +308,33 @@
     });
   }
 
+  function handleLightSelect(lightId: string | null) {
+    selectedLightId = lightId;
+    lightsStore.selectLight(lightId);
+  }
+
+  function handleLightDoubleClick(lightId: string) {
+    selectedLightId = lightId;
+    showLightConfig = true;
+  }
+
+  function handleLightMove(lightId: string, x: number, y: number) {
+    websocket.sendLightUpdate({
+      lightId,
+      updates: { x, y }
+    });
+  }
+
+  function handleCloseLightConfig() {
+    showLightConfig = false;
+    selectedLightId = null;
+  }
+
+  function handleDeleteLight() {
+    showLightConfig = false;
+    selectedLightId = null;
+  }
+
   function handleOpenActorSheet(actorId: string) {
     selectedActorId = actorId;
     showActorSheet = true;
@@ -405,6 +437,9 @@
           onWallRemove={handleWallRemove}
           onWallUpdate={handleWallUpdate}
           onLightAdd={handleLightAdd}
+          onLightSelect={handleLightSelect}
+          onLightDoubleClick={handleLightDoubleClick}
+          onLightMove={handleLightMove}
         />
         {#if isGM}
           <div class="scene-controls-overlay">
@@ -467,6 +502,17 @@
       {isGM}
       on:close={handleCloseTokenConfig}
       on:delete={handleDeleteToken}
+    />
+  {/if}
+
+  {#if showLightConfig && selectedLightId && activeScene}
+    <LightingConfig
+      isOpen={showLightConfig}
+      light={$lightsStore.lights.get(selectedLightId) || null}
+      sceneId={activeScene.id}
+      token={localStorage.getItem('vtt_session_id') || sessionStorage.getItem('vtt_session_id') || ''}
+      on:close={handleCloseLightConfig}
+      on:delete={handleDeleteLight}
     />
   {/if}
 
