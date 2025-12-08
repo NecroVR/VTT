@@ -1728,10 +1728,14 @@
           const tokenWidth = (token.width || 1) * scene.gridSize;
           const tokenHeight = (token.height || 1) * scene.gridSize;
 
-          // Calculate grid cell center position
-          // Formula: Round to nearest grid cell, then offset to center the token
-          newX = Math.round((newX + tokenWidth / 2) / scene.gridSize) * scene.gridSize - tokenWidth / 2;
-          newY = Math.round((newY + tokenHeight / 2) / scene.gridSize) * scene.gridSize - tokenHeight / 2;
+          // Snap token center to grid cell center
+          // 1. Find which cell the token center is in
+          // 2. Calculate that cell's center position
+          // 3. Position token so its center aligns with cell center
+          const cellX = Math.floor((newX + tokenWidth / 2) / scene.gridSize);
+          const cellY = Math.floor((newY + tokenHeight / 2) / scene.gridSize);
+          newX = cellX * scene.gridSize + (scene.gridSize - tokenWidth) / 2;
+          newY = cellY * scene.gridSize + (scene.gridSize - tokenHeight) / 2;
         }
       }
 
