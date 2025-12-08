@@ -203,6 +203,7 @@
 
   // Watch for light changes
   $: if (lights) {
+    invalidateVisibilityCache();
     renderLights();
   }
 
