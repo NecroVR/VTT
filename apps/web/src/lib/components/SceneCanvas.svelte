@@ -3,6 +3,9 @@
   import type { Scene, Token, Wall, AmbientLight, FogGrid } from '@vtt/shared';
   import { lightsStore } from '$lib/stores/lights';
   import { fogStore } from '$lib/stores/fog';
+  import { websocket } from '$lib/stores/websocket';
+  import SceneContextMenu from './SceneContextMenu.svelte';
+  import ConfirmDialog from './ConfirmDialog.svelte';
 
   // Props
   export let scene: Scene;
@@ -71,6 +74,19 @@
   let lastClickTokenId: string | null = null;
   let lastClickLightId: string | null = null;
   const DOUBLE_CLICK_THRESHOLD = 300; // ms
+
+  // Context menu state
+  let showContextMenu = false;
+  let contextMenuX = 0;
+  let contextMenuY = 0;
+  let contextMenuElementType: 'token' | 'light' | 'wall' | null = null;
+  let contextMenuElementId: string | null = null;
+  let contextMenuElementVisible = true;
+
+  // Delete confirmation dialog state
+  let showDeleteDialog = false;
+  let deleteDialogTitle = '';
+  let deleteDialogMessage = '';
 
   // Drag-and-drop state
   let isDragOver = false;
@@ -2069,10 +2085,155 @@
   }
 
   function handleContextMenu(e: MouseEvent) {
-    // Prevent context menu when drawing walls
+    e.preventDefault();
+
+    // Cancel if drawing walls
     if (isDrawingWall) {
-      e.preventDefault();
+      return;
     }
+
+    const rect = controlsCanvas.getBoundingClientRect();
+    const clientX = e.clientX - rect.left;
+    const clientY = e.clientY - rect.top;
+
+    // Convert to world coordinates
+    const worldX = (clientX + viewX * scale) / scale;
+    const worldY = (clientY + viewY * scale) / scale;
+
+    // Check for token at position
+    const clickedToken = tokens.find(token => {
+      const width = (token.width || 1) * scene.gridSize;
+      const height = (token.height || 1) * scene.gridSize;
+      const tokenCenterX = token.x + width / 2;
+      const tokenCenterY = token.y + height / 2;
+      const radius = Math.min(width, height) / 2;
+      const distance = Math.sqrt(Math.pow(worldX - tokenCenterX, 2) + Math.pow(worldY - tokenCenterY, 2));
+      return distance <= radius;
+    });
+
+    if (clickedToken) {
+      showContextMenu = true;
+      contextMenuX = e.clientX;
+      contextMenuY = e.clientY;
+      contextMenuElementType = 'token';
+      contextMenuElementId = clickedToken.id;
+      contextMenuElementVisible = clickedToken.visible !== false;
+      return;
+    }
+
+    // Check for light at position (if GM)
+    if (isGM) {
+      const clickedLight = lights.find(light => {
+        const distance = Math.sqrt(Math.pow(worldX - light.x, 2) + Math.pow(worldY - light.y, 2));
+        const handleRadius = 12 / scale;
+        return distance <= handleRadius;
+      });
+
+      if (clickedLight) {
+        showContextMenu = true;
+        contextMenuX = e.clientX;
+        contextMenuY = e.clientY;
+        contextMenuElementType = 'light';
+        contextMenuElementId = clickedLight.id;
+        contextMenuElementVisible = true; // Lights don't have visibility toggle yet
+        return;
+      }
+
+      // Check for wall at position
+      const clickedWallId = findWallAtPoint(worldX, worldY);
+      if (clickedWallId) {
+        showContextMenu = true;
+        contextMenuX = e.clientX;
+        contextMenuY = e.clientY;
+        contextMenuElementType = 'wall';
+        contextMenuElementId = clickedWallId;
+        contextMenuElementVisible = true; // Walls don't have visibility toggle
+        return;
+      }
+    }
+
+    // No element clicked - close any existing menu
+    showContextMenu = false;
+  }
+
+  // Context menu action handlers
+  function handleContextMenuEdit() {
+    showContextMenu = false;
+    if (contextMenuElementType === 'token' && contextMenuElementId) {
+      onTokenDoubleClick?.(contextMenuElementId);
+    } else if (contextMenuElementType === 'light' && contextMenuElementId) {
+      onLightDoubleClick?.(contextMenuElementId);
+    } else if (contextMenuElementType === 'wall' && contextMenuElementId) {
+      // Wall edit - select the wall for now
+      selectedWallId = contextMenuElementId;
+      renderWalls();
+      // Could open a wall config modal if one exists in the future
+    }
+  }
+
+  function handleContextMenuToggleVisibility() {
+    showContextMenu = false;
+    if (contextMenuElementType === 'token' && contextMenuElementId) {
+      const token = tokens.find(t => t.id === contextMenuElementId);
+      if (token) {
+        websocket.sendTokenUpdate({
+          tokenId: contextMenuElementId,
+          updates: { visible: !contextMenuElementVisible }
+        });
+      }
+    }
+    // Add similar for lights/walls if they support visibility in the future
+  }
+
+  function handleContextMenuDelete() {
+    showContextMenu = false;
+
+    // Set up delete dialog
+    if (contextMenuElementType === 'token') {
+      const token = tokens.find(t => t.id === contextMenuElementId);
+      deleteDialogTitle = 'Delete Token';
+      deleteDialogMessage = `Are you sure you want to delete "${token?.name || 'this token'}"? This action cannot be undone.`;
+    } else if (contextMenuElementType === 'light') {
+      deleteDialogTitle = 'Delete Light';
+      deleteDialogMessage = 'Are you sure you want to delete this light? This action cannot be undone.';
+    } else if (contextMenuElementType === 'wall') {
+      deleteDialogTitle = 'Delete Wall';
+      deleteDialogMessage = 'Are you sure you want to delete this wall? This action cannot be undone.';
+    }
+
+    showDeleteDialog = true;
+  }
+
+  function handleDeleteConfirm() {
+    showDeleteDialog = false;
+
+    if (contextMenuElementType === 'token' && contextMenuElementId) {
+      websocket.sendTokenRemove({ tokenId: contextMenuElementId });
+    } else if (contextMenuElementType === 'light' && contextMenuElementId) {
+      websocket.sendLightRemove({ lightId: contextMenuElementId });
+    } else if (contextMenuElementType === 'wall' && contextMenuElementId) {
+      websocket.sendWallRemove({ wallId: contextMenuElementId });
+    }
+
+    // Clear selection
+    if (contextMenuElementType === 'token') {
+      selectedTokenId = null;
+      onTokenSelect?.(null);
+    }
+    if (contextMenuElementType === 'light') {
+      selectedLightId = null;
+      onLightSelect?.(null);
+    }
+    if (contextMenuElementType === 'wall') {
+      selectedWallId = null;
+    }
+
+    contextMenuElementId = null;
+    contextMenuElementType = null;
+  }
+
+  function handleDeleteCancel() {
+    showDeleteDialog = false;
   }
 
   // Drag-and-drop handlers
@@ -2158,6 +2319,33 @@
     </div>
   </div>
 </div>
+
+{#if showContextMenu && contextMenuElementType && contextMenuElementId}
+  <SceneContextMenu
+    x={contextMenuX}
+    y={contextMenuY}
+    elementType={contextMenuElementType}
+    elementId={contextMenuElementId}
+    {isGM}
+    isVisible={contextMenuElementVisible}
+    on:edit={handleContextMenuEdit}
+    on:toggleVisibility={handleContextMenuToggleVisibility}
+    on:delete={handleContextMenuDelete}
+    on:close={() => showContextMenu = false}
+  />
+{/if}
+
+{#if showDeleteDialog}
+  <ConfirmDialog
+    title={deleteDialogTitle}
+    message={deleteDialogMessage}
+    confirmText="Delete"
+    cancelText="Cancel"
+    danger={true}
+    on:confirm={handleDeleteConfirm}
+    on:cancel={handleDeleteCancel}
+  />
+{/if}
 
 <style>
   .scene-canvas-container {
