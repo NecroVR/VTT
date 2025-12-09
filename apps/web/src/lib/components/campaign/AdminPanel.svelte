@@ -200,7 +200,8 @@
   let localGridHeight = 100;
   let isEditingGridWidth = false;
   let isEditingGridHeight = false;
-  let gridDimensionDebounceTimer: number | null = null;
+  let gridStoreUpdateTimer: number | null = null;
+  let gridApiSaveTimer: number | null = null;
 
   // Sync local state with store values ONLY when not editing
   $: if (!isEditingGridWidth && gridWidth !== undefined) {
@@ -226,10 +227,10 @@
         localGridHeight = localGridWidth;
         updates.gridHeight = localGridWidth;
       }
-      // Update store immediately for instant grid rendering
-      scenesStore.updateScene(activeScene.id, updates);
-      // Debounce the API call for persistence
-      debouncedGridDimensionSave(updates);
+      // Debounce store update to prevent cursor jumping during rapid typing
+      debouncedStoreUpdate(updates);
+      // Debounce API call for persistence (longer delay)
+      debouncedApiSave(updates);
     }
   }
 
@@ -241,28 +242,65 @@
         localGridWidth = localGridHeight;
         updates.gridWidth = localGridHeight;
       }
-      // Update store immediately for instant grid rendering
-      scenesStore.updateScene(activeScene.id, updates);
-      // Debounce the API call for persistence
-      debouncedGridDimensionSave(updates);
+      // Debounce store update to prevent cursor jumping during rapid typing
+      debouncedStoreUpdate(updates);
+      // Debounce API call for persistence (longer delay)
+      debouncedApiSave(updates);
     }
   }
 
-  function debouncedGridDimensionSave(updates: Record<string, number>) {
-    if (gridDimensionDebounceTimer) {
-      clearTimeout(gridDimensionDebounceTimer);
+  // Short debounce for store update - allows typing to complete before re-render
+  function debouncedStoreUpdate(updates: Record<string, number>) {
+    if (gridStoreUpdateTimer) {
+      clearTimeout(gridStoreUpdateTimer);
     }
-    gridDimensionDebounceTimer = window.setTimeout(async () => {
+    gridStoreUpdateTimer = window.setTimeout(() => {
+      if (activeScene) {
+        scenesStore.updateScene(activeScene.id, updates);
+      }
+    }, 100); // Short delay - grid updates after brief pause in typing
+  }
+
+  // Longer debounce for API persistence
+  function debouncedApiSave(updates: Record<string, number>) {
+    if (gridApiSaveTimer) {
+      clearTimeout(gridApiSaveTimer);
+    }
+    gridApiSaveTimer = window.setTimeout(async () => {
       await updateSceneGridSetting(updates);
-    }, 300);
+    }, 400); // Longer delay for API save
   }
 
   function handleGridWidthBlur() {
     isEditingGridWidth = false;
+    // Immediately update store and save on blur to ensure final value is applied
+    if (activeScene && !isNaN(localGridWidth)) {
+      const updates: Record<string, number> = { gridWidth: localGridWidth };
+      if (linkGridDimensions) {
+        updates.gridHeight = localGridWidth;
+      }
+      // Clear pending timers and apply immediately
+      if (gridStoreUpdateTimer) clearTimeout(gridStoreUpdateTimer);
+      if (gridApiSaveTimer) clearTimeout(gridApiSaveTimer);
+      scenesStore.updateScene(activeScene.id, updates);
+      updateSceneGridSetting(updates);
+    }
   }
 
   function handleGridHeightBlur() {
     isEditingGridHeight = false;
+    // Immediately update store and save on blur to ensure final value is applied
+    if (activeScene && !isNaN(localGridHeight)) {
+      const updates: Record<string, number> = { gridHeight: localGridHeight };
+      if (linkGridDimensions) {
+        updates.gridWidth = localGridHeight;
+      }
+      // Clear pending timers and apply immediately
+      if (gridStoreUpdateTimer) clearTimeout(gridStoreUpdateTimer);
+      if (gridApiSaveTimer) clearTimeout(gridApiSaveTimer);
+      scenesStore.updateScene(activeScene.id, updates);
+      updateSceneGridSetting(updates);
+    }
   }
 </script>
 
