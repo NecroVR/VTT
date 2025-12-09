@@ -172,8 +172,19 @@
     backgroundNeedsUpdate = true;
   }
 
-  // Watch for grid setting changes
-  $: if (scene.gridSize || scene.gridWidth || scene.gridHeight || scene.gridColor || scene.gridAlpha || scene.gridType || scene.gridVisible !== undefined || scene.gridLineWidth) {
+  // Watch for grid setting changes - track actual values to detect changes
+  $: {
+    // Reference all grid properties to establish reactivity
+    const _gridTrigger = [
+      scene.gridSize,
+      scene.gridWidth,
+      scene.gridHeight,
+      scene.gridColor,
+      scene.gridAlpha,
+      scene.gridType,
+      scene.gridVisible,
+      scene.gridLineWidth
+    ];
     gridNeedsUpdate = true;
   }
 

@@ -200,20 +200,31 @@
   let gridHeightDebounceTimer: number | null = null;
   let localGridWidth = 100;
   let localGridHeight = 100;
+  let isEditingGridWidth = false;
+  let isEditingGridHeight = false;
 
-  // Sync local state with store values
-  $: localGridWidth = gridWidth;
-  $: localGridHeight = gridHeight;
+  // Sync local state with store values ONLY when not editing
+  // This prevents the reactive statement from overwriting user input
+  $: if (!isEditingGridWidth) {
+    localGridWidth = gridWidth;
+  }
+  $: if (!isEditingGridHeight) {
+    localGridHeight = gridHeight;
+  }
 
   async function handleGridWidthChange(event: Event) {
     const target = event.target as HTMLInputElement;
     const newValue = parseInt(target.value, 10);
+
+    // Mark as editing to prevent reactive overwrite
+    isEditingGridWidth = true;
 
     // Update local state immediately for smooth UI
     localGridWidth = newValue;
 
     // If linked, also update height
     if (linkGridDimensions) {
+      isEditingGridHeight = true;
       localGridHeight = newValue;
     }
 
@@ -227,6 +238,11 @@
         updates.gridHeight = newValue;
       }
       await updateSceneGridSetting(updates);
+      // Clear editing flags after API update completes
+      isEditingGridWidth = false;
+      if (linkGridDimensions) {
+        isEditingGridHeight = false;
+      }
     }, 150);
   }
 
@@ -234,11 +250,15 @@
     const target = event.target as HTMLInputElement;
     const newValue = parseInt(target.value, 10);
 
+    // Mark as editing to prevent reactive overwrite
+    isEditingGridHeight = true;
+
     // Update local state immediately for smooth UI
     localGridHeight = newValue;
 
     // If linked, also update width
     if (linkGridDimensions) {
+      isEditingGridWidth = true;
       localGridWidth = newValue;
     }
 
@@ -252,6 +272,11 @@
         updates.gridWidth = newValue;
       }
       await updateSceneGridSetting(updates);
+      // Clear editing flags after API update completes
+      isEditingGridHeight = false;
+      if (linkGridDimensions) {
+        isEditingGridWidth = false;
+      }
     }, 150);
   }
 </script>
