@@ -9,12 +9,12 @@ import type { FastifyPluginAsync } from 'fastify';
 const multipartPlugin: FastifyPluginAsync = async (fastify) => {
   await fastify.register(multipart, {
     limits: {
-      fileSize: 10 * 1024 * 1024, // 10MB
+      fileSize: 20 * 1024 * 1024, // 20MB
       files: 1, // Max 1 file per upload
     },
   });
 
-  fastify.log.info('Multipart file upload enabled (10MB limit)');
+  fastify.log.info('Multipart file upload enabled (20MB limit)');
 };
 
 export default fp(multipartPlugin, {

@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify';
-import { assets } from '@vtt/database';
+import { assets, users } from '@vtt/database';
 import { eq, and, like, or } from 'drizzle-orm';
 import type { Asset, CreateAssetRequest, UpdateAssetRequest, AssetType } from '@vtt/shared';
 import { authenticate } from '../../../middleware/auth.js';
@@ -31,6 +31,42 @@ const assetsRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(400).send({ error: 'No file uploaded' });
         }
 
+        // Get file size by buffering the file
+        const buffer = await data.toBuffer();
+        const fileSize = buffer.length;
+
+        // Check user's storage quota before processing
+        const [user] = await fastify.db
+          .select({
+            storageUsedBytes: users.storageUsedBytes,
+            storageQuotaBytes: users.storageQuotaBytes,
+            accountTier: users.accountTier,
+          })
+          .from(users)
+          .where(eq(users.id, request.user.id))
+          .limit(1);
+
+        if (!user) {
+          return reply.status(404).send({ error: 'User not found' });
+        }
+
+        const remainingBytes = user.storageQuotaBytes - user.storageUsedBytes;
+
+        // Check if user has enough storage
+        if (user.storageUsedBytes + fileSize > user.storageQuotaBytes) {
+          return reply.status(413).send({
+            error: 'QUOTA_EXCEEDED',
+            message: 'Storage quota exceeded',
+            details: {
+              usedBytes: user.storageUsedBytes,
+              quotaBytes: user.storageQuotaBytes,
+              remainingBytes,
+              fileSize,
+              tier: user.accountTier,
+            },
+          });
+        }
+
         // Get metadata from fields
         const fields = data.fields as any;
         const assetType = (fields.assetType?.value as AssetType) || 'other';
@@ -40,36 +76,52 @@ const assetsRoute: FastifyPluginAsync = async (fastify) => {
         const tags = fields.tags?.value ? JSON.parse(fields.tags.value as string) : undefined;
         const metadata = fields.metadata?.value ? JSON.parse(fields.metadata.value as string) : {};
 
-        // Save file to disk
+        // Save file to disk (pass the buffer we already created)
         const fileResult = await saveUploadedFile({
           file: data,
           userId: request.user.id,
           assetType,
         });
 
-        // Create asset record in database
-        const newAssets = await fastify.db
-          .insert(assets)
-          .values({
-            userId: request.user.id,
-            campaignId: campaignId || null,
-            filename: fileResult.filename,
-            originalName: data.filename,
-            mimeType: fileResult.mimeType,
-            size: fileResult.size,
-            path: fileResult.path,
-            thumbnailPath: fileResult.thumbnailPath || null,
-            assetType,
-            width: fileResult.width || null,
-            height: fileResult.height || null,
-            name: name || null,
-            description: description || null,
-            tags: tags || null,
-            metadata,
-          })
-          .returning();
+        // Use a transaction to ensure atomicity between asset creation and storage update
+        const result = await fastify.db.transaction(async (tx) => {
+          // Create asset record in database
+          const newAssets = await tx
+            .insert(assets)
+            .values({
+              userId: request.user!.id,
+              campaignId: campaignId || null,
+              filename: fileResult.filename,
+              originalName: data.filename,
+              mimeType: fileResult.mimeType,
+              size: fileResult.size,
+              path: fileResult.path,
+              thumbnailPath: fileResult.thumbnailPath || null,
+              assetType,
+              width: fileResult.width || null,
+              height: fileResult.height || null,
+              name: name || null,
+              description: description || null,
+              tags: tags || null,
+              metadata,
+            })
+            .returning();
 
-        const newAsset = newAssets[0];
+          const newAsset = newAssets[0];
+
+          // Update user's storage usage
+          await tx
+            .update(users)
+            .set({
+              storageUsedBytes: user.storageUsedBytes + fileResult.size,
+              updatedAt: new Date(),
+            })
+            .where(eq(users.id, request.user!.id));
+
+          return newAsset;
+        });
+
+        const newAsset = result;
 
         // Format response
         const formattedAsset: Asset = {
@@ -370,13 +422,39 @@ const assetsRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(403).send({ error: 'Access denied' });
         }
 
+        // Get user's current storage usage
+        const [user] = await fastify.db
+          .select({
+            storageUsedBytes: users.storageUsedBytes,
+          })
+          .from(users)
+          .where(eq(users.id, request.user.id))
+          .limit(1);
+
+        if (!user) {
+          return reply.status(404).send({ error: 'User not found' });
+        }
+
         // Delete files from disk
         await deleteFile(existingAsset.path, existingAsset.thumbnailPath || undefined);
 
-        // Delete asset from database
-        await fastify.db
-          .delete(assets)
-          .where(eq(assets.id, assetId));
+        // Use a transaction to ensure atomicity between asset deletion and storage update
+        await fastify.db.transaction(async (tx) => {
+          // Delete asset from database
+          await tx
+            .delete(assets)
+            .where(eq(assets.id, assetId));
+
+          // Update user's storage usage (decrease by asset size)
+          const newStorageUsed = Math.max(0, user.storageUsedBytes - existingAsset.size);
+          await tx
+            .update(users)
+            .set({
+              storageUsedBytes: newStorageUsed,
+              updatedAt: new Date(),
+            })
+            .where(eq(users.id, request.user!.id));
+        });
 
         return reply.status(204).send();
       } catch (error) {
