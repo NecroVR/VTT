@@ -2928,9 +2928,11 @@
     const gridSize = scene.gridSize ?? 100;
     const cellWidth = scene.gridWidth ?? gridSize;
     const cellHeight = scene.gridHeight ?? gridSize;
+    const offsetX = scene.gridOffsetX ?? 0;
+    const offsetY = scene.gridOffsetY ?? 0;
     return {
-      x: Math.round(x / cellWidth) * cellWidth,
-      y: Math.round(y / cellHeight) * cellHeight,
+      x: Math.round((x - offsetX) / cellWidth) * cellWidth + offsetX,
+      y: Math.round((y - offsetY) / cellHeight) * cellHeight + offsetY,
     };
   }
 
@@ -2938,10 +2940,12 @@
     const gridSize = scene.gridSize ?? 100;
     const cellWidth = scene.gridWidth ?? gridSize;
     const cellHeight = scene.gridHeight ?? gridSize;
+    const offsetX = scene.gridOffsetX ?? 0;
+    const offsetY = scene.gridOffsetY ?? 0;
     // Snap to center of cell (add half grid size after rounding to corner)
     return {
-      x: Math.floor(x / cellWidth) * cellWidth + cellWidth / 2,
-      y: Math.floor(y / cellHeight) * cellHeight + cellHeight / 2,
+      x: Math.floor((x - offsetX) / cellWidth) * cellWidth + cellWidth / 2 + offsetX,
+      y: Math.floor((y - offsetY) / cellHeight) * cellHeight + cellHeight / 2 + offsetY,
     };
   }
 
