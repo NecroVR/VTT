@@ -175,6 +175,9 @@
           invalidateVisibilityCache();
           gridNeedsUpdate = true;
           backgroundNeedsUpdate = true;
+
+          // Re-render with loaded viewport position
+          render();
         }
       }
     } catch (error) {
