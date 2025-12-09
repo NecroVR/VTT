@@ -39,6 +39,7 @@
   let showActorCreateModal = false;
   let sidebarWidth = 350;
   let activeTabId = 'chat';
+  let sidebarCollapsed = false;
 
   // Use auto-subscription with $ prefix - Svelte handles cleanup automatically
   $: campaignId = $page.params.id;
@@ -104,6 +105,12 @@
   ] as Tab[];
 
   onMount(async () => {
+    // Load sidebar collapsed state from localStorage
+    const savedCollapsedState = localStorage.getItem('vtt-sidebar-collapsed');
+    if (savedCollapsedState !== null) {
+      sidebarCollapsed = savedCollapsedState === 'true';
+    }
+
     // Check if user is authenticated
     const isAuthenticated = await authStore.checkSession();
     if (!isAuthenticated) {
@@ -376,6 +383,11 @@
     // Token selection is already handled by tokensStore, just ensure UI updates
     tokensStore.selectToken(event.detail.tokenId);
   }
+
+  function handleSidebarCollapse(event: CustomEvent<{ collapsed: boolean }>) {
+    sidebarCollapsed = event.detail.collapsed;
+    localStorage.setItem('vtt-sidebar-collapsed', String(sidebarCollapsed));
+  }
 </script>
 
 <svelte:head>
@@ -477,6 +489,8 @@
       {tabs}
       bind:activeTabId
       {sidebarWidth}
+      collapsed={sidebarCollapsed}
+      on:collapse={handleSidebarCollapse}
       on:create-actor={handleCreateActor}
       on:edit-actor={handleEditActor}
       on:select-token={handleSelectToken}
