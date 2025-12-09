@@ -121,6 +121,7 @@
   let lastSavedViewX = viewX;
   let lastSavedViewY = viewY;
   let lastSavedScale = scale;
+  let previousSceneId: string | null = null;
 
   // Performance optimization: Layer caching
   let backgroundCached = false;
@@ -147,42 +148,29 @@
   // Subscribe to fog store
   $: fogData = scene ? $fogStore.fog.get(scene.id) : undefined;
 
+  // Handle scene switching - save old viewport and load new viewport
+  $: if (scene.id && scene.id !== previousSceneId) {
+    // Save viewport for previous scene before switching
+    if (previousSceneId) {
+      saveViewportImmediate(previousSceneId, viewX, viewY, scale);
+    }
+    // Reset to scene defaults while loading
+    viewX = scene.initialX ?? 0;
+    viewY = scene.initialY ?? 0;
+    scale = scene.initialScale ?? 1;
+    // Load viewport for new scene
+    loadViewport(scene.id);
+    previousSceneId = scene.id;
+  }
+
   onMount(async () => {
     initializeCanvases();
     loadBackgroundImage();
     resizeCanvases();
 
     // Load saved viewport position
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/scenes/${scene.id}/viewport`, {
-        method: 'GET',
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.viewport) {
-          viewX = data.viewport.cameraX;
-          viewY = data.viewport.cameraY;
-          scale = data.viewport.zoom;
-
-          // Update last saved values to prevent immediate save
-          lastSavedViewX = viewX;
-          lastSavedViewY = viewY;
-          lastSavedScale = scale;
-
-          // Invalidate caches to reflect new viewport
-          invalidateVisibilityCache();
-          gridNeedsUpdate = true;
-          backgroundNeedsUpdate = true;
-
-          // Re-render with loaded viewport position
-          render();
-        }
-      }
-    } catch (error) {
-      console.error('Failed to load viewport:', error);
-    }
+    await loadViewport(scene.id);
+    previousSceneId = scene.id;
 
     render();
     startAnimationLoop();
@@ -333,6 +321,58 @@
         console.error('Failed to save viewport:', error);
       }
     }, 500);
+  }
+
+  async function saveViewportImmediate(sceneId: string, x: number, y: number, z: number) {
+    try {
+      await fetch(`${API_BASE_URL}/api/v1/scenes/${sceneId}/viewport`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          cameraX: x,
+          cameraY: y,
+          zoom: z
+        })
+      });
+    } catch (error) {
+      console.error('Failed to save viewport immediately:', error);
+    }
+  }
+
+  async function loadViewport(sceneId: string) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/scenes/${sceneId}/viewport`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.viewport) {
+          viewX = data.viewport.cameraX;
+          viewY = data.viewport.cameraY;
+          scale = data.viewport.zoom;
+
+          // Update last saved values to prevent immediate save
+          lastSavedViewX = viewX;
+          lastSavedViewY = viewY;
+          lastSavedScale = scale;
+
+          // Invalidate caches to reflect new viewport
+          invalidateVisibilityCache();
+          gridNeedsUpdate = true;
+          backgroundNeedsUpdate = true;
+
+          // Re-render with loaded viewport position
+          render();
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load viewport:', error);
+    }
   }
 
   function initializeCanvases() {
