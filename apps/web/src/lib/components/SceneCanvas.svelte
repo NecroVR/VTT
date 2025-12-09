@@ -617,7 +617,10 @@
       const tokenHeight = (possessedToken.height || 1) * (scene.gridHeight ?? scene.gridSize);
       const tokenCenterX = possessedToken.x + tokenWidth / 2;
       const tokenCenterY = possessedToken.y + tokenHeight / 2;
-      const visionRadius = possessedToken.visionRange * ((scene.gridWidth ?? scene.gridSize) + (scene.gridHeight ?? scene.gridSize)) / 2;
+      // Vision radius = token edge radius + vision range in cells
+      const tokenRadius = (tokenWidth + tokenHeight) / 4; // Average radius to token edge
+      const avgCellSize = ((scene.gridWidth ?? scene.gridSize) + (scene.gridHeight ?? scene.gridSize)) / 2;
+      const visionRadius = tokenRadius + (possessedToken.visionRange * avgCellSize);
 
       // Compute visibility polygon for wall occlusion
       visionPolygon = computeVisibilityPolygon(
@@ -657,7 +660,10 @@
         const dx = tokenCenterX - possessedCenterX;
         const dy = tokenCenterY - possessedCenterY;
         const distance = Math.sqrt(dx * dx + dy * dy);
-        const visionRangePixels = possessedToken.visionRange * ((scene.gridWidth ?? scene.gridSize) + (scene.gridHeight ?? scene.gridSize)) / 2;
+        // Vision radius = possessed token edge radius + vision range in cells
+        const possessedTokenRadius = (possessedWidth + possessedHeight) / 4;
+        const avgCellSize = ((scene.gridWidth ?? scene.gridSize) + (scene.gridHeight ?? scene.gridSize)) / 2;
+        const visionRangePixels = possessedTokenRadius + (possessedToken.visionRange * avgCellSize);
 
         // Token must be within vision range
         if (distance > visionRangePixels) {
@@ -1828,8 +1834,10 @@
     const x = token.x + width / 2;
     const y = token.y + height / 2;
 
-    // Convert vision range from grid units to pixels (use average for circular vision)
-    const visionRadius = token.visionRange * (cellWidth + cellHeight) / 2;
+    // Vision radius = token edge radius + vision range in cells
+    const tokenRadius = (width + height) / 4; // Average radius to token edge
+    const avgCellSize = (cellWidth + cellHeight) / 2;
+    const visionRadius = tokenRadius + (token.visionRange * avgCellSize);
 
     ctx.save();
 
@@ -1867,8 +1875,10 @@
     const x = token.x + width / 2;
     const y = token.y + height / 2;
 
-    // Convert vision range from grid units to pixels (use average for circular vision)
-    const visionRadius = token.visionRange * (cellWidth + cellHeight) / 2;
+    // Vision radius = token edge radius + vision range in cells
+    const tokenRadius = (width + height) / 4; // Average radius to token edge
+    const avgCellSize = (cellWidth + cellHeight) / 2;
+    const visionRadius = tokenRadius + (token.visionRange * avgCellSize);
 
     // Compute visibility polygon for wall occlusion
     const visibilityPolygon = computeVisibilityPolygon(
@@ -2122,9 +2132,14 @@
     if (possessedTokenId) {
       const possessedToken = tokens.find(t => t.id === possessedTokenId);
       if (possessedToken && possessedToken.vision && possessedToken.visionRange > 0) {
-        const tokenCenterX = possessedToken.x + ((possessedToken.width || 1) * (scene.gridWidth ?? scene.gridSize)) / 2;
-        const tokenCenterY = possessedToken.y + ((possessedToken.height || 1) * (scene.gridHeight ?? scene.gridSize)) / 2;
-        const visionRadius = possessedToken.visionRange * ((scene.gridWidth ?? scene.gridSize) + (scene.gridHeight ?? scene.gridSize)) / 2;
+        const tokenWidth = (possessedToken.width || 1) * (scene.gridWidth ?? scene.gridSize);
+        const tokenHeight = (possessedToken.height || 1) * (scene.gridHeight ?? scene.gridSize);
+        const tokenCenterX = possessedToken.x + tokenWidth / 2;
+        const tokenCenterY = possessedToken.y + tokenHeight / 2;
+        // Vision radius = token edge radius + vision range in cells
+        const tokenRadius = (tokenWidth + tokenHeight) / 4;
+        const avgCellSize = ((scene.gridWidth ?? scene.gridSize) + (scene.gridHeight ?? scene.gridSize)) / 2;
+        const visionRadius = tokenRadius + (possessedToken.visionRange * avgCellSize);
 
         // Compute visibility polygon for the possessed token
         const visibilityPolygon = computeVisibilityPolygon(
@@ -2183,9 +2198,14 @@
     tokens.forEach(token => {
       if (!token.visible || !token.vision || token.visionRange <= 0) return;
 
-      const tokenX = token.x + ((token.width || 1) * (scene.gridWidth ?? scene.gridSize)) / 2;
-      const tokenY = token.y + ((token.height || 1) * (scene.gridHeight ?? scene.gridSize)) / 2;
-      const visionRadius = token.visionRange * ((scene.gridWidth ?? scene.gridSize) + (scene.gridHeight ?? scene.gridSize)) / 2;
+      const tokenWidth = (token.width || 1) * (scene.gridWidth ?? scene.gridSize);
+      const tokenHeight = (token.height || 1) * (scene.gridHeight ?? scene.gridSize);
+      const tokenX = token.x + tokenWidth / 2;
+      const tokenY = token.y + tokenHeight / 2;
+      // Vision radius = token edge radius + vision range in cells
+      const tokenRadius = (tokenWidth + tokenHeight) / 4;
+      const avgCellSize = ((scene.gridWidth ?? scene.gridSize) + (scene.gridHeight ?? scene.gridSize)) / 2;
+      const visionRadius = tokenRadius + (token.visionRange * avgCellSize);
 
       // Compute visibility polygon for this token
       const visibilityPolygon = computeVisibilityPolygon(
