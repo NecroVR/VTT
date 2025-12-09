@@ -218,15 +218,13 @@
     isEditingGridHeight = true;
   }
 
-  function handleGridWidthInput(event: Event) {
-    const target = event.target as HTMLInputElement;
-    const newValue = parseInt(target.value, 10);
-    if (!isNaN(newValue) && activeScene) {
-      localGridWidth = newValue;
-      const updates: Record<string, number> = { gridWidth: newValue };
+  // Handle grid width changes - called after bind:value updates localGridWidth
+  function handleGridWidthInput() {
+    if (!isNaN(localGridWidth) && activeScene) {
+      const updates: Record<string, number> = { gridWidth: localGridWidth };
       if (linkGridDimensions) {
-        localGridHeight = newValue;
-        updates.gridHeight = newValue;
+        localGridHeight = localGridWidth;
+        updates.gridHeight = localGridWidth;
       }
       // Update store immediately for instant grid rendering
       scenesStore.updateScene(activeScene.id, updates);
@@ -235,15 +233,13 @@
     }
   }
 
-  function handleGridHeightInput(event: Event) {
-    const target = event.target as HTMLInputElement;
-    const newValue = parseInt(target.value, 10);
-    if (!isNaN(newValue) && activeScene) {
-      localGridHeight = newValue;
-      const updates: Record<string, number> = { gridHeight: newValue };
+  // Handle grid height changes - called after bind:value updates localGridHeight
+  function handleGridHeightInput() {
+    if (!isNaN(localGridHeight) && activeScene) {
+      const updates: Record<string, number> = { gridHeight: localGridHeight };
       if (linkGridDimensions) {
-        localGridWidth = newValue;
-        updates.gridWidth = newValue;
+        localGridWidth = localGridHeight;
+        updates.gridWidth = localGridHeight;
       }
       // Update store immediately for instant grid rendering
       scenesStore.updateScene(activeScene.id, updates);
@@ -479,7 +475,7 @@
                   min="10"
                   max="500"
                   step="5"
-                  value={localGridWidth}
+                  bind:value={localGridWidth}
                   disabled={saving || !gridVisible}
                   on:focus={handleGridWidthFocus}
                   on:input={handleGridWidthInput}
@@ -506,7 +502,7 @@
                   min="10"
                   max="500"
                   step="5"
-                  value={localGridHeight}
+                  bind:value={localGridHeight}
                   disabled={saving || !gridVisible}
                   on:focus={handleGridHeightFocus}
                   on:input={handleGridHeightInput}
