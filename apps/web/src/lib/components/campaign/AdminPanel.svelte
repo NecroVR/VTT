@@ -29,6 +29,8 @@
   $: gridAlpha = activeScene?.gridAlpha ?? 0.2;
   $: gridWidth = activeScene?.gridWidth ?? 100;
   $: gridHeight = activeScene?.gridHeight ?? 100;
+  $: gridOffsetX = activeScene?.gridOffsetX ?? 0;
+  $: gridOffsetY = activeScene?.gridOffsetY ?? 0;
 
   // Scene background settings (reactive)
   $: backgroundImage = activeScene?.backgroundImage ?? null;
@@ -199,17 +201,23 @@
   // Grid dimension handlers - use focus/blur to track editing state
   let localGridWidth = 100;
   let localGridHeight = 100;
+  let localGridOffsetX = 0;
+  let localGridOffsetY = 0;
   let isEditingGridWidth = false;
   let isEditingGridHeight = false;
+  let isEditingGridOffsetX = false;
+  let isEditingGridOffsetY = false;
   let gridStoreUpdateTimer: number | null = null;
   let gridApiSaveTimer: number | null = null;
 
   // Input element references for cursor position restoration
   let gridWidthInput: HTMLInputElement;
   let gridHeightInput: HTMLInputElement;
+  let gridOffsetXInput: HTMLInputElement;
+  let gridOffsetYInput: HTMLInputElement;
   let savedSelectionStart: number | null = null;
   let savedSelectionEnd: number | null = null;
-  let activeGridInput: 'width' | 'height' | null = null;
+  let activeGridInput: 'width' | 'height' | 'offsetX' | 'offsetY' | null = null;
 
   // Save cursor position before any update
   beforeUpdate(() => {
@@ -221,6 +229,14 @@
       savedSelectionStart = gridHeightInput.selectionStart;
       savedSelectionEnd = gridHeightInput.selectionEnd;
       activeGridInput = 'height';
+    } else if (isEditingGridOffsetX && gridOffsetXInput && document.activeElement === gridOffsetXInput) {
+      savedSelectionStart = gridOffsetXInput.selectionStart;
+      savedSelectionEnd = gridOffsetXInput.selectionEnd;
+      activeGridInput = 'offsetX';
+    } else if (isEditingGridOffsetY && gridOffsetYInput && document.activeElement === gridOffsetYInput) {
+      savedSelectionStart = gridOffsetYInput.selectionStart;
+      savedSelectionEnd = gridOffsetYInput.selectionEnd;
+      activeGridInput = 'offsetY';
     } else {
       activeGridInput = null;
     }
@@ -234,6 +250,12 @@
     } else if (activeGridInput === 'height' && gridHeightInput && savedSelectionStart !== null) {
       gridHeightInput.focus();
       gridHeightInput.setSelectionRange(savedSelectionStart, savedSelectionEnd);
+    } else if (activeGridInput === 'offsetX' && gridOffsetXInput && savedSelectionStart !== null) {
+      gridOffsetXInput.focus();
+      gridOffsetXInput.setSelectionRange(savedSelectionStart, savedSelectionEnd);
+    } else if (activeGridInput === 'offsetY' && gridOffsetYInput && savedSelectionStart !== null) {
+      gridOffsetYInput.focus();
+      gridOffsetYInput.setSelectionRange(savedSelectionStart, savedSelectionEnd);
     }
   });
 
@@ -243,6 +265,12 @@
   }
   $: if (!isEditingGridHeight && gridHeight !== undefined) {
     localGridHeight = gridHeight;
+  }
+  $: if (!isEditingGridOffsetX && gridOffsetX !== undefined) {
+    localGridOffsetX = gridOffsetX;
+  }
+  $: if (!isEditingGridOffsetY && gridOffsetY !== undefined) {
+    localGridOffsetY = gridOffsetY;
   }
 
   function handleGridWidthFocus() {
@@ -330,6 +358,53 @@
         updates.gridWidth = localGridHeight;
       }
       // Clear pending timers and apply immediately
+      if (gridStoreUpdateTimer) clearTimeout(gridStoreUpdateTimer);
+      if (gridApiSaveTimer) clearTimeout(gridApiSaveTimer);
+      scenesStore.updateScene(activeScene.id, updates);
+      updateSceneGridSetting(updates);
+    }
+  }
+
+  // Grid offset handlers
+  function handleGridOffsetXFocus() {
+    isEditingGridOffsetX = true;
+  }
+
+  function handleGridOffsetYFocus() {
+    isEditingGridOffsetY = true;
+  }
+
+  function handleGridOffsetXInput() {
+    if (!isNaN(localGridOffsetX) && activeScene) {
+      const updates: Record<string, number> = { gridOffsetX: localGridOffsetX };
+      debouncedStoreUpdate(updates);
+      debouncedApiSave(updates);
+    }
+  }
+
+  function handleGridOffsetYInput() {
+    if (!isNaN(localGridOffsetY) && activeScene) {
+      const updates: Record<string, number> = { gridOffsetY: localGridOffsetY };
+      debouncedStoreUpdate(updates);
+      debouncedApiSave(updates);
+    }
+  }
+
+  function handleGridOffsetXBlur() {
+    isEditingGridOffsetX = false;
+    if (activeScene && !isNaN(localGridOffsetX)) {
+      const updates: Record<string, number> = { gridOffsetX: localGridOffsetX };
+      if (gridStoreUpdateTimer) clearTimeout(gridStoreUpdateTimer);
+      if (gridApiSaveTimer) clearTimeout(gridApiSaveTimer);
+      scenesStore.updateScene(activeScene.id, updates);
+      updateSceneGridSetting(updates);
+    }
+  }
+
+  function handleGridOffsetYBlur() {
+    isEditingGridOffsetY = false;
+    if (activeScene && !isNaN(localGridOffsetY)) {
+      const updates: Record<string, number> = { gridOffsetY: localGridOffsetY };
       if (gridStoreUpdateTimer) clearTimeout(gridStoreUpdateTimer);
       if (gridApiSaveTimer) clearTimeout(gridApiSaveTimer);
       scenesStore.updateScene(activeScene.id, updates);
@@ -581,6 +656,51 @@
                   on:focus={handleGridHeightFocus}
                   on:input={handleGridHeightInput}
                   on:blur={handleGridHeightBlur}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <label>Grid Offset</label>
+              <p class="setting-description">
+                Adjust grid position to align with background image
+              </p>
+            </div>
+            <div class="grid-dimensions-controls">
+              <div class="dimension-input">
+                <label for="grid-offset-x" class="dimension-label">X Offset</label>
+                <input
+                  id="grid-offset-x"
+                  type="number"
+                  class="setting-number"
+                  min="-1000"
+                  max="1000"
+                  step="1"
+                  bind:this={gridOffsetXInput}
+                  bind:value={localGridOffsetX}
+                  disabled={saving || !gridVisible}
+                  on:focus={handleGridOffsetXFocus}
+                  on:input={handleGridOffsetXInput}
+                  on:blur={handleGridOffsetXBlur}
+                />
+              </div>
+              <div class="dimension-input">
+                <label for="grid-offset-y" class="dimension-label">Y Offset</label>
+                <input
+                  id="grid-offset-y"
+                  type="number"
+                  class="setting-number"
+                  min="-1000"
+                  max="1000"
+                  step="1"
+                  bind:this={gridOffsetYInput}
+                  bind:value={localGridOffsetY}
+                  disabled={saving || !gridVisible}
+                  on:focus={handleGridOffsetYFocus}
+                  on:input={handleGridOffsetYInput}
+                  on:blur={handleGridOffsetYBlur}
                 />
               </div>
             </div>

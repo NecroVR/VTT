@@ -18,6 +18,8 @@ export interface Scene {
   gridLineWidth: number;
   gridDistance: number;
   gridUnits: string;
+  gridOffsetX?: number;
+  gridOffsetY?: number;
   // Vision settings
   tokenVision: boolean;
   fogExploration: boolean;
@@ -51,6 +53,8 @@ export interface CreateSceneRequest {
   gridLineWidth?: number;
   gridDistance?: number;
   gridUnits?: string;
+  gridOffsetX?: number;
+  gridOffsetY?: number;
   tokenVision?: boolean;
   fogExploration?: boolean;
   globalLight?: boolean;
@@ -78,6 +82,8 @@ export interface UpdateSceneRequest {
   gridLineWidth?: number;
   gridDistance?: number;
   gridUnits?: string;
+  gridOffsetX?: number;
+  gridOffsetY?: number;
   tokenVision?: boolean;
   fogExploration?: boolean;
   globalLight?: boolean;

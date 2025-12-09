@@ -639,6 +639,8 @@
     const gridSize = scene.gridSize ?? 100;
     const cellWidth = scene.gridWidth ?? gridSize;
     const cellHeight = scene.gridHeight ?? gridSize;
+    const offsetX = scene.gridOffsetX ?? 0;
+    const offsetY = scene.gridOffsetY ?? 0;
     const sceneWidth = scene.backgroundWidth || 4000;
     const sceneHeight = scene.backgroundHeight || 4000;
 
@@ -648,7 +650,7 @@
 
     if (scene.gridType === 'square') {
       // Draw vertical lines (spaced by cellWidth)
-      for (let x = 0; x <= sceneWidth; x += cellWidth) {
+      for (let x = offsetX; x <= sceneWidth; x += cellWidth) {
         gridCtx.beginPath();
         gridCtx.moveTo(x, 0);
         gridCtx.lineTo(x, sceneHeight);
@@ -656,16 +658,35 @@
       }
 
       // Draw horizontal lines (spaced by cellHeight)
-      for (let y = 0; y <= sceneHeight; y += cellHeight) {
+      for (let y = offsetY; y <= sceneHeight; y += cellHeight) {
         gridCtx.beginPath();
         gridCtx.moveTo(0, y);
         gridCtx.lineTo(sceneWidth, y);
         gridCtx.stroke();
       }
+
+      // Handle negative offsets - draw lines in the negative direction
+      if (offsetX < 0) {
+        for (let x = offsetX; x >= -cellWidth; x -= cellWidth) {
+          gridCtx.beginPath();
+          gridCtx.moveTo(x, 0);
+          gridCtx.lineTo(x, sceneHeight);
+          gridCtx.stroke();
+        }
+      }
+
+      if (offsetY < 0) {
+        for (let y = offsetY; y >= -cellHeight; y -= cellHeight) {
+          gridCtx.beginPath();
+          gridCtx.moveTo(0, y);
+          gridCtx.lineTo(sceneWidth, y);
+          gridCtx.stroke();
+        }
+      }
     } else if (scene.gridType === 'hex') {
       // Hex grid (pointy-top)
       // For hex grids, use cellWidth as the hex size (horizontal spacing determines hex size)
-      renderHexGrid(gridCtx, sceneWidth, sceneHeight, cellWidth);
+      renderHexGrid(gridCtx, sceneWidth, sceneHeight, cellWidth, offsetX, offsetY);
     }
 
     gridCtx.restore();
@@ -675,15 +696,15 @@
     gridNeedsUpdate = false;
   }
 
-  function renderHexGrid(ctx: CanvasRenderingContext2D, width: number, height: number, size: number) {
+  function renderHexGrid(ctx: CanvasRenderingContext2D, width: number, height: number, size: number, offsetX: number = 0, offsetY: number = 0) {
     const hexHeight = size;
     const hexWidth = (size * 2) / Math.sqrt(3);
     const hexVertDist = hexHeight * 0.75;
 
     for (let row = 0; row < height / hexVertDist + 2; row++) {
       for (let col = 0; col < width / hexWidth + 2; col++) {
-        const x = col * hexWidth + (row % 2) * (hexWidth / 2);
-        const y = row * hexVertDist;
+        const x = col * hexWidth + (row % 2) * (hexWidth / 2) + offsetX;
+        const y = row * hexVertDist + offsetY;
 
         drawHexagon(ctx, x, y, size);
       }

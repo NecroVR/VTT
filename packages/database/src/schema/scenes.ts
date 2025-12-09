@@ -21,6 +21,8 @@ export const scenes = pgTable('scenes', {
   gridLineWidth: real('grid_line_width').notNull().default(1),
   gridDistance: real('grid_distance').notNull().default(5),
   gridUnits: text('grid_units').notNull().default('ft'),
+  gridOffsetX: real('grid_offset_x').notNull().default(0),
+  gridOffsetY: real('grid_offset_y').notNull().default(0),
   // Vision settings
   tokenVision: boolean('token_vision').notNull().default(true),
   fogExploration: boolean('fog_exploration').notNull().default(true),
