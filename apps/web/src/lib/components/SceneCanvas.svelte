@@ -613,8 +613,8 @@
     const shouldApplyVisionHiding = (!isGM || possessedTokenId) && !scene.globalLight && possessedToken && scene.tokenVision && possessedToken.vision && possessedToken.visionRange > 0;
 
     if (shouldApplyVisionHiding && possessedToken) {
-      const tokenWidth = (possessedToken.width || 1) * scene.gridSize;
-      const tokenHeight = (possessedToken.height || 1) * scene.gridSize;
+      const tokenWidth = (possessedToken.width || 1) * (scene.gridWidth ?? scene.gridSize);
+      const tokenHeight = (possessedToken.height || 1) * (scene.gridHeight ?? scene.gridSize);
       const tokenCenterX = possessedToken.x + tokenWidth / 2;
       const tokenCenterY = possessedToken.y + tokenHeight / 2;
       const visionRadius = possessedToken.visionRange * scene.gridSize;
@@ -631,8 +631,8 @@
     const visibleTokens = tokens.filter(token => {
       if (!token.visible) return false;
 
-      const width = (token.width || 1) * scene.gridSize;
-      const height = (token.height || 1) * scene.gridSize;
+      const width = (token.width || 1) * (scene.gridWidth ?? scene.gridSize);
+      const height = (token.height || 1) * (scene.gridHeight ?? scene.gridSize);
 
       // Check viewport visibility
       if (!isInViewport(token.x, token.y, width, height)) {
@@ -649,8 +649,8 @@
         // Check if token is within vision range
         const tokenCenterX = token.x + width / 2;
         const tokenCenterY = token.y + height / 2;
-        const possessedWidth = (possessedToken.width || 1) * scene.gridSize;
-        const possessedHeight = (possessedToken.height || 1) * scene.gridSize;
+        const possessedWidth = (possessedToken.width || 1) * (scene.gridWidth ?? scene.gridSize);
+        const possessedHeight = (possessedToken.height || 1) * (scene.gridHeight ?? scene.gridSize);
         const possessedCenterX = possessedToken.x + possessedWidth / 2;
         const possessedCenterY = possessedToken.y + possessedHeight / 2;
 
@@ -679,8 +679,8 @@
 
       const x = token.x;
       const y = token.y;
-      const width = (token.width || 1) * scene.gridSize;
-      const height = (token.height || 1) * scene.gridSize;
+      const width = (token.width || 1) * (scene.gridWidth ?? scene.gridSize);
+      const height = (token.height || 1) * (scene.gridHeight ?? scene.gridSize);
       const centerX = x + width / 2;
       const centerY = y + height / 2;
       const radius = width / 2;
@@ -2120,8 +2120,8 @@
     if (possessedTokenId) {
       const possessedToken = tokens.find(t => t.id === possessedTokenId);
       if (possessedToken && possessedToken.vision && possessedToken.visionRange > 0) {
-        const tokenCenterX = possessedToken.x + ((possessedToken.width || 1) * scene.gridSize) / 2;
-        const tokenCenterY = possessedToken.y + ((possessedToken.height || 1) * scene.gridSize) / 2;
+        const tokenCenterX = possessedToken.x + ((possessedToken.width || 1) * (scene.gridWidth ?? scene.gridSize)) / 2;
+        const tokenCenterY = possessedToken.y + ((possessedToken.height || 1) * (scene.gridHeight ?? scene.gridSize)) / 2;
         const visionRadius = possessedToken.visionRange * scene.gridSize;
 
         // Compute visibility polygon for the possessed token
@@ -2181,8 +2181,8 @@
     tokens.forEach(token => {
       if (!token.visible || !token.vision || token.visionRange <= 0) return;
 
-      const tokenX = token.x + ((token.width || 1) * scene.gridSize) / 2;
-      const tokenY = token.y + ((token.height || 1) * scene.gridSize) / 2;
+      const tokenX = token.x + ((token.width || 1) * (scene.gridWidth ?? scene.gridSize)) / 2;
+      const tokenY = token.y + ((token.height || 1) * (scene.gridHeight ?? scene.gridSize)) / 2;
       const visionRadius = token.visionRange * scene.gridSize;
 
       // Compute visibility polygon for this token
@@ -2444,8 +2444,8 @@
 
       // Check if clicking on a token
       const clickedToken = tokens.find(token => {
-        const width = (token.width || 1) * scene.gridSize;
-        const height = (token.height || 1) * scene.gridSize;
+        const width = (token.width || 1) * (scene.gridWidth ?? scene.gridSize);
+        const height = (token.height || 1) * (scene.gridHeight ?? scene.gridSize);
         const dx = worldPos.x - (token.x + width / 2);
         const dy = worldPos.y - (token.y + height / 2);
         const distance = Math.sqrt(dx * dx + dy * dy);
@@ -2826,8 +2826,8 @@
 
     // Check for token at position
     const clickedToken = tokens.find(token => {
-      const width = (token.width || 1) * scene.gridSize;
-      const height = (token.height || 1) * scene.gridSize;
+      const width = (token.width || 1) * (scene.gridWidth ?? scene.gridSize);
+      const height = (token.height || 1) * (scene.gridHeight ?? scene.gridSize);
       const tokenCenterX = token.x + width / 2;
       const tokenCenterY = token.y + height / 2;
       const radius = Math.min(width, height) / 2;
