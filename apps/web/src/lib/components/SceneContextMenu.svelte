@@ -11,6 +11,7 @@
 
   const dispatch = createEventDispatcher<{
     edit: void;
+    possess: void;
     toggleVisibility: { currentState: boolean };
     delete: void;
     close: void;
@@ -79,6 +80,11 @@
     close();
   }
 
+  function handlePossess() {
+    dispatch('possess');
+    close();
+  }
+
   function handleToggleVisibility() {
     dispatch('toggleVisibility', { currentState: isVisible });
     close();
@@ -111,6 +117,19 @@
     </span>
     <span>Edit Properties</span>
   </button>
+
+  <!-- Possess Token (GM only, tokens only) -->
+  {#if isGM && elementType === 'token'}
+    <button class="menu-item" on:click={handlePossess}>
+      <span class="icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+      </span>
+      <span>Possess Token</span>
+    </button>
+  {/if}
 
   <div class="separator"></div>
 

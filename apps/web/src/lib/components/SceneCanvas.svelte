@@ -89,6 +89,8 @@
   let deleteDialogTitle = '';
   let deleteDialogMessage = '';
 
+  // Token possession state (GM only)
+  let possessedTokenId: string | null = null;
 
   // Drag-and-drop state
   let isDragOver = false;
@@ -1987,7 +1989,10 @@
   }
 
   function renderFog() {
-    if (!fogCtx || !fogCanvas || !scene.fogExploration || isGM) return;
+    // When GM is possessing a token, show fog from that token's perspective
+    // Otherwise, GMs see no fog
+    if (!fogCtx || !fogCanvas || !scene.fogExploration) return;
+    if (isGM && !possessedTokenId) return;
     if (!fogData) return;
 
     fogCtx.clearRect(0, 0, fogCanvas.width, fogCanvas.height);
@@ -2030,6 +2035,35 @@
             fogCtx.fillStyle = 'rgba(0, 0, 0, 1)';
             fogCtx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
           }
+        }
+      }
+    }
+
+    // When GM is possessing a token, also cut out the current vision
+    if (possessedTokenId) {
+      const possessedToken = tokens.find(t => t.id === possessedTokenId);
+      if (possessedToken && possessedToken.vision && possessedToken.visionRange > 0) {
+        const tokenCenterX = possessedToken.x + ((possessedToken.width || 1) * scene.gridSize) / 2;
+        const tokenCenterY = possessedToken.y + ((possessedToken.height || 1) * scene.gridSize) / 2;
+        const visionRadius = possessedToken.visionRange * scene.gridSize;
+
+        // Compute visibility polygon for the possessed token
+        const visibilityPolygon = computeVisibilityPolygon(
+          { x: tokenCenterX, y: tokenCenterY },
+          walls,
+          visionRadius
+        );
+
+        // Cut out the current vision area
+        if (visibilityPolygon.length > 0) {
+          fogCtx.fillStyle = 'rgba(0, 0, 0, 1)';
+          fogCtx.beginPath();
+          fogCtx.moveTo(visibilityPolygon[0].x, visibilityPolygon[0].y);
+          for (let i = 1; i < visibilityPolygon.length; i++) {
+            fogCtx.lineTo(visibilityPolygon[i].x, visibilityPolygon[i].y);
+          }
+          fogCtx.closePath();
+          fogCtx.fill();
         }
       }
     }
@@ -2370,7 +2404,8 @@
           lastClickLightId = null;
         }
       } else {
-        // Clicking on empty space - clear selections and start panning
+        // Clicking on empty space - exit possession, clear selections and start panning
+        exitPossession();
         selectedTokenId = null;
         selectedLightId = null;
         onTokenSelect?.(null);
@@ -2669,9 +2704,12 @@
       return;
     }
 
-    // Escape - cancel wall drawing
+    // Escape - exit possession, or cancel wall drawing
     if (e.key === 'Escape') {
-      if (isDrawingWall) {
+      if (possessedTokenId) {
+        exitPossession();
+        e.preventDefault();
+      } else if (isDrawingWall) {
         cancelWallDrawing();
         e.preventDefault();
       }
@@ -2787,6 +2825,23 @@
     // Add similar for lights/walls if they support visibility in the future
   }
 
+  function handleContextMenuPossess() {
+    showContextMenu = false;
+    if (contextMenuElementType === 'token' && contextMenuElementId && isGM) {
+      possessedTokenId = contextMenuElementId;
+      // Re-render fog with the possessed token's perspective
+      renderFog();
+    }
+  }
+
+  function exitPossession() {
+    if (possessedTokenId) {
+      possessedTokenId = null;
+      // Re-render fog from GM perspective
+      renderFog();
+    }
+  }
+
   function handleContextMenuDelete() {
     showContextMenu = false;
 
@@ -2892,7 +2947,7 @@
   <canvas class="canvas-layer" bind:this={gridCanvas}></canvas>
   <canvas class="canvas-layer" bind:this={tokensCanvas}></canvas>
   <canvas class="canvas-layer" bind:this={lightingCanvas}></canvas>
-  {#if scene.fogExploration && !isGM}
+  {#if scene.fogExploration && (!isGM || possessedTokenId)}
     <canvas class="canvas-layer" bind:this={fogCanvas}></canvas>
   {/if}
   {#if isGM}
@@ -2915,6 +2970,29 @@
     on:drop={handleDrop}
   ></canvas>
 
+  <!-- Possession indicator -->
+  {#if possessedTokenId}
+    {#each tokens as token}
+      {#if token.id === possessedTokenId}
+        <div class="possession-indicator">
+          <div class="possession-content">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <span>Possessing: {token.name || 'Token'}</span>
+            <button class="exit-button" on:click={exitPossession} title="Exit Possession (ESC)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+      {/if}
+    {/each}
+  {/if}
+
   <div class="canvas-controls">
     <div class="zoom-display">
       {Math.round(scale * 100)}%
@@ -2931,6 +3009,7 @@
     {isGM}
     isVisible={contextMenuElementVisible}
     on:edit={handleContextMenuEdit}
+    on:possess={handleContextMenuPossess}
     on:toggleVisibility={handleContextMenuToggleVisibility}
     on:delete={handleContextMenuDelete}
     on:close={() => showContextMenu = false}
@@ -3006,6 +3085,57 @@
     border-radius: 4px;
     font-size: 14px;
     font-weight: 500;
+  }
+
+  .possession-indicator {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    pointer-events: all;
+    z-index: 100;
+  }
+
+  .possession-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: rgba(251, 191, 36, 0.95);
+    color: #1f2937;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    animation: possession-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes possession-pulse {
+    0%, 100% {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    50% {
+      box-shadow: 0 4px 16px rgba(251, 191, 36, 0.5);
+    }
+  }
+
+  .possession-content svg {
+    flex-shrink: 0;
+  }
+
+  .exit-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.2);
+    border: none;
+    border-radius: 3px;
+    padding: 2px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+  }
+
+  .exit-button:hover {
+    background: rgba(0, 0, 0, 0.35);
   }
 
   .canvas-interactive.drag-over {
