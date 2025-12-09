@@ -17,6 +17,39 @@ This document contains critical instructions for Claude Code when working on the
 - **Container**: `trading_platform_redis`
 - **URL**: `redis://localhost:6379`
 
+## Docker Deployment (CRITICAL)
+
+**All testing and verification is done in Docker.** After any code changes:
+
+1. **Build and deploy to Docker**:
+   ```bash
+   docker-compose up -d --build
+   ```
+
+2. **Verify containers are running**:
+   ```bash
+   docker-compose ps
+   ```
+
+3. **Check logs for errors**:
+   ```bash
+   docker-compose logs --tail=50 server
+   docker-compose logs --tail=50 web
+   ```
+
+**Important**: Changes are NOT considered complete until they are deployed to Docker and verified working. The dev server (`pnpm run dev`) is for development convenience only - final testing must be in Docker.
+
+### Docker Services
+- **vtt_server**: Backend API (port 3000 internal)
+- **vtt_web**: Frontend (port 5173 internal)
+- **vtt_nginx**: Reverse proxy (ports 80, 443 external)
+- **vtt_db**: PostgreSQL database
+- **vtt_redis**: Redis cache
+
+### Persistent Volumes
+- `postgres_data`: Database storage
+- `uploads_data`: User uploaded assets (images, etc.)
+
 ---
 
 # UNIVERSAL INSTRUCTIONS
@@ -455,4 +488,4 @@ fix(websocket): Add heartbeat subscription to prevent reconnects
 
 ---
 
-**Last Updated**: 2025-12-03
+**Last Updated**: 2025-12-09

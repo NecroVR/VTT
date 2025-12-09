@@ -45,6 +45,8 @@ services:
       PORT: 3000
       HTTPS_ENABLED: "false"
       CORS_ORIGIN: https://localhost
+    volumes:
+      - uploads_data:/app/apps/server/uploads
     networks:
       - vtt-network
     depends_on:
@@ -92,3 +94,4 @@ networks:
 
 volumes:
   postgres_data:
+  uploads_data:
