@@ -477,6 +477,7 @@
       backgroundImage = cachedImage;
       imageLoadingState = 'loaded';
       imageErrorMessage = null;
+      backgroundNeedsUpdate = true; // Invalidate cache so image renders
       renderBackground();
       return;
     }
@@ -495,6 +496,7 @@
         imageLoadingState = 'loaded';
         imageErrorMessage = null;
         imageCache.set(imageUrl, img);
+        backgroundNeedsUpdate = true; // Invalidate cache so image renders
         renderBackground();
       }
     };
