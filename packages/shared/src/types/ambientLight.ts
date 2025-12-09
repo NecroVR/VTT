@@ -1,3 +1,19 @@
+/** Configuration for sparkle animation type, stored in light.data */
+export interface SparkleConfig {
+  /** Array of hex colors to randomly pick from (defaults to [light.color]) */
+  sparkleColors?: string[];
+  /** Number of concurrent sparks (default: 10, range: 1-50) */
+  sparkleCount?: number;
+  /** Size of each spark in pixels (default: 3, range: 1-10) */
+  sparkleSize?: number;
+  /** How long each spark lives in milliseconds (default: 1000, range: 200-5000) */
+  sparkleLifetime?: number;
+  /** Whether sparks fade in/out or just appear/disappear (default: true) */
+  sparkleFade?: boolean;
+  /** Distribution pattern for spark positions */
+  sparkleDistribution?: 'uniform' | 'center-weighted' | 'edge-weighted';
+}
+
 export interface AmbientLight {
   id: string;
   sceneId: string;
@@ -12,6 +28,7 @@ export interface AmbientLight {
   color: string;
   alpha: number;
   // Animation
+  /** Animation type: 'flicker' | 'pulse' | 'wave' | 'sparkle' | null */
   animationType?: string | null;
   animationSpeed: number;
   animationIntensity: number;

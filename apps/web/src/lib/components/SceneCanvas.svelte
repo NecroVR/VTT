@@ -6,7 +6,7 @@
   import { websocket } from '$lib/stores/websocket';
   import SceneContextMenu from './SceneContextMenu.svelte';
   import ConfirmDialog from './ConfirmDialog.svelte';
-  import { computeViewport } from 'visibility-polygon';
+  import { computeViewport, breakIntersections } from 'visibility-polygon';
 
   // Props
   export let scene: Scene;
@@ -122,6 +122,10 @@
   // Performance optimization: Visibility cache
   let visibilityCache = new Map<string, Point[]>();
   let visibilityCacheValid = false;
+
+  // Debug: Track light rendering issues
+  const DEBUG_LIGHTS = true;
+  let debugLightFrame = 0;
 
   // Performance optimization: Animation throttling
   const TARGET_FPS = 30;
@@ -556,7 +560,14 @@
     const cacheKey = `${sourceId}-${Math.floor(x)}-${Math.floor(y)}-${roundedRadius}`;
 
     if (visibilityCacheValid && visibilityCache.has(cacheKey)) {
+      if (DEBUG_LIGHTS && debugLightFrame % 60 === 0) {
+        console.log(`[Light Debug] Cache HIT for ${sourceId.slice(-12)}: ${cacheKey.slice(-30)}`);
+      }
       return visibilityCache.get(cacheKey)!;
+    }
+
+    if (DEBUG_LIGHTS && debugLightFrame % 60 === 0) {
+      console.log(`[Light Debug] Cache MISS for ${sourceId.slice(-12)}: ${cacheKey.slice(-30)}`);
     }
 
     // Use adjusted coordinates for polygon computation
@@ -884,6 +895,121 @@
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   }
 
+  // Seeded random number generator for deterministic sparks
+  function createSeededRandom(seed: number): () => number {
+    let state = seed;
+    return () => {
+      state = (state * 1103515245 + 12345) & 0x7fffffff;
+      return state / 0x7fffffff;
+    };
+  }
+
+  // String hash for light ID
+  function hashString(str: string): number {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) - hash) + str.charCodeAt(i);
+      hash |= 0;
+    }
+    return Math.abs(hash);
+  }
+
+  interface Spark {
+    x: number;
+    y: number;
+    color: string;
+    birthTime: number;
+    lifetime: number;
+    size: number;
+  }
+
+  interface SparkleConfig {
+    sparkleColors?: string[];
+    sparkleCount?: number;
+    sparkleSize?: number;
+    sparkleLifetime?: number;
+    sparkleFade?: boolean;
+    sparkleDistribution?: 'uniform' | 'center-weighted' | 'edge-weighted';
+  }
+
+  function getSparkleConfig(light: AmbientLight): SparkleConfig {
+    const data = light.data as SparkleConfig | undefined;
+    return {
+      sparkleColors: data?.sparkleColors,
+      sparkleCount: data?.sparkleCount,
+      sparkleSize: data?.sparkleSize,
+      sparkleLifetime: data?.sparkleLifetime,
+      sparkleFade: data?.sparkleFade,
+      sparkleDistribution: data?.sparkleDistribution
+    };
+  }
+
+  function generateSparkPosition(
+    radius: number,
+    distribution: string,
+    rng: () => number
+  ): { x: number; y: number } {
+    const angle = rng() * Math.PI * 2;
+    let distance: number;
+
+    switch (distribution) {
+      case 'center-weighted':
+        distance = Math.sqrt(rng()) * radius * 0.7;
+        break;
+      case 'edge-weighted':
+        distance = (0.5 + rng() * 0.5) * radius;
+        break;
+      case 'uniform':
+      default:
+        distance = Math.sqrt(rng()) * radius;
+    }
+
+    return {
+      x: Math.cos(angle) * distance,
+      y: Math.sin(angle) * distance
+    };
+  }
+
+  function generateSparks(light: AmbientLight, time: number): Spark[] {
+    const config = getSparkleConfig(light);
+    const sparkleCount = config.sparkleCount ?? 10;
+    const sparkleLifetime = config.sparkleLifetime ?? 1000;
+    const colors = config.sparkleColors?.length ? config.sparkleColors : [light.color];
+    const sparkleSize = config.sparkleSize ?? 3;
+    const distribution = config.sparkleDistribution ?? 'uniform';
+
+    const seed = hashString(light.id);
+    const sparks: Spark[] = [];
+
+    for (let i = 0; i < sparkleCount; i++) {
+      const slotOffset = (i / sparkleCount) * sparkleLifetime;
+      const cycleTime = sparkleLifetime;
+      const adjustedTime = time + slotOffset;
+      const cycleNumber = Math.floor(adjustedTime / cycleTime);
+      const birthTime = cycleNumber * cycleTime - slotOffset;
+      const age = time - birthTime;
+
+      if (age < 0 || age > sparkleLifetime) continue;
+
+      const sparkSeed = seed + cycleNumber * 1000 + i;
+      const sparkRng = createSeededRandom(sparkSeed);
+
+      const position = generateSparkPosition(light.dim, distribution, sparkRng);
+      const colorIndex = Math.floor(sparkRng() * colors.length);
+
+      sparks.push({
+        x: position.x,
+        y: position.y,
+        color: colors[colorIndex],
+        birthTime,
+        lifetime: sparkleLifetime,
+        size: sparkleSize * (0.7 + sparkRng() * 0.6)
+      });
+    }
+
+    return sparks;
+  }
+
   // Wall occlusion helpers
   interface Point {
     x: number;
@@ -1012,6 +1138,7 @@
     }
 
     // Convert walls to visibility-polygon segment format: [[x1, y1], [x2, y2]]
+    // Create fresh arrays to avoid any mutation issues with the library
     const segments: [number, number][][] = blockingWalls.map(w => [
       [w.x1, w.y1] as [number, number],
       [w.x2, w.y2] as [number, number]
@@ -1021,17 +1148,71 @@
     const viewportMin: [number, number] = [source.x - maxRadius, source.y - maxRadius];
     const viewportMax: [number, number] = [source.x + maxRadius, source.y + maxRadius];
 
+    // Debug: Check if walls have valid coordinates
+    if (DEBUG_LIGHTS && debugLightFrame % 60 === 0) {
+      const invalidWalls = blockingWalls.filter(w =>
+        !isFinite(w.x1) || !isFinite(w.y1) || !isFinite(w.x2) || !isFinite(w.y2)
+      );
+      if (invalidWalls.length > 0) {
+        console.error(`[Light Debug] Found ${invalidWalls.length} walls with invalid coordinates!`);
+      }
+    }
+
+    // IMPORTANT: Use breakIntersections to handle intersecting wall segments
+    // The visibility-polygon library requires non-intersecting segments to work correctly
+    // Without this, if walls intersect, the library may produce incorrect/empty polygons
+    const processedSegments = breakIntersections(segments);
+
     // Compute visibility polygon using the library
     // computeViewport is faster when many segments are outside the viewport
-    const polygonTuples = computeViewport(
-      [source.x, source.y],
-      segments,
-      viewportMin,
-      viewportMax
-    );
+    let polygonTuples: [number, number][];
+    try {
+      polygonTuples = computeViewport(
+        [source.x, source.y],
+        processedSegments,
+        viewportMin,
+        viewportMax
+      );
+    } catch (error) {
+      console.error(`[Light Debug] computeViewport FAILED for source=(${source.x.toFixed(1)},${source.y.toFixed(1)}):`, error);
+      return []; // Return empty to render light without clipping
+    }
+
+    // Debug: Log if polygon has very few vertices or seems degenerate
+    if (DEBUG_LIGHTS && debugLightFrame % 60 === 0) {
+      if (polygonTuples.length < 3) {
+        console.warn(`[Light Debug] computeVisibilityPolygon: degenerate polygon with ${polygonTuples.length} vertices! source=(${source.x.toFixed(1)},${source.y.toFixed(1)}), segments=${segments.length}`);
+      }
+    }
+
+    // If polygon has fewer than 3 vertices, it's degenerate - return empty to skip clipping
+    if (polygonTuples.length < 3) {
+      return [];
+    }
 
     // Convert from [x, y] tuples back to {x, y} Point objects
-    return polygonTuples.map(([x, y]) => ({ x, y }));
+    const polygon = polygonTuples.map(([x, y]) => ({ x, y }));
+
+    // Validate: Check if source point is inside the polygon
+    // If not, the polygon is invalid for this light and we should skip clipping
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+      const xi = polygon[i].x, yi = polygon[i].y;
+      const xj = polygon[j].x, yj = polygon[j].y;
+      if (((yi > source.y) !== (yj > source.y)) && (source.x < (xj - xi) * (source.y - yi) / (yj - yi) + xi)) {
+        inside = !inside;
+      }
+    }
+
+    if (!inside) {
+      if (DEBUG_LIGHTS) {
+        console.warn(`[Light Debug] computeVisibilityPolygon: source NOT inside polygon! Returning empty. source=(${source.x.toFixed(1)},${source.y.toFixed(1)}), verts=${polygon.length}`);
+      }
+      // Return empty so the light renders without clipping rather than being invisible
+      return [];
+    }
+
+    return polygon;
   }
 
   /**
@@ -1118,7 +1299,31 @@
     renderCallback: () => void,
     lightId?: string
   ) {
-    if (visibilityPolygon.length === 0) return;
+    if (visibilityPolygon.length === 0) {
+      if (DEBUG_LIGHTS && debugLightFrame % 60 === 0) {
+        console.log(`[Light Debug] renderClippedLight id=${lightId?.slice(-8)} SKIPPED: empty polygon`);
+      }
+      return;
+    }
+
+    // Debug: Check if source is inside the polygon
+    if (DEBUG_LIGHTS && debugLightFrame % 60 === 0) {
+      // Simple point-in-polygon check using winding number
+      let inside = false;
+      for (let i = 0, j = visibilityPolygon.length - 1; i < visibilityPolygon.length; j = i++) {
+        const xi = visibilityPolygon[i].x, yi = visibilityPolygon[i].y;
+        const xj = visibilityPolygon[j].x, yj = visibilityPolygon[j].y;
+        if (((yi > source.y) !== (yj > source.y)) && (source.x < (xj - xi) * (source.y - yi) / (yj - yi) + xi)) {
+          inside = !inside;
+        }
+      }
+      if (!inside) {
+        console.warn(`[Light Debug] WARNING: id=${lightId?.slice(-8)} source NOT inside polygon! source=(${source.x.toFixed(1)},${source.y.toFixed(1)})`);
+        // Log first few polygon vertices
+        const sample = visibilityPolygon.slice(0, 4).map(p => `(${p.x.toFixed(0)},${p.y.toFixed(0)})`).join(', ');
+        console.warn(`[Light Debug]   polygon vertices (first 4): ${sample}`);
+      }
+    }
 
     ctx.save();
 
@@ -1179,6 +1384,9 @@
 
     // Skip hidden lights
     if (hidden) {
+      if (DEBUG_LIGHTS && debugLightFrame % 60 === 0) {
+        console.log(`[Light Debug] id=${light.id.slice(-8)} SKIPPED: hidden`);
+      }
       return;
     }
 
@@ -1189,11 +1397,17 @@
 
     // Skip if scene darkness is outside this light's activation range
     if (sceneDarkness < darknessMin || sceneDarkness > darknessMax) {
+      if (DEBUG_LIGHTS && debugLightFrame % 60 === 0) {
+        console.log(`[Light Debug] id=${light.id.slice(-8)} SKIPPED: darkness range (scene=${sceneDarkness}, min=${darknessMin}, max=${darknessMax})`);
+      }
       return;
     }
 
     // Performance optimization: Cull lights outside viewport
     if (!isInViewport(x - dim, y - dim, dim * 2, dim * 2)) {
+      if (DEBUG_LIGHTS && debugLightFrame % 60 === 0) {
+        console.log(`[Light Debug] id=${light.id.slice(-8)} SKIPPED: outside viewport`);
+      }
       return;
     }
 
@@ -1221,6 +1435,8 @@
     } else if (animationType === "wave") {
       // Wave animation - ripple effect
       // Speed and intensity will be used in gradient rendering below
+    } else if (animationType === 'sparkle') {
+      // Sparkle uses base light settings, sparks rendered separately
     }
 
     // Round animated radii to fix canvas rendering issues with sub-pixel precision
@@ -1231,6 +1447,22 @@
     const visibilityPolygon = wallsEnabled
       ? getVisibilityPolygon(`light-${light.id}`, x, y, animatedDim)
       : null;
+
+    // Debug logging for light rendering issues
+    if (DEBUG_LIGHTS && debugLightFrame % 60 === 0) {
+      const hasWalls = hasWallsInRange({ x, y }, walls, animatedDim);
+      console.log(`[Light Debug] id=${light.id.slice(-8)}, pos=(${x.toFixed(0)},${y.toFixed(0)}), dim=${animatedDim}, alpha=${alpha}, wallsEnabled=${wallsEnabled}, hasWallsInRange=${hasWalls}, polygonVerts=${visibilityPolygon?.length ?? 'null'}`);
+
+      // If polygon exists, log its bounding box
+      if (visibilityPolygon && visibilityPolygon.length > 0) {
+        const minX = Math.min(...visibilityPolygon.map(p => p.x));
+        const maxX = Math.max(...visibilityPolygon.map(p => p.x));
+        const minY = Math.min(...visibilityPolygon.map(p => p.y));
+        const maxY = Math.max(...visibilityPolygon.map(p => p.y));
+        const containsSource = x >= minX && x <= maxX && y >= minY && y <= maxY;
+        console.log(`[Light Debug]   polygon bounds: (${minX.toFixed(0)},${minY.toFixed(0)}) to (${maxX.toFixed(0)},${maxY.toFixed(0)}), containsSource=${containsSource}`);
+      }
+    }
 
     // Determine if this is a darkness source (negative light)
     const isNegative = negative === true;
@@ -1348,14 +1580,62 @@
         ctx.fill();
       }
 
+      // Render sparkles on top of base light
+      if (animationType === 'sparkle') {
+        const config = getSparkleConfig(light);
+        const sparks = generateSparks(light, time);
+        const intensity = animationIntensity / 10;
+
+        sparks.forEach(spark => {
+          const age = time - spark.birthTime;
+          const lifeProgress = age / spark.lifetime;
+
+          let fadeAlpha: number;
+          if (config.sparkleFade !== false) {
+            fadeAlpha = Math.sin(lifeProgress * Math.PI);
+          } else {
+            fadeAlpha = 1;
+          }
+
+          const finalAlpha = alpha * intensity * fadeAlpha;
+          if (finalAlpha <= 0.01) return;
+
+          const sparkX = Math.floor(x + spark.x) + 0.5;
+          const sparkY = Math.floor(y + spark.y) + 0.5;
+
+          const sparkGradient = ctx.createRadialGradient(
+            sparkX, sparkY, 0,
+            sparkX, sparkY, spark.size
+          );
+
+          sparkGradient.addColorStop(0, hexToRgba(spark.color, finalAlpha));
+          sparkGradient.addColorStop(0.5, hexToRgba(spark.color, finalAlpha * 0.5));
+          sparkGradient.addColorStop(1, hexToRgba(spark.color, 0));
+
+          ctx.fillStyle = sparkGradient;
+          ctx.beginPath();
+          ctx.arc(sparkX, sparkY, spark.size, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
+
       ctx.restore();
     };
 
     // Render light with or without wall occlusion based on light.walls property
     // Empty polygon means no walls are affecting this light - render without clipping
     if (wallsEnabled && visibilityPolygon && visibilityPolygon.length > 0) {
+      if (DEBUG_LIGHTS && debugLightFrame % 60 === 0) {
+        console.log(`[Light Debug] id=${light.id.slice(-8)} RENDERING with clipping (${visibilityPolygon.length} vertices)`);
+      }
       renderClippedLight(ctx, { x, y }, animatedDim, visibilityPolygon, renderLightGradient, light.id);
     } else {
+      // Log every frame if walls are enabled but polygon is empty/missing - this is suspicious!
+      if (DEBUG_LIGHTS && wallsEnabled && hasWallsInRange({ x, y }, walls, animatedDim)) {
+        console.warn(`[Light Debug] id=${light.id.slice(-8)} SUSPICIOUS: wallsEnabled=true, hasWallsInRange=true, but polygon=${visibilityPolygon?.length ?? 'null'}`);
+      } else if (DEBUG_LIGHTS && debugLightFrame % 60 === 0) {
+        console.log(`[Light Debug] id=${light.id.slice(-8)} RENDERING without clipping (wallsEnabled=${wallsEnabled}, polygon=${visibilityPolygon?.length ?? 'null'})`);
+      }
       renderLightGradient();
     }
   }
@@ -1534,6 +1814,11 @@
 
   function renderLights() {
     if (!lightingCtx || !lightingCanvas) return;
+
+    // Debug frame counter
+    if (DEBUG_LIGHTS) {
+      debugLightFrame++;
+    }
 
     // Performance optimization: Pre-calculate visibility at start of frame
     // Capture whether cache needs clearing, but defer setting the flag until after rendering
@@ -1857,7 +2142,7 @@
 
       // Only re-render lights if there are animated lights or token lights
       const hasAnimatedLights = lights.some(light =>
-        light.animationType === 'torch' || light.animationType === 'pulse' || light.animationType === 'chroma' || light.animationType === 'wave'
+        light.animationType === 'torch' || light.animationType === 'pulse' || light.animationType === 'chroma' || light.animationType === 'wave' || light.animationType === 'sparkle'
       );
 
       // Check if any tokens emit light (for now we always re-render if they exist)

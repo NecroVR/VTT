@@ -50,6 +50,8 @@
     coloration: light?.coloration ?? 1,
     darknessMin: light?.darknessMin ?? 0,
     darknessMax: light?.darknessMax ?? 1,
+    // Animation-specific data (e.g., sparkle configuration)
+    data: light?.data ?? {},
   };
 
   // Animation types
@@ -59,6 +61,7 @@
     { value: 'pulse', label: 'Pulse' },
     { value: 'chroma', label: 'Chroma' },
     { value: 'wave', label: 'Wave' },
+    { value: 'sparkle', label: 'Sparkle' },
   ];
 
   // Coloration modes
@@ -392,6 +395,87 @@
                 <label>
                   <input type="checkbox" bind:checked={formData.animationReverse} />
                   Reverse animation
+                </label>
+              </div>
+            {/if}
+
+            {#if formData.animationType === 'sparkle'}
+              <div class="form-row">
+                <label for="sparkleCount">
+                  Spark Count: {formData.data?.sparkleCount ?? 10}
+                  <input
+                    type="range"
+                    id="sparkleCount"
+                    min="1"
+                    max="50"
+                    value={formData.data?.sparkleCount ?? 10}
+                    on:input={(e) => {
+                      formData.data = { ...formData.data, sparkleCount: parseInt(e.currentTarget.value) };
+                    }}
+                  />
+                </label>
+              </div>
+
+              <div class="form-row">
+                <label for="sparkleSize">
+                  Spark Size: {formData.data?.sparkleSize ?? 3}px
+                  <input
+                    type="range"
+                    id="sparkleSize"
+                    min="1"
+                    max="10"
+                    value={formData.data?.sparkleSize ?? 3}
+                    on:input={(e) => {
+                      formData.data = { ...formData.data, sparkleSize: parseInt(e.currentTarget.value) };
+                    }}
+                  />
+                </label>
+              </div>
+
+              <div class="form-row">
+                <label for="sparkleLifetime">
+                  Lifetime: {formData.data?.sparkleLifetime ?? 1000}ms
+                  <input
+                    type="range"
+                    id="sparkleLifetime"
+                    min="200"
+                    max="5000"
+                    step="100"
+                    value={formData.data?.sparkleLifetime ?? 1000}
+                    on:input={(e) => {
+                      formData.data = { ...formData.data, sparkleLifetime: parseInt(e.currentTarget.value) };
+                    }}
+                  />
+                </label>
+              </div>
+
+              <div class="form-row">
+                <label for="sparkleDistribution">
+                  Distribution
+                  <select
+                    id="sparkleDistribution"
+                    value={formData.data?.sparkleDistribution ?? 'uniform'}
+                    on:change={(e) => {
+                      formData.data = { ...formData.data, sparkleDistribution: e.currentTarget.value };
+                    }}
+                  >
+                    <option value="uniform">Uniform</option>
+                    <option value="center-weighted">Center Weighted</option>
+                    <option value="edge-weighted">Edge Weighted</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="form-row-checkbox">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={formData.data?.sparkleFade !== false}
+                    on:change={(e) => {
+                      formData.data = { ...formData.data, sparkleFade: e.currentTarget.checked };
+                    }}
+                  />
+                  Fade In/Out
                 </label>
               </div>
             {/if}
