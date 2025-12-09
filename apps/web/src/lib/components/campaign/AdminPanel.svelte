@@ -200,6 +200,7 @@
   let localGridHeight = 100;
   let isEditingGridWidth = false;
   let isEditingGridHeight = false;
+  let gridDimensionDebounceTimer: number | null = null;
 
   // Sync local state with store values ONLY when not editing
   $: if (!isEditingGridWidth && gridWidth !== undefined) {
@@ -220,43 +221,52 @@
   function handleGridWidthInput(event: Event) {
     const target = event.target as HTMLInputElement;
     const newValue = parseInt(target.value, 10);
-    if (!isNaN(newValue)) {
+    if (!isNaN(newValue) && activeScene) {
       localGridWidth = newValue;
+      const updates: Record<string, number> = { gridWidth: newValue };
       if (linkGridDimensions) {
         localGridHeight = newValue;
+        updates.gridHeight = newValue;
       }
+      // Update store immediately for instant grid rendering
+      scenesStore.updateScene(activeScene.id, updates);
+      // Debounce the API call for persistence
+      debouncedGridDimensionSave(updates);
     }
   }
 
   function handleGridHeightInput(event: Event) {
     const target = event.target as HTMLInputElement;
     const newValue = parseInt(target.value, 10);
-    if (!isNaN(newValue)) {
+    if (!isNaN(newValue) && activeScene) {
       localGridHeight = newValue;
+      const updates: Record<string, number> = { gridHeight: newValue };
       if (linkGridDimensions) {
         localGridWidth = newValue;
+        updates.gridWidth = newValue;
       }
+      // Update store immediately for instant grid rendering
+      scenesStore.updateScene(activeScene.id, updates);
+      // Debounce the API call for persistence
+      debouncedGridDimensionSave(updates);
     }
   }
 
-  async function handleGridWidthBlur() {
+  function debouncedGridDimensionSave(updates: Record<string, number>) {
+    if (gridDimensionDebounceTimer) {
+      clearTimeout(gridDimensionDebounceTimer);
+    }
+    gridDimensionDebounceTimer = window.setTimeout(async () => {
+      await updateSceneGridSetting(updates);
+    }, 300);
+  }
+
+  function handleGridWidthBlur() {
     isEditingGridWidth = false;
-    const updates: Record<string, number> = { gridWidth: localGridWidth };
-    if (linkGridDimensions) {
-      updates.gridHeight = localGridWidth;
-      isEditingGridHeight = false;
-    }
-    await updateSceneGridSetting(updates);
   }
 
-  async function handleGridHeightBlur() {
+  function handleGridHeightBlur() {
     isEditingGridHeight = false;
-    const updates: Record<string, number> = { gridHeight: localGridHeight };
-    if (linkGridDimensions) {
-      updates.gridWidth = localGridHeight;
-      isEditingGridWidth = false;
-    }
-    await updateSceneGridSetting(updates);
   }
 </script>
 
