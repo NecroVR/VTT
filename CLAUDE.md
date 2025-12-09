@@ -249,6 +249,28 @@ Resuming work...
 
 ## Development Guidelines
 
+### Debug Code Protection (CRITICAL)
+
+**NEVER remove or disable debug code without explicit user permission.**
+
+This includes:
+- Debug logging statements (console.log, console.warn, etc.)
+- Debug flags (DEBUG_*, ENABLE_*, etc.)
+- Debug tracking variables and Maps
+- Diagnostic helper functions
+- Performance monitoring code
+- State inspection utilities
+
+**Why this matters**: Debug code is often added during active troubleshooting. Removing it without permission:
+- Loses valuable diagnostic capability during ongoing investigations
+- Forces re-implementation when issues resurface
+- Wastes user time explaining what was already working
+
+**Correct behavior**:
+- Keep all debug code intact unless user explicitly requests removal
+- If debug code seems excessive, ASK before removing
+- When fixing bugs, ADD debug code as needed, never remove existing
+
 ### Code Style
 - Type hints throughout, docstrings for public methods
 - Follow PEP 8, keep functions focused and small
