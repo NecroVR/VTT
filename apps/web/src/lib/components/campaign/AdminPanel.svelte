@@ -195,89 +195,68 @@
     }
   }
 
-  // Grid dimension handlers
-  let gridWidthDebounceTimer: number | null = null;
-  let gridHeightDebounceTimer: number | null = null;
+  // Grid dimension handlers - use focus/blur to track editing state
   let localGridWidth = 100;
   let localGridHeight = 100;
   let isEditingGridWidth = false;
   let isEditingGridHeight = false;
 
   // Sync local state with store values ONLY when not editing
-  // This prevents the reactive statement from overwriting user input
-  $: if (!isEditingGridWidth) {
+  $: if (!isEditingGridWidth && gridWidth !== undefined) {
     localGridWidth = gridWidth;
   }
-  $: if (!isEditingGridHeight) {
+  $: if (!isEditingGridHeight && gridHeight !== undefined) {
     localGridHeight = gridHeight;
   }
 
-  async function handleGridWidthChange(event: Event) {
-    const target = event.target as HTMLInputElement;
-    const newValue = parseInt(target.value, 10);
-
-    // Mark as editing to prevent reactive overwrite
+  function handleGridWidthFocus() {
     isEditingGridWidth = true;
-
-    // Update local state immediately for smooth UI
-    localGridWidth = newValue;
-
-    // If linked, also update height
-    if (linkGridDimensions) {
-      isEditingGridHeight = true;
-      localGridHeight = newValue;
-    }
-
-    // Debounce API call
-    if (gridWidthDebounceTimer) {
-      clearTimeout(gridWidthDebounceTimer);
-    }
-    gridWidthDebounceTimer = window.setTimeout(async () => {
-      const updates: Record<string, number> = { gridWidth: newValue };
-      if (linkGridDimensions) {
-        updates.gridHeight = newValue;
-      }
-      await updateSceneGridSetting(updates);
-      // Clear editing flags after API update completes
-      isEditingGridWidth = false;
-      if (linkGridDimensions) {
-        isEditingGridHeight = false;
-      }
-    }, 150);
   }
 
-  async function handleGridHeightChange(event: Event) {
+  function handleGridHeightFocus() {
+    isEditingGridHeight = true;
+  }
+
+  function handleGridWidthInput(event: Event) {
     const target = event.target as HTMLInputElement;
     const newValue = parseInt(target.value, 10);
-
-    // Mark as editing to prevent reactive overwrite
-    isEditingGridHeight = true;
-
-    // Update local state immediately for smooth UI
-    localGridHeight = newValue;
-
-    // If linked, also update width
-    if (linkGridDimensions) {
-      isEditingGridWidth = true;
+    if (!isNaN(newValue)) {
       localGridWidth = newValue;
+      if (linkGridDimensions) {
+        localGridHeight = newValue;
+      }
     }
+  }
 
-    // Debounce API call
-    if (gridHeightDebounceTimer) {
-      clearTimeout(gridHeightDebounceTimer);
+  function handleGridHeightInput(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const newValue = parseInt(target.value, 10);
+    if (!isNaN(newValue)) {
+      localGridHeight = newValue;
+      if (linkGridDimensions) {
+        localGridWidth = newValue;
+      }
     }
-    gridHeightDebounceTimer = window.setTimeout(async () => {
-      const updates: Record<string, number> = { gridHeight: newValue };
-      if (linkGridDimensions) {
-        updates.gridWidth = newValue;
-      }
-      await updateSceneGridSetting(updates);
-      // Clear editing flags after API update completes
+  }
+
+  async function handleGridWidthBlur() {
+    isEditingGridWidth = false;
+    const updates: Record<string, number> = { gridWidth: localGridWidth };
+    if (linkGridDimensions) {
+      updates.gridHeight = localGridWidth;
       isEditingGridHeight = false;
-      if (linkGridDimensions) {
-        isEditingGridWidth = false;
-      }
-    }, 150);
+    }
+    await updateSceneGridSetting(updates);
+  }
+
+  async function handleGridHeightBlur() {
+    isEditingGridHeight = false;
+    const updates: Record<string, number> = { gridHeight: localGridHeight };
+    if (linkGridDimensions) {
+      updates.gridWidth = localGridHeight;
+      isEditingGridWidth = false;
+    }
+    await updateSceneGridSetting(updates);
   }
 </script>
 
@@ -492,7 +471,9 @@
                   step="5"
                   value={localGridWidth}
                   disabled={saving || !gridVisible}
-                  on:input={handleGridWidthChange}
+                  on:focus={handleGridWidthFocus}
+                  on:input={handleGridWidthInput}
+                  on:blur={handleGridWidthBlur}
                 />
               </div>
               <div class="dimension-link">
@@ -517,7 +498,9 @@
                   step="5"
                   value={localGridHeight}
                   disabled={saving || !gridVisible}
-                  on:input={handleGridHeightChange}
+                  on:focus={handleGridHeightFocus}
+                  on:input={handleGridHeightInput}
+                  on:blur={handleGridHeightBlur}
                 />
               </div>
             </div>
