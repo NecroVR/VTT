@@ -10,6 +10,8 @@ export interface Scene {
   // Grid configuration
   gridType: string;
   gridSize: number;
+  gridWidth?: number;
+  gridHeight?: number;
   gridColor: string;
   gridAlpha: number;
   gridVisible: boolean;
@@ -41,6 +43,8 @@ export interface CreateSceneRequest {
   backgroundHeight?: number | null;
   gridType?: string;
   gridSize?: number;
+  gridWidth?: number;
+  gridHeight?: number;
   gridColor?: string;
   gridAlpha?: number;
   gridVisible?: boolean;
@@ -66,6 +70,8 @@ export interface UpdateSceneRequest {
   backgroundHeight?: number | null;
   gridType?: string;
   gridSize?: number;
+  gridWidth?: number;
+  gridHeight?: number;
   gridColor?: string;
   gridAlpha?: number;
   gridVisible?: boolean;

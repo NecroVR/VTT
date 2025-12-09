@@ -173,7 +173,7 @@
   }
 
   // Watch for grid setting changes
-  $: if (scene.gridSize || scene.gridColor || scene.gridAlpha || scene.gridType || scene.gridVisible !== undefined || scene.gridLineWidth) {
+  $: if (scene.gridSize || scene.gridWidth || scene.gridHeight || scene.gridColor || scene.gridAlpha || scene.gridType || scene.gridVisible !== undefined || scene.gridLineWidth) {
     gridNeedsUpdate = true;
   }
 
@@ -447,7 +447,10 @@
     gridCtx.translate(-viewX * scale, -viewY * scale);
     gridCtx.scale(scale, scale);
 
-    const gridSize = scene.gridSize;
+    // Support non-square grid cells with backward compatibility
+    const gridSize = scene.gridSize ?? 100;
+    const cellWidth = scene.gridWidth ?? gridSize;
+    const cellHeight = scene.gridHeight ?? gridSize;
     const sceneWidth = scene.backgroundWidth || 4000;
     const sceneHeight = scene.backgroundHeight || 4000;
 
@@ -456,16 +459,16 @@
     gridCtx.lineWidth = (scene.gridLineWidth || 1) / scale; // Use configurable line width, keep constant in screen space
 
     if (scene.gridType === 'square') {
-      // Draw vertical lines
-      for (let x = 0; x <= sceneWidth; x += gridSize) {
+      // Draw vertical lines (spaced by cellWidth)
+      for (let x = 0; x <= sceneWidth; x += cellWidth) {
         gridCtx.beginPath();
         gridCtx.moveTo(x, 0);
         gridCtx.lineTo(x, sceneHeight);
         gridCtx.stroke();
       }
 
-      // Draw horizontal lines
-      for (let y = 0; y <= sceneHeight; y += gridSize) {
+      // Draw horizontal lines (spaced by cellHeight)
+      for (let y = 0; y <= sceneHeight; y += cellHeight) {
         gridCtx.beginPath();
         gridCtx.moveTo(0, y);
         gridCtx.lineTo(sceneWidth, y);
@@ -473,7 +476,8 @@
       }
     } else if (scene.gridType === 'hex') {
       // Hex grid (pointy-top)
-      renderHexGrid(gridCtx, sceneWidth, sceneHeight, gridSize);
+      // For hex grids, use cellWidth as the hex size (horizontal spacing determines hex size)
+      renderHexGrid(gridCtx, sceneWidth, sceneHeight, cellWidth);
     }
 
     gridCtx.restore();
@@ -2624,9 +2628,12 @@
 
         // Apply grid snapping if enabled
         if (gridSnap) {
+          const gridSize = scene.gridSize ?? 100;
+          const cellWidth = scene.gridWidth ?? gridSize;
+          const cellHeight = scene.gridHeight ?? gridSize;
           // Snap the token's top-left corner to the nearest grid intersection
-          newX = Math.round(newX / scene.gridSize) * scene.gridSize;
-          newY = Math.round(newY / scene.gridSize) * scene.gridSize;
+          newX = Math.round(newX / cellWidth) * cellWidth;
+          newY = Math.round(newY / cellHeight) * cellHeight;
         }
 
         // Only send move event if position actually changed
@@ -2685,19 +2692,23 @@
 
   function snapToGrid(x: number, y: number): { x: number; y: number } {
     if (!gridSnap) return { x, y };
-    const gridSize = scene.gridSize;
+    const gridSize = scene.gridSize ?? 100;
+    const cellWidth = scene.gridWidth ?? gridSize;
+    const cellHeight = scene.gridHeight ?? gridSize;
     return {
-      x: Math.round(x / gridSize) * gridSize,
-      y: Math.round(y / gridSize) * gridSize,
+      x: Math.round(x / cellWidth) * cellWidth,
+      y: Math.round(y / cellHeight) * cellHeight,
     };
   }
 
   function snapToGridCenter(x: number, y: number): { x: number; y: number } {
-    const gridSize = scene.gridSize;
+    const gridSize = scene.gridSize ?? 100;
+    const cellWidth = scene.gridWidth ?? gridSize;
+    const cellHeight = scene.gridHeight ?? gridSize;
     // Snap to center of cell (add half grid size after rounding to corner)
     return {
-      x: Math.floor(x / gridSize) * gridSize + gridSize / 2,
-      y: Math.floor(y / gridSize) * gridSize + gridSize / 2,
+      x: Math.floor(x / cellWidth) * cellWidth + cellWidth / 2,
+      y: Math.floor(y / cellHeight) * cellHeight + cellHeight / 2,
     };
   }
 

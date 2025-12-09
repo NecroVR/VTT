@@ -13,6 +13,8 @@ export const scenes = pgTable('scenes', {
   // Grid configuration
   gridType: text('grid_type').notNull().default('square'),
   gridSize: integer('grid_size').notNull().default(100),
+  gridWidth: integer('grid_width').notNull().default(100),
+  gridHeight: integer('grid_height').notNull().default(100),
   gridColor: text('grid_color').notNull().default('#000000'),
   gridAlpha: real('grid_alpha').notNull().default(0.2),
   gridVisible: boolean('grid_visible').notNull().default(true),

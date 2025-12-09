@@ -1,6 +1,9 @@
 <script lang="ts">
   import { campaignsStore } from '$lib/stores/campaigns';
   import { scenesStore } from '$lib/stores/scenes';
+  import { assetsStore } from '$lib/stores/assets';
+  import { AssetPicker } from '$lib/components/assets';
+  import type { Asset } from '@vtt/shared';
 
   export let campaignId: string;
 
@@ -23,12 +26,25 @@
   $: gridColor = activeScene?.gridColor ?? '#000000';
   $: gridLineWidth = activeScene?.gridLineWidth ?? 1;
   $: gridAlpha = activeScene?.gridAlpha ?? 0.2;
+  $: gridWidth = activeScene?.gridWidth ?? 100;
+  $: gridHeight = activeScene?.gridHeight ?? 100;
+
+  // Scene background settings (reactive)
+  $: backgroundImage = activeScene?.backgroundImage ?? null;
+  $: backgroundWidth = activeScene?.backgroundWidth ?? null;
+  $: backgroundHeight = activeScene?.backgroundHeight ?? null;
 
   // Scene lighting & vision settings (reactive)
   $: globalLight = activeScene?.globalLight ?? true;
   $: darkness = activeScene?.darkness ?? 0;
   $: tokenVision = activeScene?.tokenVision ?? true;
   $: fogExploration = activeScene?.fogExploration ?? true;
+
+  // Asset picker state
+  let showAssetPicker = false;
+
+  // Grid dimension linking
+  let linkGridDimensions = true;
 
   async function handleToggleSnapToGrid() {
     saving = true;
@@ -147,6 +163,97 @@
   async function handleToggleFogExploration() {
     await updateSceneGridSetting({ fogExploration: !fogExploration });
   }
+
+  // Background image handlers
+  function handleSelectBackground() {
+    showAssetPicker = true;
+  }
+
+  async function handleAssetSelect(event: CustomEvent<{ asset: Asset; url: string }>) {
+    const { asset, url } = event.detail;
+
+    await updateSceneGridSetting({
+      backgroundImage: url,
+      backgroundWidth: asset.width ?? null,
+      backgroundHeight: asset.height ?? null,
+    });
+
+    showAssetPicker = false;
+  }
+
+  function handleAssetPickerCancel() {
+    showAssetPicker = false;
+  }
+
+  async function handleClearBackground() {
+    if (confirm('Are you sure you want to remove the background image?')) {
+      await updateSceneGridSetting({
+        backgroundImage: null,
+        backgroundWidth: null,
+        backgroundHeight: null,
+      });
+    }
+  }
+
+  // Grid dimension handlers
+  let gridWidthDebounceTimer: number | null = null;
+  let gridHeightDebounceTimer: number | null = null;
+  let localGridWidth = 100;
+  let localGridHeight = 100;
+
+  // Sync local state with store values
+  $: localGridWidth = gridWidth;
+  $: localGridHeight = gridHeight;
+
+  async function handleGridWidthChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const newValue = parseInt(target.value, 10);
+
+    // Update local state immediately for smooth UI
+    localGridWidth = newValue;
+
+    // If linked, also update height
+    if (linkGridDimensions) {
+      localGridHeight = newValue;
+    }
+
+    // Debounce API call
+    if (gridWidthDebounceTimer) {
+      clearTimeout(gridWidthDebounceTimer);
+    }
+    gridWidthDebounceTimer = window.setTimeout(async () => {
+      const updates: Record<string, number> = { gridWidth: newValue };
+      if (linkGridDimensions) {
+        updates.gridHeight = newValue;
+      }
+      await updateSceneGridSetting(updates);
+    }, 150);
+  }
+
+  async function handleGridHeightChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const newValue = parseInt(target.value, 10);
+
+    // Update local state immediately for smooth UI
+    localGridHeight = newValue;
+
+    // If linked, also update width
+    if (linkGridDimensions) {
+      localGridWidth = newValue;
+    }
+
+    // Debounce API call
+    if (gridHeightDebounceTimer) {
+      clearTimeout(gridHeightDebounceTimer);
+    }
+    gridHeightDebounceTimer = window.setTimeout(async () => {
+      const updates: Record<string, number> = { gridHeight: newValue };
+      if (linkGridDimensions) {
+        updates.gridWidth = newValue;
+      }
+      await updateSceneGridSetting(updates);
+    }, 150);
+  }
 </script>
 
 <div class="admin-panel">
@@ -181,6 +288,54 @@
             <span class="slider"></span>
           </label>
         </div>
+      </section>
+
+      <section class="settings-section">
+        <h3>Scene Background</h3>
+
+        {#if !activeScene}
+          <div class="no-scene-message">
+            No active scene selected. Please select or create a scene to configure its settings.
+          </div>
+        {:else}
+          <div class="scene-header">
+            <h4>{activeScene.name}</h4>
+          </div>
+
+          {#if backgroundImage}
+            <div class="background-preview">
+              <img src={backgroundImage} alt="Scene background" />
+              <div class="background-info">
+                {#if backgroundWidth && backgroundHeight}
+                  <span class="background-dimensions">{backgroundWidth} x {backgroundHeight} px</span>
+                {/if}
+              </div>
+            </div>
+          {:else}
+            <div class="no-background-message">
+              No background image set for this scene
+            </div>
+          {/if}
+
+          <div class="background-buttons">
+            <button
+              class="button-select-background"
+              on:click={handleSelectBackground}
+              disabled={saving}
+            >
+              {backgroundImage ? 'Change Background' : 'Select Background'}
+            </button>
+            {#if backgroundImage}
+              <button
+                class="button-clear-background"
+                on:click={handleClearBackground}
+                disabled={saving}
+              >
+                Clear Background
+              </button>
+            {/if}
+          </div>
+        {/if}
       </section>
 
       <section class="settings-section">
@@ -292,6 +447,56 @@
               <span class="setting-range-value">{Math.round(localGridAlpha * 100)}%</span>
             </div>
           </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <label>Grid Cell Dimensions</label>
+              <p class="setting-description">
+                Size of each grid cell in pixels
+              </p>
+            </div>
+            <div class="grid-dimensions-controls">
+              <div class="dimension-input">
+                <label for="grid-width" class="dimension-label">Width</label>
+                <input
+                  id="grid-width"
+                  type="number"
+                  class="setting-number"
+                  min="10"
+                  max="500"
+                  step="5"
+                  value={localGridWidth}
+                  disabled={saving || !gridVisible}
+                  on:input={handleGridWidthChange}
+                />
+              </div>
+              <div class="dimension-link">
+                <label class="toggle-switch-small">
+                  <input
+                    type="checkbox"
+                    bind:checked={linkGridDimensions}
+                    disabled={saving || !gridVisible}
+                  />
+                  <span class="slider-small"></span>
+                </label>
+                <span class="link-label">Link</span>
+              </div>
+              <div class="dimension-input">
+                <label for="grid-height" class="dimension-label">Height</label>
+                <input
+                  id="grid-height"
+                  type="number"
+                  class="setting-number"
+                  min="10"
+                  max="500"
+                  step="5"
+                  value={localGridHeight}
+                  disabled={saving || !gridVisible}
+                  on:input={handleGridHeightChange}
+                />
+              </div>
+            </div>
+          </div>
         {/if}
       </section>
 
@@ -389,6 +594,16 @@
     {/if}
   </div>
 </div>
+
+<!-- Asset Picker Modal -->
+<AssetPicker
+  bind:isOpen={showAssetPicker}
+  {campaignId}
+  allowedTypes={['map']}
+  title="Select Scene Background"
+  on:select={handleAssetSelect}
+  on:cancel={handleAssetPickerCancel}
+/>
 
 <style>
   .admin-panel {
@@ -687,5 +902,198 @@
     font-weight: 500;
     color: #f3f4f6;
     text-align: right;
+  }
+
+  /* Background image styles */
+  .background-preview {
+    margin-bottom: 1rem;
+    border: 1px solid #374151;
+    border-radius: 6px;
+    overflow: hidden;
+    background-color: #111827;
+  }
+
+  .background-preview img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .background-info {
+    padding: 0.5rem;
+    background-color: rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .background-dimensions {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    font-weight: 500;
+  }
+
+  .no-background-message {
+    padding: 2rem 1rem;
+    text-align: center;
+    color: #9ca3af;
+    font-size: 0.875rem;
+    font-style: italic;
+    background-color: #111827;
+    border: 1px dashed #374151;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+  }
+
+  .background-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .button-select-background,
+  .button-clear-background {
+    flex: 1;
+    min-width: 120px;
+    padding: 0.75rem 1rem;
+    border: 1px solid #374151;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+  }
+
+  .button-select-background {
+    background-color: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+  }
+
+  .button-select-background:hover:not(:disabled) {
+    background-color: #2563eb;
+    border-color: #2563eb;
+  }
+
+  .button-select-background:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .button-clear-background {
+    background-color: transparent;
+    color: #ef4444;
+    border-color: #ef4444;
+  }
+
+  .button-clear-background:hover:not(:disabled) {
+    background-color: rgba(239, 68, 68, 0.1);
+  }
+
+  .button-clear-background:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Grid dimension controls */
+  .grid-dimensions-controls {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.75rem;
+  }
+
+  .dimension-input {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .dimension-label {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    font-weight: 500;
+  }
+
+  .dimension-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .link-label {
+    font-size: 0.625rem;
+    color: #9ca3af;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Small toggle switch for link button */
+  .toggle-switch-small {
+    position: relative;
+    display: inline-block;
+    width: 36px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  .toggle-switch-small input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider-small {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #374151;
+    transition: 0.3s;
+    border-radius: 20px;
+  }
+
+  .slider-small:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #9ca3af;
+    transition: 0.3s;
+    border-radius: 50%;
+  }
+
+  input:checked + .slider-small {
+    background-color: #3b82f6;
+  }
+
+  input:checked + .slider-small:before {
+    background-color: white;
+    transform: translateX(16px);
+  }
+
+  input:disabled + .slider-small {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  input:focus + .slider-small {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+  }
+
+  .slider-small:hover {
+    background-color: #4b5563;
+  }
+
+  input:checked + .slider-small:hover {
+    background-color: #2563eb;
   }
 </style>
