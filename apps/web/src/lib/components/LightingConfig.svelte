@@ -54,6 +54,21 @@
     data: light?.data ?? {},
   };
 
+  // Local state for sparkle sliders (for immediate UI feedback)
+  let sparkleCount = formData.data?.sparkleCount ?? 10;
+  let sparkleSize = formData.data?.sparkleSize ?? 3;
+  let sparkleLifetime = formData.data?.sparkleLifetime ?? 1000;
+
+  // Sync sparkle values back to formData when they change
+  $: if (formData.animationType === 'sparkle') {
+    formData.data = {
+      ...formData.data,
+      sparkleCount,
+      sparkleSize,
+      sparkleLifetime,
+    };
+  }
+
   // Animation types
   const animationTypes = [
     { value: null, label: 'None' },
@@ -402,49 +417,40 @@
             {#if formData.animationType === 'sparkle'}
               <div class="form-row">
                 <label for="sparkleCount">
-                  Spark Count: {formData.data?.sparkleCount ?? 10}
+                  Spark Count: {sparkleCount}
                   <input
                     type="range"
                     id="sparkleCount"
                     min="1"
                     max="50"
-                    value={formData.data?.sparkleCount ?? 10}
-                    on:input={(e) => {
-                      formData.data = { ...formData.data, sparkleCount: parseInt(e.currentTarget.value) };
-                    }}
+                    bind:value={sparkleCount}
                   />
                 </label>
               </div>
 
               <div class="form-row">
                 <label for="sparkleSize">
-                  Spark Size: {formData.data?.sparkleSize ?? 3}px
+                  Spark Size: {sparkleSize}px
                   <input
                     type="range"
                     id="sparkleSize"
                     min="1"
                     max="10"
-                    value={formData.data?.sparkleSize ?? 3}
-                    on:input={(e) => {
-                      formData.data = { ...formData.data, sparkleSize: parseInt(e.currentTarget.value) };
-                    }}
+                    bind:value={sparkleSize}
                   />
                 </label>
               </div>
 
               <div class="form-row">
                 <label for="sparkleLifetime">
-                  Lifetime: {formData.data?.sparkleLifetime ?? 1000}ms
+                  Lifetime: {sparkleLifetime}ms
                   <input
                     type="range"
                     id="sparkleLifetime"
                     min="200"
                     max="5000"
                     step="100"
-                    value={formData.data?.sparkleLifetime ?? 1000}
-                    on:input={(e) => {
-                      formData.data = { ...formData.data, sparkleLifetime: parseInt(e.currentTarget.value) };
-                    }}
+                    bind:value={sparkleLifetime}
                   />
                 </label>
               </div>

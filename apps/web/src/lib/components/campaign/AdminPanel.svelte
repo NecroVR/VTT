@@ -92,9 +92,32 @@
     await updateSceneGridSetting({ gridLineWidth: parseFloat(target.value) });
   }
 
+  // Debounce timer for slider changes
+  let opacityDebounceTimer: number | null = null;
+  let darknessDebounceTimer: number | null = null;
+
+  // Local state for sliders (for immediate UI updates)
+  let localGridAlpha = 0;
+  let localDarkness = 0;
+
+  // Sync local state with store values
+  $: localGridAlpha = gridAlpha;
+  $: localDarkness = darkness;
+
   async function handleGridOpacityChange(event: Event) {
     const target = event.target as HTMLInputElement;
-    await updateSceneGridSetting({ gridAlpha: parseFloat(target.value) / 100 });
+    const newValue = parseFloat(target.value) / 100;
+
+    // Update local state immediately for smooth UI
+    localGridAlpha = newValue;
+
+    // Debounce API call
+    if (opacityDebounceTimer) {
+      clearTimeout(opacityDebounceTimer);
+    }
+    opacityDebounceTimer = window.setTimeout(async () => {
+      await updateSceneGridSetting({ gridAlpha: newValue });
+    }, 150);
   }
 
   async function handleToggleGlobalLight() {
@@ -103,7 +126,18 @@
 
   async function handleDarknessChange(event: Event) {
     const target = event.target as HTMLInputElement;
-    await updateSceneGridSetting({ darkness: parseFloat(target.value) / 100 });
+    const newValue = parseFloat(target.value) / 100;
+
+    // Update local state immediately for smooth UI
+    localDarkness = newValue;
+
+    // Debounce API call
+    if (darknessDebounceTimer) {
+      clearTimeout(darknessDebounceTimer);
+    }
+    darknessDebounceTimer = window.setTimeout(async () => {
+      await updateSceneGridSetting({ darkness: newValue });
+    }, 150);
   }
 
   async function handleToggleTokenVision() {
@@ -251,11 +285,11 @@
                 min="0"
                 max="100"
                 step="1"
-                value={gridAlpha * 100}
+                value={localGridAlpha * 100}
                 disabled={saving || !gridVisible}
                 on:input={handleGridOpacityChange}
               />
-              <span class="setting-range-value">{Math.round(gridAlpha * 100)}%</span>
+              <span class="setting-range-value">{Math.round(localGridAlpha * 100)}%</span>
             </div>
           </div>
         {/if}
@@ -304,11 +338,11 @@
                   min="0"
                   max="100"
                   step="1"
-                  value={darkness * 100}
+                  value={localDarkness * 100}
                   disabled={saving}
                   on:input={handleDarknessChange}
                 />
-                <span class="setting-range-value">{Math.round(darkness * 100)}%</span>
+                <span class="setting-range-value">{Math.round(localDarkness * 100)}%</span>
               </div>
             </div>
           {/if}
