@@ -64,6 +64,9 @@ const authRoute: FastifyPluginAsync = async (fastify) => {
             id: users.id,
             email: users.email,
             username: users.username,
+            accountTier: users.accountTier,
+            storageQuotaBytes: users.storageQuotaBytes,
+            storageUsedBytes: users.storageUsedBytes,
             createdAt: users.createdAt,
           });
 
@@ -140,6 +143,9 @@ const authRoute: FastifyPluginAsync = async (fastify) => {
             id: user.id,
             email: user.email,
             username: user.username,
+            accountTier: user.accountTier,
+            storageQuotaBytes: user.storageQuotaBytes,
+            storageUsedBytes: user.storageUsedBytes,
             createdAt: user.createdAt,
           },
           sessionId: session.id,

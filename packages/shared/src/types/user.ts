@@ -2,6 +2,9 @@ export interface User {
   id: string;
   email: string;
   username: string;
+  accountTier: string;
+  storageQuotaBytes: number;
+  storageUsedBytes: number;
   createdAt: Date;
 }
 

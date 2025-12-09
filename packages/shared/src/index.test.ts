@@ -10,6 +10,9 @@ describe('Index Exports', () => {
         id: 'user1',
         email: 'test@test.com',
         username: 'test',
+        accountTier: 'basic',
+        storageQuotaBytes: 104857600,
+        storageUsedBytes: 0,
         createdAt: new Date(),
       };
       expect(user).toBeDefined();

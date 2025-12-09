@@ -8,12 +8,18 @@ describe('User Types', () => {
         id: 'user123',
         email: 'test@example.com',
         username: 'testuser',
+        accountTier: 'basic',
+        storageQuotaBytes: 104857600,
+        storageUsedBytes: 0,
         createdAt: new Date(),
       };
 
       expect(user.id).toBe('user123');
       expect(user.email).toBe('test@example.com');
       expect(user.username).toBe('testuser');
+      expect(user.accountTier).toBe('basic');
+      expect(user.storageQuotaBytes).toBe(104857600);
+      expect(user.storageUsedBytes).toBe(0);
       expect(user.createdAt).toBeInstanceOf(Date);
     });
 
@@ -22,6 +28,9 @@ describe('User Types', () => {
         id: 'abc123xyz',
         email: 'user@test.com',
         username: 'user1',
+        accountTier: 'basic',
+        storageQuotaBytes: 104857600,
+        storageUsedBytes: 0,
         createdAt: new Date(),
       };
 
@@ -33,6 +42,9 @@ describe('User Types', () => {
         id: '1',
         email: 'test+tag@subdomain.example.com',
         username: 'user',
+        accountTier: 'basic',
+        storageQuotaBytes: 104857600,
+        storageUsedBytes: 0,
         createdAt: new Date(),
       };
 
@@ -44,6 +56,9 @@ describe('User Types', () => {
         id: '1',
         email: 'test@test.com',
         username: 'user_name-123',
+        accountTier: 'basic',
+        storageQuotaBytes: 104857600,
+        storageUsedBytes: 0,
         createdAt: new Date(),
       };
 
@@ -96,6 +111,9 @@ describe('User Types', () => {
           id: 'user123',
           email: 'test@example.com',
           username: 'testuser',
+          accountTier: 'basic',
+          storageQuotaBytes: 104857600,
+          storageUsedBytes: 0,
           createdAt: new Date(),
         },
         sessionId: 'session123',
@@ -111,6 +129,9 @@ describe('User Types', () => {
         id: 'abc',
         email: 'user@test.com',
         username: 'username',
+        accountTier: 'basic',
+        storageQuotaBytes: 104857600,
+        storageUsedBytes: 0,
         createdAt: new Date(),
       };
 

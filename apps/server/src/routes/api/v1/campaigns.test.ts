@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { buildApp } from '../../../app.js';
 import type { FastifyInstance } from 'fastify';
 import { createDb } from '@vtt/database';
-import { users, sessions, campaigns } from '@vtt/database';
+import { users, sessions, campaigns, STORAGE_QUOTAS } from '@vtt/database';
 import { eq } from 'drizzle-orm';
 
 describe('Campaigns Routes', () => {
@@ -206,6 +206,77 @@ describe('Campaigns Routes', () => {
       });
 
       expect(response.statusCode).toBe(401);
+    });
+
+    it('should auto-upgrade user from basic to gm tier when creating first campaign', async () => {
+      // Verify user starts with basic tier
+      const [userBefore] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+
+      expect(userBefore.accountTier).toBe('basic');
+      expect(userBefore.storageQuotaBytes).toBe(STORAGE_QUOTAS.basic);
+
+      // Create campaign
+      const response = await app.inject({
+        method: 'POST',
+        url: '/api/v1/campaigns',
+        headers: {
+          authorization: `Bearer ${sessionId}`,
+        },
+        payload: {
+          name: 'First Campaign',
+        },
+      });
+
+      expect(response.statusCode).toBe(201);
+
+      // Verify user has been upgraded to GM tier
+      const [userAfter] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+
+      expect(userAfter.accountTier).toBe('gm');
+      expect(userAfter.storageQuotaBytes).toBe(STORAGE_QUOTAS.gm);
+    });
+
+    it('should not downgrade user if they already have gm tier', async () => {
+      // Upgrade user to GM tier first
+      await db
+        .update(users)
+        .set({
+          accountTier: 'gm',
+          storageQuotaBytes: STORAGE_QUOTAS.gm,
+        })
+        .where(eq(users.id, userId));
+
+      // Create campaign
+      const response = await app.inject({
+        method: 'POST',
+        url: '/api/v1/campaigns',
+        headers: {
+          authorization: `Bearer ${sessionId}`,
+        },
+        payload: {
+          name: 'Test Campaign',
+        },
+      });
+
+      expect(response.statusCode).toBe(201);
+
+      // Verify user still has GM tier
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+
+      expect(user.accountTier).toBe('gm');
+      expect(user.storageQuotaBytes).toBe(STORAGE_QUOTAS.gm);
     });
   });
 

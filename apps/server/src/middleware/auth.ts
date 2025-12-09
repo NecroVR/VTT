@@ -47,6 +47,9 @@ export const authenticate: preHandlerHookHandler = async (
         id: users.id,
         email: users.email,
         username: users.username,
+        accountTier: users.accountTier,
+        storageQuotaBytes: users.storageQuotaBytes,
+        storageUsedBytes: users.storageUsedBytes,
         createdAt: users.createdAt,
       })
       .from(users)

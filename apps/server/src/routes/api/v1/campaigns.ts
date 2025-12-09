@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify';
-import { campaigns, users } from '@vtt/database';
+import { campaigns, users, STORAGE_QUOTAS } from '@vtt/database';
 import { eq, or, arrayContains, sql } from 'drizzle-orm';
 import type { CreateCampaignRequest, UpdateCampaignRequest, CampaignResponse, CampaignsListResponse, CampaignSettings, AddGMRequest, RemoveGMRequest, GMsListResponse } from '@vtt/shared';
 import { authenticate } from '../../../middleware/auth.js';
@@ -160,6 +160,20 @@ const campaignsRoute: FastifyPluginAsync = async (fastify) => {
             createdAt: campaigns.createdAt,
             updatedAt: campaigns.updatedAt,
           });
+
+        // Auto-upgrade user to GM tier if they're on basic tier
+        if (request.user.accountTier === 'basic') {
+          await fastify.db
+            .update(users)
+            .set({
+              accountTier: 'gm',
+              storageQuotaBytes: STORAGE_QUOTAS.gm,
+              updatedAt: new Date(),
+            })
+            .where(eq(users.id, request.user.id));
+
+          fastify.log.info(`User ${request.user.id} auto-upgraded to GM tier after creating first campaign`);
+        }
 
         const formattedCampaign = {
           id: newCampaign.id,
