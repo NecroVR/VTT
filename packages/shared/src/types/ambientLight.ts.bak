@@ -1,0 +1,112 @@
+export interface AmbientLight {
+  id: string;
+  sceneId: string;
+  // Position
+  x: number;
+  y: number;
+  rotation: number;
+  // Light configuration
+  bright: number;
+  dim: number;
+  angle: number;
+  color: string;
+  alpha: number;
+  // Animation
+  animationType?: string | null;
+  animationSpeed: number;
+  animationIntensity: number;
+  animationReverse: boolean;
+  // Settings
+  walls: boolean;
+  vision: boolean;
+  snapToGrid: boolean;
+  // Foundry VTT Advanced Settings
+  negative: boolean;        // Is this a darkness source (subtractive)?
+  priority: number;         // Rendering priority (higher = on top)
+  luminosity: number;       // Shader luminosity [0-1]
+  saturation: number;       // Color saturation adjustment [-1 to 1]
+  contrast: number;         // Contrast adjustment [-1 to 1]
+  shadows: number;          // Shadow depth [0-1]
+  attenuation: number;      // Fade between bright/dim [0-1]
+  coloration: number;       // Shader technique (0-9)
+  darknessMin: number;      // Min darkness level for activation [0-1]
+  darknessMax: number;      // Max darkness level for activation [0-1]
+  hidden: boolean;          // Quick visibility toggle
+  elevation: number;        // Vertical position for layering
+  // Metadata
+  data: Record<string, unknown>;
+  createdAt: Date;
+}
+
+export interface CreateAmbientLightRequest {
+  sceneId: string;
+  x: number;
+  y: number;
+  rotation?: number;
+  bright?: number;
+  dim?: number;
+  angle?: number;
+  color?: string;
+  alpha?: number;
+  animationType?: string | null;
+  animationSpeed?: number;
+  animationIntensity?: number;
+  animationReverse?: boolean;
+  walls?: boolean;
+  vision?: boolean;
+  snapToGrid?: boolean;
+  // Foundry VTT Advanced Settings
+  negative?: boolean;
+  priority?: number;
+  luminosity?: number;
+  saturation?: number;
+  contrast?: number;
+  shadows?: number;
+  attenuation?: number;
+  coloration?: number;
+  darknessMin?: number;
+  darknessMax?: number;
+  hidden?: boolean;
+  elevation?: number;
+  data?: Record<string, unknown>;
+}
+
+export interface UpdateAmbientLightRequest {
+  x?: number;
+  y?: number;
+  rotation?: number;
+  bright?: number;
+  dim?: number;
+  angle?: number;
+  color?: string;
+  alpha?: number;
+  animationType?: string | null;
+  animationSpeed?: number;
+  animationIntensity?: number;
+  animationReverse?: boolean;
+  walls?: boolean;
+  vision?: boolean;
+  snapToGrid?: boolean;
+  // Foundry VTT Advanced Settings
+  negative?: boolean;
+  priority?: number;
+  luminosity?: number;
+  saturation?: number;
+  contrast?: number;
+  shadows?: number;
+  attenuation?: number;
+  coloration?: number;
+  darknessMin?: number;
+  darknessMax?: number;
+  hidden?: boolean;
+  elevation?: number;
+  data?: Record<string, unknown>;
+}
+
+export interface AmbientLightResponse {
+  ambientLight: AmbientLight;
+}
+
+export interface AmbientLightsListResponse {
+  ambientLights: AmbientLight[];
+}

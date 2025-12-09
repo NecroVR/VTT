@@ -6,8 +6,6 @@
   import { websocket } from '$lib/stores/websocket';
   import SceneContextMenu from './SceneContextMenu.svelte';
   import ConfirmDialog from './ConfirmDialog.svelte';
-  import { computeViewport, breakIntersections } from 'visibility-polygon';
-  import { API_BASE_URL } from '$lib/config/api';
 
   // Props
   export let scene: Scene;
@@ -90,9 +88,6 @@
   let deleteDialogTitle = '';
   let deleteDialogMessage = '';
 
-  // Token possession state (GM only)
-  let possessedTokenId: string | null = null;
-
   // Drag-and-drop state
   let isDragOver = false;
 
@@ -116,13 +111,6 @@
   const MIN_SCALE = 0.25;
   const MAX_SCALE = 4;
 
-  // Viewport persistence
-  let saveViewportTimeout: number | null = null;
-  let lastSavedViewX = viewX;
-  let lastSavedViewY = viewY;
-  let lastSavedScale = scale;
-  let previousSceneId: string | null = null;
-
   // Performance optimization: Layer caching
   let backgroundCached = false;
   let gridCached = false;
@@ -132,10 +120,6 @@
   // Performance optimization: Visibility cache
   let visibilityCache = new Map<string, Point[]>();
   let visibilityCacheValid = false;
-
-  // Debug: Track light rendering issues (set to true to enable verbose console logging)
-  const DEBUG_LIGHTS = false; // Disabled - re-enable for debugging light issues
-  let debugLightFrame = 0;
 
   // Performance optimization: Animation throttling
   const TARGET_FPS = 30;
@@ -148,39 +132,10 @@
   // Subscribe to fog store
   $: fogData = scene ? $fogStore.fog.get(scene.id) : undefined;
 
-  // Handle scene switching - save old viewport and load new viewport
-  $: if (scene.id && scene.id !== previousSceneId) {
-    // Clear any pending debounced save (we'll do immediate save instead)
-    if (saveViewportTimeout !== null) {
-      clearTimeout(saveViewportTimeout);
-      saveViewportTimeout = null;
-    }
-    // Save viewport for previous scene before switching
-    if (previousSceneId) {
-      saveViewportImmediate(previousSceneId, viewX, viewY, scale);
-    }
-    // Reset to scene defaults while loading
-    viewX = scene.initialX ?? 0;
-    viewY = scene.initialY ?? 0;
-    scale = scene.initialScale ?? 1;
-    // Reset last saved values for new scene
-    lastSavedViewX = viewX;
-    lastSavedViewY = viewY;
-    lastSavedScale = scale;
-    // Load viewport for new scene
-    loadViewport(scene.id);
-    previousSceneId = scene.id;
-  }
-
-  onMount(async () => {
+  onMount(() => {
     initializeCanvases();
     loadBackgroundImage();
     resizeCanvases();
-
-    // Load saved viewport position
-    await loadViewport(scene.id);
-    previousSceneId = scene.id;
-
     render();
     startAnimationLoop();
 
@@ -194,33 +149,8 @@
     };
   });
 
-  onDestroy(async () => {
+  onDestroy(() => {
     stopAnimationLoop();
-
-    // Clear any pending save timeout
-    if (saveViewportTimeout !== null) {
-      clearTimeout(saveViewportTimeout);
-    }
-
-    // Save viewport immediately before unmounting
-    if (viewX !== lastSavedViewX || viewY !== lastSavedViewY || scale !== lastSavedScale) {
-      try {
-        await fetch(`${API_BASE_URL}/api/v1/scenes/${scene.id}/viewport`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({
-            cameraX: viewX,
-            cameraY: viewY,
-            zoom: scale
-          })
-        });
-      } catch (error) {
-        console.error('Failed to save viewport on unmount:', error);
-      }
-    }
   });
 
   // Watch for background image URL changes only
@@ -234,19 +164,8 @@
     backgroundNeedsUpdate = true;
   }
 
-  // Watch for grid setting changes - track actual values to detect changes
-  $: {
-    // Reference all grid properties to establish reactivity
-    const _gridTrigger = [
-      scene.gridSize,
-      scene.gridWidth,
-      scene.gridHeight,
-      scene.gridColor,
-      scene.gridAlpha,
-      scene.gridType,
-      scene.gridVisible,
-      scene.gridLineWidth
-    ];
+  // Watch for grid setting changes
+  $: if (scene.gridSize || scene.gridColor || scene.gridAlpha || scene.gridType || scene.gridVisible !== undefined || scene.gridLineWidth) {
     gridNeedsUpdate = true;
   }
 
@@ -282,9 +201,9 @@
     renderLights();
   }
 
-  // Watch for light changes - render without full cache invalidation
-  // (new lights get cache miss by ID, moved lights get cache miss by position)
+  // Watch for light changes
   $: if (lights) {
+    visibilityCacheValid = false;  // Invalidate for new lights too
     renderLights();
   }
 
@@ -296,101 +215,6 @@
   // Update explored areas when tokens move (with vision enabled)
   $: if (scene.fogExploration && tokens && !isGM) {
     updateExploredAreas();
-  }
-
-  function saveViewport() {
-    // Only save if values actually changed
-    if (viewX === lastSavedViewX && viewY === lastSavedViewY && scale === lastSavedScale) {
-      return;
-    }
-
-    if (saveViewportTimeout !== null) {
-      clearTimeout(saveViewportTimeout);
-    }
-
-    // Capture current values at call time, not when timeout fires
-    const sceneIdToSave = scene.id;
-    const xToSave = viewX;
-    const yToSave = viewY;
-    const scaleToSave = scale;
-
-    saveViewportTimeout = setTimeout(async () => {
-      try {
-        await fetch(`${API_BASE_URL}/api/v1/scenes/${sceneIdToSave}/viewport`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({
-            cameraX: xToSave,
-            cameraY: yToSave,
-            zoom: scaleToSave
-          })
-        });
-
-        // Only update last saved if we're still on the same scene
-        if (scene.id === sceneIdToSave) {
-          lastSavedViewX = xToSave;
-          lastSavedViewY = yToSave;
-          lastSavedScale = scaleToSave;
-        }
-      } catch (error) {
-        console.error('Failed to save viewport:', error);
-      }
-    }, 500);
-  }
-
-  async function saveViewportImmediate(sceneId: string, x: number, y: number, z: number) {
-    try {
-      await fetch(`${API_BASE_URL}/api/v1/scenes/${sceneId}/viewport`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          cameraX: x,
-          cameraY: y,
-          zoom: z
-        })
-      });
-    } catch (error) {
-      console.error('Failed to save viewport immediately:', error);
-    }
-  }
-
-  async function loadViewport(sceneId: string) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/scenes/${sceneId}/viewport`, {
-        method: 'GET',
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.viewport) {
-          viewX = data.viewport.cameraX;
-          viewY = data.viewport.cameraY;
-          scale = data.viewport.zoom;
-
-          // Update last saved values to prevent immediate save
-          lastSavedViewX = viewX;
-          lastSavedViewY = viewY;
-          lastSavedScale = scale;
-
-          // Invalidate caches to reflect new viewport
-          invalidateVisibilityCache();
-          gridNeedsUpdate = true;
-          backgroundNeedsUpdate = true;
-
-          // Re-render with loaded viewport position
-          render();
-        }
-      }
-    } catch (error) {
-      console.error('Failed to load viewport:', error);
-    }
   }
 
   function initializeCanvases() {
@@ -615,10 +439,7 @@
     gridCtx.translate(-viewX * scale, -viewY * scale);
     gridCtx.scale(scale, scale);
 
-    // Support non-square grid cells with backward compatibility
-    const gridSize = scene.gridSize ?? 100;
-    const cellWidth = scene.gridWidth ?? gridSize;
-    const cellHeight = scene.gridHeight ?? gridSize;
+    const gridSize = scene.gridSize;
     const sceneWidth = scene.backgroundWidth || 4000;
     const sceneHeight = scene.backgroundHeight || 4000;
 
@@ -627,16 +448,16 @@
     gridCtx.lineWidth = (scene.gridLineWidth || 1) / scale; // Use configurable line width, keep constant in screen space
 
     if (scene.gridType === 'square') {
-      // Draw vertical lines (spaced by cellWidth)
-      for (let x = 0; x <= sceneWidth; x += cellWidth) {
+      // Draw vertical lines
+      for (let x = 0; x <= sceneWidth; x += gridSize) {
         gridCtx.beginPath();
         gridCtx.moveTo(x, 0);
         gridCtx.lineTo(x, sceneHeight);
         gridCtx.stroke();
       }
 
-      // Draw horizontal lines (spaced by cellHeight)
-      for (let y = 0; y <= sceneHeight; y += cellHeight) {
+      // Draw horizontal lines
+      for (let y = 0; y <= sceneHeight; y += gridSize) {
         gridCtx.beginPath();
         gridCtx.moveTo(0, y);
         gridCtx.lineTo(sceneWidth, y);
@@ -644,8 +465,7 @@
       }
     } else if (scene.gridType === 'hex') {
       // Hex grid (pointy-top)
-      // For hex grids, use cellWidth as the hex size (horizontal spacing determines hex size)
-      renderHexGrid(gridCtx, sceneWidth, sceneHeight, cellWidth);
+      renderHexGrid(gridCtx, sceneWidth, sceneHeight, gridSize);
     }
 
     gridCtx.restore();
@@ -717,36 +537,14 @@
 
   /**
    * Performance optimization: Get cached visibility polygon
-   * Cache key includes position and radius so moved lights get fresh polygons
    */
   function getVisibilityPolygon(sourceId: string, x: number, y: number, radius: number): Point[] {
-    // Use floor + 0.5 to center on pixel - MUST match renderLight and renderClippedLight
-    const adjustedX = Math.floor(x) + 0.5;
-    const adjustedY = Math.floor(y) + 0.5;
-    const roundedRadius = Math.round(radius);
-
-    // Early exit: if no walls are within range, skip polygon computation
-    if (!hasWallsInRange({ x: adjustedX, y: adjustedY }, walls, roundedRadius)) {
-      return [];
+    if (visibilityCacheValid && visibilityCache.has(sourceId)) {
+      return visibilityCache.get(sourceId)!;
     }
 
-    // Cache key uses floor values (all positions in same pixel share visibility polygon)
-    const cacheKey = `${sourceId}-${Math.floor(x)}-${Math.floor(y)}-${roundedRadius}`;
-
-    if (visibilityCacheValid && visibilityCache.has(cacheKey)) {
-      if (DEBUG_LIGHTS && debugLightFrame % 60 === 0) {
-        console.log(`[Light Debug] Cache HIT for ${sourceId.slice(-12)}: ${cacheKey.slice(-30)}`);
-      }
-      return visibilityCache.get(cacheKey)!;
-    }
-
-    if (DEBUG_LIGHTS && debugLightFrame % 60 === 0) {
-      console.log(`[Light Debug] Cache MISS for ${sourceId.slice(-12)}: ${cacheKey.slice(-30)}`);
-    }
-
-    // Use adjusted coordinates for polygon computation
-    const polygon = computeVisibilityPolygon({ x: adjustedX, y: adjustedY }, walls, roundedRadius);
-    visibilityCache.set(cacheKey, polygon);
+    const polygon = computeVisibilityPolygon({ x, y }, walls, radius);
+    visibilityCache.set(sourceId, polygon);
 
     return polygon;
   }
@@ -761,89 +559,21 @@
     tokensCtx.translate(-viewX * scale, -viewY * scale);
     tokensCtx.scale(scale, scale);
 
-    // Get possessed token for vision-based filtering
-    const possessedToken = possessedTokenId ? tokens.find(t => t.id === possessedTokenId) : null;
-
-    // Compute vision polygon if needed for vision-based token hiding
-    let visionPolygon: Point[] | null = null;
-    // Apply vision hiding for: (1) non-GM players, or (2) GMs who are possessing a token to preview player view
-    const shouldApplyVisionHiding = (!isGM || possessedTokenId) && !scene.globalLight && possessedToken && scene.tokenVision && possessedToken.vision && possessedToken.visionRange > 0;
-
-    if (shouldApplyVisionHiding && possessedToken) {
-      const tokenWidth = (possessedToken.width || 1) * (scene.gridWidth ?? scene.gridSize);
-      const tokenHeight = (possessedToken.height || 1) * (scene.gridHeight ?? scene.gridSize);
-      const tokenCenterX = possessedToken.x + tokenWidth / 2;
-      const tokenCenterY = possessedToken.y + tokenHeight / 2;
-      // Vision radius = token edge radius + vision range in cells
-      const tokenRadius = (tokenWidth + tokenHeight) / 4; // Average radius to token edge
-      const avgCellSize = ((scene.gridWidth ?? scene.gridSize) + (scene.gridHeight ?? scene.gridSize)) / 2;
-      const visionRadius = tokenRadius + (possessedToken.visionRange * avgCellSize);
-
-      // Compute visibility polygon for wall occlusion
-      visionPolygon = computeVisibilityPolygon(
-        { x: tokenCenterX, y: tokenCenterY },
-        walls,
-        visionRadius
-      );
-    }
-
     // Performance optimization: Filter to only visible tokens in viewport
     const visibleTokens = tokens.filter(token => {
       if (!token.visible) return false;
 
-      const width = (token.width || 1) * (scene.gridWidth ?? scene.gridSize);
-      const height = (token.height || 1) * (scene.gridHeight ?? scene.gridSize);
-
-      // Check viewport visibility
-      if (!isInViewport(token.x, token.y, width, height)) {
-        return false;
-      }
-
-      // Apply vision-based token hiding for players with possessed tokens
-      if (shouldApplyVisionHiding && possessedToken) {
-        // Always show the possessed token itself
-        if (token.id === possessedTokenId) {
-          return true;
-        }
-
-        // Check if token is within vision range
-        const tokenCenterX = token.x + width / 2;
-        const tokenCenterY = token.y + height / 2;
-        const possessedWidth = (possessedToken.width || 1) * (scene.gridWidth ?? scene.gridSize);
-        const possessedHeight = (possessedToken.height || 1) * (scene.gridHeight ?? scene.gridSize);
-        const possessedCenterX = possessedToken.x + possessedWidth / 2;
-        const possessedCenterY = possessedToken.y + possessedHeight / 2;
-
-        const dx = tokenCenterX - possessedCenterX;
-        const dy = tokenCenterY - possessedCenterY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        // Vision radius = possessed token edge radius + vision range in cells
-        const possessedTokenRadius = (possessedWidth + possessedHeight) / 4;
-        const avgCellSize = ((scene.gridWidth ?? scene.gridSize) + (scene.gridHeight ?? scene.gridSize)) / 2;
-        const visionRangePixels = possessedTokenRadius + (possessedToken.visionRange * avgCellSize);
-
-        // Token must be within vision range
-        if (distance > visionRangePixels) {
-          return false;
-        }
-
-        // If we have a vision polygon (wall occlusion), check if token center is visible
-        if (visionPolygon && visionPolygon.length > 0) {
-          if (!isPointInPolygon({ x: tokenCenterX, y: tokenCenterY }, visionPolygon)) {
-            return false;
-          }
-        }
-      }
-
-      return true;
+      const width = (token.width || 1) * scene.gridSize;
+      const height = (token.height || 1) * scene.gridSize;
+      return isInViewport(token.x, token.y, width, height);
     });
 
     visibleTokens.forEach(token => {
 
       const x = token.x;
       const y = token.y;
-      const width = (token.width || 1) * (scene.gridWidth ?? scene.gridSize);
-      const height = (token.height || 1) * (scene.gridHeight ?? scene.gridSize);
+      const width = (token.width || 1) * scene.gridSize;
+      const height = (token.height || 1) * scene.gridSize;
       const centerX = x + width / 2;
       const centerY = y + height / 2;
       const radius = width / 2;
@@ -1137,121 +867,6 @@
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   }
 
-  // Seeded random number generator for deterministic sparks
-  function createSeededRandom(seed: number): () => number {
-    let state = seed;
-    return () => {
-      state = (state * 1103515245 + 12345) & 0x7fffffff;
-      return state / 0x7fffffff;
-    };
-  }
-
-  // String hash for light ID
-  function hashString(str: string): number {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      hash = ((hash << 5) - hash) + str.charCodeAt(i);
-      hash |= 0;
-    }
-    return Math.abs(hash);
-  }
-
-  interface Spark {
-    x: number;
-    y: number;
-    color: string;
-    birthTime: number;
-    lifetime: number;
-    size: number;
-  }
-
-  interface SparkleConfig {
-    sparkleColors?: string[];
-    sparkleCount?: number;
-    sparkleSize?: number;
-    sparkleLifetime?: number;
-    sparkleFade?: boolean;
-    sparkleDistribution?: 'uniform' | 'center-weighted' | 'edge-weighted';
-  }
-
-  function getSparkleConfig(light: AmbientLight): SparkleConfig {
-    const data = light.data as SparkleConfig | undefined;
-    return {
-      sparkleColors: data?.sparkleColors,
-      sparkleCount: data?.sparkleCount,
-      sparkleSize: data?.sparkleSize,
-      sparkleLifetime: data?.sparkleLifetime,
-      sparkleFade: data?.sparkleFade,
-      sparkleDistribution: data?.sparkleDistribution
-    };
-  }
-
-  function generateSparkPosition(
-    radius: number,
-    distribution: string,
-    rng: () => number
-  ): { x: number; y: number } {
-    const angle = rng() * Math.PI * 2;
-    let distance: number;
-
-    switch (distribution) {
-      case 'center-weighted':
-        distance = Math.sqrt(rng()) * radius * 0.7;
-        break;
-      case 'edge-weighted':
-        distance = (0.5 + rng() * 0.5) * radius;
-        break;
-      case 'uniform':
-      default:
-        distance = Math.sqrt(rng()) * radius;
-    }
-
-    return {
-      x: Math.cos(angle) * distance,
-      y: Math.sin(angle) * distance
-    };
-  }
-
-  function generateSparks(light: AmbientLight, time: number): Spark[] {
-    const config = getSparkleConfig(light);
-    const sparkleCount = config.sparkleCount ?? 10;
-    const sparkleLifetime = config.sparkleLifetime ?? 1000;
-    const colors = config.sparkleColors?.length ? config.sparkleColors : [light.color];
-    const sparkleSize = config.sparkleSize ?? 3;
-    const distribution = config.sparkleDistribution ?? 'uniform';
-
-    const seed = hashString(light.id);
-    const sparks: Spark[] = [];
-
-    for (let i = 0; i < sparkleCount; i++) {
-      const slotOffset = (i / sparkleCount) * sparkleLifetime;
-      const cycleTime = sparkleLifetime;
-      const adjustedTime = time + slotOffset;
-      const cycleNumber = Math.floor(adjustedTime / cycleTime);
-      const birthTime = cycleNumber * cycleTime - slotOffset;
-      const age = time - birthTime;
-
-      if (age < 0 || age > sparkleLifetime) continue;
-
-      const sparkSeed = seed + cycleNumber * 1000 + i;
-      const sparkRng = createSeededRandom(sparkSeed);
-
-      const position = generateSparkPosition(light.dim, distribution, sparkRng);
-      const colorIndex = Math.floor(sparkRng() * colors.length);
-
-      sparks.push({
-        x: position.x,
-        y: position.y,
-        color: colors[colorIndex],
-        birthTime,
-        lifetime: sparkleLifetime,
-        size: sparkleSize * (0.7 + sparkRng() * 0.6)
-      });
-    }
-
-    return sparks;
-  }
-
   // Wall occlusion helpers
   interface Point {
     x: number;
@@ -1282,7 +897,7 @@
     const t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom;
     const u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / denom;
 
-    if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
+    if (u >= 0 && u <= 1) {
       return {
         x: x1 + t * (x2 - x1),
         y: y1 + t * (y2 - y1)
@@ -1329,285 +944,80 @@
     return closestPoint;
   }
 
-  /**
-   * Check if any walls are within range of a point
-   * Used to skip visibility polygon computation when no walls affect the light
-   */
-  function hasWallsInRange(source: Point, walls: Wall[], maxRadius: number): boolean {
-    const radiusSq = maxRadius * maxRadius;
-
-    for (const wall of walls) {
-      // Check if wall has blocking sense
-      const effectiveProps = getEffectiveWallProperties(wall);
-      if (effectiveProps.sense !== 'block') continue;
-
-      // Check if either endpoint is within radius
-      const d1Sq = (wall.x1 - source.x) ** 2 + (wall.y1 - source.y) ** 2;
-      const d2Sq = (wall.x2 - source.x) ** 2 + (wall.y2 - source.y) ** 2;
-      if (d1Sq <= radiusSq || d2Sq <= radiusSq) return true;
-
-      // Check if wall segment passes through the circle
-      // Project source point onto wall line segment
-      const dx = wall.x2 - wall.x1;
-      const dy = wall.y2 - wall.y1;
-      const lengthSq = dx * dx + dy * dy;
-      if (lengthSq === 0) continue;
-
-      const t = Math.max(0, Math.min(1, ((source.x - wall.x1) * dx + (source.y - wall.y1) * dy) / lengthSq));
-      const closestX = wall.x1 + t * dx;
-      const closestY = wall.y1 + t * dy;
-      const distSq = (source.x - closestX) ** 2 + (source.y - closestY) ** 2;
-      if (distSq <= radiusSq) return true;
-    }
-
-    return false;
-  }
-
   function computeVisibilityPolygon(
     source: Point,
     walls: Wall[],
     maxRadius: number
   ): Point[] {
-    // Filter walls to only blocking ones (respects door open/close state)
+    // Only consider walls with effective sense === 'block' (closed doors block, open doors don't)
     const blockingWalls = walls.filter(w => {
       const effectiveProps = getEffectiveWallProperties(w);
       return effectiveProps.sense === 'block';
     });
 
-    // If no blocking walls, return empty array (caller should skip clipping)
     if (blockingWalls.length === 0) {
-      return [];
-    }
-
-    // Convert walls to visibility-polygon segment format: [[x1, y1], [x2, y2]]
-    // Create fresh arrays to avoid any mutation issues with the library
-    const segments: [number, number][][] = blockingWalls.map(w => [
-      [w.x1, w.y1] as [number, number],
-      [w.x2, w.y2] as [number, number]
-    ]);
-
-    // Define viewport bounds (light radius circle bounding box)
-    const viewportMin: [number, number] = [source.x - maxRadius, source.y - maxRadius];
-    const viewportMax: [number, number] = [source.x + maxRadius, source.y + maxRadius];
-
-    // Debug: Check if walls have valid coordinates
-    if (DEBUG_LIGHTS && debugLightFrame % 60 === 0) {
-      const invalidWalls = blockingWalls.filter(w =>
-        !isFinite(w.x1) || !isFinite(w.y1) || !isFinite(w.x2) || !isFinite(w.y2)
-      );
-      if (invalidWalls.length > 0) {
-        console.error(`[Light Debug] Found ${invalidWalls.length} walls with invalid coordinates!`);
+      // No blocking walls, return full circle
+      const points: Point[] = [];
+      const steps = 32;
+      for (let i = 0; i < steps; i++) {
+        const angle = (i / steps) * Math.PI * 2;
+        points.push({
+          x: source.x + Math.cos(angle) * maxRadius,
+          y: source.y + Math.sin(angle) * maxRadius
+        });
       }
+      return points;
     }
 
-    // IMPORTANT: Use breakIntersections to handle intersecting wall segments
-    // The visibility-polygon library requires non-intersecting segments to work correctly
-    // Without this, if walls intersect, the library may produce incorrect/empty polygons
-    const processedSegments = breakIntersections(segments);
+    // Collect all unique angles to wall endpoints
+    const angles: number[] = [];
 
-    // Compute visibility polygon using the library
-    // computeViewport is faster when many segments are outside the viewport
-    let polygonTuples: [number, number][];
-    try {
-      polygonTuples = computeViewport(
-        [source.x, source.y],
-        processedSegments,
-        viewportMin,
-        viewportMax
-      );
-    } catch (error) {
-      console.error(`[Light Debug] computeViewport FAILED for source=(${source.x.toFixed(1)},${source.y.toFixed(1)}):`, error);
-      return []; // Return empty to render light without clipping
+    for (const wall of blockingWalls) {
+      // Add angles to each wall endpoint, plus slightly offset angles
+      const angle1 = Math.atan2(wall.y1 - source.y, wall.x1 - source.x);
+      const angle2 = Math.atan2(wall.y2 - source.y, wall.x2 - source.x);
+
+      angles.push(angle1 - 0.0001, angle1, angle1 + 0.0001);
+      angles.push(angle2 - 0.0001, angle2, angle2 + 0.0001);
     }
 
-    // Debug: Log if polygon has very few vertices or seems degenerate
-    if (DEBUG_LIGHTS && debugLightFrame % 60 === 0) {
-      if (polygonTuples.length < 3) {
-        console.warn(`[Light Debug] computeVisibilityPolygon: degenerate polygon with ${polygonTuples.length} vertices! source=(${source.x.toFixed(1)},${source.y.toFixed(1)}), segments=${segments.length}`);
-      }
+    // Sort angles
+    angles.sort((a, b) => a - b);
+
+    // Cast rays at each angle and build visibility polygon
+    const segments: Segment[] = blockingWalls.map(w => ({
+      x1: w.x1,
+      y1: w.y1,
+      x2: w.x2,
+      y2: w.y2
+    }));
+
+    const points: Point[] = [];
+    for (const angle of angles) {
+      const point = castRay(source, angle, segments, maxRadius);
+      points.push(point);
     }
 
-    // If polygon has fewer than 3 vertices, it's degenerate - return empty to skip clipping
-    if (polygonTuples.length < 3) {
-      return [];
-    }
-
-    // Convert from [x, y] tuples back to {x, y} Point objects
-    const polygon = polygonTuples.map(([x, y]) => ({ x, y }));
-
-    // Validate: Check if source point is inside the polygon
-    // If not, the polygon is invalid for this light and we should skip clipping
-    let inside = false;
-    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-      const xi = polygon[i].x, yi = polygon[i].y;
-      const xj = polygon[j].x, yj = polygon[j].y;
-      if (((yi > source.y) !== (yj > source.y)) && (source.x < (xj - xi) * (source.y - yi) / (yj - yi) + xi)) {
-        inside = !inside;
-      }
-    }
-
-    if (!inside) {
-      if (DEBUG_LIGHTS) {
-        console.warn(`[Light Debug] computeVisibilityPolygon: source NOT inside polygon! Returning empty. source=(${source.x.toFixed(1)},${source.y.toFixed(1)}), verts=${polygon.length}`);
-      }
-      // Return empty so the light renders without clipping rather than being invisible
-      return [];
-    }
-
-    return polygon;
+    return points;
   }
-
-  /**
-   * Convert hex color to HSL
-   */
-  function hexToHSL(hex: string): { h: number; s: number; l: number } {
-    hex = hex.replace(/^#/, "");
-    const r = parseInt(hex.slice(0, 2), 16) / 255;
-    const g = parseInt(hex.slice(2, 4), 16) / 255;
-    const b = parseInt(hex.slice(4, 6), 16) / 255;
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    const diff = max - min;
-    let h = 0;
-    let s = 0;
-    const l = (max + min) / 2;
-    if (diff !== 0) {
-      s = l > 0.5 ? diff / (2 - max - min) : diff / (max + min);
-      switch (max) {
-        case r:
-          h = ((g - b) / diff + (g < b ? 6 : 0)) / 6;
-          break;
-        case g:
-          h = ((b - r) / diff + 2) / 6;
-          break;
-        case b:
-          h = ((r - g) / diff + 4) / 6;
-          break;
-      }
-    }
-    return { h, s, l };
-  }
-
-  /**
-   * Convert HSL to RGB
-   */
-  function hslToRgb(h: number, s: number, l: number): { r: number; g: number; b: number } {
-    let r, g, b;
-    if (s === 0) {
-      r = g = b = l;
-    } else {
-      const hue2rgb = (p: number, q: number, t: number) => {
-        if (t < 0) t += 1;
-        if (t > 1) t -= 1;
-        if (t < 1/6) return p + (q - p) * 6 * t;
-        if (t < 1/2) return q;
-        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-        return p;
-      };
-      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-      const p = 2 * l - q;
-      r = hue2rgb(p, q, h + 1/3);
-      g = hue2rgb(p, q, h);
-      b = hue2rgb(p, q, h - 1/3);
-    }
-    return {
-      r: Math.round(r * 255),
-      g: Math.round(g * 255),
-      b: Math.round(b * 255)
-    };
-  }
-
-  /**
-   * Shift hue by specified amount (0-1 range)
-   */
-  function shiftHue(hexColor: string, hueShift: number): string {
-    const hsl = hexToHSL(hexColor);
-    let newHue = (hsl.h + hueShift) % 1;
-    if (newHue < 0) newHue += 1;
-    const rgb = hslToRgb(newHue, hsl.s, hsl.l);
-    const toHex = (n: number) => {
-      const hex = n.toString(16);
-      return hex.length === 1 ? "0" + hex : hex;
-    };
-    return `#${toHex(rgb.r)}${toHex(rgb.g)}${toHex(rgb.b)}`;
-  }
-
 
   function renderClippedLight(
     ctx: CanvasRenderingContext2D,
     source: Point,
     maxRadius: number,
     visibilityPolygon: Point[],
-    renderCallback: () => void,
-    lightId?: string
+    renderCallback: () => void
   ) {
-    if (visibilityPolygon.length === 0) {
-      if (DEBUG_LIGHTS && debugLightFrame % 60 === 0) {
-        console.log(`[Light Debug] renderClippedLight id=${lightId?.slice(-8)} SKIPPED: empty polygon`);
-      }
-      return;
-    }
-
-    // Debug: Check if source is inside the polygon
-    if (DEBUG_LIGHTS && debugLightFrame % 60 === 0) {
-      // Simple point-in-polygon check using winding number
-      let inside = false;
-      for (let i = 0, j = visibilityPolygon.length - 1; i < visibilityPolygon.length; j = i++) {
-        const xi = visibilityPolygon[i].x, yi = visibilityPolygon[i].y;
-        const xj = visibilityPolygon[j].x, yj = visibilityPolygon[j].y;
-        if (((yi > source.y) !== (yj > source.y)) && (source.x < (xj - xi) * (source.y - yi) / (yj - yi) + xi)) {
-          inside = !inside;
-        }
-      }
-      if (!inside) {
-        console.warn(`[Light Debug] WARNING: id=${lightId?.slice(-8)} source NOT inside polygon! source=(${source.x.toFixed(1)},${source.y.toFixed(1)})`);
-        // Log first few polygon vertices
-        const sample = visibilityPolygon.slice(0, 4).map(p => `(${p.x.toFixed(0)},${p.y.toFixed(0)})`).join(', ');
-        console.warn(`[Light Debug]   polygon vertices (first 4): ${sample}`);
-      }
-    }
+    if (visibilityPolygon.length === 0) return;
 
     ctx.save();
 
-    // Expand the clipping polygon slightly outward from the light center
-    // This ensures the light center is always inside the clipping region
-    // while walls still properly occlude the light edges
-    const CLIP_EXPANSION = 0.5;
-
+    // Create clipping path from visibility polygon
     ctx.beginPath();
-
-    // Calculate expanded vertex for the first point
-    const firstVertex = visibilityPolygon[0];
-    const firstDx = firstVertex.x - source.x;
-    const firstDy = firstVertex.y - source.y;
-    const firstDist = Math.sqrt(firstDx * firstDx + firstDy * firstDy);
-
-    if (firstDist > 0.1) {
-      const firstRatio = (firstDist + CLIP_EXPANSION) / firstDist;
-      const firstExpandedX = source.x + firstDx * firstRatio;
-      const firstExpandedY = source.y + firstDy * firstRatio;
-      ctx.moveTo(firstExpandedX, firstExpandedY);
-    } else {
-      ctx.moveTo(firstVertex.x, firstVertex.y);
-    }
-
-    // Expand and add remaining vertices
+    ctx.moveTo(visibilityPolygon[0].x, visibilityPolygon[0].y);
     for (let i = 1; i < visibilityPolygon.length; i++) {
-      const vertex = visibilityPolygon[i];
-      const dx = vertex.x - source.x;
-      const dy = vertex.y - source.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-
-      if (dist > 0.1) {
-        const ratio = (dist + CLIP_EXPANSION) / dist;
-        const expandedX = source.x + dx * ratio;
-        const expandedY = source.y + dy * ratio;
-        ctx.lineTo(expandedX, expandedY);
-      } else {
-        ctx.lineTo(vertex.x, vertex.y);
-      }
+      ctx.lineTo(visibilityPolygon[i].x, visibilityPolygon[i].y);
     }
-
     ctx.closePath();
     ctx.clip();
 
@@ -1618,38 +1028,15 @@
   }
 
   function renderLight(ctx: CanvasRenderingContext2D, light: AmbientLight, time: number) {
-    // Use floor + 0.5 to center on pixel and avoid exact grid boundaries
-    // This prevents edge cases when light is at grid cell corners
-    const x = Math.floor(light.x) + 0.5;
-    const y = Math.floor(light.y) + 0.5;
-    const { bright, dim, color, alpha, angle, rotation, animationType, animationSpeed, animationIntensity, walls: wallsEnabled, hidden, negative } = light;
+    const { x, y, bright, dim, color, alpha, angle, rotation, animationType, animationSpeed, animationIntensity, walls: wallsEnabled, hidden, negative } = light;
 
     // Skip hidden lights
     if (hidden) {
-      if (DEBUG_LIGHTS && debugLightFrame % 60 === 0) {
-        console.log(`[Light Debug] id=${light.id.slice(-8)} SKIPPED: hidden`);
-      }
-      return;
-    }
-
-    // Check darkness activation range
-    const darknessMin = light.darknessMin ?? 0;
-    const darknessMax = light.darknessMax ?? 1;
-    const sceneDarkness = scene.darkness ?? 0;
-
-    // Skip if scene darkness is outside this light's activation range
-    if (sceneDarkness < darknessMin || sceneDarkness > darknessMax) {
-      if (DEBUG_LIGHTS && debugLightFrame % 60 === 0) {
-        console.log(`[Light Debug] id=${light.id.slice(-8)} SKIPPED: darkness range (scene=${sceneDarkness}, min=${darknessMin}, max=${darknessMax})`);
-      }
       return;
     }
 
     // Performance optimization: Cull lights outside viewport
     if (!isInViewport(x - dim, y - dim, dim * 2, dim * 2)) {
-      if (DEBUG_LIGHTS && debugLightFrame % 60 === 0) {
-        console.log(`[Light Debug] id=${light.id.slice(-8)} SKIPPED: outside viewport`);
-      }
       return;
     }
 
@@ -1671,40 +1058,12 @@
       const intensity = animationIntensity / 100;
       animatedBright = bright * (1 + pulse * intensity * 0.3);
       animatedDim = dim * (1 + pulse * intensity * 0.3);
-    } else if (animationType === "chroma") {
-      // Chroma animation - color cycling effect
-      // Speed and intensity remain unchanged, color will be modified below
-    } else if (animationType === "wave") {
-      // Wave animation - ripple effect
-      // Speed and intensity will be used in gradient rendering below
-    } else if (animationType === 'sparkle') {
-      // Sparkle uses base light settings, sparks rendered separately
     }
-
-    // Round animated radii to fix canvas rendering issues with sub-pixel precision
-    animatedBright = Math.round(animatedBright);
-    animatedDim = Math.round(animatedDim);
 
     // Determine if we should apply wall occlusion based on light.walls property
     const visibilityPolygon = wallsEnabled
       ? getVisibilityPolygon(`light-${light.id}`, x, y, animatedDim)
       : null;
-
-    // Debug logging for light rendering issues
-    if (DEBUG_LIGHTS && debugLightFrame % 60 === 0) {
-      const hasWalls = hasWallsInRange({ x, y }, walls, animatedDim);
-      console.log(`[Light Debug] id=${light.id.slice(-8)}, pos=(${x.toFixed(0)},${y.toFixed(0)}), dim=${animatedDim}, alpha=${alpha}, wallsEnabled=${wallsEnabled}, hasWallsInRange=${hasWalls}, polygonVerts=${visibilityPolygon?.length ?? 'null'}`);
-
-      // If polygon exists, log its bounding box
-      if (visibilityPolygon && visibilityPolygon.length > 0) {
-        const minX = Math.min(...visibilityPolygon.map(p => p.x));
-        const maxX = Math.max(...visibilityPolygon.map(p => p.x));
-        const minY = Math.min(...visibilityPolygon.map(p => p.y));
-        const maxY = Math.max(...visibilityPolygon.map(p => p.y));
-        const containsSource = x >= minX && x <= maxX && y >= minY && y <= maxY;
-        console.log(`[Light Debug]   polygon bounds: (${minX.toFixed(0)},${minY.toFixed(0)}) to (${maxX.toFixed(0)},${maxY.toFixed(0)}), containsSource=${containsSource}`);
-      }
-    }
 
     // Determine if this is a darkness source (negative light)
     const isNegative = negative === true;
@@ -1730,87 +1089,29 @@
         ctx.clip();
       }
 
-      // Create radial gradient with attenuation-based falloff
+      // Create radial gradient
       const gradient = ctx.createRadialGradient(x, y, 0, x, y, animatedDim);
 
-      // Apply chroma animation - shift hue over time
-      let effectiveColor = color;
-      if (animationType === "chroma") {
-        const speed = animationSpeed / 5;
-        const intensity = animationIntensity / 10;
-        const hueShift = (time * speed * 0.001) % 1;
-        effectiveColor = shiftHue(color, hueShift * intensity);
-      }
-
-      // Parse color and add alpha
-      const baseColor = hexToRgba(effectiveColor, alpha);
-      const dimColor = hexToRgba(effectiveColor, 0);
-
-      // Get attenuation value (default 0.5 for smooth falloff)
-      const attenuation = light.attenuation ?? 0.5;
-
-      // Calculate normalized bright radius (0-1 range within dim radius)
-      const brightStop = animatedBright > 0 && animatedDim > 0
-        ? Math.min(1, animatedBright / animatedDim)
-        : 0;
-
-      // Wave animation overrides normal gradient
-      if (animationType === "wave") {
-        const speed = animationSpeed / 5;
-        const intensity = animationIntensity / 10;
-        const wavePhase = (time * speed * 0.002) % 1;
-        
-        // Add base gradient stops first
-        gradient.addColorStop(0, baseColor);
-        gradient.addColorStop(1, dimColor);
-        
-        // Create multiple wave rings on top
-        const numRings = 3;
-        for (let i = 0; i < numRings; i++) {
-          const ringPhase = (wavePhase + i / numRings) % 1;
-          const ringAlpha = Math.abs(Math.sin(ringPhase * Math.PI)) * intensity;
-          
-          if (ringPhase > 0 && ringPhase < 1) {
-            const waveColor = hexToRgba(effectiveColor, alpha * ringAlpha * 2);
-            gradient.addColorStop(ringPhase, waveColor);
-          }
+      if (isNegative) {
+        // For darkness sources, use opaque (full alpha) at center to transparent at edge
+        // This creates a "darkness hole" that cuts through existing light
+        gradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
+        if (animatedBright > 0 && animatedDim > 0) {
+          gradient.addColorStop(Math.min(1, animatedBright / animatedDim), 'rgba(0, 0, 0, 1)');
         }
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
       } else {
-      // Create gradient stops based on attenuation
-      // - attenuation = 0: Sharp transition (step function)
-      // - attenuation = 0.5: Default gradual fade
-      // - attenuation = 1: Very smooth/soft transition
+        // Parse color and add alpha for normal lights
+        const baseColor = hexToRgba(color, alpha);
+        const dimColor = hexToRgba(color, 0);
 
-      // Inner bright zone (full brightness from center to bright radius)
-      gradient.addColorStop(0, baseColor);
-
-      if (brightStop > 0) {
-        // Maintain full brightness up to bright radius
-        // Lower attenuation = more stops clustered near bright edge (sharper)
-        // Higher attenuation = more distributed stops (smoother)
-        const transitionStart = brightStop * (1 - attenuation * 0.3);
-        gradient.addColorStop(transitionStart, baseColor);
-
-        // Transition zone - use attenuation to control the curve
-        if (attenuation < 0.3) {
-          // Sharp falloff - add intermediate stop close to bright edge
-          const midAlpha = alpha * 0.5;
-          gradient.addColorStop(brightStop, hexToRgba(effectiveColor, midAlpha));
-          gradient.addColorStop(brightStop + (1 - brightStop) * 0.3, hexToRgba(effectiveColor, midAlpha * 0.3));
-        } else if (attenuation > 0.7) {
-          // Soft falloff - distributed stops for smooth gradient
-          gradient.addColorStop(brightStop, hexToRgba(effectiveColor, alpha * 0.85));
-          gradient.addColorStop(brightStop + (1 - brightStop) * 0.4, hexToRgba(effectiveColor, alpha * 0.5));
-          gradient.addColorStop(brightStop + (1 - brightStop) * 0.7, hexToRgba(effectiveColor, alpha * 0.2));
-        } else {
-          // Medium falloff - default smooth transition
-          gradient.addColorStop(brightStop, hexToRgba(effectiveColor, alpha * 0.7));
-          gradient.addColorStop(brightStop + (1 - brightStop) * 0.5, hexToRgba(effectiveColor, alpha * 0.3));
+        // Bright zone (0 to bright radius)
+        gradient.addColorStop(0, baseColor);
+        if (animatedBright > 0 && animatedDim > 0) {
+          gradient.addColorStop(Math.min(1, animatedBright / animatedDim), baseColor);
         }
-      }
-
-      // Outer edge (fully transparent)
-      gradient.addColorStop(1, dimColor);
+        // Dim zone (bright to dim radius)
+        gradient.addColorStop(1, dimColor);
       }
 
       ctx.fillStyle = gradient;
@@ -1822,62 +1123,13 @@
         ctx.fill();
       }
 
-      // Render sparkles on top of base light
-      if (animationType === 'sparkle') {
-        const config = getSparkleConfig(light);
-        const sparks = generateSparks(light, time);
-        const intensity = animationIntensity / 10;
-
-        sparks.forEach(spark => {
-          const age = time - spark.birthTime;
-          const lifeProgress = age / spark.lifetime;
-
-          let fadeAlpha: number;
-          if (config.sparkleFade !== false) {
-            fadeAlpha = Math.sin(lifeProgress * Math.PI);
-          } else {
-            fadeAlpha = 1;
-          }
-
-          const finalAlpha = alpha * intensity * fadeAlpha;
-          if (finalAlpha <= 0.01) return;
-
-          const sparkX = Math.floor(x + spark.x) + 0.5;
-          const sparkY = Math.floor(y + spark.y) + 0.5;
-
-          const sparkGradient = ctx.createRadialGradient(
-            sparkX, sparkY, 0,
-            sparkX, sparkY, spark.size
-          );
-
-          sparkGradient.addColorStop(0, hexToRgba(spark.color, finalAlpha));
-          sparkGradient.addColorStop(0.5, hexToRgba(spark.color, finalAlpha * 0.5));
-          sparkGradient.addColorStop(1, hexToRgba(spark.color, 0));
-
-          ctx.fillStyle = sparkGradient;
-          ctx.beginPath();
-          ctx.arc(sparkX, sparkY, spark.size, 0, Math.PI * 2);
-          ctx.fill();
-        });
-      }
-
       ctx.restore();
     };
 
     // Render light with or without wall occlusion based on light.walls property
-    // Empty polygon means no walls are affecting this light - render without clipping
-    if (wallsEnabled && visibilityPolygon && visibilityPolygon.length > 0) {
-      if (DEBUG_LIGHTS && debugLightFrame % 60 === 0) {
-        console.log(`[Light Debug] id=${light.id.slice(-8)} RENDERING with clipping (${visibilityPolygon.length} vertices)`);
-      }
-      renderClippedLight(ctx, { x, y }, animatedDim, visibilityPolygon, renderLightGradient, light.id);
+    if (wallsEnabled && visibilityPolygon) {
+      renderClippedLight(ctx, { x, y }, animatedDim, visibilityPolygon, renderLightGradient);
     } else {
-      // Log every frame if walls are enabled but polygon is empty/missing - this is suspicious!
-      if (DEBUG_LIGHTS && wallsEnabled && hasWallsInRange({ x, y }, walls, animatedDim)) {
-        console.warn(`[Light Debug] id=${light.id.slice(-8)} SUSPICIOUS: wallsEnabled=true, hasWallsInRange=true, but polygon=${visibilityPolygon?.length ?? 'null'}`);
-      } else if (DEBUG_LIGHTS && debugLightFrame % 60 === 0) {
-        console.log(`[Light Debug] id=${light.id.slice(-8)} RENDERING without clipping (wallsEnabled=${wallsEnabled}, polygon=${visibilityPolygon?.length ?? 'null'})`);
-      }
       renderLightGradient();
     }
   }
@@ -1934,36 +1186,15 @@
 
       // Parse color with alpha (using default 0.8 alpha for token lights)
       const baseColor = hexToRgba(color, 0.8);
-      const dimColor = hexToRgba(effectiveColor, 0);
+      const dimColor = hexToRgba(color, 0);
 
-        // Wave animation - create ripple effect with multiple rings
-        if (animationType === "wave") {
-          const speed = animationSpeed / 5;
-          const intensity = animationIntensity / 10;
-          const wavePhase = (time * speed * 0.002) % 1;
-          
-          // Create multiple wave rings
-          const numRings = 3;
-          for (let i = 0; i < numRings; i++) {
-            const ringPhase = (wavePhase + i / numRings) % 1;
-            const ringPos = ringPhase;
-            const ringAlpha = Math.abs(Math.sin(ringPhase * Math.PI)) * intensity;
-            
-            if (ringPos > 0 && ringPos < 1) {
-              const waveColor = hexToRgba(effectiveColor, alpha * ringAlpha);
-              gradient.addColorStop(ringPos, waveColor);
-            }
-          }
-        } else {
-          // Normal gradient (non-wave animations)
-          gradient.addColorStop(0, baseColor);
-          if (animatedBright > 0 && animatedDim > 0) {
-            gradient.addColorStop(Math.min(1, animatedBright / animatedDim), baseColor);
-          }
-          gradient.addColorStop(1, dimColor);
-        }
+      // Bright zone (0 to bright radius)
+      gradient.addColorStop(0, baseColor);
       if (bright > 0 && dim > 0) {
+        gradient.addColorStop(Math.min(1, bright / dim), baseColor);
       }
+      // Dim zone (bright to dim radius)
+      gradient.addColorStop(1, dimColor);
 
       ctx.fillStyle = gradient;
       if (angle < 360) {
@@ -1982,19 +1213,16 @@
     // Skip if token doesn't have vision
     if (!token.vision || token.visionRange <= 0) return;
 
-    const cellWidth = scene.gridWidth ?? scene.gridSize;
-    const cellHeight = scene.gridHeight ?? scene.gridSize;
-    const width = (token.width || 1) * cellWidth;
-    const height = (token.height || 1) * cellHeight;
+    const gridSize = scene.gridSize;
+    const width = (token.width || 1) * gridSize;
+    const height = (token.height || 1) * gridSize;
 
     // Token center position
     const x = token.x + width / 2;
     const y = token.y + height / 2;
 
-    // Vision radius = token edge radius + vision range in cells
-    const tokenRadius = (width + height) / 4; // Average radius to token edge
-    const avgCellSize = (cellWidth + cellHeight) / 2;
-    const visionRadius = tokenRadius + (token.visionRange * avgCellSize);
+    // Convert vision range from grid units to pixels
+    const visionRadius = token.visionRange * gridSize;
 
     ctx.save();
 
@@ -2023,19 +1251,16 @@
     // This renders the actual vision area when tokenVision is enabled
     if (!token.vision || token.visionRange <= 0) return;
 
-    const cellWidth = scene.gridWidth ?? scene.gridSize;
-    const cellHeight = scene.gridHeight ?? scene.gridSize;
-    const width = (token.width || 1) * cellWidth;
-    const height = (token.height || 1) * cellHeight;
+    const gridSize = scene.gridSize;
+    const width = (token.width || 1) * gridSize;
+    const height = (token.height || 1) * gridSize;
 
     // Token center position
     const x = token.x + width / 2;
     const y = token.y + height / 2;
 
-    // Vision radius = token edge radius + vision range in cells
-    const tokenRadius = (width + height) / 4; // Average radius to token edge
-    const avgCellSize = (cellWidth + cellHeight) / 2;
-    const visionRadius = tokenRadius + (token.visionRange * avgCellSize);
+    // Convert vision range from grid units to pixels
+    const visionRadius = token.visionRange * gridSize;
 
     // Compute visibility polygon for wall occlusion
     const visibilityPolygon = computeVisibilityPolygon(
@@ -2050,6 +1275,9 @@
 
       // Create radial gradient for vision area
       const gradient = ctx.createRadialGradient(x, y, 0, x, y, visionRadius);
+      gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+      gradient.addColorStop(0.8, 'rgba(255, 255, 255, 0.8)');
+      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
 
       ctx.fillStyle = gradient;
       ctx.beginPath();
@@ -2062,11 +1290,6 @@
 
   function renderLights() {
     if (!lightingCtx || !lightingCanvas) return;
-
-    // Debug frame counter
-    if (DEBUG_LIGHTS) {
-      debugLightFrame++;
-    }
 
     // Performance optimization: Pre-calculate visibility at start of frame
     // Capture whether cache needs clearing, but defer setting the flag until after rendering
@@ -2131,13 +1354,8 @@
         lightingCtx.fillRect(0, 0, sceneWidth, sceneHeight);
 
         // Cut out lit areas using destination-out
-        // Must reset transform to draw tempCanvas at screen coordinates (0,0)
-        // since tempCanvas was rendered in screen space
         lightingCtx.globalCompositeOperation = 'destination-out';
-        lightingCtx.save();
-        lightingCtx.setTransform(1, 0, 0, 1, 0, 0);  // Reset to identity transform
         lightingCtx.drawImage(tempCanvas, 0, 0);
-        lightingCtx.restore();
         lightingCtx.globalCompositeOperation = 'source-over';
       }
     } else {
@@ -2235,10 +1453,7 @@
   }
 
   function renderFog() {
-    // When GM is possessing a token, show fog from that token's perspective
-    // Otherwise, GMs see no fog
-    if (!fogCtx || !fogCanvas || !scene.fogExploration) return;
-    if (isGM && !possessedTokenId) return;
+    if (!fogCtx || !fogCanvas || !scene.fogExploration || isGM) return;
     if (!fogData) return;
 
     fogCtx.clearRect(0, 0, fogCanvas.width, fogCanvas.height);
@@ -2285,40 +1500,6 @@
       }
     }
 
-    // When GM is possessing a token, also cut out the current vision
-    if (possessedTokenId) {
-      const possessedToken = tokens.find(t => t.id === possessedTokenId);
-      if (possessedToken && possessedToken.vision && possessedToken.visionRange > 0) {
-        const tokenWidth = (possessedToken.width || 1) * (scene.gridWidth ?? scene.gridSize);
-        const tokenHeight = (possessedToken.height || 1) * (scene.gridHeight ?? scene.gridSize);
-        const tokenCenterX = possessedToken.x + tokenWidth / 2;
-        const tokenCenterY = possessedToken.y + tokenHeight / 2;
-        // Vision radius = token edge radius + vision range in cells
-        const tokenRadius = (tokenWidth + tokenHeight) / 4;
-        const avgCellSize = ((scene.gridWidth ?? scene.gridSize) + (scene.gridHeight ?? scene.gridSize)) / 2;
-        const visionRadius = tokenRadius + (possessedToken.visionRange * avgCellSize);
-
-        // Compute visibility polygon for the possessed token
-        const visibilityPolygon = computeVisibilityPolygon(
-          { x: tokenCenterX, y: tokenCenterY },
-          walls,
-          visionRadius
-        );
-
-        // Cut out the current vision area
-        if (visibilityPolygon.length > 0) {
-          fogCtx.fillStyle = 'rgba(0, 0, 0, 1)';
-          fogCtx.beginPath();
-          fogCtx.moveTo(visibilityPolygon[0].x, visibilityPolygon[0].y);
-          for (let i = 1; i < visibilityPolygon.length; i++) {
-            fogCtx.lineTo(visibilityPolygon[i].x, visibilityPolygon[i].y);
-          }
-          fogCtx.closePath();
-          fogCtx.fill();
-        }
-      }
-    }
-
     fogCtx.globalCompositeOperation = 'source-over';
     fogCtx.restore();
   }
@@ -2355,14 +1536,9 @@
     tokens.forEach(token => {
       if (!token.visible || !token.vision || token.visionRange <= 0) return;
 
-      const tokenWidth = (token.width || 1) * (scene.gridWidth ?? scene.gridSize);
-      const tokenHeight = (token.height || 1) * (scene.gridHeight ?? scene.gridSize);
-      const tokenX = token.x + tokenWidth / 2;
-      const tokenY = token.y + tokenHeight / 2;
-      // Vision radius = token edge radius + vision range in cells
-      const tokenRadius = (tokenWidth + tokenHeight) / 4;
-      const avgCellSize = ((scene.gridWidth ?? scene.gridSize) + (scene.gridHeight ?? scene.gridSize)) / 2;
-      const visionRadius = tokenRadius + (token.visionRange * avgCellSize);
+      const tokenX = token.x + ((token.width || 1) * scene.gridSize) / 2;
+      const tokenY = token.y + ((token.height || 1) * scene.gridSize) / 2;
+      const visionRadius = token.visionRange * scene.gridSize;
 
       // Compute visibility polygon for this token
       const visibilityPolygon = computeVisibilityPolygon(
@@ -2432,7 +1608,7 @@
 
       // Only re-render lights if there are animated lights or token lights
       const hasAnimatedLights = lights.some(light =>
-        light.animationType === 'torch' || light.animationType === 'pulse' || light.animationType === 'chroma' || light.animationType === 'wave' || light.animationType === 'sparkle'
+        light.animationType === 'torch' || light.animationType === 'pulse'
       );
 
       // Check if any tokens emit light (for now we always re-render if they exist)
@@ -2623,8 +1799,8 @@
 
       // Check if clicking on a token
       const clickedToken = tokens.find(token => {
-        const width = (token.width || 1) * (scene.gridWidth ?? scene.gridSize);
-        const height = (token.height || 1) * (scene.gridHeight ?? scene.gridSize);
+        const width = (token.width || 1) * scene.gridSize;
+        const height = (token.height || 1) * scene.gridSize;
         const dx = worldPos.x - (token.x + width / 2);
         const dy = worldPos.y - (token.y + height / 2);
         const distance = Math.sqrt(dx * dx + dy * dy);
@@ -2660,8 +1836,7 @@
           lastClickLightId = null;
         }
       } else {
-        // Clicking on empty space - exit possession, clear selections and start panning
-        exitPossession();
+        // Clicking on empty space - clear selections and start panning
         selectedTokenId = null;
         selectedLightId = null;
         onTokenSelect?.(null);
@@ -2782,7 +1957,6 @@
       backgroundNeedsUpdate = true;
 
       render();
-      saveViewport();
     }
   }
 
@@ -2819,12 +1993,9 @@
 
         // Apply grid snapping if enabled
         if (gridSnap) {
-          const gridSize = scene.gridSize ?? 100;
-          const cellWidth = scene.gridWidth ?? gridSize;
-          const cellHeight = scene.gridHeight ?? gridSize;
           // Snap the token's top-left corner to the nearest grid intersection
-          newX = Math.round(newX / cellWidth) * cellWidth;
-          newY = Math.round(newY / cellHeight) * cellHeight;
+          newX = Math.round(newX / scene.gridSize) * scene.gridSize;
+          newY = Math.round(newY / scene.gridSize) * scene.gridSize;
         }
 
         // Only send move event if position actually changed
@@ -2867,7 +2038,6 @@
       backgroundNeedsUpdate = true;
 
       render();
-      saveViewport();
     }
   }
 
@@ -2884,23 +2054,19 @@
 
   function snapToGrid(x: number, y: number): { x: number; y: number } {
     if (!gridSnap) return { x, y };
-    const gridSize = scene.gridSize ?? 100;
-    const cellWidth = scene.gridWidth ?? gridSize;
-    const cellHeight = scene.gridHeight ?? gridSize;
+    const gridSize = scene.gridSize;
     return {
-      x: Math.round(x / cellWidth) * cellWidth,
-      y: Math.round(y / cellHeight) * cellHeight,
+      x: Math.round(x / gridSize) * gridSize,
+      y: Math.round(y / gridSize) * gridSize,
     };
   }
 
   function snapToGridCenter(x: number, y: number): { x: number; y: number } {
-    const gridSize = scene.gridSize ?? 100;
-    const cellWidth = scene.gridWidth ?? gridSize;
-    const cellHeight = scene.gridHeight ?? gridSize;
+    const gridSize = scene.gridSize;
     // Snap to center of cell (add half grid size after rounding to corner)
     return {
-      x: Math.floor(x / cellWidth) * cellWidth + cellWidth / 2,
-      y: Math.floor(y / cellHeight) * cellHeight + cellHeight / 2,
+      x: Math.floor(x / gridSize) * gridSize + gridSize / 2,
+      y: Math.floor(y / gridSize) * gridSize + gridSize / 2,
     };
   }
 
@@ -2969,12 +2135,9 @@
       return;
     }
 
-    // Escape - exit possession, or cancel wall drawing
+    // Escape - cancel wall drawing
     if (e.key === 'Escape') {
-      if (possessedTokenId) {
-        exitPossession();
-        e.preventDefault();
-      } else if (isDrawingWall) {
+      if (isDrawingWall) {
         cancelWallDrawing();
         e.preventDefault();
       }
@@ -3007,8 +2170,8 @@
 
     // Check for token at position
     const clickedToken = tokens.find(token => {
-      const width = (token.width || 1) * (scene.gridWidth ?? scene.gridSize);
-      const height = (token.height || 1) * (scene.gridHeight ?? scene.gridSize);
+      const width = (token.width || 1) * scene.gridSize;
+      const height = (token.height || 1) * scene.gridSize;
       const tokenCenterX = token.x + width / 2;
       const tokenCenterY = token.y + height / 2;
       const radius = Math.min(width, height) / 2;
@@ -3088,23 +2251,6 @@
       }
     }
     // Add similar for lights/walls if they support visibility in the future
-  }
-
-  function handleContextMenuPossess() {
-    showContextMenu = false;
-    if (contextMenuElementType === 'token' && contextMenuElementId && isGM) {
-      possessedTokenId = contextMenuElementId;
-      // Re-render fog with the possessed token's perspective
-      renderFog();
-    }
-  }
-
-  function exitPossession() {
-    if (possessedTokenId) {
-      possessedTokenId = null;
-      // Re-render fog from GM perspective
-      renderFog();
-    }
   }
 
   function handleContextMenuDelete() {
@@ -3212,7 +2358,7 @@
   <canvas class="canvas-layer" bind:this={gridCanvas}></canvas>
   <canvas class="canvas-layer" bind:this={tokensCanvas}></canvas>
   <canvas class="canvas-layer" bind:this={lightingCanvas}></canvas>
-  {#if scene.fogExploration && (!isGM || possessedTokenId)}
+  {#if scene.fogExploration && !isGM}
     <canvas class="canvas-layer" bind:this={fogCanvas}></canvas>
   {/if}
   {#if isGM}
@@ -3235,29 +2381,6 @@
     on:drop={handleDrop}
   ></canvas>
 
-  <!-- Possession indicator -->
-  {#if possessedTokenId}
-    {#each tokens as token}
-      {#if token.id === possessedTokenId}
-        <div class="possession-indicator">
-          <div class="possession-content">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-              <circle cx="12" cy="12" r="3"></circle>
-            </svg>
-            <span>Possessing: {token.name || 'Token'}</span>
-            <button class="exit-button" on:click={exitPossession} title="Exit Possession (ESC)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
-          </div>
-        </div>
-      {/if}
-    {/each}
-  {/if}
-
   <div class="canvas-controls">
     <div class="zoom-display">
       {Math.round(scale * 100)}%
@@ -3274,7 +2397,6 @@
     {isGM}
     isVisible={contextMenuElementVisible}
     on:edit={handleContextMenuEdit}
-    on:possess={handleContextMenuPossess}
     on:toggleVisibility={handleContextMenuToggleVisibility}
     on:delete={handleContextMenuDelete}
     on:close={() => showContextMenu = false}
@@ -3350,57 +2472,6 @@
     border-radius: 4px;
     font-size: 14px;
     font-weight: 500;
-  }
-
-  .possession-indicator {
-    position: absolute;
-    top: 16px;
-    left: 16px;
-    pointer-events: all;
-    z-index: 100;
-  }
-
-  .possession-content {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background-color: rgba(251, 191, 36, 0.95);
-    color: #1f2937;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 600;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    animation: possession-pulse 2s ease-in-out infinite;
-  }
-
-  @keyframes possession-pulse {
-    0%, 100% {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
-    50% {
-      box-shadow: 0 4px 16px rgba(251, 191, 36, 0.5);
-    }
-  }
-
-  .possession-content svg {
-    flex-shrink: 0;
-  }
-
-  .exit-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.2);
-    border: none;
-    border-radius: 3px;
-    padding: 2px;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-  }
-
-  .exit-button:hover {
-    background: rgba(0, 0, 0, 0.35);
   }
 
   .canvas-interactive.drag-over {
