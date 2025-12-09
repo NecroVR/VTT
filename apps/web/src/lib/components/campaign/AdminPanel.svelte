@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { beforeUpdate, afterUpdate } from 'svelte';
   import { campaignsStore } from '$lib/stores/campaigns';
   import { scenesStore } from '$lib/stores/scenes';
   import { assetsStore } from '$lib/stores/assets';
@@ -202,6 +203,39 @@
   let isEditingGridHeight = false;
   let gridStoreUpdateTimer: number | null = null;
   let gridApiSaveTimer: number | null = null;
+
+  // Input element references for cursor position restoration
+  let gridWidthInput: HTMLInputElement;
+  let gridHeightInput: HTMLInputElement;
+  let savedSelectionStart: number | null = null;
+  let savedSelectionEnd: number | null = null;
+  let activeGridInput: 'width' | 'height' | null = null;
+
+  // Save cursor position before any update
+  beforeUpdate(() => {
+    if (isEditingGridWidth && gridWidthInput && document.activeElement === gridWidthInput) {
+      savedSelectionStart = gridWidthInput.selectionStart;
+      savedSelectionEnd = gridWidthInput.selectionEnd;
+      activeGridInput = 'width';
+    } else if (isEditingGridHeight && gridHeightInput && document.activeElement === gridHeightInput) {
+      savedSelectionStart = gridHeightInput.selectionStart;
+      savedSelectionEnd = gridHeightInput.selectionEnd;
+      activeGridInput = 'height';
+    } else {
+      activeGridInput = null;
+    }
+  });
+
+  // Restore cursor position after update
+  afterUpdate(() => {
+    if (activeGridInput === 'width' && gridWidthInput && savedSelectionStart !== null) {
+      gridWidthInput.focus();
+      gridWidthInput.setSelectionRange(savedSelectionStart, savedSelectionEnd);
+    } else if (activeGridInput === 'height' && gridHeightInput && savedSelectionStart !== null) {
+      gridHeightInput.focus();
+      gridHeightInput.setSelectionRange(savedSelectionStart, savedSelectionEnd);
+    }
+  });
 
   // Sync local state with store values ONLY when not editing
   $: if (!isEditingGridWidth && gridWidth !== undefined) {
@@ -513,6 +547,7 @@
                   min="10"
                   max="500"
                   step="5"
+                  bind:this={gridWidthInput}
                   bind:value={localGridWidth}
                   disabled={saving || !gridVisible}
                   on:focus={handleGridWidthFocus}
@@ -540,6 +575,7 @@
                   min="10"
                   max="500"
                   step="5"
+                  bind:this={gridHeightInput}
                   bind:value={localGridHeight}
                   disabled={saving || !gridVisible}
                   on:focus={handleGridHeightFocus}
