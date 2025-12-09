@@ -594,7 +594,8 @@
 
     // Compute vision polygon if needed for vision-based token hiding
     let visionPolygon: Point[] | null = null;
-    const shouldApplyVisionHiding = !isGM && !scene.globalLight && possessedToken && scene.tokenVision && possessedToken.vision && possessedToken.visionRange > 0;
+    // Apply vision hiding for: (1) non-GM players, or (2) GMs who are possessing a token to preview player view
+    const shouldApplyVisionHiding = (!isGM || possessedTokenId) && !scene.globalLight && possessedToken && scene.tokenVision && possessedToken.vision && possessedToken.visionRange > 0;
 
     if (shouldApplyVisionHiding && possessedToken) {
       const tokenWidth = (possessedToken.width || 1) * scene.gridSize;
