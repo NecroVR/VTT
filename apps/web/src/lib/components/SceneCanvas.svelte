@@ -1819,16 +1819,17 @@
     // Skip if token doesn't have vision
     if (!token.vision || token.visionRange <= 0) return;
 
-    const gridSize = scene.gridSize;
-    const width = (token.width || 1) * gridSize;
-    const height = (token.height || 1) * gridSize;
+    const cellWidth = scene.gridWidth ?? scene.gridSize;
+    const cellHeight = scene.gridHeight ?? scene.gridSize;
+    const width = (token.width || 1) * cellWidth;
+    const height = (token.height || 1) * cellHeight;
 
     // Token center position
     const x = token.x + width / 2;
     const y = token.y + height / 2;
 
-    // Convert vision range from grid units to pixels
-    const visionRadius = token.visionRange * gridSize;
+    // Convert vision range from grid units to pixels (use average for circular vision)
+    const visionRadius = token.visionRange * (cellWidth + cellHeight) / 2;
 
     ctx.save();
 
@@ -1857,16 +1858,17 @@
     // This renders the actual vision area when tokenVision is enabled
     if (!token.vision || token.visionRange <= 0) return;
 
-    const gridSize = scene.gridSize;
-    const width = (token.width || 1) * gridSize;
-    const height = (token.height || 1) * gridSize;
+    const cellWidth = scene.gridWidth ?? scene.gridSize;
+    const cellHeight = scene.gridHeight ?? scene.gridSize;
+    const width = (token.width || 1) * cellWidth;
+    const height = (token.height || 1) * cellHeight;
 
     // Token center position
     const x = token.x + width / 2;
     const y = token.y + height / 2;
 
-    // Convert vision range from grid units to pixels
-    const visionRadius = token.visionRange * gridSize;
+    // Convert vision range from grid units to pixels (use average for circular vision)
+    const visionRadius = token.visionRange * (cellWidth + cellHeight) / 2;
 
     // Compute visibility polygon for wall occlusion
     const visibilityPolygon = computeVisibilityPolygon(
