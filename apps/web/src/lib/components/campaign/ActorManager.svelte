@@ -183,7 +183,7 @@
 
 <div class="actor-manager">
   <div class="manager-header">
-    <h3>Actor Manager</h3>
+    <h3>Tokens</h3>
   </div>
 
   <!-- Actor Templates Section -->

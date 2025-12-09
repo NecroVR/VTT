@@ -19,7 +19,6 @@
   import ActorManager from '$lib/components/campaign/ActorManager.svelte';
   import ActorCreateModal from '$lib/components/actor/ActorCreateModal.svelte';
   import TokenConfig from '$lib/components/TokenConfig.svelte';
-  import TokenBrowser from '$lib/components/campaign/TokenBrowser.svelte';
   import AssetBrowser from '$lib/components/assets/AssetBrowser.svelte';
   import AdminPanel from '$lib/components/campaign/AdminPanel.svelte';
   import LightingConfig from '$lib/components/LightingConfig.svelte';
@@ -84,16 +83,10 @@
       props: { campaignId: campaignId, isGM }
     },
     {
-      id: 'actors',
-      label: 'Actors',
-      component: ActorManager,
-      props: { campaignId: campaignId, isGM, currentSceneId: activeScene?.id || null }
-    },
-    {
       id: 'tokens',
       label: 'Tokens',
-      component: TokenBrowser,
-      props: { campaignId: campaignId, isGM }
+      component: ActorManager,
+      props: { campaignId: campaignId, isGM, currentSceneId: activeScene?.id || null }
     },
     {
       id: 'assets',
