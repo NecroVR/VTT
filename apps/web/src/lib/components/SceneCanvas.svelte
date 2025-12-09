@@ -2845,6 +2845,12 @@
         // Only send move event if position actually changed
         const positionChanged = Math.abs(newX - light.x) > 1 || Math.abs(newY - light.y) > 1;
         if (positionChanged) {
+          // Update local position immediately for visual feedback
+          light.x = newX;
+          light.y = newY;
+          invalidateVisibilityCache();
+          renderLights();
+          renderControls();
           onLightMove?.(draggedLightId, newX, newY);
         }
       }
@@ -2858,14 +2864,11 @@
         let newX = worldPos.x + dragOffsetX;
         let newY = worldPos.y + dragOffsetY;
 
-        // Apply grid snapping if enabled
+        // Apply grid snapping if enabled (use snapToGrid for offset support)
         if (gridSnap) {
-          const gridSize = scene.gridSize ?? 100;
-          const cellWidth = scene.gridWidth ?? gridSize;
-          const cellHeight = scene.gridHeight ?? gridSize;
-          // Snap the token's top-left corner to the nearest grid intersection
-          newX = Math.round(newX / cellWidth) * cellWidth;
-          newY = Math.round(newY / cellHeight) * cellHeight;
+          const snappedPos = snapToGrid(newX, newY);
+          newX = snappedPos.x;
+          newY = snappedPos.y;
         }
 
         // Only send move event if position actually changed
