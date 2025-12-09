@@ -7,6 +7,7 @@
   import SceneContextMenu from './SceneContextMenu.svelte';
   import ConfirmDialog from './ConfirmDialog.svelte';
   import { computeViewport, breakIntersections } from 'visibility-polygon';
+  import { API_BASE_URL } from '$lib/config/api';
 
   // Props
   export let scene: Scene;
@@ -115,6 +116,12 @@
   const MIN_SCALE = 0.25;
   const MAX_SCALE = 4;
 
+  // Viewport persistence
+  let saveViewportTimeout: number | null = null;
+  let lastSavedViewX = viewX;
+  let lastSavedViewY = viewY;
+  let lastSavedScale = scale;
+
   // Performance optimization: Layer caching
   let backgroundCached = false;
   let gridCached = false;
@@ -140,10 +147,40 @@
   // Subscribe to fog store
   $: fogData = scene ? $fogStore.fog.get(scene.id) : undefined;
 
-  onMount(() => {
+  onMount(async () => {
     initializeCanvases();
     loadBackgroundImage();
     resizeCanvases();
+
+    // Load saved viewport position
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/scenes/${scene.id}/viewport`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.viewport) {
+          viewX = data.viewport.cameraX;
+          viewY = data.viewport.cameraY;
+          scale = data.viewport.zoom;
+
+          // Update last saved values to prevent immediate save
+          lastSavedViewX = viewX;
+          lastSavedViewY = viewY;
+          lastSavedScale = scale;
+
+          // Invalidate caches to reflect new viewport
+          invalidateVisibilityCache();
+          gridNeedsUpdate = true;
+          backgroundNeedsUpdate = true;
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load viewport:', error);
+    }
+
     render();
     startAnimationLoop();
 
@@ -157,8 +194,33 @@
     };
   });
 
-  onDestroy(() => {
+  onDestroy(async () => {
     stopAnimationLoop();
+
+    // Clear any pending save timeout
+    if (saveViewportTimeout !== null) {
+      clearTimeout(saveViewportTimeout);
+    }
+
+    // Save viewport immediately before unmounting
+    if (viewX !== lastSavedViewX || viewY !== lastSavedViewY || scale !== lastSavedScale) {
+      try {
+        await fetch(`${API_BASE_URL}/api/v1/scenes/${scene.id}/viewport`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            cameraX: viewX,
+            cameraY: viewY,
+            zoom: scale
+          })
+        });
+      } catch (error) {
+        console.error('Failed to save viewport on unmount:', error);
+      }
+    }
   });
 
   // Watch for background image URL changes only
@@ -234,6 +296,40 @@
   // Update explored areas when tokens move (with vision enabled)
   $: if (scene.fogExploration && tokens && !isGM) {
     updateExploredAreas();
+  }
+
+  function saveViewport() {
+    // Only save if values actually changed
+    if (viewX === lastSavedViewX && viewY === lastSavedViewY && scale === lastSavedScale) {
+      return;
+    }
+
+    if (saveViewportTimeout !== null) {
+      clearTimeout(saveViewportTimeout);
+    }
+
+    saveViewportTimeout = setTimeout(async () => {
+      try {
+        await fetch(`${API_BASE_URL}/api/v1/scenes/${scene.id}/viewport`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            cameraX: viewX,
+            cameraY: viewY,
+            zoom: scale
+          })
+        });
+
+        lastSavedViewX = viewX;
+        lastSavedViewY = viewY;
+        lastSavedScale = scale;
+      } catch (error) {
+        console.error('Failed to save viewport:', error);
+      }
+    }, 500);
   }
 
   function initializeCanvases() {
@@ -2625,6 +2721,7 @@
       backgroundNeedsUpdate = true;
 
       render();
+      saveViewport();
     }
   }
 
@@ -2709,6 +2806,7 @@
       backgroundNeedsUpdate = true;
 
       render();
+      saveViewport();
     }
   }
 
