@@ -59,10 +59,20 @@ function createScenesStore() {
           });
         }
 
+        // Try to restore active scene from localStorage
+        const savedActiveSceneId = localStorage.getItem(`vtt_active_scene_${campaignId}`);
+
+        // Priority: 1) localStorage (if valid) 2) API-marked active 3) First scene
+        if (savedActiveSceneId && scenes.has(savedActiveSceneId)) {
+          activeSceneId = savedActiveSceneId;
+        } else if (!activeSceneId && scenes.size > 0) {
+          activeSceneId = scenes.values().next().value.id;
+        }
+
         update(state => ({
           ...state,
           scenes,
-          activeSceneId: activeSceneId || (scenes.size > 0 ? scenes.values().next().value.id : null),
+          activeSceneId,
           loading: false,
         }));
       } catch (error) {
@@ -79,7 +89,12 @@ function createScenesStore() {
     /**
      * Set the active scene
      */
-    setActiveScene(sceneId: string | null): void {
+    setActiveScene(sceneId: string | null, campaignId?: string): void {
+      // Save to localStorage if browser environment and campaignId provided
+      if (browser && sceneId && campaignId) {
+        localStorage.setItem(`vtt_active_scene_${campaignId}`, sceneId);
+      }
+
       update(state => ({
         ...state,
         activeSceneId: sceneId,

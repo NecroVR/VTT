@@ -147,7 +147,7 @@
 
     // Subscribe to scene events
     const unsubscribeSceneSwitched = websocket.onSceneSwitched((payload) => {
-      scenesStore.setActiveScene(payload.scene.id);
+      scenesStore.setActiveScene(payload.scene.id, campaignId);
     });
 
     const unsubscribeSceneUpdated = websocket.onSceneUpdated((payload) => {
@@ -256,7 +256,7 @@
   }
 
   function handleSceneChange(sceneId: string) {
-    scenesStore.setActiveScene(sceneId);
+    scenesStore.setActiveScene(sceneId, campaignId);
     websocket.sendSceneSwitch({ sceneId });
   }
 
@@ -350,7 +350,7 @@
     showSceneModal = false;
     // Add the scene to the store and set it as active
     scenesStore.addScene(scene);
-    scenesStore.setActiveScene(scene.id);
+    scenesStore.setActiveScene(scene.id, campaignId);
   }
 
   function handleSidebarWidthChange(event: CustomEvent<number>) {
