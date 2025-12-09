@@ -24,6 +24,12 @@
   $: gridLineWidth = activeScene?.gridLineWidth ?? 1;
   $: gridAlpha = activeScene?.gridAlpha ?? 0.2;
 
+  // Scene lighting & vision settings (reactive)
+  $: globalLight = activeScene?.globalLight ?? true;
+  $: darkness = activeScene?.darkness ?? 0;
+  $: tokenVision = activeScene?.tokenVision ?? true;
+  $: fogExploration = activeScene?.fogExploration ?? true;
+
   async function handleToggleSnapToGrid() {
     saving = true;
     error = null;
@@ -89,6 +95,23 @@
   async function handleGridOpacityChange(event: Event) {
     const target = event.target as HTMLInputElement;
     await updateSceneGridSetting({ gridAlpha: parseFloat(target.value) / 100 });
+  }
+
+  async function handleToggleGlobalLight() {
+    await updateSceneGridSetting({ globalLight: !globalLight });
+  }
+
+  async function handleDarknessChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+    await updateSceneGridSetting({ darkness: parseFloat(target.value) / 100 });
+  }
+
+  async function handleToggleTokenVision() {
+    await updateSceneGridSetting({ tokenVision: !tokenVision });
+  }
+
+  async function handleToggleFogExploration() {
+    await updateSceneGridSetting({ fogExploration: !fogExploration });
   }
 </script>
 
@@ -234,6 +257,98 @@
               />
               <span class="setting-range-value">{Math.round(gridAlpha * 100)}%</span>
             </div>
+          </div>
+        {/if}
+      </section>
+
+      <section class="settings-section">
+        <h3>Lighting & Vision</h3>
+
+        {#if !activeScene}
+          <div class="no-scene-message">
+            No active scene selected. Please select or create a scene to configure its settings.
+          </div>
+        {:else}
+          <div class="setting-item">
+            <div class="setting-info">
+              <label for="global-light">Global Illumination</label>
+              <p class="setting-description">
+                When enabled, the entire scene is lit. When disabled, only areas within light sources and token vision are visible.
+              </p>
+            </div>
+            <label class="toggle-switch">
+              <input
+                id="global-light"
+                type="checkbox"
+                checked={globalLight}
+                disabled={saving}
+                on:change={handleToggleGlobalLight}
+              />
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          {#if !globalLight}
+            <div class="setting-item">
+              <div class="setting-info">
+                <label for="darkness-level">Darkness Level</label>
+                <p class="setting-description">
+                  Control the darkness level of the scene (0% = no darkness, 100% = full darkness)
+                </p>
+              </div>
+              <div class="setting-range-container">
+                <input
+                  id="darkness-level"
+                  type="range"
+                  class="setting-range"
+                  min="0"
+                  max="100"
+                  step="1"
+                  value={darkness * 100}
+                  disabled={saving}
+                  on:input={handleDarknessChange}
+                />
+                <span class="setting-range-value">{Math.round(darkness * 100)}%</span>
+              </div>
+            </div>
+          {/if}
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <label for="token-vision">Token Vision</label>
+              <p class="setting-description">
+                Enable vision for tokens with vision ranges set
+              </p>
+            </div>
+            <label class="toggle-switch">
+              <input
+                id="token-vision"
+                type="checkbox"
+                checked={tokenVision}
+                disabled={saving}
+                on:change={handleToggleTokenVision}
+              />
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <label for="fog-exploration">Fog Exploration</label>
+              <p class="setting-description">
+                Allow token vision to reveal fog of war
+              </p>
+            </div>
+            <label class="toggle-switch">
+              <input
+                id="fog-exploration"
+                type="checkbox"
+                checked={fogExploration}
+                disabled={saving}
+                on:change={handleToggleFogExploration}
+              />
+              <span class="slider"></span>
+            </label>
           </div>
         {/if}
       </section>
