@@ -204,21 +204,24 @@
 
     // Save viewport immediately before unmounting
     if (viewX !== lastSavedViewX || viewY !== lastSavedViewY || scale !== lastSavedScale) {
-      try {
-        await fetch(`${API_BASE_URL}/api/v1/scenes/${scene.id}/viewport`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({
-            cameraX: viewX,
-            cameraY: viewY,
-            zoom: scale
-          })
-        });
-      } catch (error) {
-        console.error('Failed to save viewport on unmount:', error);
+      const token = getAuthToken();
+      if (token) {
+        try {
+          await fetch(`${API_BASE_URL}/api/v1/scenes/${scene.id}/viewport`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              cameraX: viewX,
+              cameraY: viewY,
+              zoom: scale
+            })
+          });
+        } catch (error) {
+          console.error('Failed to save viewport on unmount:', error);
+        }
       }
     }
   });
@@ -298,6 +301,10 @@
     updateExploredAreas();
   }
 
+  function getAuthToken(): string | null {
+    return localStorage.getItem('vtt_session_id') || sessionStorage.getItem('vtt_session_id');
+  }
+
   function saveViewport() {
     // Only save if values actually changed
     if (viewX === lastSavedViewX && viewY === lastSavedViewY && scale === lastSavedScale) {
@@ -315,13 +322,16 @@
     const scaleToSave = scale;
 
     saveViewportTimeout = setTimeout(async () => {
+      const token = getAuthToken();
+      if (!token) return;
+
       try {
         await fetch(`${API_BASE_URL}/api/v1/scenes/${sceneIdToSave}/viewport`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
           },
-          credentials: 'include',
           body: JSON.stringify({
             cameraX: xToSave,
             cameraY: yToSave,
@@ -342,13 +352,16 @@
   }
 
   async function saveViewportImmediate(sceneId: string, x: number, y: number, z: number) {
+    const token = getAuthToken();
+    if (!token) return;
+
     try {
       await fetch(`${API_BASE_URL}/api/v1/scenes/${sceneId}/viewport`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
-        credentials: 'include',
         body: JSON.stringify({
           cameraX: x,
           cameraY: y,
@@ -361,10 +374,15 @@
   }
 
   async function loadViewport(sceneId: string) {
+    const token = getAuthToken();
+    if (!token) return;
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/scenes/${sceneId}/viewport`, {
         method: 'GET',
-        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
       });
 
       if (response.ok) {
