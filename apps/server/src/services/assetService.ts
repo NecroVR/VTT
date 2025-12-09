@@ -79,7 +79,8 @@ export async function saveUploadedFile(options: SaveUploadedFileOptions): Promis
 
   // Full file path
   const filePath = path.join(userDir, filename);
-  const relativePath = path.join(userId, assetType, filename);
+  // Store path with /uploads/ prefix so frontend URLs work correctly
+  const relativePath = `/uploads/${userId}/${assetType}/${filename}`;
 
   // Save file to disk
   const buffer = await file.toBuffer();
@@ -104,7 +105,7 @@ export async function saveUploadedFile(options: SaveUploadedFileOptions): Promis
       // Generate thumbnail (max 200x200)
       const thumbnailFilename = `thumb_${filename}`;
       const thumbnailFilePath = path.join(userDir, thumbnailFilename);
-      const thumbnailRelativePath = path.join(userId, assetType, thumbnailFilename);
+      const thumbnailRelativePath = `/uploads/${userId}/${assetType}/${thumbnailFilename}`;
 
       await image
         .resize(200, 200, {
@@ -132,14 +133,24 @@ export async function saveUploadedFile(options: SaveUploadedFileOptions): Promis
 }
 
 /**
+ * Strip /uploads/ prefix from path for filesystem operations
+ */
+function stripUploadsPrefix(urlPath: string): string {
+  if (urlPath.startsWith('/uploads/')) {
+    return urlPath.slice('/uploads/'.length);
+  }
+  return urlPath;
+}
+
+/**
  * Delete file from disk
  */
 export async function deleteFile(filePath: string, thumbnailPath?: string): Promise<void> {
   const uploadsDir = getUploadsDir();
 
-  // Delete main file
+  // Delete main file (strip /uploads/ prefix since it's already the root)
   try {
-    const fullPath = path.join(uploadsDir, filePath);
+    const fullPath = path.join(uploadsDir, stripUploadsPrefix(filePath));
     await fs.unlink(fullPath);
   } catch (error) {
     console.error(`Failed to delete file ${filePath}:`, error);
@@ -148,7 +159,7 @@ export async function deleteFile(filePath: string, thumbnailPath?: string): Prom
   // Delete thumbnail if it exists
   if (thumbnailPath) {
     try {
-      const fullThumbnailPath = path.join(uploadsDir, thumbnailPath);
+      const fullThumbnailPath = path.join(uploadsDir, stripUploadsPrefix(thumbnailPath));
       await fs.unlink(fullThumbnailPath);
     } catch (error) {
       console.error(`Failed to delete thumbnail ${thumbnailPath}:`, error);

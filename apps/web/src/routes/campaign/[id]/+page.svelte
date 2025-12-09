@@ -20,6 +20,7 @@
   import ActorCreateModal from '$lib/components/actor/ActorCreateModal.svelte';
   import TokenConfig from '$lib/components/TokenConfig.svelte';
   import TokenBrowser from '$lib/components/campaign/TokenBrowser.svelte';
+  import AssetBrowser from '$lib/components/assets/AssetBrowser.svelte';
   import AdminPanel from '$lib/components/campaign/AdminPanel.svelte';
   import LightingConfig from '$lib/components/LightingConfig.svelte';
   import TabbedSidebar, { type Tab } from '$lib/components/campaign/TabbedSidebar.svelte';
@@ -93,6 +94,12 @@
       label: 'Tokens',
       component: TokenBrowser,
       props: { campaignId: campaignId, isGM }
+    },
+    {
+      id: 'assets',
+      label: 'Assets',
+      component: AssetBrowser,
+      props: { campaignId: campaignId }
     },
     // Admin tab - only visible to GMs
     ...(isGM ? [{

@@ -51,7 +51,9 @@
   ];
 
   onMount(async () => {
-    await assetsStore.loadAssets({ campaignId });
+    // Load all user assets (not filtered by campaign)
+    // Assets are tied to user accounts, not campaigns
+    await assetsStore.loadAssets();
   });
 
   function handleUpload(event: CustomEvent<Asset>) {
