@@ -617,7 +617,7 @@
       const tokenHeight = (possessedToken.height || 1) * (scene.gridHeight ?? scene.gridSize);
       const tokenCenterX = possessedToken.x + tokenWidth / 2;
       const tokenCenterY = possessedToken.y + tokenHeight / 2;
-      const visionRadius = possessedToken.visionRange * scene.gridSize;
+      const visionRadius = possessedToken.visionRange * ((scene.gridWidth ?? scene.gridSize) + (scene.gridHeight ?? scene.gridSize)) / 2;
 
       // Compute visibility polygon for wall occlusion
       visionPolygon = computeVisibilityPolygon(
@@ -657,7 +657,7 @@
         const dx = tokenCenterX - possessedCenterX;
         const dy = tokenCenterY - possessedCenterY;
         const distance = Math.sqrt(dx * dx + dy * dy);
-        const visionRangePixels = possessedToken.visionRange * scene.gridSize;
+        const visionRangePixels = possessedToken.visionRange * ((scene.gridWidth ?? scene.gridSize) + (scene.gridHeight ?? scene.gridSize)) / 2;
 
         // Token must be within vision range
         if (distance > visionRangePixels) {
@@ -2122,7 +2122,7 @@
       if (possessedToken && possessedToken.vision && possessedToken.visionRange > 0) {
         const tokenCenterX = possessedToken.x + ((possessedToken.width || 1) * (scene.gridWidth ?? scene.gridSize)) / 2;
         const tokenCenterY = possessedToken.y + ((possessedToken.height || 1) * (scene.gridHeight ?? scene.gridSize)) / 2;
-        const visionRadius = possessedToken.visionRange * scene.gridSize;
+        const visionRadius = possessedToken.visionRange * ((scene.gridWidth ?? scene.gridSize) + (scene.gridHeight ?? scene.gridSize)) / 2;
 
         // Compute visibility polygon for the possessed token
         const visibilityPolygon = computeVisibilityPolygon(
@@ -2183,7 +2183,7 @@
 
       const tokenX = token.x + ((token.width || 1) * (scene.gridWidth ?? scene.gridSize)) / 2;
       const tokenY = token.y + ((token.height || 1) * (scene.gridHeight ?? scene.gridSize)) / 2;
-      const visionRadius = token.visionRange * scene.gridSize;
+      const visionRadius = token.visionRange * ((scene.gridWidth ?? scene.gridSize) + (scene.gridHeight ?? scene.gridSize)) / 2;
 
       // Compute visibility polygon for this token
       const visibilityPolygon = computeVisibilityPolygon(
