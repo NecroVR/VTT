@@ -79,6 +79,13 @@
     }
   }
 
+  async function handleTypeChange(asset: Asset, newType: AssetType) {
+    const updatedAsset = await assetsStore.updateAsset(asset.id, { assetType: newType });
+    if (!updatedAsset) {
+      alert('Failed to update asset type');
+    }
+  }
+
   function formatFileSize(bytes: number): string {
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -227,6 +234,20 @@
               <div class="asset-meta">
                 {formatFileSize(asset.size)}
               </div>
+              {#if !selectionMode}
+                <div class="asset-type-selector">
+                  <select
+                    class="type-select"
+                    value={asset.assetType}
+                    on:click|stopPropagation
+                    on:change={(e) => handleTypeChange(asset, e.currentTarget.value as AssetType)}
+                  >
+                    {#each assetTypes.filter(t => t.value !== 'all') as type}
+                      <option value={type.value}>{type.label}</option>
+                    {/each}
+                  </select>
+                </div>
+              {/if}
             </div>
             {#if !selectionMode}
               <button
@@ -269,7 +290,22 @@
             <div class="row-info">
               <div class="row-name">{asset.name || asset.originalName}</div>
               <div class="row-meta">
-                {asset.assetType} • {formatFileSize(asset.size)} • {formatDate(asset.createdAt)}
+                {#if !selectionMode}
+                  <select
+                    class="type-select-inline"
+                    value={asset.assetType}
+                    on:click|stopPropagation
+                    on:change={(e) => handleTypeChange(asset, e.currentTarget.value as AssetType)}
+                  >
+                    {#each assetTypes.filter(t => t.value !== 'all') as type}
+                      <option value={type.value}>{type.label}</option>
+                    {/each}
+                  </select>
+                  •
+                {:else}
+                  {asset.assetType} •
+                {/if}
+                {formatFileSize(asset.size)} • {formatDate(asset.createdAt)}
               </div>
             </div>
             {#if !selectionMode}
@@ -522,6 +558,51 @@
     font-size: 0.75rem;
     color: var(--color-text-secondary, #888);
     margin-top: 0.25rem;
+  }
+
+  .asset-type-selector {
+    margin-top: 0.5rem;
+  }
+
+  .type-select {
+    width: 100%;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--color-border, #333);
+    border-radius: 4px;
+    background-color: var(--color-bg-primary, #121212);
+    color: var(--color-text-primary, #ffffff);
+    font-size: 0.75rem;
+    cursor: pointer;
+  }
+
+  .type-select:hover {
+    border-color: #4a90e2;
+  }
+
+  .type-select:focus {
+    outline: none;
+    border-color: #4a90e2;
+  }
+
+  .type-select-inline {
+    padding: 0.125rem 0.25rem;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    background-color: transparent;
+    color: var(--color-text-secondary, #888);
+    font-size: 0.75rem;
+    cursor: pointer;
+  }
+
+  .type-select-inline:hover {
+    border-color: var(--color-border, #333);
+    background-color: var(--color-bg-secondary, #1e1e1e);
+  }
+
+  .type-select-inline:focus {
+    outline: none;
+    border-color: #4a90e2;
+    background-color: var(--color-bg-secondary, #1e1e1e);
   }
 
   .delete-button {
