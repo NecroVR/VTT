@@ -589,13 +589,74 @@
     tokensCtx.translate(-viewX * scale, -viewY * scale);
     tokensCtx.scale(scale, scale);
 
+    // Get possessed token for vision-based filtering
+    const possessedToken = possessedTokenId ? tokens.find(t => t.id === possessedTokenId) : null;
+
+    // Compute vision polygon if needed for vision-based token hiding
+    let visionPolygon: Point[] | null = null;
+    const shouldApplyVisionHiding = !isGM && !scene.globalLight && possessedToken && scene.tokenVision && possessedToken.vision && possessedToken.visionRange > 0;
+
+    if (shouldApplyVisionHiding && possessedToken) {
+      const tokenWidth = (possessedToken.width || 1) * scene.gridSize;
+      const tokenHeight = (possessedToken.height || 1) * scene.gridSize;
+      const tokenCenterX = possessedToken.x + tokenWidth / 2;
+      const tokenCenterY = possessedToken.y + tokenHeight / 2;
+      const visionRadius = possessedToken.visionRange * scene.gridSize;
+
+      // Compute visibility polygon for wall occlusion
+      visionPolygon = computeVisibilityPolygon(
+        { x: tokenCenterX, y: tokenCenterY },
+        walls,
+        visionRadius
+      );
+    }
+
     // Performance optimization: Filter to only visible tokens in viewport
     const visibleTokens = tokens.filter(token => {
       if (!token.visible) return false;
 
       const width = (token.width || 1) * scene.gridSize;
       const height = (token.height || 1) * scene.gridSize;
-      return isInViewport(token.x, token.y, width, height);
+
+      // Check viewport visibility
+      if (!isInViewport(token.x, token.y, width, height)) {
+        return false;
+      }
+
+      // Apply vision-based token hiding for players with possessed tokens
+      if (shouldApplyVisionHiding && possessedToken) {
+        // Always show the possessed token itself
+        if (token.id === possessedTokenId) {
+          return true;
+        }
+
+        // Check if token is within vision range
+        const tokenCenterX = token.x + width / 2;
+        const tokenCenterY = token.y + height / 2;
+        const possessedWidth = (possessedToken.width || 1) * scene.gridSize;
+        const possessedHeight = (possessedToken.height || 1) * scene.gridSize;
+        const possessedCenterX = possessedToken.x + possessedWidth / 2;
+        const possessedCenterY = possessedToken.y + possessedHeight / 2;
+
+        const dx = tokenCenterX - possessedCenterX;
+        const dy = tokenCenterY - possessedCenterY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const visionRangePixels = possessedToken.visionRange * scene.gridSize;
+
+        // Token must be within vision range
+        if (distance > visionRangePixels) {
+          return false;
+        }
+
+        // If we have a vision polygon (wall occlusion), check if token center is visible
+        if (visionPolygon && visionPolygon.length > 0) {
+          if (!isPointInPolygon({ x: tokenCenterX, y: tokenCenterY }, visionPolygon)) {
+            return false;
+          }
+        }
+      }
+
+      return true;
     });
 
     visibleTokens.forEach(token => {
