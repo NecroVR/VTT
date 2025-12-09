@@ -125,8 +125,8 @@
   let visibilityCache = new Map<string, Point[]>();
   let visibilityCacheValid = false;
 
-  // Debug: Track light rendering issues
-  const DEBUG_LIGHTS = true;
+  // Debug: Track light rendering issues (set to true to enable verbose console logging)
+  const DEBUG_LIGHTS = false; // Disabled - re-enable for debugging light issues
   let debugLightFrame = 0;
 
   // Performance optimization: Animation throttling
