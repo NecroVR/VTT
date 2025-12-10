@@ -70,7 +70,7 @@
   let isDrawingWall = false;
   let wallStartPoint: { x: number; y: number } | null = null;
   let wallPreview: { x1: number; y1: number; x2: number; y2: number } | null = null;
-  let selectedWallId: string | null = null;
+  let selectedWallIds: Set<string> = new Set();
   let hoveredWallId: string | null = null;
 
   // Wall endpoint dragging state
@@ -1114,7 +1114,7 @@
 
     // Render existing walls
     walls.forEach(wall => {
-      const isSelected = wall.id === selectedWallId;
+      const isSelected = selectedWallIds.has(wall.id);
       const isHovered = wall.id === hoveredWallId;
 
       // Draw selection/hover glow
@@ -2658,7 +2658,7 @@
             if (light) {
               selectedLightId = lightId;
               selectedTokenId = null;
-              selectedWallId = null;
+              selectedWallIds = new Set();
               draggedLightId = lightId;
               isDraggingLight = true;
               dragOffsetX = light.x - worldPos.x;
@@ -2682,7 +2682,10 @@
           isDraggingWallEndpoint = true;
           draggedWallId = endpointHit.wallId;
           draggedEndpoint = endpointHit.endpoint;
-          selectedWallId = endpointHit.wallId;
+          // If the wall being dragged is not in the selection, select only that wall
+          if (!selectedWallIds.has(endpointHit.wallId)) {
+            selectedWallIds = new Set([endpointHit.wallId]);
+          }
           selectedTokenId = null;
           selectedLightId = null;
           onTokenSelect?.(null);
@@ -2710,7 +2713,17 @@
           }
 
           // Regular wall selection
-          selectedWallId = wallId;
+          if (e.ctrlKey) {
+            // Ctrl+Click: Toggle wall in/out of selection
+            if (selectedWallIds.has(wallId)) {
+              selectedWallIds = new Set([...selectedWallIds].filter(id => id !== wallId));
+            } else {
+              selectedWallIds = new Set([...selectedWallIds, wallId]);
+            }
+          } else {
+            // Regular click: Select only this wall
+            selectedWallIds = new Set([wallId]);
+          }
           selectedTokenId = null;
           selectedLightId = null;
           onTokenSelect?.(null);
@@ -2718,7 +2731,7 @@
           renderWalls();
           return;
         } else {
-          selectedWallId = null;
+          selectedWallIds = new Set();
         }
       }
 
@@ -3208,10 +3221,13 @@
       }
     }
 
-    // Delete - remove selected wall
-    if (e.key === 'Delete' && selectedWallId && isGM) {
-      onWallRemove?.(selectedWallId);
-      selectedWallId = null;
+    // Delete - remove selected wall(s)
+    if (e.key === 'Delete' && selectedWallIds.size > 0 && isGM) {
+      // Delete all selected walls
+      selectedWallIds.forEach(wallId => {
+        onWallRemove?.(wallId);
+      });
+      selectedWallIds = new Set();
       renderWalls();
       e.preventDefault();
     }
@@ -3300,7 +3316,7 @@
       onLightDoubleClick?.(contextMenuElementId);
     } else if (contextMenuElementType === 'wall' && contextMenuElementId) {
       // Wall edit - select the wall for now
-      selectedWallId = contextMenuElementId;
+      selectedWallIds = new Set([contextMenuElementId]);
       renderWalls();
       // Could open a wall config modal if one exists in the future
     }
@@ -3390,7 +3406,7 @@
       onLightSelect?.(null);
     }
     if (contextMenuElementType === 'wall') {
-      selectedWallId = null;
+      selectedWallIds = new Set();
     }
 
     contextMenuElementId = null;

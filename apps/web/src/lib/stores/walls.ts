@@ -3,7 +3,7 @@ import type { Wall } from '@vtt/shared';
 
 interface WallsState {
   walls: Map<string, Wall>;
-  selectedWallId: string | null;
+  selectedWallIds: Set<string>;
   loading: boolean;
   error: string | null;
 }
@@ -11,7 +11,7 @@ interface WallsState {
 function createWallsStore() {
   const { subscribe, set, update } = writable<WallsState>({
     walls: new Map(),
-    selectedWallId: null,
+    selectedWallIds: new Set<string>(),
     loading: false,
     error: null,
   });
@@ -102,22 +102,88 @@ function createWallsStore() {
         const newWalls = new Map(state.walls);
         newWalls.delete(wallId);
 
+        const newSelectedWallIds = new Set(state.selectedWallIds);
+        newSelectedWallIds.delete(wallId);
+
         return {
           ...state,
           walls: newWalls,
-          selectedWallId: state.selectedWallId === wallId ? null : state.selectedWallId,
+          selectedWallIds: newSelectedWallIds,
         };
       });
     },
 
     /**
-     * Select a wall
+     * Select a single wall (clears all other selections)
      */
     selectWall(wallId: string | null): void {
       update(state => ({
         ...state,
-        selectedWallId: wallId,
+        selectedWallIds: wallId ? new Set([wallId]) : new Set<string>(),
       }));
+    },
+
+    /**
+     * Toggle a wall's selection state
+     */
+    toggleWallSelection(wallId: string): void {
+      update(state => {
+        const newSelectedWallIds = new Set(state.selectedWallIds);
+        if (newSelectedWallIds.has(wallId)) {
+          newSelectedWallIds.delete(wallId);
+        } else {
+          newSelectedWallIds.add(wallId);
+        }
+        return {
+          ...state,
+          selectedWallIds: newSelectedWallIds,
+        };
+      });
+    },
+
+    /**
+     * Add a wall to the current selection
+     */
+    addToWallSelection(wallId: string): void {
+      update(state => {
+        const newSelectedWallIds = new Set(state.selectedWallIds);
+        newSelectedWallIds.add(wallId);
+        return {
+          ...state,
+          selectedWallIds: newSelectedWallIds,
+        };
+      });
+    },
+
+    /**
+     * Remove a wall from the current selection
+     */
+    removeFromWallSelection(wallId: string): void {
+      update(state => {
+        const newSelectedWallIds = new Set(state.selectedWallIds);
+        newSelectedWallIds.delete(wallId);
+        return {
+          ...state,
+          selectedWallIds: newSelectedWallIds,
+        };
+      });
+    },
+
+    /**
+     * Clear all selected walls
+     */
+    clearWallSelection(): void {
+      update(state => ({
+        ...state,
+        selectedWallIds: new Set<string>(),
+      }));
+    },
+
+    /**
+     * Check if a wall is currently selected
+     */
+    isWallSelected(wallId: string, currentState: WallsState): boolean {
+      return currentState.selectedWallIds.has(wallId);
     },
 
     /**
@@ -133,7 +199,7 @@ function createWallsStore() {
     clear(): void {
       set({
         walls: new Map(),
-        selectedWallId: null,
+        selectedWallIds: new Set<string>(),
         loading: false,
         error: null,
       });
