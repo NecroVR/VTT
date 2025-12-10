@@ -123,6 +123,12 @@
     sidebarStore.closeOverlay();
   }
 
+  function handleOverlayPopOut(event: CustomEvent<string>) {
+    const tabId = event.detail;
+    handlePopOut(tabId);
+    sidebarStore.closeOverlay();
+  }
+
   // Forward events from child components
   function forwardEvent(event: CustomEvent) {
     dispatch(event.type, event.detail);
@@ -284,6 +290,7 @@
           tabProps={overlayTab.props || {}}
           iconStripWidth={45}
           on:close={handleOverlayClose}
+          on:pop-out={handleOverlayPopOut}
           on:create-actor={forwardEvent}
           on:edit-actor={forwardEvent}
           on:select-token={forwardEvent}

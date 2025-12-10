@@ -10,6 +10,7 @@
 
   const dispatch = createEventDispatcher<{
     close: void;
+    'pop-out': string;
     'create-actor': any;
     'edit-actor': any;
     'select-token': any;
@@ -57,6 +58,10 @@
     close();
   }
 
+  function handlePopOutClick() {
+    dispatch('pop-out', tabId);
+  }
+
   function close() {
     dispatch('close');
   }
@@ -77,13 +82,23 @@
   <!-- Header -->
   <div class="overlay-panel-header">
     <span class="overlay-panel-title">{tabLabel}</span>
-    <button
-      class="overlay-panel-close"
-      on:click={handleCloseClick}
-      aria-label="Close panel"
-    >
-      ×
-    </button>
+    <div class="overlay-panel-actions">
+      <button
+        class="overlay-panel-action"
+        on:click={handlePopOutClick}
+        aria-label="Pop out to floating window"
+        title="Pop out to floating window"
+      >
+        ⤴
+      </button>
+      <button
+        class="overlay-panel-action overlay-panel-close"
+        on:click={handleCloseClick}
+        aria-label="Close panel"
+      >
+        ×
+      </button>
+    </div>
   </div>
 
   <!-- Content -->
@@ -140,7 +155,13 @@
     color: #f9fafb;
   }
 
-  .overlay-panel-close {
+  .overlay-panel-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .overlay-panel-action {
     background: none;
     border: none;
     color: #9ca3af;
@@ -150,16 +171,20 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: 1rem;
     line-height: 1;
     width: 28px;
     height: 28px;
     transition: background-color 0.2s, color 0.2s;
   }
 
-  .overlay-panel-close:hover {
+  .overlay-panel-action:hover {
     background-color: rgba(255, 255, 255, 0.1);
     color: #f9fafb;
+  }
+
+  .overlay-panel-close {
+    font-size: 1.5rem;
   }
 
   .overlay-panel-content {
