@@ -19,6 +19,8 @@
     renderSplinePath,
     catmullRomSpline,
     distanceToSpline,
+    findClosestPointOnSpline,
+    insertControlPoint,
   } from '$lib/utils/spline';
 
   // Props
@@ -91,6 +93,12 @@
   let draggedEndpointRequiresGridSnap = false;  // True if any dragged wall has snapToGrid
   let nearbyEndpoint: { wallId: string; endpoint: 'start' | 'end'; x: number; y: number } | null = null;
 
+  // Control point dragging state
+  let isDraggingControlPoint = false;
+  let draggedControlPoint: { wallId: string; controlPointIndex: number } | null = null;
+  let draggedControlPointRequiresGridSnap = false;
+  let isHoveringControlPoint = false;
+
   // Selection box state
   let isDrawingSelectionBox = false;
   let selectionBoxStart: { x: number; y: number } | null = null;
@@ -110,6 +118,8 @@
   let contextMenuElementId: string | null = null;
   let contextMenuElementVisible = true;
   let contextMenuElementSnapToGrid = true;
+  let contextMenuWallShape: 'straight' | 'curved' | undefined = undefined;
+  let contextMenuClickWorldPos: { x: number; y: number } | undefined = undefined;
 
   // Delete confirmation dialog state
   let showDeleteDialog = false;
@@ -1187,13 +1197,27 @@
 
         // Draw control points for curved walls
         if (wall.wallShape === 'curved' && wall.controlPoints && wall.controlPoints.length > 0) {
-          wallsCtx.fillStyle = '#06b6d4'; // Cyan color for control points
           const controlPointRadius = 3 / scale; // Slightly smaller than endpoints
 
-          wall.controlPoints.forEach(cp => {
-            wallsCtx.beginPath();
-            wallsCtx.arc(cp.x, cp.y, controlPointRadius, 0, Math.PI * 2);
-            wallsCtx.fill();
+          wall.controlPoints.forEach((cp, index) => {
+            // Check if this control point is being dragged
+            const isBeingDragged = isDraggingControlPoint &&
+                                   draggedControlPoint?.wallId === wall.id &&
+                                   draggedControlPoint?.controlPointIndex === index;
+
+            if (isBeingDragged) {
+              // Highlight dragged control point
+              wallsCtx.fillStyle = '#22c55e'; // Green highlight
+              wallsCtx.beginPath();
+              wallsCtx.arc(cp.x, cp.y, controlPointRadius * 1.5, 0, Math.PI * 2);
+              wallsCtx.fill();
+            } else {
+              // Normal control point
+              wallsCtx.fillStyle = '#06b6d4'; // Cyan
+              wallsCtx.beginPath();
+              wallsCtx.arc(cp.x, cp.y, controlPointRadius, 0, Math.PI * 2);
+              wallsCtx.fill();
+            }
           });
         }
       }
@@ -2841,6 +2865,28 @@
           }
         }
 
+        // Check for control point dragging with Shift key (highest priority)
+        if (e.shiftKey) {
+          const controlPointHit = findControlPointAtPoint(worldPos.x, worldPos.y);
+          if (controlPointHit) {
+            const wall = walls.find(w => w.id === controlPointHit.wallId);
+            if (wall) {
+              draggedControlPoint = controlPointHit;
+              draggedControlPointRequiresGridSnap = wall.snapToGrid === true;
+              isDraggingControlPoint = true;
+
+              // Clear other selections
+              selectedTokenId = null;
+              selectedLightId = null;
+              onTokenSelect?.(null);
+              onLightSelect?.(null);
+
+              renderWalls();
+              return;
+            }
+          }
+        }
+
         // Check for wall endpoint dragging first (higher priority than wall selection)
         const endpointHit = findWallEndpointAtPoint(worldPos.x, worldPos.y);
         if (endpointHit) {
@@ -3054,6 +3100,14 @@
       return;
     }
 
+    // Update control point hover (when Shift is held)
+    if (activeTool === 'select' && isGM && e.shiftKey && !isDraggingToken && !isDraggingLight && !isPanning && !isDraggingWallEndpoint && !isDraggingControlPoint) {
+      const controlPointHit = findControlPointAtPoint(worldPos.x, worldPos.y);
+      isHoveringControlPoint = controlPointHit !== null;
+    } else if (!isDraggingControlPoint) {
+      isHoveringControlPoint = false;
+    }
+
     // Update wall hover
     if (activeTool === 'select' && isGM && !isDraggingToken && !isDraggingLight && !isPanning && !isDraggingWallEndpoint) {
       const wallId = findWallAtPoint(worldPos.x, worldPos.y);
@@ -3084,6 +3138,26 @@
             wall.y2 = targetPos.y;
           }
         }
+      }
+
+      // Invalidate visibility cache so walls update during drag
+      invalidateVisibilityCache();
+      renderWalls();
+      return;
+    }
+
+    // Handle control point dragging
+    if (isDraggingControlPoint && draggedControlPoint) {
+      // Apply snapping if needed
+      const targetPos = draggedControlPointRequiresGridSnap ? snapToGrid(worldPos.x, worldPos.y) : worldPos;
+
+      // Update the control point position locally for immediate feedback
+      const wall = walls.find(w => w.id === draggedControlPoint.wallId);
+      if (wall && wall.controlPoints) {
+        wall.controlPoints[draggedControlPoint.controlPointIndex] = {
+          x: targetPos.x,
+          y: targetPos.y
+        };
       }
 
       // Invalidate visibility cache so walls update during drag
@@ -3238,6 +3312,29 @@
       draggedWalls = [];
       draggedEndpointRequiresGridSnap = false;
       nearbyEndpoint = null;
+    } else if (isDraggingControlPoint && draggedControlPoint) {
+      const worldPos = screenToWorld(e.clientX, e.clientY);
+      // Apply snapping if needed
+      const finalPos = draggedControlPointRequiresGridSnap
+        ? snapToGrid(worldPos.x, worldPos.y)
+        : worldPos;
+
+      // Find the wall and update its control points
+      const wall = walls.find(w => w.id === draggedControlPoint.wallId);
+      if (wall && wall.controlPoints) {
+        const newControlPoints = [...wall.controlPoints];
+        newControlPoints[draggedControlPoint.controlPointIndex] = {
+          x: finalPos.x,
+          y: finalPos.y
+        };
+
+        onWallUpdate?.(draggedControlPoint.wallId, { controlPoints: newControlPoints });
+      }
+
+      // Reset drag state
+      isDraggingControlPoint = false;
+      draggedControlPoint = null;
+      draggedControlPointRequiresGridSnap = false;
     }
 
     isPanning = false;
@@ -3386,6 +3483,26 @@
       const dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
       if (dist2 <= threshold) {
         return { wallId: wall.id, endpoint: 'end' };
+      }
+    }
+
+    return null;
+  }
+
+  function findControlPointAtPoint(worldX: number, worldY: number): { wallId: string; controlPointIndex: number } | null {
+    const threshold = 8 / scale; // Same as endpoint detection
+
+    for (const wall of walls) {
+      if (wall.wallShape === 'curved' && wall.controlPoints && wall.controlPoints.length > 0) {
+        for (let i = 0; i < wall.controlPoints.length; i++) {
+          const cp = wall.controlPoints[i];
+          const dx = worldX - cp.x;
+          const dy = worldY - cp.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist <= threshold) {
+            return { wallId: wall.id, controlPointIndex: i };
+          }
+        }
       }
     }
 
@@ -3589,6 +3706,8 @@
         contextMenuElementId = clickedWallId;
         contextMenuElementVisible = true; // Walls don't have visibility toggle
         contextMenuElementSnapToGrid = wall?.snapToGrid !== false; // Default to true if undefined
+        contextMenuWallShape = wall?.wallShape;
+        contextMenuClickWorldPos = { x: worldX, y: worldY };
         return;
       }
     }
@@ -3635,6 +3754,42 @@
           wallId: contextMenuElementId,
           updates: { snapToGrid: !contextMenuElementSnapToGrid }
         });
+      }
+    }
+  }
+
+  function handleAddSplinePoint(event: CustomEvent<{ worldPos: { x: number; y: number } }>) {
+    showContextMenu = false;
+    if (contextMenuElementType === 'wall' && contextMenuElementId) {
+      const wall = walls.find(w => w.id === contextMenuElementId);
+      if (wall && wall.wallShape === 'curved') {
+        // Get the spline points
+        const splinePoints = getSplinePoints(wall);
+        const curvePoints = catmullRomSpline(splinePoints);
+
+        // Find the closest point on the spline to the click position
+        const clickPos = event.detail.worldPos;
+        const closestInfo = findClosestPointOnSpline(clickPos.x, clickPos.y, curvePoints);
+
+        // Map the segment index back to control point index
+        // The splinePoints array is: [start, ...controlPoints, end]
+        // We need to insert the new control point at the right position
+        const existingControlPoints = wall.controlPoints || [];
+
+        // Calculate which segment of the original control points this corresponds to
+        // Each segment in curvePoints represents a portion between control points
+        const numSegmentsPerControlSegment = 20; // Default from catmullRomSpline
+        const controlSegmentIndex = Math.floor(closestInfo.segmentIndex / numSegmentsPerControlSegment);
+
+        // Insert the new control point at the snapped position
+        const newControlPoints = insertControlPoint(
+          existingControlPoints,
+          closestInfo.point,
+          controlSegmentIndex
+        );
+
+        // Update the wall with the new control points
+        onWallUpdate?.(contextMenuElementId, { controlPoints: newControlPoints });
       }
     }
   }
@@ -3770,7 +3925,9 @@
   <canvas
     class="canvas-layer canvas-interactive"
     class:cursor-crosshair={activeTool === 'wall' || activeTool === 'curved-wall' || activeTool === 'light'}
-    class:cursor-grab={activeTool === 'select'}
+    class:cursor-grab={activeTool === 'select' && !isHoveringControlPoint && !isDraggingControlPoint}
+    class:cursor-control-point-hover={isHoveringControlPoint && !isDraggingControlPoint}
+    class:cursor-control-point-drag={isDraggingControlPoint}
     class:drag-over={isDragOver}
     bind:this={controlsCanvas}
     on:mousedown={handleMouseDown}
@@ -3823,10 +3980,13 @@
     {isGM}
     isVisible={contextMenuElementVisible}
     snapToGrid={contextMenuElementSnapToGrid}
+    wallShape={contextMenuWallShape}
+    clickWorldPos={contextMenuClickWorldPos}
     on:edit={handleContextMenuEdit}
     on:possess={handleContextMenuPossess}
     on:toggleVisibility={handleContextMenuToggleVisibility}
     on:toggleSnapToGrid={handleContextMenuToggleSnapToGrid}
+    on:addSplinePoint={handleAddSplinePoint}
     on:delete={handleContextMenuDelete}
     on:close={() => showContextMenu = false}
   />
@@ -3882,6 +4042,14 @@
   }
 
   .canvas-interactive.cursor-grab:active {
+    cursor: grabbing;
+  }
+
+  .canvas-interactive.cursor-control-point-hover {
+    cursor: grab;
+  }
+
+  .canvas-interactive.cursor-control-point-drag {
     cursor: grabbing;
   }
 
