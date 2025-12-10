@@ -196,6 +196,7 @@ export interface WallAddPayload {
   sound?: string;
   door?: string;
   doorState?: string;
+  snapToGrid?: boolean;
   data?: Record<string, unknown>;
   wallShape?: 'straight' | 'curved';
   controlPoints?: Array<{ x: number; y: number }>;

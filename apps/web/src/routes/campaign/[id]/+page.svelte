@@ -304,8 +304,13 @@
   }
 
   function handleWallAdd(wall: { x1: number; y1: number; x2: number; y2: number; snapToGrid?: boolean; wallShape?: 'straight' | 'curved' }) {
-    if (!activeScene) return;
-    websocket.sendWallAdd({
+    console.log('handleWallAdd called with:', wall);
+    if (!activeScene) {
+      console.log('No active scene, cannot add wall');
+      return;
+    }
+
+    const wallPayload = {
       sceneId: activeScene.id,
       x1: wall.x1,
       y1: wall.y1,
@@ -319,7 +324,10 @@
       doorState: 'closed',
       wallShape: wall.wallShape,
       snapToGrid: wall.snapToGrid
-    });
+    };
+
+    console.log('Sending wall to WebSocket:', wallPayload);
+    websocket.sendWallAdd(wallPayload);
   }
 
   function handleWallRemove(wallId: string) {

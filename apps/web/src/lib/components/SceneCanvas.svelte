@@ -2802,14 +2802,17 @@
 
     // Handle wall tool (both straight and curved)
     if ((activeTool === 'wall' || activeTool === 'curved-wall') && isGM) {
+      console.log('Wall tool clicked', { activeTool, isDrawingWall, snappedPos });
       if (!isDrawingWall) {
         // Start drawing wall
+        console.log('Starting wall drawing');
         isDrawingWall = true;
         wallStartPoint = snappedPos;
         wallPreview = { x1: snappedPos.x, y1: snappedPos.y, x2: snappedPos.x, y2: snappedPos.y };
         renderWalls();
       } else {
         // Complete wall
+        console.log('Completing wall drawing');
         completeWallDrawing(snappedPos);
       }
       return;
@@ -3054,32 +3057,44 @@
   }
 
   function completeWallDrawing(endPos: { x: number; y: number }) {
-    if (!wallStartPoint) return;
+    console.log('completeWallDrawing called', { endPos, wallStartPoint, activeTool });
+
+    if (!wallStartPoint) {
+      console.log('No wallStartPoint, returning');
+      return;
+    }
 
     // Don't create zero-length walls
     if (wallStartPoint.x === endPos.x && wallStartPoint.y === endPos.y) {
+      console.log('Zero-length wall, cancelling');
       cancelWallDrawing();
       return;
     }
 
     // Determine wall shape based on active tool
     const wallShape = activeTool === 'curved-wall' ? 'curved' : 'straight';
+    console.log('Wall shape determined:', wallShape);
 
-    // Create wall via callback - use current gridSnap setting as default
-    onWallAdd?.({
+    const wallData = {
       x1: wallStartPoint.x,
       y1: wallStartPoint.y,
       x2: endPos.x,
       y2: endPos.y,
       snapToGrid: gridSnap,
       wallShape,
-    });
+    };
+
+    console.log('Calling onWallAdd with:', wallData);
+
+    // Create wall via callback - use current gridSnap setting as default
+    onWallAdd?.(wallData);
 
     // Reset drawing state
     isDrawingWall = false;
     wallStartPoint = null;
     wallPreview = null;
     renderWalls();
+    console.log('Wall drawing complete');
   }
 
   function cancelWallDrawing() {

@@ -1204,6 +1204,7 @@ async function handleWallAdd(
       sound = 'block',
       door = 'none',
       doorState = 'closed',
+      snapToGrid = false,
       data = {},
       wallShape = 'straight',
       controlPoints = [],
@@ -1226,6 +1227,7 @@ async function handleWallAdd(
         controlPoints,
         door,
         doorState,
+        snapToGrid,
         data,
       })
       .returning();
