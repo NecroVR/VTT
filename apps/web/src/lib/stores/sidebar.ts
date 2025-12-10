@@ -15,6 +15,7 @@ interface SidebarState {
   activeTabId: string;
   poppedOutTabs: Set<string>;
   highestZIndex: number;
+  overlayTabId: string | null; // null = overlay closed, string = tab ID being shown
 }
 
 /**
@@ -42,6 +43,7 @@ const initialState: SidebarState = {
   activeTabId: 'chat',
   poppedOutTabs: new Set<string>(),
   highestZIndex: INITIAL_Z_INDEX,
+  overlayTabId: null,
 };
 
 /**
@@ -61,10 +63,12 @@ function loadState(): SidebarState {
     const parsed = JSON.parse(stored);
 
     // Convert poppedOutTabs array back to Set
+    // Always start with overlay closed (overlayTabId: null)
     return {
       ...initialState,
       ...parsed,
       poppedOutTabs: new Set(parsed.poppedOutTabs || []),
+      overlayTabId: null, // Never persist overlay state - always start closed
     };
   } catch (error) {
     console.error('Failed to load sidebar state:', error);
@@ -82,8 +86,10 @@ function saveState(state: SidebarState): void {
 
   try {
     // Convert Set to array for JSON serialization
+    // Exclude overlayTabId from persistence (always start closed on page load)
+    const { overlayTabId, ...stateToSave } = state;
     const toSave = {
-      ...state,
+      ...stateToSave,
       poppedOutTabs: Array.from(state.poppedOutTabs),
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
@@ -117,6 +123,7 @@ function createSidebarStore() {
       updateAndSave(state => ({
         ...state,
         docked: !state.docked,
+        overlayTabId: null, // Close overlay when toggling dock mode
       }));
     },
 
@@ -127,6 +134,7 @@ function createSidebarStore() {
       updateAndSave(state => ({
         ...state,
         collapsed: !state.collapsed,
+        overlayTabId: null, // Always close overlay when toggling collapse
       }));
     },
 
@@ -137,6 +145,31 @@ function createSidebarStore() {
       updateAndSave(state => ({
         ...state,
         activeTabId: tabId,
+      }));
+    },
+
+    /**
+     * Open overlay panel with specific tab (only works when collapsed)
+     * Toggle behavior: if same tab is clicked, close the overlay
+     */
+    openOverlay(tabId: string): void {
+      updateAndSave(state => {
+        if (!state.collapsed) return state; // Only works when collapsed
+        return {
+          ...state,
+          overlayTabId: state.overlayTabId === tabId ? null : tabId, // Toggle behavior
+          activeTabId: tabId,
+        };
+      });
+    },
+
+    /**
+     * Close overlay panel
+     */
+    closeOverlay(): void {
+      updateAndSave(state => ({
+        ...state,
+        overlayTabId: null,
       }));
     },
 
@@ -351,6 +384,8 @@ export const {
   toggleDock,
   toggleCollapse,
   setActiveTab,
+  openOverlay,
+  closeOverlay,
   popOutTab,
   dockPopOutWindow,
   bringToFront,

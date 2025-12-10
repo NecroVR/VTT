@@ -26,6 +26,7 @@
   import { createEventDispatcher, onMount } from 'svelte';
   import { sidebarStore, floatingWindows } from '$lib/stores/sidebar';
   import FloatingWindow from './FloatingWindow.svelte';
+  import OverlayPanel from './OverlayPanel.svelte';
   import {
     ChatIcon,
     SwordsIcon,
@@ -54,6 +55,10 @@
   $: docked = $sidebarStore.docked;
   $: collapsed = $sidebarStore.collapsed;
   $: dockedWidth = $sidebarStore.dockedWidth;
+
+  // Track overlay state
+  $: overlayTabId = $sidebarStore.overlayTabId;
+  $: overlayTab = overlayTabId ? tabs.find(t => t.id === overlayTabId) : null;
 
   // Track if tabs should show text or icon-only based on available width
   let tabBarElement: HTMLElement | null = null;
@@ -97,13 +102,12 @@
 
   function handleTabClick(tabId: string) {
     if (!collapsed) {
+      // Expanded state: just switch tabs
       activeTabId = tabId;
       sidebarStore.setActiveTab(tabId);
     } else {
-      // If collapsed, expand and set active tab
-      sidebarStore.toggleCollapse();
-      activeTabId = tabId;
-      sidebarStore.setActiveTab(tabId);
+      // Collapsed state: open/toggle overlay instead of expanding
+      sidebarStore.openOverlay(tabId);
     }
   }
 
@@ -113,6 +117,10 @@
 
   function toggleDock() {
     sidebarStore.toggleDock();
+  }
+
+  function handleOverlayClose() {
+    sidebarStore.closeOverlay();
   }
 
   // Forward events from child components
@@ -253,7 +261,7 @@
           {#each visibleTabs as tab}
             <button
               class="icon-tab-button"
-              class:active={activeTabId === tab.id}
+              class:active={overlayTabId === tab.id}
               on:click={() => handleTabClick(tab.id)}
               type="button"
               title={tab.label}
@@ -267,6 +275,20 @@
           {/each}
         </div>
       </div>
+
+      {#if overlayTab}
+        <OverlayPanel
+          tabId={overlayTab.id}
+          tabLabel={overlayTab.label}
+          tabComponent={overlayTab.component}
+          tabProps={overlayTab.props || {}}
+          iconStripWidth={45}
+          on:close={handleOverlayClose}
+          on:create-actor={forwardEvent}
+          on:edit-actor={forwardEvent}
+          on:select-token={forwardEvent}
+        />
+      {/if}
     {:else}
       <!-- Expanded state: Tab bar and content -->
       <div class="tab-bar" class:icon-only={!showTabText}>
