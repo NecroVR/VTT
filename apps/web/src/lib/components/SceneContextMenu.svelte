@@ -4,7 +4,7 @@
   // Props
   export let x: number;
   export let y: number;
-  export let elementType: 'token' | 'light' | 'wall';
+  export let elementType: 'token' | 'light' | 'wall' | 'pathpoint';
   export let elementId: string;
   export let isGM: boolean = false;
   export let isVisible: boolean = true;
@@ -20,6 +20,8 @@
     toggleSnapToGrid: { currentState: boolean };
     addSplinePoint: { worldPos: { x: number; y: number } };
     deleteSplinePoint: { controlPointIndex: number };
+    editPathName: void;
+    editPathIndex: void;
     delete: void;
     close: void;
   }>();
@@ -119,6 +121,16 @@
       dispatch('deleteSplinePoint', { controlPointIndex });
       close();
     }
+  }
+
+  function handleEditPathName() {
+    dispatch('editPathName');
+    close();
+  }
+
+  function handleEditPathIndex() {
+    dispatch('editPathIndex');
+    close();
   }
 
   function close() {
@@ -233,6 +245,29 @@
         </svg>
       </span>
       <span>Delete Spline Point</span>
+    </button>
+  {/if}
+
+  <!-- Edit Path Name (path points only) -->
+  {#if elementType === 'pathpoint'}
+    <button class="menu-item" on:click={handleEditPathName}>
+      <span class="icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+        </svg>
+      </span>
+      <span>Edit Path Name</span>
+    </button>
+
+    <button class="menu-item" on:click={handleEditPathIndex}>
+      <span class="icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+        </svg>
+      </span>
+      <span>Edit Path Index</span>
     </button>
   {/if}
 

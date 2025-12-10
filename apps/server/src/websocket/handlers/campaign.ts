@@ -7,7 +7,6 @@ import type {
   Scene,
   Wall,
   AmbientLight,
-  Path,
   TokenMovePayload,
   TokenAddPayload,
   TokenAddedPayload,
@@ -46,6 +45,13 @@ import type {
   PathUpdatedPayload,
   PathRemovePayload,
   PathRemovedPayload,
+  PathPoint,
+  PathPointAddPayload,
+  PathPointAddedPayload,
+  PathPointUpdatePayload,
+  PathPointUpdatedPayload,
+  PathPointRemovePayload,
+  PathPointRemovedPayload,
   ActorCreatePayload,
   ActorUpdatePayload,
   ActorDeletePayload,
@@ -103,8 +109,8 @@ import type {
 import { parseDiceNotation, type DiceGroup } from '@vtt/shared/dice';
 import { roomManager } from '../rooms.js';
 import { validateSession, extractSessionToken } from '../auth.js';
-import { tokens, scenes, walls, ambientLights, paths } from '@vtt/database';
-import { eq } from 'drizzle-orm';
+import { tokens, scenes, walls, ambientLights, paths, pathPoints } from '@vtt/database';
+import { eq, and, asc } from 'drizzle-orm';
 import {
   handleActorCreate,
   handleActorUpdate,
@@ -329,6 +335,18 @@ export async function handleCampaignWebSocket(
 
         case 'path:remove':
           await handlePathRemove(socket, message as WSMessage<PathRemovePayload>, request);
+          break;
+
+        case 'pathPoint:add':
+          await handlePathPointAdd(socket, message as WSMessage<PathPointAddPayload>, request);
+          break;
+
+        case 'pathPoint:update':
+          await handlePathPointUpdate(socket, message as WSMessage<PathPointUpdatePayload>, request);
+          break;
+
+        case 'pathPoint:remove':
+          await handlePathPointRemove(socket, message as WSMessage<PathPointRemovePayload>, request);
           break;
 
         case 'effect:add':
@@ -1646,14 +1664,14 @@ async function handleLightRemove(
 }
 
 /**
- * Handle path:add message
+ * Handle path:add message (bulk operation - creates points + settings)
  */
 async function handlePathAdd(
   socket: WebSocket,
   message: WSMessage<PathAddPayload>,
   request: FastifyRequest
 ): Promise<void> {
-  request.log.debug({ payload: message.payload }, 'Path add');
+  request.log.debug({ payload: message.payload }, 'Path add (bulk)');
 
   const campaignId = roomManager.getRoomForSocket(socket);
 
@@ -1665,63 +1683,63 @@ async function handlePathAdd(
   try {
     const {
       sceneId,
-      name = 'New Path',
-      nodes,
+      pathName,
+      points,
       speed = 50,
       loop = true,
       visible = true,
-      color = '#ffff00',
+      color = '#00ff00',
+      assignedObjectId,
+      assignedObjectType,
     } = message.payload;
 
-    // Validate nodes
-    if (!nodes || !Array.isArray(nodes) || nodes.length < 2) {
-      sendMessage(socket, 'error', { message: 'Path must have at least 2 nodes' });
+    // Validate points
+    if (!points || !Array.isArray(points) || points.length < 2) {
+      sendMessage(socket, 'error', { message: 'Path must have at least 2 points' });
       return;
     }
 
-    // Create path in database
-    const newPaths = await request.server.db
-      .insert(paths)
-      .values({
-        sceneId,
-        name,
-        nodes,
-        speed,
-        loop,
-        visible,
-        color,
-        data: {},
-      })
+    // Create path points with color and visible on each point
+    const pointValues = points.map((point, index) => ({
+      sceneId,
+      pathName,
+      pathIndex: index,
+      x: point.x,
+      y: point.y,
+      color,
+      visible,
+      data: {},
+    }));
+
+    const createdPoints = await request.server.db
+      .insert(pathPoints)
+      .values(pointValues)
       .returning();
 
-    const newPath = newPaths[0];
-
-    // Format path
-    const formattedPath: Path = {
-      id: newPath.id,
-      sceneId: newPath.sceneId,
-      name: newPath.name,
-      nodes: newPath.nodes as Array<{ x: number; y: number }>,
-      speed: newPath.speed,
-      loop: newPath.loop,
-      assignedObjectId: newPath.assignedObjectId ?? null,
-      assignedObjectType: newPath.assignedObjectType as 'token' | 'light' | null,
-      visible: newPath.visible,
-      color: newPath.color,
-      data: newPath.data as Record<string, unknown>,
-      createdAt: newPath.createdAt,
-      updatedAt: newPath.updatedAt,
+    // Format assembled path (color and visible from first point)
+    const firstPoint = createdPoints[0];
+    const assembledPath = {
+      pathName,
+      sceneId,
+      points: createdPoints.map(p => ({
+        id: p.id,
+        x: p.x,
+        y: p.y,
+        pathIndex: p.pathIndex,
+      })),
+      color: firstPoint?.color ?? '#ffff00',
+      visible: firstPoint?.visible ?? true,
     };
 
     // Broadcast to all players
-    const addedPayload: PathAddedPayload = { path: formattedPath };
+    const addedPayload: PathAddedPayload = { assembledPath };
     roomManager.broadcast(campaignId, {
       type: 'path:added',
       payload: addedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ pathId: newPath.id, sceneId, campaignId }, 'Path added');
+    request.log.info({ pathName, sceneId, campaignId }, 'Path added (bulk)');
   } catch (error) {
     request.log.error({ error, sceneId: message.payload.sceneId }, 'Error adding path');
     sendMessage(socket, 'error', { message: 'Failed to add path' });
@@ -1729,14 +1747,14 @@ async function handlePathAdd(
 }
 
 /**
- * Handle path:update message
+ * Handle path:update message (bulk operation - updates points and/or settings)
  */
 async function handlePathUpdate(
   socket: WebSocket,
   message: WSMessage<PathUpdatePayload>,
   request: FastifyRequest
 ): Promise<void> {
-  request.log.debug({ payload: message.payload }, 'Path update');
+  request.log.debug({ payload: message.payload }, 'Path update (bulk)');
 
   const campaignId = roomManager.getRoomForSocket(socket);
 
@@ -1746,103 +1764,99 @@ async function handlePathUpdate(
   }
 
   try {
-    const { pathId, updates } = message.payload;
+    const { sceneId, pathName, points, speed, loop, assignedObjectId, assignedObjectType, visible, color } = message.payload;
 
-    // Validate nodes if provided
-    if (updates.nodes !== undefined) {
-      if (!Array.isArray(updates.nodes) || updates.nodes.length < 2) {
-        sendMessage(socket, 'error', { message: 'Path must have at least 2 nodes' });
+    // Update points if provided
+    if (points !== undefined) {
+      if (!Array.isArray(points) || points.length < 2) {
+        sendMessage(socket, 'error', { message: 'Path must have at least 2 points' });
         return;
       }
+
+      // Delete existing points
+      await request.server.db
+        .delete(pathPoints)
+        .where(and(eq(pathPoints.sceneId, sceneId), eq(pathPoints.pathName, pathName)));
+
+      // Create new points with color and visible
+      const pointValues = points.map((point, index) => ({
+        sceneId,
+        pathName,
+        pathIndex: index,
+        x: point.x,
+        y: point.y,
+        color: color ?? '#ffff00',
+        visible: visible ?? true,
+        data: {},
+      }));
+
+      await request.server.db
+        .insert(pathPoints)
+        .values(pointValues);
     }
 
-    // Build update object
-    const updateData: any = {
-      updatedAt: new Date(),
-    };
+    // Update color/visible on all points if provided
+    if (visible !== undefined || color !== undefined) {
+      const updateData: any = {
+        updatedAt: new Date(),
+      };
+      if (visible !== undefined) updateData.visible = visible;
+      if (color !== undefined) updateData.color = color;
 
-    if (updates.name !== undefined) {
-      updateData.name = updates.name;
-    }
-    if (updates.nodes !== undefined) {
-      updateData.nodes = updates.nodes;
-    }
-    if (updates.speed !== undefined) {
-      updateData.speed = updates.speed;
-    }
-    if (updates.loop !== undefined) {
-      updateData.loop = updates.loop;
-    }
-    if (updates.assignedObjectId !== undefined) {
-      updateData.assignedObjectId = updates.assignedObjectId;
-    }
-    if (updates.assignedObjectType !== undefined) {
-      updateData.assignedObjectType = updates.assignedObjectType;
-    }
-    if (updates.visible !== undefined) {
-      updateData.visible = updates.visible;
-    }
-    if (updates.color !== undefined) {
-      updateData.color = updates.color;
+      await request.server.db
+        .update(pathPoints)
+        .set(updateData)
+        .where(and(eq(pathPoints.sceneId, sceneId), eq(pathPoints.pathName, pathName)));
     }
 
-    // Update path in database
-    const updatedPaths = await request.server.db
-      .update(paths)
-      .set(updateData)
-      .where(eq(paths.id, pathId))
-      .returning();
+    // Fetch updated data
+    const updatedPoints = await request.server.db
+      .select()
+      .from(pathPoints)
+      .where(and(eq(pathPoints.sceneId, sceneId), eq(pathPoints.pathName, pathName)))
+      .orderBy(asc(pathPoints.pathIndex));
 
-    if (updatedPaths.length === 0) {
-      sendMessage(socket, 'error', { message: 'Path not found' });
-      return;
-    }
-
-    const updatedPath = updatedPaths[0];
-
-    // Format path
-    const formattedPath: Path = {
-      id: updatedPath.id,
-      sceneId: updatedPath.sceneId,
-      name: updatedPath.name,
-      nodes: updatedPath.nodes as Array<{ x: number; y: number }>,
-      speed: updatedPath.speed,
-      loop: updatedPath.loop,
-      assignedObjectId: updatedPath.assignedObjectId ?? null,
-      assignedObjectType: updatedPath.assignedObjectType as 'token' | 'light' | null,
-      visible: updatedPath.visible,
-      color: updatedPath.color,
-      data: updatedPath.data as Record<string, unknown>,
-      createdAt: updatedPath.createdAt,
-      updatedAt: updatedPath.updatedAt,
+    // Format assembled path (color and visible from first point)
+    const firstPoint = updatedPoints[0];
+    const assembledPath = {
+      pathName,
+      sceneId,
+      points: updatedPoints.map(p => ({
+        id: p.id,
+        x: p.x,
+        y: p.y,
+        pathIndex: p.pathIndex,
+      })),
+      color: firstPoint?.color ?? '#ffff00',
+      visible: firstPoint?.visible ?? true,
     };
 
     // Broadcast to all players
-    const updatedPayload: PathUpdatedPayload = { path: formattedPath };
+    const updatedPayload: PathUpdatedPayload = { assembledPath };
     roomManager.broadcast(campaignId, {
       type: 'path:updated',
       payload: updatedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ pathId, campaignId }, 'Path updated');
+    request.log.info({ pathName, sceneId, campaignId }, 'Path updated (bulk)');
   } catch (error) {
-    request.log.error({ error, pathId: message.payload.pathId }, 'Error updating path');
+    request.log.error({ error, sceneId: message.payload.sceneId, pathName: message.payload.pathName }, 'Error updating path');
     sendMessage(socket, 'error', { message: 'Failed to update path' });
   }
 }
 
 /**
- * Handle path:remove message
+ * Handle path:remove message (bulk operation - removes points and settings)
  */
 async function handlePathRemove(
   socket: WebSocket,
   message: WSMessage<PathRemovePayload>,
   request: FastifyRequest
 ): Promise<void> {
-  request.log.debug({ payload: message.payload }, 'Path remove');
+  request.log.debug({ payload: message.payload }, 'Path remove (bulk)');
 
-  const { pathId } = message.payload;
+  const { sceneId, pathName } = message.payload;
 
   const campaignId = roomManager.getRoomForSocket(socket);
 
@@ -1852,28 +1866,227 @@ async function handlePathRemove(
   }
 
   try {
-    // Delete path from database
-    const deletedPaths = await request.server.db
-      .delete(paths)
-      .where(eq(paths.id, pathId))
-      .returning();
-
-    if (deletedPaths.length === 0) {
-      sendMessage(socket, 'error', { message: 'Path not found' });
-      return;
-    }
+    // Delete all path points for this path
+    await request.server.db
+      .delete(pathPoints)
+      .where(and(eq(pathPoints.sceneId, sceneId), eq(pathPoints.pathName, pathName)));
 
     // Broadcast to all players
-    const removedPayload: PathRemovedPayload = { pathId };
+    const removedPayload: PathRemovedPayload = { sceneId, pathName };
     roomManager.broadcast(campaignId, {
       type: 'path:removed',
       payload: removedPayload,
       timestamp: Date.now(),
     });
 
-    request.log.info({ pathId, campaignId }, 'Path removed');
+    request.log.info({ pathName, sceneId, campaignId }, 'Path removed (bulk)');
   } catch (error) {
-    request.log.error({ error, pathId }, 'Error removing path');
+    request.log.error({ error, sceneId, pathName }, 'Error removing path');
     sendMessage(socket, 'error', { message: 'Failed to remove path' });
   }
 }
+
+/**
+ * Handle pathPoint:add message
+ */
+async function handlePathPointAdd(
+  socket: WebSocket,
+  message: WSMessage<PathPointAddPayload>,
+  request: FastifyRequest
+): Promise<void> {
+  request.log.debug({ payload: message.payload }, 'PathPoint add');
+
+  const { sceneId, pathName, pathIndex, x, y, color, visible, data } = message.payload;
+
+  const campaignId = roomManager.getRoomForSocket(socket);
+
+  if (!campaignId) {
+    sendMessage(socket, 'error', { message: 'Not in a campaign room' });
+    return;
+  }
+
+  try {
+    // Create path point in database
+    const newPoints = await request.server.db
+      .insert(pathPoints)
+      .values({
+        sceneId,
+        pathName,
+        pathIndex,
+        x,
+        y,
+        color: color ?? '#ffff00',
+        visible: visible ?? true,
+        data: data ?? {},
+      })
+      .returning();
+
+    const newPoint = newPoints[0];
+
+    // Format path point
+    const formattedPoint: PathPoint = {
+      id: newPoint.id,
+      sceneId: newPoint.sceneId,
+      pathName: newPoint.pathName,
+      pathIndex: newPoint.pathIndex,
+      x: newPoint.x,
+      y: newPoint.y,
+      color: newPoint.color,
+      visible: newPoint.visible,
+      data: newPoint.data as Record<string, unknown>,
+      createdAt: newPoint.createdAt,
+      updatedAt: newPoint.updatedAt,
+    };
+
+    // Broadcast to all players
+    const addedPayload: PathPointAddedPayload = { pathPoint: formattedPoint };
+    roomManager.broadcast(campaignId, {
+      type: 'pathPoint:added',
+      payload: addedPayload,
+      timestamp: Date.now(),
+    });
+
+    request.log.info({ pathPointId: newPoint.id, pathName, campaignId }, 'PathPoint added');
+  } catch (error) {
+    request.log.error({ error, pathName }, 'Error adding path point');
+    sendMessage(socket, 'error', { message: 'Failed to add path point' });
+  }
+}
+
+/**
+ * Handle pathPoint:update message
+ */
+async function handlePathPointUpdate(
+  socket: WebSocket,
+  message: WSMessage<PathPointUpdatePayload>,
+  request: FastifyRequest
+): Promise<void> {
+  request.log.debug({ payload: message.payload }, 'PathPoint update');
+
+  const { pathPointId, updates } = message.payload;
+
+  const campaignId = roomManager.getRoomForSocket(socket);
+
+  if (!campaignId) {
+    sendMessage(socket, 'error', { message: 'Not in a campaign room' });
+    return;
+  }
+
+  try {
+    // Build update object
+    const updateData: any = {
+      updatedAt: new Date(),
+    };
+
+    if (updates.pathName !== undefined) {
+      updateData.pathName = updates.pathName;
+    }
+    if (updates.pathIndex !== undefined) {
+      updateData.pathIndex = updates.pathIndex;
+    }
+    if (updates.x !== undefined) {
+      updateData.x = updates.x;
+    }
+    if (updates.y !== undefined) {
+      updateData.y = updates.y;
+    }
+    if (updates.color !== undefined) {
+      updateData.color = updates.color;
+    }
+    if (updates.visible !== undefined) {
+      updateData.visible = updates.visible;
+    }
+    if (updates.data !== undefined) {
+      updateData.data = updates.data;
+    }
+
+    // Update path point in database
+    const updatedPoints = await request.server.db
+      .update(pathPoints)
+      .set(updateData)
+      .where(eq(pathPoints.id, pathPointId))
+      .returning();
+
+    if (updatedPoints.length === 0) {
+      sendMessage(socket, 'error', { message: 'Path point not found' });
+      return;
+    }
+
+    const updatedPoint = updatedPoints[0];
+
+    // Format path point
+    const formattedPoint: PathPoint = {
+      id: updatedPoint.id,
+      sceneId: updatedPoint.sceneId,
+      pathName: updatedPoint.pathName,
+      pathIndex: updatedPoint.pathIndex,
+      x: updatedPoint.x,
+      y: updatedPoint.y,
+      color: updatedPoint.color,
+      visible: updatedPoint.visible,
+      data: updatedPoint.data as Record<string, unknown>,
+      createdAt: updatedPoint.createdAt,
+      updatedAt: updatedPoint.updatedAt,
+    };
+
+    // Broadcast to all players
+    const updatedPayload: PathPointUpdatedPayload = { pathPoint: formattedPoint };
+    roomManager.broadcast(campaignId, {
+      type: 'pathPoint:updated',
+      payload: updatedPayload,
+      timestamp: Date.now(),
+    });
+
+    request.log.info({ pathPointId, campaignId }, 'PathPoint updated');
+  } catch (error) {
+    request.log.error({ error, pathPointId }, 'Error updating path point');
+    sendMessage(socket, 'error', { message: 'Failed to update path point' });
+  }
+}
+
+/**
+ * Handle pathPoint:remove message
+ */
+async function handlePathPointRemove(
+  socket: WebSocket,
+  message: WSMessage<PathPointRemovePayload>,
+  request: FastifyRequest
+): Promise<void> {
+  request.log.debug({ payload: message.payload }, 'PathPoint remove');
+
+  const { pathPointId } = message.payload;
+
+  const campaignId = roomManager.getRoomForSocket(socket);
+
+  if (!campaignId) {
+    sendMessage(socket, 'error', { message: 'Not in a campaign room' });
+    return;
+  }
+
+  try {
+    // Delete path point from database
+    const deletedPoints = await request.server.db
+      .delete(pathPoints)
+      .where(eq(pathPoints.id, pathPointId))
+      .returning();
+
+    if (deletedPoints.length === 0) {
+      sendMessage(socket, 'error', { message: 'Path point not found' });
+      return;
+    }
+
+    // Broadcast to all players
+    const removedPayload: PathPointRemovedPayload = { pathPointId };
+    roomManager.broadcast(campaignId, {
+      type: 'pathPoint:removed',
+      payload: removedPayload,
+      timestamp: Date.now(),
+    });
+
+    request.log.info({ pathPointId, campaignId }, 'PathPoint removed');
+  } catch (error) {
+    request.log.error({ error, pathPointId }, 'Error removing path point');
+    sendMessage(socket, 'error', { message: 'Failed to remove path point' });
+  }
+}
+

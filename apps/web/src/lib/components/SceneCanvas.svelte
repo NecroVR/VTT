@@ -1376,9 +1376,8 @@
   function renderPaths() {
     if (!wallsCtx || !wallsCanvas || !isGM) return;
 
-    // Get paths from store
-    const state = get(pathsStore);
-    const paths = Array.from(state.paths.values()).filter(p => p.sceneId === scene.id);
+    // Get assembled paths from store (groups PathPoints by pathName)
+    const paths = get(assembledPaths).filter(p => p.sceneId === scene.id);
 
     wallsCtx.save();
 
@@ -1390,29 +1389,44 @@
     paths.forEach(path => {
       if (!path.visible && !isGM) return; // Skip invisible paths for non-GMs
 
-      const isSelected = selectedPathId === path.id;
+      const isSelected = selectedPathId === path.pathName;
 
       // Render path line using spline
       wallsCtx.beginPath();
       wallsCtx.strokeStyle = path.color || '#00ff00';
       wallsCtx.lineWidth = isSelected ? 3 / scale : 2 / scale;
 
-      if (path.nodes.length >= 2) {
-        const splinePoints = catmullRomSpline(path.nodes);
+      if (path.points.length >= 2) {
+        const splinePoints = catmullRomSpline(path.points);
         renderSplinePath(wallsCtx, splinePoints);
       }
       wallsCtx.stroke();
 
-      // Render nodes (only for GMs)
+      // Render path points (only for GMs)
       if (isGM) {
-        path.nodes.forEach((node) => {
+        path.points.forEach((point, index) => {
+          const pathPoint = pathPoints.find(pp => pp.id === point.id);
+          if (!pathPoint) return;
+
+          const isPointSelected = selectedPathPointId === point.id;
+
+          // Draw node circle
           wallsCtx.beginPath();
-          wallsCtx.arc(node.x, node.y, 5 / scale, 0, Math.PI * 2);
-          wallsCtx.fillStyle = isSelected ? '#ffff00' : '#ffffff';
+          wallsCtx.arc(point.x, point.y, 8 / scale, 0, Math.PI * 2);
+          wallsCtx.fillStyle = isPointSelected ? '#ffff00' : (isSelected ? '#ffff00' : '#ffffff');
           wallsCtx.fill();
           wallsCtx.strokeStyle = '#000000';
           wallsCtx.lineWidth = 1 / scale;
           wallsCtx.stroke();
+
+          // Draw pathIndex number next to node
+          wallsCtx.save();
+          wallsCtx.font = `${12 / scale}px Arial`;
+          wallsCtx.fillStyle = '#000000';
+          wallsCtx.textAlign = 'left';
+          wallsCtx.textBaseline = 'middle';
+          wallsCtx.fillText(String(pathPoint.pathIndex), point.x + 12 / scale, point.y);
+          wallsCtx.restore();
         });
       }
     });
@@ -2998,23 +3012,22 @@
 
     // Handle path tool
     if (activeTool === 'path' && isGM) {
-      // Check for double-click to complete path
-      const currentTime = Date.now();
-      const timeSinceLastClick = currentTime - lastClickTime;
-      const isDoubleClick = timeSinceLastClick < DOUBLE_CLICK_THRESHOLD;
+      // Get the current highest pathIndex for this pathName
+      const existingPoints = pathPoints.filter(p => p.pathName === currentPathName);
+      const nextIndex = existingPoints.length > 0
+        ? Math.max(...existingPoints.map(p => p.pathIndex)) + 1
+        : 0;
 
-      if (isDoubleClick && currentPathNodes.length >= 2) {
-        // Complete path on double-click
-        completePath();
-        lastClickTime = 0;
-        return;
-      }
+      // Create new path point
+      onPathPointAdd?.({
+        pathName: currentPathName,
+        pathIndex: nextIndex,
+        x: snappedPos.x,
+        y: snappedPos.y,
+        color: '#00ff00',
+        visible: true
+      });
 
-      // Add node to current path
-      currentPathNodes = [...currentPathNodes, snappedPos];
-      isDrawingPath = true;
-      lastClickTime = currentTime;
-      renderPaths();
       return;
     }
 
@@ -3170,6 +3183,30 @@
           selectedWallIds = new Set();
         }
 
+        // Check for path point selection first (GM only)
+        const pathPointId = findPathPointAtPoint(worldPos.x, worldPos.y);
+        if (pathPointId) {
+          const pathPoint = pathPoints.find(pp => pp.id === pathPointId);
+          if (pathPoint) {
+            selectedPathPointId = pathPointId;
+            selectedTokenId = null;
+            selectedLightId = null;
+            selectedWallIds = new Set();
+            selectedPathId = null;
+            onPathPointSelect?.(pathPointId);
+            onTokenSelect?.(null);
+            onLightSelect?.(null);
+            renderPaths();
+
+            // Enable dragging
+            isDraggingPathPoint = true;
+            draggedPathPointId = pathPointId;
+            dragOffsetX = pathPoint.x - worldPos.x;
+            dragOffsetY = pathPoint.y - worldPos.y;
+            return;
+          }
+        }
+
         // Check for path selection (GM only)
         const pathId = findPathAtPoint(worldPos.x, worldPos.y);
         if (pathId) {
@@ -3177,6 +3214,7 @@
           selectedTokenId = null;
           selectedLightId = null;
           selectedWallIds = new Set();
+          selectedPathPointId = null;
           onPathSelect?.(pathId);
           onTokenSelect?.(null);
           onLightSelect?.(null);
@@ -3442,7 +3480,18 @@
       return;
     }
 
-    if (isDraggingLight && draggedLightId) {
+    if (isDraggingPathPoint && draggedPathPointId) {
+      const newX = worldPos.x + dragOffsetX;
+      const newY = worldPos.y + dragOffsetY;
+
+      // Update path point position locally for immediate feedback
+      const pathPoint = pathPoints.find(pp => pp.id === draggedPathPointId);
+      if (pathPoint) {
+        pathPoint.x = newX;
+        pathPoint.y = newY;
+        renderPaths();
+      }
+    } else if (isDraggingLight && draggedLightId) {
       const newX = worldPos.x + dragOffsetX;
       const newY = worldPos.y + dragOffsetY;
 
@@ -3509,7 +3558,33 @@
       return; // Don't process other mouse up logic
     }
 
-    if (isDraggingLight && draggedLightId) {
+    if (isDraggingPathPoint && draggedPathPointId) {
+      const pathPoint = pathPoints.find(pp => pp.id === draggedPathPointId);
+      if (pathPoint) {
+        const worldPos = screenToWorld(e.clientX, e.clientY);
+        let newX = worldPos.x + dragOffsetX;
+        let newY = worldPos.y + dragOffsetY;
+
+        // Apply grid snapping if enabled
+        if (gridSnap) {
+          const snappedPos = snapToGrid(newX, newY);
+          newX = snappedPos.x;
+          newY = snappedPos.y;
+        }
+
+        // Only send update if position actually changed
+        const positionChanged = Math.abs(newX - pathPoint.x) > 1 || Math.abs(newY - pathPoint.y) > 1;
+        if (positionChanged) {
+          pathPoint.x = newX;
+          pathPoint.y = newY;
+          onPathPointUpdate?.(draggedPathPointId, { x: newX, y: newY });
+          renderPaths();
+        }
+      }
+
+      isDraggingPathPoint = false;
+      draggedPathPointId = null;
+    } else if (isDraggingLight && draggedLightId) {
       const light = lights.find(l => l.id === draggedLightId);
       if (light) {
         const worldPos = screenToWorld(e.clientX, e.clientY);
@@ -3918,6 +3993,24 @@
     return null;
   }
 
+  function findPathPointAtPoint(worldX: number, worldY: number): string | null {
+    const handleRadius = 10 / scale; // Slightly larger than render size for easier clicking
+
+    // Check path points in reverse order (top-most first)
+    for (let i = pathPoints.length - 1; i >= 0; i--) {
+      const point = pathPoints[i];
+      const dx = worldX - point.x;
+      const dy = worldY - point.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance <= handleRadius) {
+        return point.id;
+      }
+    }
+
+    return null;
+  }
+
   function handleKeyDown(e: KeyboardEvent) {
     // Ignore if typing in input/textarea
     const target = e.target as HTMLElement;
@@ -4001,6 +4094,21 @@
         contextMenuElementId = clickedLight.id;
         contextMenuElementVisible = true; // Lights don't have visibility toggle yet
         return;
+      }
+
+      // Check for path point at position (if GM)
+      const clickedPathPointId = findPathPointAtPoint(worldX, worldY);
+      if (clickedPathPointId) {
+        const pathPoint = pathPoints.find(pp => pp.id === clickedPathPointId);
+        if (pathPoint) {
+          showContextMenu = true;
+          contextMenuX = e.clientX;
+          contextMenuY = e.clientY;
+          contextMenuElementType = 'pathpoint';
+          contextMenuElementId = clickedPathPointId;
+          contextMenuElementVisible = pathPoint.visible;
+          return;
+        }
       }
 
       // Check for control point at position (for curved walls)
@@ -4174,6 +4282,9 @@
     } else if (contextMenuElementType === 'wall') {
       deleteDialogTitle = 'Delete Wall';
       deleteDialogMessage = 'Are you sure you want to delete this wall? This action cannot be undone.';
+    } else if (contextMenuElementType === 'pathpoint') {
+      deleteDialogTitle = 'Delete Path Point';
+      deleteDialogMessage = 'Are you sure you want to delete this path point? This action cannot be undone.';
     }
 
     showDeleteDialog = true;
@@ -4188,6 +4299,8 @@
       websocket.sendLightRemove({ lightId: contextMenuElementId });
     } else if (contextMenuElementType === 'wall' && contextMenuElementId) {
       websocket.sendWallRemove({ wallId: contextMenuElementId });
+    } else if (contextMenuElementType === 'pathpoint' && contextMenuElementId) {
+      onPathPointRemove?.(contextMenuElementId);
     }
 
     // Clear selection
@@ -4202,6 +4315,10 @@
     if (contextMenuElementType === 'wall') {
       selectedWallIds = new Set();
     }
+    if (contextMenuElementType === 'pathpoint') {
+      selectedPathPointId = null;
+      onPathPointSelect?.(null);
+    }
 
     contextMenuElementId = null;
     contextMenuElementType = null;
@@ -4209,6 +4326,35 @@
 
   function handleDeleteCancel() {
     showDeleteDialog = false;
+  }
+
+  function handleEditPathName() {
+    showContextMenu = false;
+    if (contextMenuElementType === 'pathpoint' && contextMenuElementId) {
+      const pathPoint = pathPoints.find(pp => pp.id === contextMenuElementId);
+      if (pathPoint) {
+        const newPathName = prompt('Enter path name:', pathPoint.pathName);
+        if (newPathName !== null && newPathName !== pathPoint.pathName) {
+          onPathPointUpdate?.(contextMenuElementId, { pathName: newPathName });
+        }
+      }
+    }
+  }
+
+  function handleEditPathIndex() {
+    showContextMenu = false;
+    if (contextMenuElementType === 'pathpoint' && contextMenuElementId) {
+      const pathPoint = pathPoints.find(pp => pp.id === contextMenuElementId);
+      if (pathPoint) {
+        const newIndexStr = prompt('Enter path index:', String(pathPoint.pathIndex));
+        if (newIndexStr !== null) {
+          const newIndex = parseInt(newIndexStr, 10);
+          if (!isNaN(newIndex) && newIndex >= 0 && newIndex !== pathPoint.pathIndex) {
+            onPathPointUpdate?.(contextMenuElementId, { pathIndex: newIndex });
+          }
+        }
+      }
+    }
   }
 
   // Drag-and-drop handlers

@@ -19,3 +19,4 @@ export * from './region.js';
 export * from './scenePin.js';
 export * from './compendium.js';
 export * from './sceneViewport.js';
+export * from './path.js';

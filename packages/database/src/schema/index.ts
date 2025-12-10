@@ -19,3 +19,5 @@ export * from './tiles.js';
 export * from './regions.js';
 export * from './scenePins.js';
 export * from './compendiums.js';
+export * from './paths.js';
+export * from './pathPoints.js';

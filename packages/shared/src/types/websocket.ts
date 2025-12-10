@@ -1090,6 +1090,8 @@ export interface PathPointAddPayload {
   pathIndex: number;
   x: number;
   y: number;
+  color?: string;
+  visible?: boolean;
   data?: Record<string, unknown>;
 }
 
@@ -1104,6 +1106,8 @@ export interface PathPointUpdatePayload {
     pathIndex?: number;
     x?: number;
     y?: number;
+    color?: string;
+    visible?: boolean;
     data?: Record<string, unknown>;
   };
 }
