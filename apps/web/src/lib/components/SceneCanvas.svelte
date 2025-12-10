@@ -8,6 +8,12 @@
   import ConfirmDialog from './ConfirmDialog.svelte';
   import { computeViewport, breakIntersections } from 'visibility-polygon';
   import { API_BASE_URL } from '$lib/config/api';
+  import {
+    pointInRect,
+    circleIntersectsRect,
+    lineSegmentsIntersect,
+    lineIntersectsRect,
+  } from '$lib/utils/geometry';
 
   // Props
   export let scene: Scene;
@@ -2580,81 +2586,8 @@
   }
 
   // ============================================================================
-  // Geometric Intersection Utilities for Selection Box
+  // Selection Box Utilities
   // ============================================================================
-
-  /**
-   * Check if a point is inside a rectangle
-   * Used for light selection (lights are points)
-   */
-  function pointInRect(
-    px: number, py: number,
-    rx: number, ry: number, rw: number, rh: number
-  ): boolean {
-    return px >= rx && px <= rx + rw && py >= ry && py <= ry + rh;
-  }
-
-  /**
-   * Check if a circle intersects with a rectangle
-   * Used for token selection (tokens are circular)
-   */
-  function circleIntersectsRect(
-    cx: number, cy: number, r: number,
-    rx: number, ry: number, rw: number, rh: number
-  ): boolean {
-    // Find closest point on rectangle to circle center
-    const closestX = Math.max(rx, Math.min(cx, rx + rw));
-    const closestY = Math.max(ry, Math.min(cy, ry + rh));
-    const dx = cx - closestX;
-    const dy = cy - closestY;
-    return (dx * dx + dy * dy) <= (r * r);
-  }
-
-  /**
-   * Check if two line segments intersect
-   */
-  function lineSegmentsIntersect(
-    x1: number, y1: number, x2: number, y2: number,
-    x3: number, y3: number, x4: number, y4: number
-  ): boolean {
-    const denom = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
-    if (denom === 0) return false; // parallel
-
-    const ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denom;
-    const ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denom;
-
-    return ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1;
-  }
-
-  /**
-   * Check if a line segment intersects with a rectangle
-   * Used for wall selection
-   */
-  function lineIntersectsRect(
-    x1: number, y1: number, x2: number, y2: number,
-    rx: number, ry: number, rw: number, rh: number
-  ): boolean {
-    // Check if either endpoint is inside rectangle
-    const p1Inside = pointInRect(x1, y1, rx, ry, rw, rh);
-    const p2Inside = pointInRect(x2, y2, rx, ry, rw, rh);
-    if (p1Inside || p2Inside) return true;
-
-    // Check if line intersects any of the 4 rectangle edges
-    const edges = [
-      [rx, ry, rx + rw, ry],           // top
-      [rx + rw, ry, rx + rw, ry + rh], // right
-      [rx, ry + rh, rx + rw, ry + rh], // bottom
-      [rx, ry, rx, ry + rh]            // left
-    ];
-
-    for (const [ex1, ey1, ex2, ey2] of edges) {
-      if (lineSegmentsIntersect(x1, y1, x2, y2, ex1, ey1, ex2, ey2)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
 
   /**
    * Select all objects that overlap with the selection box
