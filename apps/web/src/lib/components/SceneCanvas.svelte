@@ -27,6 +27,7 @@
   export let onLightSelect: ((lightId: string | null) => void) | undefined = undefined;
   export let onLightDoubleClick: ((lightId: string) => void) | undefined = undefined;
   export let onLightMove: ((lightId: string, x: number, y: number) => void) | undefined = undefined;
+  export let wallEndpointSnapRange: number = 4; // Pixel range for wall endpoint snapping
 
   // Canvas refs
   let canvasContainer: HTMLDivElement;
@@ -76,6 +77,7 @@
   let isDraggingWallEndpoint = false;
   let draggedWallId: string | null = null;
   let draggedEndpoint: 'start' | 'end' | null = null;
+  let nearbyEndpoint: { wallId: string; endpoint: 'start' | 'end'; x: number; y: number } | null = null;
 
   // Double-click detection
   let lastClickTime = 0;
@@ -1184,6 +1186,26 @@
       wallsCtx.beginPath();
       wallsCtx.arc(wallPreview.x2, wallPreview.y2, endpointRadius, 0, Math.PI * 2);
       wallsCtx.fill();
+    }
+
+    // Render highlighted nearby endpoint when dragging
+    if (nearbyEndpoint && isDraggingWallEndpoint) {
+      const highlightRadius = 8 / scale;
+
+      // Draw outer glow ring
+      wallsCtx.strokeStyle = '#22c55e'; // Green highlight
+      wallsCtx.lineWidth = 3 / scale;
+      wallsCtx.beginPath();
+      wallsCtx.arc(nearbyEndpoint.x, nearbyEndpoint.y, highlightRadius, 0, Math.PI * 2);
+      wallsCtx.stroke();
+
+      // Draw inner filled circle
+      wallsCtx.fillStyle = '#22c55e';
+      wallsCtx.globalAlpha = 0.5;
+      wallsCtx.beginPath();
+      wallsCtx.arc(nearbyEndpoint.x, nearbyEndpoint.y, highlightRadius - 2 / scale, 0, Math.PI * 2);
+      wallsCtx.fill();
+      wallsCtx.globalAlpha = 1.0;
     }
 
     wallsCtx.restore();
@@ -2827,6 +2849,9 @@
         // Apply snapping based on wall's snapToGrid setting
         const targetPos = wall.snapToGrid ? snapToGrid(worldPos.x, worldPos.y) : worldPos;
 
+        // Check for nearby endpoints to snap to
+        nearbyEndpoint = findNearbyWallEndpoint(targetPos.x, targetPos.y, draggedWallId, draggedEndpoint);
+
         // Update wall position locally for immediate feedback
         if (draggedEndpoint === 'start') {
           wall.x1 = targetPos.x;
@@ -2944,15 +2969,22 @@
     } else if (isDraggingWallEndpoint && draggedWallId && draggedEndpoint) {
       const wall = walls.find(w => w.id === draggedWallId);
       if (wall) {
-        const worldPos = screenToWorld(e.clientX, e.clientY);
+        let finalPos: { x: number; y: number };
 
-        // Apply snapping based on wall's snapToGrid setting
-        const targetPos = wall.snapToGrid ? snapToGrid(worldPos.x, worldPos.y) : worldPos;
+        // Check if we should snap to a nearby endpoint
+        if (nearbyEndpoint) {
+          // Snap to the nearby endpoint
+          finalPos = { x: nearbyEndpoint.x, y: nearbyEndpoint.y };
+        } else {
+          const worldPos = screenToWorld(e.clientX, e.clientY);
+          // Apply snapping based on wall's snapToGrid setting
+          finalPos = wall.snapToGrid ? snapToGrid(worldPos.x, worldPos.y) : worldPos;
+        }
 
         // Prepare the update based on which endpoint was dragged
         const updates: Partial<Wall> = draggedEndpoint === 'start'
-          ? { x1: targetPos.x, y1: targetPos.y }
-          : { x2: targetPos.x, y2: targetPos.y };
+          ? { x1: finalPos.x, y1: finalPos.y }
+          : { x2: finalPos.x, y2: finalPos.y };
 
         // Send the wall update via callback
         onWallUpdate?.(draggedWallId, updates);
@@ -2961,6 +2993,7 @@
       isDraggingWallEndpoint = false;
       draggedWallId = null;
       draggedEndpoint = null;
+      nearbyEndpoint = null;
     }
 
     isPanning = false;
@@ -3094,6 +3127,48 @@
       }
     }
 
+    return null;
+  }
+
+  /**
+   * Find the nearest wall endpoint within range, excluding the currently dragged endpoint
+   */
+  function findNearbyWallEndpoint(
+    worldX: number,
+    worldY: number,
+    excludeWallId: string,
+    excludeEndpoint: 'start' | 'end'
+  ): { wallId: string; endpoint: 'start' | 'end'; x: number; y: number } | null {
+    if (wallEndpointSnapRange <= 0) return null;
+
+    const threshold = wallEndpointSnapRange / scale; // Convert pixels to world units
+    let closest: { wallId: string; endpoint: 'start' | 'end'; x: number; y: number; distance: number } | null = null;
+
+    for (const wall of walls) {
+      // Check start endpoint (x1, y1) - skip if it's the one being dragged
+      if (!(wall.id === excludeWallId && excludeEndpoint === 'start')) {
+        const dx1 = worldX - wall.x1;
+        const dy1 = worldY - wall.y1;
+        const dist1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
+        if (dist1 <= threshold && (!closest || dist1 < closest.distance)) {
+          closest = { wallId: wall.id, endpoint: 'start', x: wall.x1, y: wall.y1, distance: dist1 };
+        }
+      }
+
+      // Check end endpoint (x2, y2) - skip if it's the one being dragged
+      if (!(wall.id === excludeWallId && excludeEndpoint === 'end')) {
+        const dx2 = worldX - wall.x2;
+        const dy2 = worldY - wall.y2;
+        const dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+        if (dist2 <= threshold && (!closest || dist2 < closest.distance)) {
+          closest = { wallId: wall.id, endpoint: 'end', x: wall.x2, y: wall.y2, distance: dist2 };
+        }
+      }
+    }
+
+    if (closest) {
+      return { wallId: closest.wallId, endpoint: closest.endpoint, x: closest.x, y: closest.y };
+    }
     return null;
   }
 

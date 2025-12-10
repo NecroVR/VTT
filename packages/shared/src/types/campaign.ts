@@ -11,6 +11,7 @@ export interface CampaignSettings {
   gridType: 'square' | 'hex' | 'none';
   gridSize: number;
   snapToGrid: boolean;
+  wallEndpointSnapRange?: number; // Pixel range for wall endpoint snapping (default: 4)
 }
 
 export interface Token {

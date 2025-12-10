@@ -586,6 +586,7 @@
             {isGM}
             {activeTool}
             gridSnap={currentCampaign?.settings?.snapToGrid ?? false}
+            wallEndpointSnapRange={currentCampaign?.settings?.wallEndpointSnapRange ?? 4}
             onTokenMove={handleTokenMove}
             onTokenAdd={handleTokenAdd}
             onTokenSelect={handleTokenSelect}

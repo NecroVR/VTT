@@ -14,6 +14,7 @@
   // Read settings from the campaigns store (reactive)
   $: currentCampaign = $campaignsStore.currentCampaign;
   $: snapToGrid = currentCampaign?.settings?.snapToGrid ?? false;
+  $: wallEndpointSnapRange = currentCampaign?.settings?.wallEndpointSnapRange ?? 4;
   $: loading = $campaignsStore.loading;
 
   // Read active scene from scenes store (reactive)
@@ -58,6 +59,33 @@
       const success = await campaignsStore.updateCampaign(campaignId, {
         settings: {
           snapToGrid: !snapToGrid,
+        },
+      });
+
+      if (!success) {
+        throw new Error('Failed to update settings');
+      }
+    } catch (err) {
+      console.error('Failed to update settings:', err);
+      error = 'Failed to save settings';
+    } finally {
+      saving = false;
+    }
+  }
+
+  async function handleWallEndpointSnapRangeChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const newValue = parseInt(target.value, 10);
+
+    if (isNaN(newValue) || newValue < 0) return;
+
+    saving = true;
+    error = null;
+
+    try {
+      const success = await campaignsStore.updateCampaign(campaignId, {
+        settings: {
+          wallEndpointSnapRange: newValue,
         },
       });
 
@@ -706,6 +734,29 @@
             </div>
           </div>
         {/if}
+
+        <div class="setting-item">
+          <div class="setting-info">
+            <label for="wall-endpoint-snap-range">Wall Endpoint Snap Range</label>
+            <p class="setting-description">
+              Distance in pixels for wall endpoints to snap together when dragging. Set to 0 to disable.
+            </p>
+          </div>
+          <div class="setting-number-container">
+            <input
+              id="wall-endpoint-snap-range"
+              type="number"
+              class="setting-number"
+              min="0"
+              max="50"
+              step="1"
+              value={wallEndpointSnapRange}
+              disabled={saving}
+              on:change={handleWallEndpointSnapRangeChange}
+            />
+            <span class="setting-unit">px</span>
+          </div>
+        </div>
       </section>
 
       <section class="settings-section">
