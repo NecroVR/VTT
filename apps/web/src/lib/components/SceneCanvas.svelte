@@ -1198,7 +1198,14 @@
 
         // Draw control points for curved walls
         if (wall.wallShape === 'curved' && wall.controlPoints && wall.controlPoints.length > 0) {
-          const controlPointRadius = 3 / scale; // Slightly smaller than endpoints
+          const controlPointRadius = 8 / scale; // Match light handle size for visibility
+
+          // Get all points including endpoints for direction calculation
+          const allPoints = [
+            { x: wall.x1, y: wall.y1 },
+            ...wall.controlPoints,
+            { x: wall.x2, y: wall.y2 }
+          ];
 
           wall.controlPoints.forEach((cp, index) => {
             // Check if this control point is being dragged
@@ -1206,18 +1213,85 @@
                                    draggedControlPoint?.wallId === wall.id &&
                                    draggedControlPoint?.controlPointIndex === index;
 
+            // Calculate direction arrow - points toward where the curve bends
+            // Get the previous and next points in the sequence
+            const prevPoint = allPoints[index]; // Previous point (could be start or earlier control point)
+            const nextPoint = allPoints[index + 2]; // Next point (could be end or later control point)
+
+            // Calculate the midpoint between prev and next (where the line would be without this control point)
+            const midX = (prevPoint.x + nextPoint.x) / 2;
+            const midY = (prevPoint.y + nextPoint.y) / 2;
+
+            // Direction from midpoint to control point (direction of deformation)
+            const dx = cp.x - midX;
+            const dy = cp.y - midY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
             if (isBeingDragged) {
-              // Highlight dragged control point
-              wallsCtx.fillStyle = '#22c55e'; // Green highlight
+              // Outer glow for dragged control point
+              wallsCtx.fillStyle = 'rgba(34, 197, 94, 0.3)'; // Green glow
               wallsCtx.beginPath();
-              wallsCtx.arc(cp.x, cp.y, controlPointRadius * 1.5, 0, Math.PI * 2);
+              wallsCtx.arc(cp.x, cp.y, controlPointRadius * 1.8, 0, Math.PI * 2);
               wallsCtx.fill();
-            } else {
-              // Normal control point
-              wallsCtx.fillStyle = '#06b6d4'; // Cyan
+
+              // Main circle
+              wallsCtx.fillStyle = '#22c55e'; // Green highlight
+              wallsCtx.strokeStyle = '#ffffff';
+              wallsCtx.lineWidth = 2 / scale;
               wallsCtx.beginPath();
               wallsCtx.arc(cp.x, cp.y, controlPointRadius, 0, Math.PI * 2);
               wallsCtx.fill();
+              wallsCtx.stroke();
+            } else {
+              // Normal control point with border
+              wallsCtx.fillStyle = '#06b6d4'; // Cyan
+              wallsCtx.strokeStyle = '#ffffff';
+              wallsCtx.lineWidth = 2 / scale;
+              wallsCtx.beginPath();
+              wallsCtx.arc(cp.x, cp.y, controlPointRadius, 0, Math.PI * 2);
+              wallsCtx.fill();
+              wallsCtx.stroke();
+            }
+
+            // Draw direction arrow if there's meaningful deformation
+            if (dist > 5) {
+              const arrowColor = isBeingDragged ? '#ffffff' : '#ffffff';
+              const normalizedDx = dx / dist;
+              const normalizedDy = dy / dist;
+
+              // Arrow starts from center and points in deformation direction
+              const arrowLength = controlPointRadius * 0.7;
+              const arrowHeadSize = controlPointRadius * 0.4;
+
+              const arrowEndX = cp.x + normalizedDx * arrowLength * 0.3;
+              const arrowEndY = cp.y + normalizedDy * arrowLength * 0.3;
+              const arrowStartX = cp.x - normalizedDx * arrowLength * 0.5;
+              const arrowStartY = cp.y - normalizedDy * arrowLength * 0.5;
+
+              // Draw arrow line
+              wallsCtx.strokeStyle = arrowColor;
+              wallsCtx.lineWidth = 2 / scale;
+              wallsCtx.beginPath();
+              wallsCtx.moveTo(arrowStartX, arrowStartY);
+              wallsCtx.lineTo(arrowEndX, arrowEndY);
+              wallsCtx.stroke();
+
+              // Draw arrow head
+              const angle = Math.atan2(normalizedDy, normalizedDx);
+              const headAngle = Math.PI / 6; // 30 degrees
+
+              wallsCtx.beginPath();
+              wallsCtx.moveTo(arrowEndX, arrowEndY);
+              wallsCtx.lineTo(
+                arrowEndX - arrowHeadSize * Math.cos(angle - headAngle),
+                arrowEndY - arrowHeadSize * Math.sin(angle - headAngle)
+              );
+              wallsCtx.moveTo(arrowEndX, arrowEndY);
+              wallsCtx.lineTo(
+                arrowEndX - arrowHeadSize * Math.cos(angle + headAngle),
+                arrowEndY - arrowHeadSize * Math.sin(angle + headAngle)
+              );
+              wallsCtx.stroke();
             }
           });
         }

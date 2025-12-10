@@ -187,6 +187,14 @@
 
     // Subscribe to wall events
     const unsubscribeWallAdded = websocket.onWallAdded((payload) => {
+      console.log('wall:added received:', payload);
+      console.log('wall:added wall details:', {
+        id: payload.wall.id,
+        sceneId: payload.wall.sceneId,
+        wallShape: payload.wall.wallShape,
+        controlPoints: payload.wall.controlPoints,
+        activeSceneId: activeScene?.id
+      });
       wallsStore.addWall(payload.wall);
     });
 

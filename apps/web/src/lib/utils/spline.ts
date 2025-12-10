@@ -24,90 +24,90 @@ export function catmullRomSpline(
     return points;
   }
 
-  // For Catmull-Rom splines, we need at least 4 points
-  // Pad the array by duplicating endpoints if needed
-  const paddedPoints: Point[] = [];
-
+  // For exactly 2 points, just return a straight line between them
+  // The centripetal parameterization causes division by zero with duplicated points
   if (points.length === 2) {
-    // For 2 points, create a straight line with duplicated endpoints
-    paddedPoints.push(points[0], points[0], points[1], points[1]);
-  } else if (points.length === 3) {
-    // For 3 points, duplicate the endpoints
-    paddedPoints.push(points[0], points[0], points[1], points[2], points[2]);
-  } else {
-    // For 4+ points, duplicate first and last
-    paddedPoints.push(points[0], ...points, points[points.length - 1]);
+    const result: Point[] = [];
+    for (let i = 0; i <= numSegments; i++) {
+      const t = i / numSegments;
+      result.push({
+        x: points[0].x + t * (points[1].x - points[0].x),
+        y: points[0].y + t * (points[1].y - points[0].y)
+      });
+    }
+    return result;
   }
 
+  // For exactly 3 points, use quadratic Bezier curve
+  // This avoids division by zero from duplicated endpoints
+  if (points.length === 3) {
+    const result: Point[] = [];
+    const p0 = points[0];
+    const p1 = points[1]; // Control point
+    const p2 = points[2];
+
+    for (let i = 0; i <= numSegments * 2; i++) {
+      const t = i / (numSegments * 2);
+      // Quadratic Bezier: B(t) = (1-t)²P0 + 2(1-t)tP1 + t²P2
+      const mt = 1 - t;
+      const x = mt * mt * p0.x + 2 * mt * t * p1.x + t * t * p2.x;
+      const y = mt * mt * p0.y + 2 * mt * t * p1.y + t * t * p2.y;
+      result.push({ x, y });
+    }
+    return result;
+  }
+
+  // For 4+ points, use cubic Bezier segments through consecutive points
+  // This avoids the division-by-zero issues with Catmull-Rom endpoint duplication
   const result: Point[] = [];
-  const alpha = 0.5; // Centripetal Catmull-Rom (0.5 is standard, 0 is uniform, 1 is chordal)
 
-  // Process each segment between control points
-  for (let i = 1; i < paddedPoints.length - 2; i++) {
-    const p0 = paddedPoints[i - 1];
-    const p1 = paddedPoints[i];
-    const p2 = paddedPoints[i + 1];
-    const p3 = paddedPoints[i + 2];
+  // Generate smooth curve through all points using cubic Bezier segments
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[Math.max(0, i - 1)];
+    const p1 = points[i];
+    const p2 = points[i + 1];
+    const p3 = points[Math.min(points.length - 1, i + 2)];
 
-    // Calculate parameterization values (for centripetal variant)
-    const t0 = 0;
-    const t1 = Math.pow(
-      Math.pow(p1.x - p0.x, 2) + Math.pow(p1.y - p0.y, 2),
-      alpha
-    ) + t0;
-    const t2 = Math.pow(
-      Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2),
-      alpha
-    ) + t1;
-    const t3 = Math.pow(
-      Math.pow(p3.x - p2.x, 2) + Math.pow(p3.y - p2.y, 2),
-      alpha
-    ) + t2;
+    // Calculate control points for cubic Bezier that passes through p1 and p2
+    // Using Catmull-Rom to Bezier conversion with tension factor
+    const t = tension;
+    const c1x = p1.x + (p2.x - p0.x) / 6 * (1 - t);
+    const c1y = p1.y + (p2.y - p0.y) / 6 * (1 - t);
+    const c2x = p2.x - (p3.x - p1.x) / 6 * (1 - t);
+    const c2y = p2.y - (p3.y - p1.y) / 6 * (1 - t);
 
-    // Generate points along this segment
+    // Generate points along this cubic Bezier segment
     for (let j = 0; j <= numSegments; j++) {
-      // Parameter from 0 to 1 for this segment
-      const t = t1 + (j / numSegments) * (t2 - t1);
+      // Skip first point of subsequent segments to avoid duplicates
+      if (i > 0 && j === 0) continue;
 
-      // Catmull-Rom interpolation formula
-      const A1x = ((t1 - t) / (t1 - t0)) * p0.x + ((t - t0) / (t1 - t0)) * p1.x;
-      const A1y = ((t1 - t) / (t1 - t0)) * p0.y + ((t - t0) / (t1 - t0)) * p1.y;
+      const s = j / numSegments;
+      const s2 = s * s;
+      const s3 = s2 * s;
+      const ms = 1 - s;
+      const ms2 = ms * ms;
+      const ms3 = ms2 * ms;
 
-      const A2x = ((t2 - t) / (t2 - t1)) * p1.x + ((t - t1) / (t2 - t1)) * p2.x;
-      const A2y = ((t2 - t) / (t2 - t1)) * p1.y + ((t - t1) / (t2 - t1)) * p2.y;
+      // Cubic Bezier formula: B(t) = (1-t)³P0 + 3(1-t)²tC1 + 3(1-t)t²C2 + t³P1
+      const x = ms3 * p1.x + 3 * ms2 * s * c1x + 3 * ms * s2 * c2x + s3 * p2.x;
+      const y = ms3 * p1.y + 3 * ms2 * s * c1y + 3 * ms * s2 * c2y + s3 * p2.y;
 
-      const A3x = ((t3 - t) / (t3 - t2)) * p2.x + ((t - t2) / (t3 - t2)) * p3.x;
-      const A3y = ((t3 - t) / (t3 - t2)) * p2.y + ((t - t2) / (t3 - t2)) * p3.y;
-
-      const B1x = ((t2 - t) / (t2 - t0)) * A1x + ((t - t0) / (t2 - t0)) * A2x;
-      const B1y = ((t2 - t) / (t2 - t0)) * A1y + ((t - t0) / (t2 - t0)) * A2y;
-
-      const B2x = ((t3 - t) / (t3 - t1)) * A2x + ((t - t1) / (t3 - t1)) * A3x;
-      const B2y = ((t3 - t) / (t3 - t1)) * A2y + ((t - t1) / (t3 - t1)) * A3y;
-
-      const Cx = ((t2 - t) / (t2 - t1)) * B1x + ((t - t1) / (t2 - t1)) * B2x;
-      const Cy = ((t2 - t) / (t2 - t1)) * B1y + ((t - t1) / (t2 - t1)) * B2y;
-
-      // Apply tension (mix between original point and interpolated point)
-      const finalX = Cx * (1 - tension) + p1.x * tension * (j === 0 ? 1 : 0) + p2.x * tension * (j === numSegments ? 1 : 0);
-      const finalY = Cy * (1 - tension) + p1.y * tension * (j === 0 ? 1 : 0) + p2.y * tension * (j === numSegments ? 1 : 0);
-
-      result.push({ x: finalX, y: finalY });
+      result.push({ x, y });
     }
   }
 
-  // Remove duplicate points
-  const deduplicated: Point[] = [];
-  for (let i = 0; i < result.length; i++) {
-    if (i === 0 ||
-        Math.abs(result[i].x - result[i - 1].x) > 0.01 ||
-        Math.abs(result[i].y - result[i - 1].y) > 0.01) {
-      deduplicated.push(result[i]);
+  // Ensure we have the final endpoint
+  if (result.length > 0) {
+    const lastPoint = points[points.length - 1];
+    const lastResult = result[result.length - 1];
+    if (Math.abs(lastResult.x - lastPoint.x) > 0.01 || Math.abs(lastResult.y - lastPoint.y) > 0.01) {
+      result.push(lastPoint);
     }
   }
 
-  return deduplicated;
+  return result;
 }
+
 
 /**
  * Combines wall endpoints and control points into an ordered array
