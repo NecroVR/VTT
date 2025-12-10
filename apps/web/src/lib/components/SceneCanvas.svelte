@@ -75,8 +75,8 @@
 
   // Wall endpoint dragging state
   let isDraggingWallEndpoint = false;
-  let draggedWallId: string | null = null;
-  let draggedEndpoint: 'start' | 'end' | null = null;
+  let draggedWalls: Array<{wallId: string, endpoint: 'start' | 'end'}> = [];
+  let draggedEndpointRequiresGridSnap = false;  // True if any dragged wall has snapToGrid
   let nearbyEndpoint: { wallId: string; endpoint: 'start' | 'end'; x: number; y: number } | null = null;
 
   // Double-click detection
@@ -2679,13 +2679,34 @@
         // Check for wall endpoint dragging first (higher priority than wall selection)
         const endpointHit = findWallEndpointAtPoint(worldPos.x, worldPos.y);
         if (endpointHit) {
-          isDraggingWallEndpoint = true;
-          draggedWallId = endpointHit.wallId;
-          draggedEndpoint = endpointHit.endpoint;
-          // If the wall being dragged is not in the selection, select only that wall
-          if (!selectedWallIds.has(endpointHit.wallId)) {
-            selectedWallIds = new Set([endpointHit.wallId]);
+          // Find the exact position of the clicked endpoint
+          const clickedWall = walls.find(w => w.id === endpointHit.wallId);
+          if (clickedWall) {
+            const endpointX = endpointHit.endpoint === 'start' ? clickedWall.x1 : clickedWall.x2;
+            const endpointY = endpointHit.endpoint === 'start' ? clickedWall.y1 : clickedWall.y2;
+
+            // If the clicked wall is not selected, select only that wall
+            if (!selectedWallIds.has(endpointHit.wallId)) {
+              selectedWallIds = new Set([endpointHit.wallId]);
+            }
+
+            // Find all selected walls sharing this endpoint
+            draggedWalls = findSelectedWallsAtEndpoint(endpointX, endpointY, selectedWallIds);
+
+            // If no walls found (shouldn't happen), fall back to just the clicked wall
+            if (draggedWalls.length === 0) {
+              draggedWalls = [{ wallId: endpointHit.wallId, endpoint: endpointHit.endpoint }];
+            }
+
+            // Determine if grid snapping should be applied (if ANY wall has snapToGrid)
+            draggedEndpointRequiresGridSnap = draggedWalls.some(dw => {
+              const wall = walls.find(w => w.id === dw.wallId);
+              return wall?.snapToGrid === true;
+            });
+
+            isDraggingWallEndpoint = true;
           }
+
           selectedTokenId = null;
           selectedLightId = null;
           onTokenSelect?.(null);
@@ -2856,27 +2877,31 @@
     }
 
     // Handle wall endpoint dragging
-    if (isDraggingWallEndpoint && draggedWallId && draggedEndpoint) {
-      const wall = walls.find(w => w.id === draggedWallId);
-      if (wall) {
-        // Apply snapping based on wall's snapToGrid setting
-        const targetPos = wall.snapToGrid ? snapToGrid(worldPos.x, worldPos.y) : worldPos;
+    if (isDraggingWallEndpoint && draggedWalls.length > 0) {
+      // Apply snapping based on whether any wall requires grid snap
+      const targetPos = draggedEndpointRequiresGridSnap ? snapToGrid(worldPos.x, worldPos.y) : worldPos;
 
-        // Check for nearby endpoints to snap to
-        nearbyEndpoint = findNearbyWallEndpoint(targetPos.x, targetPos.y, draggedWallId, draggedEndpoint);
+      // For snap-to-endpoint, use the first dragged wall for exclusion logic
+      const firstDragged = draggedWalls[0];
+      nearbyEndpoint = findNearbyWallEndpoint(targetPos.x, targetPos.y, firstDragged.wallId, firstDragged.endpoint);
 
-        // Update wall position locally for immediate feedback
-        if (draggedEndpoint === 'start') {
-          wall.x1 = targetPos.x;
-          wall.y1 = targetPos.y;
-        } else {
-          wall.x2 = targetPos.x;
-          wall.y2 = targetPos.y;
+      // Update all dragged wall endpoints locally for immediate feedback
+      for (const dw of draggedWalls) {
+        const wall = walls.find(w => w.id === dw.wallId);
+        if (wall) {
+          if (dw.endpoint === 'start') {
+            wall.x1 = targetPos.x;
+            wall.y1 = targetPos.y;
+          } else {
+            wall.x2 = targetPos.x;
+            wall.y2 = targetPos.y;
+          }
         }
-        // Invalidate visibility cache so walls update during drag
-        invalidateVisibilityCache();
-        renderWalls();
       }
+
+      // Invalidate visibility cache so walls update during drag
+      invalidateVisibilityCache();
+      renderWalls();
       return;
     }
 
@@ -2979,33 +3004,32 @@
 
       isDraggingToken = false;
       draggedTokenId = null;
-    } else if (isDraggingWallEndpoint && draggedWallId && draggedEndpoint) {
-      const wall = walls.find(w => w.id === draggedWallId);
-      if (wall) {
-        let finalPos: { x: number; y: number };
+    } else if (isDraggingWallEndpoint && draggedWalls.length > 0) {
+      let finalPos: { x: number; y: number };
 
-        // Check if we should snap to a nearby endpoint
-        if (nearbyEndpoint) {
-          // Snap to the nearby endpoint
-          finalPos = { x: nearbyEndpoint.x, y: nearbyEndpoint.y };
-        } else {
-          const worldPos = screenToWorld(e.clientX, e.clientY);
-          // Apply snapping based on wall's snapToGrid setting
-          finalPos = wall.snapToGrid ? snapToGrid(worldPos.x, worldPos.y) : worldPos;
-        }
+      // Check if we should snap to a nearby endpoint
+      if (nearbyEndpoint) {
+        // Snap to the nearby endpoint
+        finalPos = { x: nearbyEndpoint.x, y: nearbyEndpoint.y };
+      } else {
+        const worldPos = screenToWorld(e.clientX, e.clientY);
+        // Apply snapping based on whether any wall requires grid snap
+        finalPos = draggedEndpointRequiresGridSnap ? snapToGrid(worldPos.x, worldPos.y) : worldPos;
+      }
 
-        // Prepare the update based on which endpoint was dragged
-        const updates: Partial<Wall> = draggedEndpoint === 'start'
+      // Send updates for ALL dragged walls
+      for (const dw of draggedWalls) {
+        const updates: Partial<Wall> = dw.endpoint === 'start'
           ? { x1: finalPos.x, y1: finalPos.y }
           : { x2: finalPos.x, y2: finalPos.y };
 
-        // Send the wall update via callback
-        onWallUpdate?.(draggedWallId, updates);
+        onWallUpdate?.(dw.wallId, updates);
       }
 
+      // Reset drag state
       isDraggingWallEndpoint = false;
-      draggedWallId = null;
-      draggedEndpoint = null;
+      draggedWalls = [];
+      draggedEndpointRequiresGridSnap = false;
       nearbyEndpoint = null;
     }
 
@@ -3144,7 +3168,42 @@
   }
 
   /**
-   * Find the nearest wall endpoint within range, excluding the currently dragged endpoint
+   * Find all selected walls that have an endpoint at the given coordinates
+   */
+  function findSelectedWallsAtEndpoint(
+    worldX: number,
+    worldY: number,
+    selectedIds: Set<string>
+  ): Array<{wallId: string, endpoint: 'start' | 'end'}> {
+    const threshold = 8 / scale; // Same threshold as endpoint hit detection
+    const result: Array<{wallId: string, endpoint: 'start' | 'end'}> = [];
+
+    for (const wall of walls) {
+      if (!selectedIds.has(wall.id)) continue;
+
+      // Check start endpoint
+      const dx1 = worldX - wall.x1;
+      const dy1 = worldY - wall.y1;
+      const dist1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
+      if (dist1 <= threshold) {
+        result.push({ wallId: wall.id, endpoint: 'start' });
+        continue; // A wall can only match once
+      }
+
+      // Check end endpoint
+      const dx2 = worldX - wall.x2;
+      const dy2 = worldY - wall.y2;
+      const dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+      if (dist2 <= threshold) {
+        result.push({ wallId: wall.id, endpoint: 'end' });
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Find the nearest wall endpoint within range, excluding the currently dragged endpoint(s)
    */
   function findNearbyWallEndpoint(
     worldX: number,
@@ -3157,9 +3216,15 @@
     const threshold = wallEndpointSnapRange / scale; // Convert pixels to world units
     let closest: { wallId: string; endpoint: 'start' | 'end'; x: number; y: number; distance: number } | null = null;
 
+    // Build a set of endpoints to exclude (all dragged endpoints)
+    const excludedEndpoints = new Set<string>();
+    for (const dw of draggedWalls) {
+      excludedEndpoints.add(`${dw.wallId}-${dw.endpoint}`);
+    }
+
     for (const wall of walls) {
-      // Check start endpoint (x1, y1) - skip if it's the one being dragged
-      if (!(wall.id === excludeWallId && excludeEndpoint === 'start')) {
+      // Check start endpoint (x1, y1) - skip if it's being dragged
+      if (!excludedEndpoints.has(`${wall.id}-start`)) {
         const dx1 = worldX - wall.x1;
         const dy1 = worldY - wall.y1;
         const dist1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
@@ -3168,8 +3233,8 @@
         }
       }
 
-      // Check end endpoint (x2, y2) - skip if it's the one being dragged
-      if (!(wall.id === excludeWallId && excludeEndpoint === 'end')) {
+      // Check end endpoint (x2, y2) - skip if it's being dragged
+      if (!excludedEndpoints.has(`${wall.id}-end`)) {
         const dx2 = worldX - wall.x2;
         const dy2 = worldY - wall.y2;
         const dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
