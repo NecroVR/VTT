@@ -72,6 +72,11 @@
   let selectedWallId: string | null = null;
   let hoveredWallId: string | null = null;
 
+  // Wall endpoint dragging state
+  let isDraggingWallEndpoint = false;
+  let draggedWallId: string | null = null;
+  let draggedEndpoint: 'start' | 'end' | null = null;
+
   // Double-click detection
   let lastClickTime = 0;
   let lastClickTokenId: string | null = null;
@@ -2649,6 +2654,21 @@
           }
         }
 
+        // Check for wall endpoint dragging first (higher priority than wall selection)
+        const endpointHit = findWallEndpointAtPoint(worldPos.x, worldPos.y);
+        if (endpointHit) {
+          isDraggingWallEndpoint = true;
+          draggedWallId = endpointHit.wallId;
+          draggedEndpoint = endpointHit.endpoint;
+          selectedWallId = endpointHit.wallId;
+          selectedTokenId = null;
+          selectedLightId = null;
+          onTokenSelect?.(null);
+          onLightSelect?.(null);
+          renderWalls();
+          return;
+        }
+
         // Check for wall/door selection
         const wallId = findWallAtPoint(worldPos.x, worldPos.y);
         if (wallId) {
@@ -2792,12 +2812,34 @@
     }
 
     // Update wall hover
-    if (activeTool === 'select' && isGM && !isDraggingToken && !isDraggingLight && !isPanning) {
+    if (activeTool === 'select' && isGM && !isDraggingToken && !isDraggingLight && !isPanning && !isDraggingWallEndpoint) {
       const wallId = findWallAtPoint(worldPos.x, worldPos.y);
       if (wallId !== hoveredWallId) {
         hoveredWallId = wallId;
         renderWalls();
       }
+    }
+
+    // Handle wall endpoint dragging
+    if (isDraggingWallEndpoint && draggedWallId && draggedEndpoint) {
+      const wall = walls.find(w => w.id === draggedWallId);
+      if (wall) {
+        // Apply snapping based on wall's snapToGrid setting
+        const targetPos = wall.snapToGrid ? snapToGrid(worldPos.x, worldPos.y) : worldPos;
+
+        // Update wall position locally for immediate feedback
+        if (draggedEndpoint === 'start') {
+          wall.x1 = targetPos.x;
+          wall.y1 = targetPos.y;
+        } else {
+          wall.x2 = targetPos.x;
+          wall.y2 = targetPos.y;
+        }
+        // Invalidate visibility cache so walls update during drag
+        invalidateVisibilityCache();
+        renderWalls();
+      }
+      return;
     }
 
     if (isDraggingLight && draggedLightId) {
@@ -2899,6 +2941,26 @@
 
       isDraggingToken = false;
       draggedTokenId = null;
+    } else if (isDraggingWallEndpoint && draggedWallId && draggedEndpoint) {
+      const wall = walls.find(w => w.id === draggedWallId);
+      if (wall) {
+        const worldPos = screenToWorld(e.clientX, e.clientY);
+
+        // Apply snapping based on wall's snapToGrid setting
+        const targetPos = wall.snapToGrid ? snapToGrid(worldPos.x, worldPos.y) : worldPos;
+
+        // Prepare the update based on which endpoint was dragged
+        const updates: Partial<Wall> = draggedEndpoint === 'start'
+          ? { x1: targetPos.x, y1: targetPos.y }
+          : { x2: targetPos.x, y2: targetPos.y };
+
+        // Send the wall update via callback
+        onWallUpdate?.(draggedWallId, updates);
+      }
+
+      isDraggingWallEndpoint = false;
+      draggedWallId = null;
+      draggedEndpoint = null;
     }
 
     isPanning = false;
@@ -3005,6 +3067,30 @@
       const distance = distanceToLineSegment(worldX, worldY, wall.x1, wall.y1, wall.x2, wall.y2);
       if (distance <= threshold) {
         return wall.id;
+      }
+    }
+
+    return null;
+  }
+
+  function findWallEndpointAtPoint(worldX: number, worldY: number): { wallId: string; endpoint: 'start' | 'end' } | null {
+    const threshold = 8 / scale; // 8 pixels in screen space for endpoint hit detection
+
+    for (const wall of walls) {
+      // Check start endpoint (x1, y1)
+      const dx1 = worldX - wall.x1;
+      const dy1 = worldY - wall.y1;
+      const dist1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
+      if (dist1 <= threshold) {
+        return { wallId: wall.id, endpoint: 'start' };
+      }
+
+      // Check end endpoint (x2, y2)
+      const dx2 = worldX - wall.x2;
+      const dy2 = worldY - wall.y2;
+      const dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+      if (dist2 <= threshold) {
+        return { wallId: wall.id, endpoint: 'end' };
       }
     }
 
