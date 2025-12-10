@@ -120,6 +120,7 @@
   let contextMenuElementSnapToGrid = true;
   let contextMenuWallShape: 'straight' | 'curved' | undefined = undefined;
   let contextMenuClickWorldPos: { x: number; y: number } | undefined = undefined;
+  let contextMenuControlPointIndex: number | null = null;
 
   // Delete confirmation dialog state
   let showDeleteDialog = false;
@@ -3695,6 +3696,25 @@
         return;
       }
 
+      // Check for control point at position (for curved walls)
+      const controlPointHit = findControlPointAtPoint(worldX, worldY);
+      if (controlPointHit) {
+        const wall = walls.find(w => w.id === controlPointHit.wallId);
+        if (wall) {
+          showContextMenu = true;
+          contextMenuX = e.clientX;
+          contextMenuY = e.clientY;
+          contextMenuElementType = 'wall';
+          contextMenuElementId = controlPointHit.wallId;
+          contextMenuElementVisible = true; // Walls don't have visibility toggle
+          contextMenuElementSnapToGrid = wall.snapToGrid !== false; // Default to true if undefined
+          contextMenuWallShape = wall.wallShape;
+          contextMenuClickWorldPos = { x: worldX, y: worldY };
+          contextMenuControlPointIndex = controlPointHit.controlPointIndex;
+          return;
+        }
+      }
+
       // Check for wall at position
       const clickedWallId = findWallAtPoint(worldX, worldY);
       if (clickedWallId) {
@@ -3708,6 +3728,7 @@
         contextMenuElementSnapToGrid = wall?.snapToGrid !== false; // Default to true if undefined
         contextMenuWallShape = wall?.wallShape;
         contextMenuClickWorldPos = { x: worldX, y: worldY };
+        contextMenuControlPointIndex = null; // Not clicking on a control point
         return;
       }
     }
@@ -3789,6 +3810,27 @@
         );
 
         // Update the wall with the new control points
+        onWallUpdate?.(contextMenuElementId, { controlPoints: newControlPoints });
+      }
+    }
+  }
+
+  function handleDeleteSplinePoint(event: CustomEvent<{ controlPointIndex: number }>) {
+    showContextMenu = false;
+    if (contextMenuElementType === 'wall' && contextMenuElementId) {
+      const wall = walls.find(w => w.id === contextMenuElementId);
+      if (wall && wall.wallShape === 'curved') {
+        const existingControlPoints = wall.controlPoints || [];
+
+        // Remove the control point at the specified index
+        const newControlPoints = [
+          ...existingControlPoints.slice(0, event.detail.controlPointIndex),
+          ...existingControlPoints.slice(event.detail.controlPointIndex + 1)
+        ];
+
+        // Update the wall with the new control points array
+        // If this was the last control point, the wall becomes effectively straight
+        // (but remains wallShape: 'curved' with empty controlPoints)
         onWallUpdate?.(contextMenuElementId, { controlPoints: newControlPoints });
       }
     }
@@ -3982,11 +4024,13 @@
     snapToGrid={contextMenuElementSnapToGrid}
     wallShape={contextMenuWallShape}
     clickWorldPos={contextMenuClickWorldPos}
+    controlPointIndex={contextMenuControlPointIndex}
     on:edit={handleContextMenuEdit}
     on:possess={handleContextMenuPossess}
     on:toggleVisibility={handleContextMenuToggleVisibility}
     on:toggleSnapToGrid={handleContextMenuToggleSnapToGrid}
     on:addSplinePoint={handleAddSplinePoint}
+    on:deleteSplinePoint={handleDeleteSplinePoint}
     on:delete={handleContextMenuDelete}
     on:close={() => showContextMenu = false}
   />

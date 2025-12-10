@@ -9,12 +9,17 @@
   export let isGM: boolean = false;
   export let isVisible: boolean = true;
   export let snapToGrid: boolean = true;
+  export let wallShape: 'straight' | 'curved' | undefined = undefined;
+  export let clickWorldPos: { x: number; y: number } | undefined = undefined;
+  export let controlPointIndex: number | null = null;
 
   const dispatch = createEventDispatcher<{
     edit: void;
     possess: void;
     toggleVisibility: { currentState: boolean };
     toggleSnapToGrid: { currentState: boolean };
+    addSplinePoint: { worldPos: { x: number; y: number } };
+    deleteSplinePoint: { controlPointIndex: number };
     delete: void;
     close: void;
   }>();
@@ -102,6 +107,20 @@
     close();
   }
 
+  function handleAddSplinePoint() {
+    if (clickWorldPos) {
+      dispatch('addSplinePoint', { worldPos: clickWorldPos });
+      close();
+    }
+  }
+
+  function handleDeleteSplinePoint() {
+    if (controlPointIndex !== null) {
+      dispatch('deleteSplinePoint', { controlPointIndex });
+      close();
+    }
+  }
+
   function close() {
     // Dispatch close event to parent using Svelte's event system
     dispatch('close');
@@ -183,6 +202,37 @@
         {/if}
       </span>
       <span>{snapToGrid ? 'Disable' : 'Enable'} Snap to Grid</span>
+    </button>
+  {/if}
+
+  <!-- Add Spline Point (curved walls only) -->
+  {#if elementType === 'wall' && wallShape === 'curved' && controlPointIndex === null}
+    <button class="menu-item" on:click={handleAddSplinePoint}>
+      <span class="icon">
+        <!-- Plus icon for adding a point -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="16"></line>
+          <line x1="8" y1="12" x2="16" y2="12"></line>
+        </svg>
+      </span>
+      <span>Add Spline Point</span>
+    </button>
+  {/if}
+
+  <!-- Delete Spline Point (curved walls only, when clicking on a control point) -->
+  {#if elementType === 'wall' && wallShape === 'curved' && controlPointIndex !== null}
+    <button class="menu-item danger" on:click={handleDeleteSplinePoint}>
+      <span class="icon">
+        <!-- Trash icon for deleting a point -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          <line x1="10" y1="11" x2="10" y2="17"></line>
+          <line x1="14" y1="11" x2="14" y2="17"></line>
+        </svg>
+      </span>
+      <span>Delete Spline Point</span>
     </button>
   {/if}
 
