@@ -79,6 +79,11 @@
   let draggedEndpointRequiresGridSnap = false;  // True if any dragged wall has snapToGrid
   let nearbyEndpoint: { wallId: string; endpoint: 'start' | 'end'; x: number; y: number } | null = null;
 
+  // Selection box state
+  let isDrawingSelectionBox = false;
+  let selectionBoxStart: { x: number; y: number } | null = null;
+  let selectionBoxEnd: { x: number; y: number } | null = null;
+
   // Double-click detection
   let lastClickTime = 0;
   let lastClickTokenId: string | null = null;
@@ -2552,6 +2557,205 @@
     if (isGM) {
       renderLightHandles();
     }
+
+    // Draw selection box if active
+    if (isDrawingSelectionBox && selectionBoxStart && selectionBoxEnd) {
+      const startScreen = worldToScreen(selectionBoxStart.x, selectionBoxStart.y);
+      const endScreen = worldToScreen(selectionBoxEnd.x, selectionBoxEnd.y);
+
+      const x = Math.min(startScreen.x, endScreen.x);
+      const y = Math.min(startScreen.y, endScreen.y);
+      const width = Math.abs(endScreen.x - startScreen.x);
+      const height = Math.abs(endScreen.y - startScreen.y);
+
+      // Draw semi-transparent blue fill
+      controlsCtx.fillStyle = 'rgba(0, 120, 215, 0.2)';
+      controlsCtx.fillRect(x, y, width, height);
+
+      // Draw solid blue border
+      controlsCtx.strokeStyle = 'rgba(0, 120, 215, 0.8)';
+      controlsCtx.lineWidth = 2;
+      controlsCtx.strokeRect(x, y, width, height);
+    }
+  }
+
+  // ============================================================================
+  // Geometric Intersection Utilities for Selection Box
+  // ============================================================================
+
+  /**
+   * Check if a point is inside a rectangle
+   * Used for light selection (lights are points)
+   */
+  function pointInRect(
+    px: number, py: number,
+    rx: number, ry: number, rw: number, rh: number
+  ): boolean {
+    return px >= rx && px <= rx + rw && py >= ry && py <= ry + rh;
+  }
+
+  /**
+   * Check if a circle intersects with a rectangle
+   * Used for token selection (tokens are circular)
+   */
+  function circleIntersectsRect(
+    cx: number, cy: number, r: number,
+    rx: number, ry: number, rw: number, rh: number
+  ): boolean {
+    // Find closest point on rectangle to circle center
+    const closestX = Math.max(rx, Math.min(cx, rx + rw));
+    const closestY = Math.max(ry, Math.min(cy, ry + rh));
+    const dx = cx - closestX;
+    const dy = cy - closestY;
+    return (dx * dx + dy * dy) <= (r * r);
+  }
+
+  /**
+   * Check if two line segments intersect
+   */
+  function lineSegmentsIntersect(
+    x1: number, y1: number, x2: number, y2: number,
+    x3: number, y3: number, x4: number, y4: number
+  ): boolean {
+    const denom = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
+    if (denom === 0) return false; // parallel
+
+    const ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denom;
+    const ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denom;
+
+    return ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1;
+  }
+
+  /**
+   * Check if a line segment intersects with a rectangle
+   * Used for wall selection
+   */
+  function lineIntersectsRect(
+    x1: number, y1: number, x2: number, y2: number,
+    rx: number, ry: number, rw: number, rh: number
+  ): boolean {
+    // Check if either endpoint is inside rectangle
+    const p1Inside = pointInRect(x1, y1, rx, ry, rw, rh);
+    const p2Inside = pointInRect(x2, y2, rx, ry, rw, rh);
+    if (p1Inside || p2Inside) return true;
+
+    // Check if line intersects any of the 4 rectangle edges
+    const edges = [
+      [rx, ry, rx + rw, ry],           // top
+      [rx + rw, ry, rx + rw, ry + rh], // right
+      [rx, ry + rh, rx + rw, ry + rh], // bottom
+      [rx, ry, rx, ry + rh]            // left
+    ];
+
+    for (const [ex1, ey1, ex2, ey2] of edges) {
+      if (lineSegmentsIntersect(x1, y1, x2, y2, ex1, ey1, ex2, ey2)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Select all objects that overlap with the selection box
+   */
+  function selectObjectsInBox(
+    startX: number, startY: number,
+    endX: number, endY: number,
+    ctrlKey: boolean
+  ) {
+    // Normalize rectangle (handle drawing in any direction)
+    const minX = Math.min(startX, endX);
+    const maxX = Math.max(startX, endX);
+    const minY = Math.min(startY, endY);
+    const maxY = Math.max(startY, endY);
+    const boxWidth = maxX - minX;
+    const boxHeight = maxY - minY;
+
+    // Find overlapping tokens
+    const selectedTokens: string[] = [];
+    for (const token of tokens) {
+      const width = (token.width || 1) * (scene.gridWidth ?? scene.gridSize);
+      const height = (token.height || 1) * (scene.gridHeight ?? scene.gridSize);
+      const cx = token.x + width / 2;
+      const cy = token.y + height / 2;
+      const r = width / 2;
+
+      if (circleIntersectsRect(cx, cy, r, minX, minY, boxWidth, boxHeight)) {
+        selectedTokens.push(token.id);
+      }
+    }
+
+    // Find overlapping walls (GM only)
+    const selectedWalls: string[] = [];
+    if (isGM) {
+      for (const wall of walls) {
+        if (lineIntersectsRect(wall.x1, wall.y1, wall.x2, wall.y2, minX, minY, boxWidth, boxHeight)) {
+          selectedWalls.push(wall.id);
+        }
+      }
+    }
+
+    // Find overlapping lights (GM only)
+    const selectedLights: string[] = [];
+    if (isGM) {
+      for (const light of lights) {
+        if (pointInRect(light.x, light.y, minX, minY, boxWidth, boxHeight)) {
+          selectedLights.push(light.id);
+        }
+      }
+    }
+
+    // Update selection state
+    if (ctrlKey) {
+      // Add to existing selection
+      if (selectedTokens.length > 0) {
+        // For tokens, just select the first one (single selection)
+        selectedTokenId = selectedTokens[0];
+        onTokenSelect?.(selectedTokenId);
+      }
+
+      if (selectedWalls.length > 0) {
+        // For walls, add to existing set
+        selectedWalls.forEach(id => selectedWallIds.add(id));
+        selectedWallIds = selectedWallIds; // trigger reactivity
+      }
+
+      if (selectedLights.length > 0) {
+        // For lights, just select the first one (single selection)
+        selectedLightId = selectedLights[0];
+        onLightSelect?.(selectedLightId);
+      }
+    } else {
+      // Replace selection
+      if (selectedTokens.length > 0) {
+        selectedTokenId = selectedTokens[0];
+        onTokenSelect?.(selectedTokenId);
+      } else {
+        selectedTokenId = null;
+        onTokenSelect?.(null);
+      }
+
+      if (selectedWalls.length > 0) {
+        selectedWallIds = new Set(selectedWalls);
+      } else {
+        selectedWallIds = new Set();
+      }
+
+      if (selectedLights.length > 0) {
+        selectedLightId = selectedLights[0];
+        onLightSelect?.(selectedLightId);
+      } else {
+        selectedLightId = null;
+        onLightSelect?.(null);
+      }
+    }
+
+    // Re-render to show selection
+    renderTokens();
+    renderWalls();
+    renderLights();
+    renderControls();
   }
 
   /**
@@ -2795,16 +2999,38 @@
           lastClickLightId = null;
         }
       } else {
-        // Clicking on empty space - exit possession, clear selections and start panning
-        exitPossession();
-        selectedTokenId = null;
-        selectedLightId = null;
-        onTokenSelect?.(null);
-        onLightSelect?.(null);
-        isPanning = true;
-        lastClickTime = 0;
-        lastClickTokenId = null;
-        lastClickLightId = null;
+        // Clicking on empty space in select mode
+        if (e.button === 0) {
+          // Left click - start selection box
+          isDrawingSelectionBox = true;
+          selectionBoxStart = { x: worldPos.x, y: worldPos.y };
+          selectionBoxEnd = { x: worldPos.x, y: worldPos.y };
+
+          // Clear selections unless Ctrl is held
+          if (!e.ctrlKey) {
+            exitPossession();
+            selectedTokenId = null;
+            selectedLightId = null;
+            selectedWallIds = new Set();
+            onTokenSelect?.(null);
+            onLightSelect?.(null);
+          }
+
+          lastClickTime = 0;
+          lastClickTokenId = null;
+          lastClickLightId = null;
+        } else {
+          // Right click - pan
+          exitPossession();
+          selectedTokenId = null;
+          selectedLightId = null;
+          onTokenSelect?.(null);
+          onLightSelect?.(null);
+          isPanning = true;
+          lastClickTime = 0;
+          lastClickTokenId = null;
+          lastClickLightId = null;
+        }
       }
     } else {
       // Non-select tool - clear selections and start panning if clicking empty space
@@ -2931,6 +3157,10 @@
         token.y = newY;
         renderTokens();
       }
+    } else if (isDrawingSelectionBox && selectionBoxStart) {
+      // Update selection box end position
+      selectionBoxEnd = { x: worldPos.x, y: worldPos.y };
+      renderControls();
     } else if (isPanning) {
       const dx = e.clientX - lastMouseX;
       const dy = e.clientY - lastMouseY;
@@ -2952,6 +3182,22 @@
   }
 
   function handleMouseUp(e: MouseEvent) {
+    // Handle selection box completion
+    if (isDrawingSelectionBox && selectionBoxStart && selectionBoxEnd) {
+      selectObjectsInBox(
+        selectionBoxStart.x, selectionBoxStart.y,
+        selectionBoxEnd.x, selectionBoxEnd.y,
+        e.ctrlKey
+      );
+
+      // Reset selection box state
+      isDrawingSelectionBox = false;
+      selectionBoxStart = null;
+      selectionBoxEnd = null;
+      renderControls();
+      return; // Don't process other mouse up logic
+    }
+
     if (isDraggingLight && draggedLightId) {
       const light = lights.find(l => l.id === draggedLightId);
       if (light) {
@@ -3074,6 +3320,13 @@
     return {
       x: (canvasX + viewX * scale) / scale,
       y: (canvasY + viewY * scale) / scale,
+    };
+  }
+
+  function worldToScreen(worldX: number, worldY: number): { x: number; y: number } {
+    return {
+      x: worldX * scale - viewX * scale,
+      y: worldY * scale - viewY * scale,
     };
   }
 
