@@ -2,6 +2,7 @@ import type { Token } from './campaign.js';
 import type { Scene } from './scene.js';
 import type { Wall } from './wall.js';
 import type { AmbientLight } from './ambientLight.js';
+import type { Path } from './path.js';
 import type { ActiveEffect } from './activeEffect.js';
 import type { MeasurementTemplate, RulerMeasurement } from './template.js';
 import type { Drawing, DrawingPoint } from './drawing.js';
@@ -16,6 +17,7 @@ export type WSMessageType =
   | 'scene:switch' | 'scene:switched' | 'scene:update' | 'scene:updated'
   | 'wall:add' | 'wall:added' | 'wall:update' | 'wall:updated' | 'wall:remove' | 'wall:removed'
   | 'light:add' | 'light:added' | 'light:update' | 'light:updated' | 'light:remove' | 'light:removed'
+  | 'path:add' | 'path:added' | 'path:update' | 'path:updated' | 'path:remove' | 'path:removed'
   | 'actor:create' | 'actor:created' | 'actor:update' | 'actor:updated' | 'actor:delete' | 'actor:deleted'
   | 'combat:start' | 'combat:started' | 'combat:end' | 'combat:ended' | 'combat:update' | 'combat:updated'
   | 'combatant:add' | 'combatant:added' | 'combatant:update' | 'combatant:updated' | 'combatant:remove' | 'combatant:removed'
@@ -1078,4 +1080,45 @@ export interface PinOpenedPayload {
   pinId: string;
   journalId?: string | null;
   pageId?: string | null;
+}
+
+// Path payloads
+export interface PathAddPayload {
+  sceneId: string;
+  name?: string;
+  nodes: Array<{ x: number; y: number }>;
+  speed?: number;
+  loop?: boolean;
+  visible?: boolean;
+  color?: string;
+}
+
+export interface PathAddedPayload {
+  path: Path;
+}
+
+export interface PathUpdatePayload {
+  pathId: string;
+  updates: {
+    name?: string;
+    nodes?: Array<{ x: number; y: number }>;
+    speed?: number;
+    loop?: boolean;
+    assignedObjectId?: string | null;
+    assignedObjectType?: 'token' | 'light' | null;
+    visible?: boolean;
+    color?: string;
+  };
+}
+
+export interface PathUpdatedPayload {
+  path: Path;
+}
+
+export interface PathRemovePayload {
+  pathId: string;
+}
+
+export interface PathRemovedPayload {
+  pathId: string;
 }

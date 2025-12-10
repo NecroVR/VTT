@@ -22,6 +22,7 @@ import pinsRoute from './pins.js';
 import compendiumsRoute from './compendiums.js';
 import storageRoute from './storage.js';
 import viewportsRoute from './viewports.js';
+import pathsRoute from './paths.js';
 
 /**
  * API v1 routes
@@ -61,6 +62,7 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
         compendiumEntries: '/api/v1/compendium-entries/:entryId',
         storage: '/api/v1/storage/quota',
         viewports: '/api/v1/scenes/:sceneId/viewport',
+        paths: '/api/v1/scenes/:sceneId/paths',
       },
     };
   });
@@ -89,6 +91,7 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
   await fastify.register(compendiumsRoute);
   await fastify.register(storageRoute);
   await fastify.register(viewportsRoute);
+  await fastify.register(pathsRoute);
 };
 
 export default apiV1Routes;
