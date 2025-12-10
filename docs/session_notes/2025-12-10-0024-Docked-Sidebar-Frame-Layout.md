@@ -859,8 +859,89 @@ Since E2E tests have environment issues, manual testing is required:
 **Final Assessment**: The sidebar layout changes are **safe to deploy**. Test failures are pre-existing infrastructure issues that need to be addressed separately. Manual testing in Docker is required to fully verify the new sidebar functionality.
 
 **Next Steps**:
-1. Deploy to Docker with `docker-compose up -d --build`
+1. ~~Deploy to Docker with `docker-compose up -d --build`~~ ✅ COMPLETE
 2. Perform manual testing checklist
 3. Verify all sidebar functionality works
 4. Create separate task to fix test infrastructure
+
+## Final Status
+
+**Date**: 2025-12-10 06:31 AM
+**Git Commit**: `9942acf`
+**Status**: ✅ COMPLETE - All implementation and deployment done
+
+### Deployment Verification
+
+**Docker Build**: ✅ SUCCESS
+- Web container built and started successfully
+- Server container built and started successfully
+- All services running (vtt_web, vtt_server, vtt_db, vtt_redis, vtt_nginx)
+
+**Container Logs**:
+- `vtt_web`: Listening on http://0.0.0.0:5173
+- `vtt_server`: Server listening on 0.0.0.0:3000 in production mode
+
+**Access URLs**:
+- HTTPS: https://localhost
+- HTTP: http://localhost (redirects to HTTPS)
+
+### Changes Summary
+
+| File | Changes |
+|------|---------|
+| `apps/web/src/routes/campaign/[id]/+page.svelte` | Layout restructure, divider implementation, scene tabs |
+| `apps/web/src/lib/components/sidebar/OverlaySidebar.svelte` | Relative positioning for docked mode |
+| `apps/web/src/lib/stores/sidebar.ts` | Minor store updates |
+| `docs/session_notes/2025-12-10-0024-Docked-Sidebar-Frame-Layout.md` | Session documentation |
+
+### Feature Description
+
+The docked sidebar now appears as a proper frame to the right of the canvas:
+- **Scene header** spans full width at top
+- **Canvas frame** takes remaining space on left (flex: 1)
+- **Sidebar divider** (6px) between canvas and sidebar when docked
+- **Sidebar frame** with dynamic width from store (280px-600px)
+
+The divider is draggable with:
+- Blue highlight on hover (`rgba(59, 130, 246, 0.5)`)
+- Brighter blue while dragging (`rgba(59, 130, 246, 0.8)`)
+- Width constraints: MIN 280px, MAX 600px
+- Width persists via sidebar store and localStorage
+
+### Manual Testing Required
+
+Please verify in browser:
+1. Open https://localhost
+2. Log in and open a campaign
+3. Test sidebar docked mode - should appear as frame next to canvas
+4. Test divider drag - should resize sidebar smoothly
+5. Test canvas interactions - tokens, pan/zoom, tools should all work
+6. Test toggle docked/floating modes
+7. Test collapsed/expanded states
+
+## User Verification
+
+**Date**: 2025-12-10 06:34 AM
+**Status**: ✅ VERIFIED WORKING
+
+User confirmed:
+- Basic layout of the sidebar is correct
+- Side-by-side frame layout is working as intended
+- Some additional changes needed (to be addressed in next session)
+
+### Known Issues for Next Session
+
+User indicated changes are needed - to be documented in follow-up session.
+
+## Session Complete
+
+**Summary**: Successfully redesigned the docked sidebar from a fixed overlay to a proper side-by-side frame layout with:
+- Flex-based layout structure
+- Draggable divider between canvas and sidebar
+- Width constraints (280px-600px)
+- Visual feedback on hover/drag
+- Canvas auto-resize via ResizeObserver
+
+**Git Commit**: `9942acf` - All implementation changes committed and pushed
+**Docker**: Deployed and verified working (required nginx restart after rebuild)
 
