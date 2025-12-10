@@ -105,6 +105,7 @@ describe('Index Exports', () => {
         y1: 0,
         x2: 100,
         y2: 0,
+        wallShape: 'straight',
         wallType: 'normal',
         move: 'block',
         sense: 'block',
