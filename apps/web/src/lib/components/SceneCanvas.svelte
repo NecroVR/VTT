@@ -3897,29 +3897,30 @@
 
   /**
    * Find a path at the given point (checks both nodes and path lines)
+   * Returns the pathName if found, null otherwise
    */
   function findPathAtPoint(x: number, y: number): string | null {
-    const state = get(pathsStore);
-    const paths = Array.from(state.paths.values()).filter(p => p.sceneId === scene.id);
+    const paths = get(assembledPaths).filter(p => p.sceneId === scene.id);
     const threshold = 10 / scale; // 10 pixels in screen space
 
     for (const path of paths) {
       // Check if clicking on a node
-      for (const node of path.nodes) {
-        const dx = x - node.x;
-        const dy = y - node.y;
+      for (const point of path.points) {
+        const dx = x - point.x;
+        const dy = y - point.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist <= threshold) {
-          return path.id;
+          return path.pathName;
         }
       }
 
       // Check if clicking on the path line
-      if (path.nodes.length >= 2) {
-        const splinePoints = catmullRomSpline(path.nodes);
+      if (path.points.length >= 2) {
+        const nodes = path.points.map(p => ({ x: p.x, y: p.y }));
+        const splinePoints = catmullRomSpline(nodes);
         const dist = distanceToSpline(x, y, splinePoints);
         if (dist <= threshold) {
-          return path.id;
+          return path.pathName;
         }
       }
     }
