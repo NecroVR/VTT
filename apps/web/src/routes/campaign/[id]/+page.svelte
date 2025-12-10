@@ -303,7 +303,7 @@
     activeTool = tool;
   }
 
-  function handleWallAdd(wall: { x1: number; y1: number; x2: number; y2: number }) {
+  function handleWallAdd(wall: { x1: number; y1: number; x2: number; y2: number; snapToGrid?: boolean; wallShape?: 'straight' | 'curved' }) {
     if (!activeScene) return;
     websocket.sendWallAdd({
       sceneId: activeScene.id,
@@ -316,7 +316,9 @@
       sense: 'block',
       sound: 'none',
       door: 'none',
-      doorState: 'closed'
+      doorState: 'closed',
+      wallShape: wall.wallShape,
+      snapToGrid: wall.snapToGrid
     });
   }
 

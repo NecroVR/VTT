@@ -33,7 +33,7 @@
   export let onTokenMove: ((tokenId: string, x: number, y: number) => void) | undefined = undefined;
   export let onTokenSelect: ((tokenId: string | null) => void) | undefined = undefined;
   export let onTokenDoubleClick: ((tokenId: string) => void) | undefined = undefined;
-  export let onWallAdd: ((wall: { x1: number; y1: number; x2: number; y2: number }) => void) | undefined = undefined;
+  export let onWallAdd: ((wall: { x1: number; y1: number; x2: number; y2: number; snapToGrid?: boolean; wallShape?: 'straight' | 'curved' }) => void) | undefined = undefined;
   export let onWallRemove: ((wallId: string) => void) | undefined = undefined;
   export let onWallUpdate: ((wallId: string, updates: Partial<Wall>) => void) | undefined = undefined;
   export let onTokenAdd: ((tokenData: any) => void) | undefined = undefined;
@@ -2800,8 +2800,8 @@
     const worldPos = screenToWorld(e.clientX, e.clientY);
     const snappedPos = snapToGrid(worldPos.x, worldPos.y);
 
-    // Handle wall tool
-    if (activeTool === 'wall' && isGM) {
+    // Handle wall tool (both straight and curved)
+    if ((activeTool === 'wall' || activeTool === 'curved-wall') && isGM) {
       if (!isDrawingWall) {
         // Start drawing wall
         isDrawingWall = true;
@@ -3062,6 +3062,9 @@
       return;
     }
 
+    // Determine wall shape based on active tool
+    const wallShape = activeTool === 'curved-wall' ? 'curved' : 'straight';
+
     // Create wall via callback - use current gridSnap setting as default
     onWallAdd?.({
       x1: wallStartPoint.x,
@@ -3069,6 +3072,7 @@
       x2: endPos.x,
       y2: endPos.y,
       snapToGrid: gridSnap,
+      wallShape,
     });
 
     // Reset drawing state
