@@ -2,6 +2,7 @@
   import { authStore } from '$lib/stores/auth';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
+  import { campaignsStore } from '$lib/stores/campaigns';
 
   async function handleLogout() {
     await authStore.logout();
@@ -21,6 +22,11 @@
   }
 
   $: isAuthPage = $page.url.pathname === '/login' || $page.url.pathname === '/register';
+
+  // Check if we're on a campaign page and extract campaign ID
+  $: campaignMatch = $page.url.pathname.match(/^\/campaign\/([^/]+)/);
+  $: campaignId = campaignMatch ? campaignMatch[1] : null;
+  $: currentCampaign = $campaignsStore.currentCampaign;
 </script>
 
 <header class="header">
@@ -28,6 +34,13 @@
     <button class="logo" on:click={goHome}>
       <span class="logo-text">VTT</span>
     </button>
+
+    {#if campaignId}
+      <div class="campaign-info">
+        <span class="campaign-label">Campaign Session</span>
+        <span class="campaign-id">ID: {campaignId}</span>
+      </div>
+    {/if}
 
     <nav class="nav">
       {#if $authStore.user}
@@ -80,6 +93,24 @@
 
   .logo:hover .logo-text {
     opacity: 0.8;
+  }
+
+  .campaign-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  .campaign-label {
+    font-size: var(--font-size-md);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  .campaign-id {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    font-family: monospace;
   }
 
   .nav {

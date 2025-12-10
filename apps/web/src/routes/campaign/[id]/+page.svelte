@@ -393,9 +393,7 @@
 
 <div class="campaign-container">
   <header class="campaign-header">
-    <div class="campaign-info">
-      <h1>Campaign Session</h1>
-      <span class="campaign-id">ID: {campaignId}</span>
+    <div class="campaign-controls">
 
       {#if scenes.length > 0}
         <div class="scene-selector">
@@ -558,21 +556,10 @@
     border-bottom: 1px solid var(--color-border);
   }
 
-  .campaign-info {
+  .campaign-controls {
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
-  }
-
-  .campaign-info h1 {
-    font-size: var(--font-size-lg);
-    font-weight: 600;
-  }
-
-  .campaign-id {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
-    font-family: monospace;
   }
 
   .scene-selector {
