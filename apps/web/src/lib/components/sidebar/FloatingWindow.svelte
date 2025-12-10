@@ -19,6 +19,10 @@
     resize: { width: number; height: number };
   }>();
 
+  // Boundary constraint constants
+  const TITLEBAR_HEIGHT = 40;  // Keep titlebar visible
+  const MIN_VISIBLE_WIDTH = 100;  // Minimum horizontal visibility
+
   // State
   let position = { ...initialPosition };
   let size = { ...initialSize };
@@ -36,6 +40,26 @@
 
   // Window element
   let windowElement: HTMLDivElement;
+
+  // Constrain position to keep window within viewport bounds
+  function constrainPosition(x: number, y: number, width: number, height: number): { x: number; y: number } {
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    // Horizontal: Ensure at least MIN_VISIBLE_WIDTH pixels are on-screen
+    const constrainedX = Math.max(
+      -width + MIN_VISIBLE_WIDTH,  // Allow most of window off left edge
+      Math.min(x, viewportWidth - MIN_VISIBLE_WIDTH)  // Allow most of window off right edge
+    );
+
+    // Vertical: Keep titlebar within viewport (cannot go above top or below bottom)
+    const constrainedY = Math.max(
+      0,  // Cannot go above viewport top
+      Math.min(y, viewportHeight - TITLEBAR_HEIGHT)  // Titlebar must stay above viewport bottom
+    );
+
+    return { x: constrainedX, y: constrainedY };
+  }
 
   // Handle window focus
   function handleFocus() {
@@ -78,18 +102,12 @@
     let newX = event.clientX - dragOffset.x;
     let newY = event.clientY - dragOffset.y;
 
-    // Bounds checking - keep window in viewport
     const windowWidth = windowElement?.offsetWidth || size.width;
     const windowHeight = windowElement?.offsetHeight || size.height;
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
 
-    // Keep titlebar visible (allow some negative offset)
-    newX = Math.max(-windowWidth + 100, Math.min(newX, viewportWidth - 100));
-    newY = Math.max(0, Math.min(newY, viewportHeight - 40));
-
-    position.x = newX;
-    position.y = newY;
+    const constrained = constrainPosition(newX, newY, windowWidth, windowHeight);
+    position.x = constrained.x;
+    position.y = constrained.y;
   }
 
   // Stop dragging
@@ -138,25 +156,51 @@
       newWidth = Math.max(minWidth, resizeStartSize.width + deltaX);
     }
     if (resizeDirection.includes('w')) {
-      newWidth = Math.max(minWidth, resizeStartSize.width - deltaX);
-      if (newWidth > minWidth) {
-        newX = position.x + deltaX;
+      const potentialWidth = Math.max(minWidth, resizeStartSize.width - deltaX);
+      if (potentialWidth > minWidth) {
+        newWidth = potentialWidth;
+        newX = position.x + (resizeStartSize.width - potentialWidth);
       }
     }
     if (resizeDirection.includes('s')) {
       newHeight = Math.max(minHeight, resizeStartSize.height + deltaY);
     }
     if (resizeDirection.includes('n')) {
-      newHeight = Math.max(minHeight, resizeStartSize.height - deltaY);
-      if (newHeight > minHeight) {
-        newY = position.y + deltaY;
+      const potentialHeight = Math.max(minHeight, resizeStartSize.height - deltaY);
+      if (potentialHeight > minHeight) {
+        newHeight = potentialHeight;
+        newY = position.y + (resizeStartSize.height - potentialHeight);
       }
+    }
+
+    // Apply boundary constraints to position
+    const constrained = constrainPosition(newX, newY, newWidth, newHeight);
+
+    // If position was constrained, also constrain the size appropriately
+    // This prevents the window from growing past the screen edge
+    if (resizeDirection.includes('w') && constrained.x !== newX) {
+      // Window hit left boundary, adjust width
+      newWidth = Math.max(minWidth, size.width + (position.x - constrained.x));
+    }
+    if (resizeDirection.includes('n') && constrained.y !== newY) {
+      // Window hit top boundary, adjust height
+      newHeight = Math.max(minHeight, size.height + (position.y - constrained.y));
+    }
+    if (resizeDirection.includes('e')) {
+      // Limit right edge to keep MIN_VISIBLE_WIDTH on screen
+      const maxWidth = window.innerWidth - constrained.x - MIN_VISIBLE_WIDTH + size.width;
+      newWidth = Math.min(newWidth, maxWidth);
+    }
+    if (resizeDirection.includes('s')) {
+      // Limit bottom edge to viewport
+      const maxHeight = window.innerHeight - constrained.y;
+      newHeight = Math.min(newHeight, maxHeight);
     }
 
     size.width = newWidth;
     size.height = newHeight;
-    position.x = newX;
-    position.y = newY;
+    position.x = constrained.x;
+    position.y = constrained.y;
   }
 
   // Stop resizing
@@ -170,12 +214,43 @@
     }
   }
 
+  // Handle browser window resize
+  function handleWindowResize() {
+    const windowWidth = windowElement?.offsetWidth || size.width;
+    const windowHeight = windowElement?.offsetHeight || size.height;
+    const constrained = constrainPosition(position.x, position.y, windowWidth, windowHeight);
+
+    if (constrained.x !== position.x || constrained.y !== position.y) {
+      position.x = constrained.x;
+      position.y = constrained.y;
+      dispatch('move', { x: position.x, y: position.y });
+    }
+  }
+
+  // Initialize and validate position on mount
+  onMount(() => {
+    // Validate initial position is within bounds
+    const windowWidth = size.width;
+    const windowHeight = size.height;
+    const constrained = constrainPosition(position.x, position.y, windowWidth, windowHeight);
+
+    if (constrained.x !== position.x || constrained.y !== position.y) {
+      position.x = constrained.x;
+      position.y = constrained.y;
+      dispatch('move', { x: position.x, y: position.y });
+    }
+
+    // Listen for browser window resize
+    window.addEventListener('resize', handleWindowResize);
+  });
+
   // Cleanup on destroy
   onDestroy(() => {
     document.removeEventListener('mousemove', onDrag);
     document.removeEventListener('mouseup', stopDrag);
     document.removeEventListener('mousemove', onResize);
     document.removeEventListener('mouseup', stopResize);
+    window.removeEventListener('resize', handleWindowResize);
   });
 
   // Get cursor style for resize direction
