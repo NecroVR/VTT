@@ -50,6 +50,9 @@ export interface AmbientLight {
   darknessMax: number;
   hidden: boolean;
   elevation: number;
+  // Path following
+  followPathName?: string | null;  // Path name to follow
+  pathSpeed?: number | null;       // Speed in units per second
   // Metadata
   data: Record<string, unknown>;
   createdAt: Date;
@@ -84,6 +87,8 @@ export interface CreateAmbientLightRequest {
   darknessMax?: number;
   hidden?: boolean;
   elevation?: number;
+  followPathName?: string | null;
+  pathSpeed?: number | null;
   data?: Record<string, unknown>;
 }
 
@@ -115,6 +120,8 @@ export interface UpdateAmbientLightRequest {
   darknessMax?: number;
   hidden?: boolean;
   elevation?: number;
+  followPathName?: string | null;
+  pathSpeed?: number | null;
   data?: Record<string, unknown>;
 }
 

@@ -2,7 +2,7 @@ import type { Token } from './campaign.js';
 import type { Scene } from './scene.js';
 import type { Wall } from './wall.js';
 import type { AmbientLight } from './ambientLight.js';
-import type { Path } from './path.js';
+import type { PathPoint, AssembledPath } from './path.js';
 import type { ActiveEffect } from './activeEffect.js';
 import type { MeasurementTemplate, RulerMeasurement } from './template.js';
 import type { Drawing, DrawingPoint } from './drawing.js';
@@ -18,6 +18,7 @@ export type WSMessageType =
   | 'wall:add' | 'wall:added' | 'wall:update' | 'wall:updated' | 'wall:remove' | 'wall:removed'
   | 'light:add' | 'light:added' | 'light:update' | 'light:updated' | 'light:remove' | 'light:removed'
   | 'path:add' | 'path:added' | 'path:update' | 'path:updated' | 'path:remove' | 'path:removed'
+  | 'pathPoint:add' | 'pathPoint:added' | 'pathPoint:update' | 'pathPoint:updated' | 'pathPoint:remove' | 'pathPoint:removed'
   | 'actor:create' | 'actor:created' | 'actor:update' | 'actor:updated' | 'actor:delete' | 'actor:deleted'
   | 'combat:start' | 'combat:started' | 'combat:end' | 'combat:ended' | 'combat:update' | 'combat:updated'
   | 'combatant:add' | 'combatant:added' | 'combatant:update' | 'combatant:updated' | 'combatant:remove' | 'combatant:removed'
@@ -1082,43 +1083,82 @@ export interface PinOpenedPayload {
   pageId?: string | null;
 }
 
-// Path payloads
+// Path Point payloads
+export interface PathPointAddPayload {
+  sceneId: string;
+  pathName: string;
+  pathIndex: number;
+  x: number;
+  y: number;
+  data?: Record<string, unknown>;
+}
+
+export interface PathPointAddedPayload {
+  pathPoint: PathPoint;
+}
+
+export interface PathPointUpdatePayload {
+  pathPointId: string;
+  updates: {
+    pathName?: string;
+    pathIndex?: number;
+    x?: number;
+    y?: number;
+    data?: Record<string, unknown>;
+  };
+}
+
+export interface PathPointUpdatedPayload {
+  pathPoint: PathPoint;
+}
+
+export interface PathPointRemovePayload {
+  pathPointId: string;
+}
+
+export interface PathPointRemovedPayload {
+  pathPointId: string;
+}
+
+// Bulk path operations (for backward compatibility and convenience)
 export interface PathAddPayload {
   sceneId: string;
-  name?: string;
-  nodes: Array<{ x: number; y: number }>;
+  pathName: string;
+  points: Array<{ x: number; y: number }>;
   speed?: number;
   loop?: boolean;
   visible?: boolean;
   color?: string;
+  assignedObjectId?: string;
+  assignedObjectType?: 'token' | 'light';
 }
 
 export interface PathAddedPayload {
-  path: Path;
+  assembledPath: AssembledPath;
 }
 
 export interface PathUpdatePayload {
-  pathId: string;
-  updates: {
-    name?: string;
-    nodes?: Array<{ x: number; y: number }>;
-    speed?: number;
-    loop?: boolean;
-    assignedObjectId?: string | null;
-    assignedObjectType?: 'token' | 'light' | null;
-    visible?: boolean;
-    color?: string;
-  };
+  sceneId: string;
+  pathName: string;
+  points?: Array<{ x: number; y: number }>;
+  speed?: number;
+  loop?: boolean;
+  assignedObjectId?: string | null;
+  assignedObjectType?: 'token' | 'light' | null;
+  visible?: boolean;
+  color?: string;
 }
 
 export interface PathUpdatedPayload {
-  path: Path;
+  assembledPath: AssembledPath;
 }
 
 export interface PathRemovePayload {
-  pathId: string;
+  sceneId: string;
+  pathName: string;
 }
 
 export interface PathRemovedPayload {
-  pathId: string;
+  sceneId: string;
+  pathName: string;
 }

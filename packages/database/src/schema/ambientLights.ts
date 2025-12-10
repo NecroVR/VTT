@@ -36,6 +36,9 @@ export const ambientLights = pgTable('ambient_lights', {
   darknessMax: real('darkness_max').notNull().default(1),
   hidden: boolean('hidden').notNull().default(false),
   elevation: real('elevation').notNull().default(0),
+  // Path following
+  followPathName: text('follow_path_name'), // Path name to follow (case-sensitive), null = no path
+  pathSpeed: real('path_speed'), // Speed in units per second, null = no movement
   // Metadata
   data: jsonb('data').notNull().default({}),
   createdAt: timestamp('created_at').defaultNow().notNull(),

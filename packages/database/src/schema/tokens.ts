@@ -31,6 +31,9 @@ export const tokens = pgTable('tokens', {
   lightDim: real('light_dim').notNull().default(0),
   lightColor: text('light_color'),
   lightAngle: real('light_angle').notNull().default(360),
+  // Path following
+  followPathName: text('follow_path_name'), // Path name to follow (case-sensitive), null = no path
+  pathSpeed: real('path_speed'), // Speed in units per second, null = no movement
   // Metadata
   data: jsonb('data').notNull().default({}),
   createdAt: timestamp('created_at').defaultNow().notNull(),
