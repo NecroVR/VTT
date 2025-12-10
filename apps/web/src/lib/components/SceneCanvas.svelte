@@ -14,6 +14,12 @@
     lineSegmentsIntersect,
     lineIntersectsRect,
   } from '$lib/utils/geometry';
+  import {
+    getSplinePoints,
+    renderSplinePath,
+    catmullRomSpline,
+    distanceToSpline,
+  } from '$lib/utils/spline';
 
   // Props
   export let scene: Scene;
@@ -1135,8 +1141,13 @@
         wallsCtx.globalAlpha = 0.5;
 
         wallsCtx.beginPath();
-        wallsCtx.moveTo(wall.x1, wall.y1);
-        wallsCtx.lineTo(wall.x2, wall.y2);
+        if (wall.wallShape === 'curved') {
+          const points = getSplinePoints(wall);
+          renderSplinePath(wallsCtx, points);
+        } else {
+          wallsCtx.moveTo(wall.x1, wall.y1);
+          wallsCtx.lineTo(wall.x2, wall.y2);
+        }
         wallsCtx.stroke();
 
         wallsCtx.globalAlpha = 1.0;
@@ -1151,8 +1162,13 @@
         wallsCtx.lineWidth = 3 / scale;
 
         wallsCtx.beginPath();
-        wallsCtx.moveTo(wall.x1, wall.y1);
-        wallsCtx.lineTo(wall.x2, wall.y2);
+        if (wall.wallShape === 'curved') {
+          const points = getSplinePoints(wall);
+          renderSplinePath(wallsCtx, points);
+        } else {
+          wallsCtx.moveTo(wall.x1, wall.y1);
+          wallsCtx.lineTo(wall.x2, wall.y2);
+        }
         wallsCtx.stroke();
       }
 
@@ -1168,6 +1184,18 @@
         wallsCtx.beginPath();
         wallsCtx.arc(wall.x2, wall.y2, endpointRadius, 0, Math.PI * 2);
         wallsCtx.fill();
+
+        // Draw control points for curved walls
+        if (wall.wallShape === 'curved' && wall.controlPoints && wall.controlPoints.length > 0) {
+          wallsCtx.fillStyle = '#06b6d4'; // Cyan color for control points
+          const controlPointRadius = 3 / scale; // Slightly smaller than endpoints
+
+          wall.controlPoints.forEach(cp => {
+            wallsCtx.beginPath();
+            wallsCtx.arc(cp.x, cp.y, controlPointRadius, 0, Math.PI * 2);
+            wallsCtx.fill();
+          });
+        }
       }
     });
 
@@ -3320,7 +3348,18 @@
     const threshold = 10 / scale; // 10 pixels in screen space
 
     for (const wall of walls) {
-      const distance = distanceToLineSegment(worldX, worldY, wall.x1, wall.y1, wall.x2, wall.y2);
+      let distance: number;
+
+      if (wall.wallShape === 'curved') {
+        // Use spline distance calculation for curved walls
+        const points = getSplinePoints(wall);
+        const splinePoints = catmullRomSpline(points);
+        distance = distanceToSpline(worldX, worldY, splinePoints, threshold);
+      } else {
+        // Use straight line distance for straight walls
+        distance = distanceToLineSegment(worldX, worldY, wall.x1, wall.y1, wall.x2, wall.y2);
+      }
+
       if (distance <= threshold) {
         return wall.id;
       }
@@ -3730,7 +3769,7 @@
   {/if}
   <canvas
     class="canvas-layer canvas-interactive"
-    class:cursor-crosshair={activeTool === 'wall' || activeTool === 'light'}
+    class:cursor-crosshair={activeTool === 'wall' || activeTool === 'curved-wall' || activeTool === 'light'}
     class:cursor-grab={activeTool === 'select'}
     class:drag-over={isDragOver}
     bind:this={controlsCanvas}

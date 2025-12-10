@@ -6,6 +6,9 @@ export interface Wall {
   y1: number;
   x2: number;
   y2: number;
+  // Wall shape and curve control
+  wallShape: 'straight' | 'curved';
+  controlPoints?: Array<{ x: number; y: number }>;
   // Wall properties
   wallType: string;
   move: string;
@@ -27,6 +30,8 @@ export interface CreateWallRequest {
   y1: number;
   x2: number;
   y2: number;
+  wallShape?: 'straight' | 'curved';
+  controlPoints?: Array<{ x: number; y: number }>;
   wallType?: string;
   move?: string;
   sense?: string;
@@ -42,6 +47,8 @@ export interface UpdateWallRequest {
   y1?: number;
   x2?: number;
   y2?: number;
+  wallShape?: 'straight' | 'curved';
+  controlPoints?: Array<{ x: number; y: number }>;
   wallType?: string;
   move?: string;
   sense?: string;

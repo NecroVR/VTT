@@ -12,6 +12,7 @@
   const tools = [
     { id: 'select', label: 'Select', icon: '⬆', gmOnly: false, shortcut: '1' },
     { id: 'wall', label: 'Wall', icon: '▬', gmOnly: true, shortcut: '2' },
+    { id: 'curved-wall', label: 'Curved Wall', icon: '⌒', gmOnly: true, shortcut: 'c' },
     { id: 'light', label: 'Light', icon: '💡', gmOnly: true, shortcut: '3' },
     { id: 'tile', label: 'Tile', icon: '🖼', gmOnly: true, shortcut: 't' },
     { id: 'region', label: 'Region', icon: '🔷', gmOnly: true, shortcut: 'r' },

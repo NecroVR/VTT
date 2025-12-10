@@ -9,6 +9,9 @@ export const walls = pgTable('walls', {
   y1: real('y1').notNull(),
   x2: real('x2').notNull(),
   y2: real('y2').notNull(),
+  // Wall shape and curve control
+  wallShape: text('wall_shape').notNull().default('straight'),
+  controlPoints: jsonb('control_points').notNull().default('[]'),
   // Wall properties
   wallType: text('wall_type').notNull().default('normal'),
   move: text('move').notNull().default('block'),
