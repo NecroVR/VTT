@@ -23,7 +23,7 @@
 -->
 <script lang="ts">
   import type { ComponentType, SvelteComponent } from 'svelte';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import { sidebarStore, floatingWindows } from '$lib/stores/sidebar';
   import FloatingWindow from './FloatingWindow.svelte';
   import {
@@ -54,6 +54,25 @@
   $: docked = $sidebarStore.docked;
   $: collapsed = $sidebarStore.collapsed;
   $: dockedWidth = $sidebarStore.dockedWidth;
+
+  // Track if tabs should show text or icon-only based on available width
+  let tabBarElement: HTMLElement | null = null;
+  let showTabText = true;
+
+  // Calculate the minimum width needed for all tabs with text
+  // Each tab needs roughly: icon(16px) + gap(8px) + text(~50px avg) + padding(32px) = ~106px
+  // Plus collapse buttons: 2 * 45px = 90px
+  // For 5 tabs: 5 * 70px (compressed) + 90px = 440px as comfortable threshold
+  const MIN_WIDTH_FOR_TEXT = 340; // Width threshold below which we hide text
+
+  // Reactive check based on dockedWidth
+  $: {
+    if (docked && !collapsed) {
+      showTabText = dockedWidth >= MIN_WIDTH_FOR_TEXT;
+    } else {
+      showTabText = true; // Always show text in floating mode
+    }
+  }
 
 
   // Filter out popped-out tabs
@@ -250,20 +269,23 @@
       </div>
     {:else}
       <!-- Expanded state: Tab bar and content -->
-      <div class="tab-bar">
+      <div class="tab-bar" class:icon-only={!showTabText}>
         {#each visibleTabs as tab}
           <button
             class="tab-button"
             class:active={activeTabId === tab.id}
+            class:icon-only={!showTabText}
             on:click={() => handleTabClick(tab.id)}
             on:contextmenu|preventDefault={() => handlePopOut(tab.id)}
             type="button"
-            title="Right-click to pop out"
+            title={showTabText ? "Right-click to pop out" : `${tab.label} (Right-click to pop out)`}
           >
             {#if tab.icon && iconMap[tab.icon]}
-              <svelte:component this={iconMap[tab.icon]} size={16} />
+              <svelte:component this={iconMap[tab.icon]} size={showTabText ? 16 : 18} />
             {/if}
-            <span class="tab-label">{tab.label}</span>
+            {#if showTabText}
+              <span class="tab-label">{tab.label}</span>
+            {/if}
           </button>
         {/each}
 
@@ -407,6 +429,15 @@
     align-items: center;
   }
 
+  /* When in icon-only mode, center the tabs and let them share space evenly */
+  .tab-bar.icon-only {
+    justify-content: flex-start;
+  }
+
+  .tab-bar.icon-only .tab-button {
+    flex: 1 1 auto;
+  }
+
   .tab-button {
     flex: 1;
     padding: 0.75rem 1rem;
@@ -424,6 +455,14 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    min-width: 0; /* Allow shrinking */
+  }
+
+  /* Icon-only mode for tabs when sidebar is narrow */
+  .tab-button.icon-only {
+    flex: 0 0 auto;
+    padding: 0.75rem 0.5rem;
+    min-width: 36px;
   }
 
   .tab-button:hover {
