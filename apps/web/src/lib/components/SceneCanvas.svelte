@@ -85,6 +85,7 @@
   let contextMenuElementType: 'token' | 'light' | 'wall' | null = null;
   let contextMenuElementId: string | null = null;
   let contextMenuElementVisible = true;
+  let contextMenuElementSnapToGrid = true;
 
   // Delete confirmation dialog state
   let showDeleteDialog = false;
@@ -2751,12 +2752,13 @@
       return;
     }
 
-    // Create wall via callback
+    // Create wall via callback - use current gridSnap setting as default
     onWallAdd?.({
       x1: wallStartPoint.x,
       y1: wallStartPoint.y,
       x2: endPos.x,
       y2: endPos.y,
+      snapToGrid: gridSnap,
     });
 
     // Reset drawing state
@@ -3112,12 +3114,14 @@
       // Check for wall at position
       const clickedWallId = findWallAtPoint(worldX, worldY);
       if (clickedWallId) {
+        const wall = walls.find(w => w.id === clickedWallId);
         showContextMenu = true;
         contextMenuX = e.clientX;
         contextMenuY = e.clientY;
         contextMenuElementType = 'wall';
         contextMenuElementId = clickedWallId;
         contextMenuElementVisible = true; // Walls don't have visibility toggle
+        contextMenuElementSnapToGrid = wall?.snapToGrid !== false; // Default to true if undefined
         return;
       }
     }
@@ -3153,6 +3157,19 @@
       }
     }
     // Add similar for lights/walls if they support visibility in the future
+  }
+
+  function handleContextMenuToggleSnapToGrid() {
+    showContextMenu = false;
+    if (contextMenuElementType === 'wall' && contextMenuElementId) {
+      const wall = walls.find(w => w.id === contextMenuElementId);
+      if (wall) {
+        websocket.sendWallUpdate({
+          wallId: contextMenuElementId,
+          updates: { snapToGrid: !contextMenuElementSnapToGrid }
+        });
+      }
+    }
   }
 
   function handleContextMenuPossess() {
@@ -3338,9 +3355,11 @@
     elementId={contextMenuElementId}
     {isGM}
     isVisible={contextMenuElementVisible}
+    snapToGrid={contextMenuElementSnapToGrid}
     on:edit={handleContextMenuEdit}
     on:possess={handleContextMenuPossess}
     on:toggleVisibility={handleContextMenuToggleVisibility}
+    on:toggleSnapToGrid={handleContextMenuToggleSnapToGrid}
     on:delete={handleContextMenuDelete}
     on:close={() => showContextMenu = false}
   />

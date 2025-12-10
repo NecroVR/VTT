@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, real, jsonb } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, uuid, real, jsonb, boolean } from 'drizzle-orm/pg-core';
 import { scenes } from './scenes.js';
 
 export const walls = pgTable('walls', {
@@ -17,6 +17,8 @@ export const walls = pgTable('walls', {
   // Door properties
   door: text('door').notNull().default('none'),
   doorState: text('door_state').notNull().default('closed'),
+  // Grid snapping
+  snapToGrid: boolean('snap_to_grid').notNull().default(true),
   // Metadata
   data: jsonb('data').notNull().default({}),
   createdAt: timestamp('created_at').defaultNow().notNull(),

@@ -1242,6 +1242,7 @@ async function handleWallAdd(
       sound: newWall.sound,
       door: newWall.door,
       doorState: newWall.doorState,
+      snapToGrid: newWall.snapToGrid,
       data: newWall.data as Record<string, unknown>,
       createdAt: newWall.createdAt,
     };
@@ -1309,6 +1310,7 @@ async function handleWallUpdate(
       sound: updatedWall.sound,
       door: updatedWall.door,
       doorState: updatedWall.doorState,
+      snapToGrid: updatedWall.snapToGrid,
       data: updatedWall.data as Record<string, unknown>,
       createdAt: updatedWall.createdAt,
     };

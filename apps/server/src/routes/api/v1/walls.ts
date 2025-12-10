@@ -58,6 +58,7 @@ const wallsRoute: FastifyPluginAsync = async (fastify) => {
           sound: wall.sound,
           door: wall.door,
           doorState: wall.doorState,
+          snapToGrid: wall.snapToGrid,
           data: wall.data as Record<string, unknown>,
           createdAt: wall.createdAt,
         }));
@@ -112,6 +113,7 @@ const wallsRoute: FastifyPluginAsync = async (fastify) => {
           sound: wall.sound,
           door: wall.door,
           doorState: wall.doorState,
+          snapToGrid: wall.snapToGrid,
           data: wall.data as Record<string, unknown>,
           createdAt: wall.createdAt,
         };
@@ -182,6 +184,7 @@ const wallsRoute: FastifyPluginAsync = async (fastify) => {
             sound: wallData.sound ?? 'block',
             door: wallData.door ?? 'none',
             doorState: wallData.doorState ?? 'closed',
+            snapToGrid: wallData.snapToGrid ?? true,
             data: wallData.data ?? {},
           })
           .returning();
@@ -202,6 +205,7 @@ const wallsRoute: FastifyPluginAsync = async (fastify) => {
           sound: newWall.sound,
           door: newWall.door,
           doorState: newWall.doorState,
+          snapToGrid: newWall.snapToGrid,
           data: newWall.data as Record<string, unknown>,
           createdAt: newWall.createdAt,
         };
@@ -290,6 +294,9 @@ const wallsRoute: FastifyPluginAsync = async (fastify) => {
         if (updates.doorState !== undefined) {
           updateData.doorState = updates.doorState;
         }
+        if (updates.snapToGrid !== undefined) {
+          updateData.snapToGrid = updates.snapToGrid;
+        }
         if (updates.data !== undefined) {
           updateData.data = updates.data;
         }
@@ -317,6 +324,7 @@ const wallsRoute: FastifyPluginAsync = async (fastify) => {
           sound: updatedWall.sound,
           door: updatedWall.door,
           doorState: updatedWall.doorState,
+          snapToGrid: updatedWall.snapToGrid,
           data: updatedWall.data as Record<string, unknown>,
           createdAt: updatedWall.createdAt,
         };

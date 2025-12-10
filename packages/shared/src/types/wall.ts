@@ -14,6 +14,8 @@ export interface Wall {
   // Door properties
   door: string;
   doorState: string;
+  // Grid snapping
+  snapToGrid?: boolean;
   // Metadata
   data: Record<string, unknown>;
   createdAt: Date;
@@ -31,6 +33,7 @@ export interface CreateWallRequest {
   sound?: string;
   door?: string;
   doorState?: string;
+  snapToGrid?: boolean;
   data?: Record<string, unknown>;
 }
 
@@ -45,6 +48,7 @@ export interface UpdateWallRequest {
   sound?: string;
   door?: string;
   doorState?: string;
+  snapToGrid?: boolean;
   data?: Record<string, unknown>;
 }
 

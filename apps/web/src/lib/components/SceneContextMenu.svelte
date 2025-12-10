@@ -8,11 +8,13 @@
   export let elementId: string;
   export let isGM: boolean = false;
   export let isVisible: boolean = true;
+  export let snapToGrid: boolean = true;
 
   const dispatch = createEventDispatcher<{
     edit: void;
     possess: void;
     toggleVisibility: { currentState: boolean };
+    toggleSnapToGrid: { currentState: boolean };
     delete: void;
     close: void;
   }>();
@@ -90,6 +92,11 @@
     close();
   }
 
+  function handleToggleSnapToGrid() {
+    dispatch('toggleSnapToGrid', { currentState: snapToGrid });
+    close();
+  }
+
   function handleDelete() {
     dispatch('delete');
     close();
@@ -152,6 +159,32 @@
     </span>
     <span>{isVisible ? 'Make Invisible' : 'Make Visible'}</span>
   </button>
+
+  <!-- Toggle Snap to Grid (walls only) -->
+  {#if elementType === 'wall'}
+    <button class="menu-item" on:click={handleToggleSnapToGrid}>
+      <span class="icon">
+        {#if snapToGrid}
+          <!-- Grid icon with checkmark -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+        {:else}
+          <!-- Grid icon without checkmark -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+        {/if}
+      </span>
+      <span>{snapToGrid ? 'Disable' : 'Enable'} Snap to Grid</span>
+    </button>
+  {/if}
 
   <!-- Delete (GM only for some element types, or always show based on requirements) -->
   {#if isGM}
