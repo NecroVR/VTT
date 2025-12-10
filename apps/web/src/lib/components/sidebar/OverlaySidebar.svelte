@@ -12,11 +12,14 @@
       ]}
       activeTabId="chat"
       width={350}
-      headerHeight={60}
+      headerHeight={calculatedHeaderHeight}
       on:create-actor={handleCreateActor}
       on:edit-actor={handleEditActor}
       on:select-token={handleSelectToken}
     />
+
+  Note: headerHeight should be calculated from the actual header element height
+  to ensure proper alignment with the content area.
 -->
 <script lang="ts">
   import type { ComponentType, SvelteComponent } from 'svelte';
@@ -44,7 +47,6 @@
   // Props
   export let tabs: Tab[] = [];
   export let activeTabId: string = '';
-  export let width: number = 350;
   export let headerHeight: number = 60;
 
   const dispatch = createEventDispatcher();
@@ -52,6 +54,8 @@
   // Subscribe to sidebar store
   $: docked = $sidebarStore.docked;
   $: collapsed = $sidebarStore.collapsed;
+  $: dockedWidth = $sidebarStore.dockedWidth;
+
 
   // Filter out popped-out tabs
   $: visibleTabs = tabs.filter(t => !$sidebarStore.poppedOutTabs.has(t.id));
@@ -209,11 +213,10 @@
     </div>
   </FloatingWindow>
 {:else}
-  <!-- Docked mode: Fixed sidebar -->
+  <!-- Docked mode: Relative positioned sidebar -->
   <div
     class="overlay-sidebar"
     class:collapsed
-    style="top: {headerHeight}px; width: {collapsed ? 45 : width}px;"
   >
     {#if collapsed}
       <!-- Collapsed state: Vertical icon strip -->
@@ -335,20 +338,14 @@
 
 <style>
   .overlay-sidebar {
-    position: fixed;
-    right: 0;
-    bottom: 0;
-    z-index: 400;
+    position: relative;
+    width: 100%;
+    height: 100%;
     pointer-events: auto;
     background-color: #1f2937;
     box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
     display: flex;
     flex-direction: column;
-    transition: width 0.2s ease;
-  }
-
-  .overlay-sidebar.collapsed {
-    width: 45px;
   }
 
   /* Collapsed state styles */

@@ -9,6 +9,7 @@ const INITIAL_Z_INDEX = 1000;
 interface SidebarState {
   docked: boolean;
   collapsed: boolean;
+  dockedWidth: number;
   floatingPosition: { x: number; y: number };
   floatingSize: { width: number; height: number };
   activeTabId: string;
@@ -35,6 +36,7 @@ export interface FloatingWindowState {
 const initialState: SidebarState = {
   docked: true,
   collapsed: false,
+  dockedWidth: 350,
   floatingPosition: { x: 20, y: 20 },
   floatingSize: { width: 350, height: 600 },
   activeTabId: 'chat',
@@ -210,6 +212,16 @@ function createSidebarStore() {
     },
 
     /**
+     * Update docked sidebar width
+     */
+    updateDockedWidth(width: number): void {
+      updateAndSave(state => ({
+        ...state,
+        dockedWidth: width,
+      }));
+    },
+
+    /**
      * Reset to initial state
      */
     reset(): void {
@@ -344,4 +356,5 @@ export const {
   bringToFront,
   updateFloatingPosition,
   updateFloatingSize,
+  updateDockedWidth,
 } = sidebarStore;

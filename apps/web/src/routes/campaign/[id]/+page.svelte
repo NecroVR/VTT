@@ -10,6 +10,7 @@
   import { wallsStore } from '$lib/stores/walls';
   import { lightsStore } from '$lib/stores/lights';
   import { actorsStore } from '$lib/stores/actors';
+  import { sidebarStore } from '$lib/stores/sidebar';
   import SceneCanvas from '$lib/components/SceneCanvas.svelte';
   import SceneControls from '$lib/components/scene/SceneControls.svelte';
   import SceneManagementModal from '$lib/components/scene/SceneManagementModal.svelte';
@@ -24,6 +25,7 @@
   import LightingConfig from '$lib/components/LightingConfig.svelte';
   import OverlaySidebar from '$lib/components/sidebar/OverlaySidebar.svelte';
   import WindowManager from '$lib/components/sidebar/WindowManager.svelte';
+  import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
   import type { ComponentType, SvelteComponent } from 'svelte';
   import type { Scene, Token, Wall } from '@vtt/shared';
   import { getWebSocketUrl } from '$lib/config/api';
@@ -47,6 +49,17 @@
   let showSceneModal = false;
   let showActorCreateModal = false;
   let activeTabId = 'chat';
+  let openDropdownId: string | null = null;
+  let showDeleteConfirm = false;
+  let sceneToDelete: string | null = null;
+  let headerElement: HTMLElement;
+  let containerElement: HTMLElement;
+  let calculatedHeaderHeight = 0;
+
+  // Sidebar resize state
+  let isResizingSidebar = false;
+  let resizeStartX = 0;
+  let resizeStartWidth = 0;
 
   // Use auto-subscription with $ prefix - Svelte handles cleanup automatically
   $: campaignId = $page.params.id;
@@ -117,6 +130,11 @@
   ] as Tab[];
 
   onMount(async () => {
+    // Calculate header height for sidebar positioning
+    if (headerElement) {
+      calculatedHeaderHeight = headerElement.offsetHeight;
+    }
+
     // Check if user is authenticated
     const isAuthenticated = await authStore.checkSession();
     if (!isAuthenticated) {
@@ -197,6 +215,10 @@
     const token = localStorage.getItem('vtt_session_id') || sessionStorage.getItem('vtt_session_id') || '';
     websocket.joinCampaign(campaignId, token);
 
+    // Add window event listeners for sidebar resize
+    window.addEventListener('mousemove', handleDividerMouseMove);
+    window.addEventListener('mouseup', handleDividerMouseUp);
+
     // Return cleanup function that will be called when component is destroyed
     return () => {
       unsubscribeState();
@@ -212,6 +234,10 @@
       unsubscribeLightAdded();
       unsubscribeLightUpdated();
       unsubscribeLightRemoved();
+
+      // Remove window event listeners
+      window.removeEventListener('mousemove', handleDividerMouseMove);
+      window.removeEventListener('mouseup', handleDividerMouseUp);
 
       campaignsStore.clearCurrentCampaign();
       scenesStore.clear();
@@ -385,35 +411,157 @@
     // Token selection is already handled by tokensStore, just ensure UI updates
     tokensStore.selectToken(event.detail.tokenId);
   }
+
+  function toggleDropdown(sceneId: string, event: Event) {
+    event.stopPropagation();
+    openDropdownId = openDropdownId === sceneId ? null : sceneId;
+  }
+
+  function closeDropdown() {
+    openDropdownId = null;
+  }
+
+  function handleMovePlayersHere(sceneId: string) {
+    handleSceneChange(sceneId);
+    closeDropdown();
+  }
+
+  function confirmDeleteScene(sceneId: string) {
+    sceneToDelete = sceneId;
+    showDeleteConfirm = true;
+    closeDropdown();
+  }
+
+  async function handleDeleteScene() {
+    if (!sceneToDelete) return;
+
+    const deletingActiveScene = activeScene?.id === sceneToDelete;
+
+    await scenesStore.deleteScene(sceneToDelete);
+
+    // If we deleted the active scene, switch to the first available scene
+    if (deletingActiveScene && scenes.length > 0) {
+      const firstAvailableScene = scenes.find(s => s.id !== sceneToDelete);
+      if (firstAvailableScene) {
+        handleSceneChange(firstAvailableScene.id);
+      }
+    }
+
+    showDeleteConfirm = false;
+    sceneToDelete = null;
+  }
+
+  function cancelDeleteScene() {
+    showDeleteConfirm = false;
+    sceneToDelete = null;
+  }
+
+  // Sidebar resize handlers
+  function handleDividerMouseDown(e: MouseEvent) {
+    isResizingSidebar = true;
+    resizeStartX = e.clientX;
+    resizeStartWidth = $sidebarStore.dockedWidth;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  }
+
+  function handleDividerMouseMove(e: MouseEvent) {
+    if (!isResizingSidebar) return;
+
+    // Moving left increases sidebar width, moving right decreases it
+    const delta = resizeStartX - e.clientX;
+    let newWidth = resizeStartWidth + delta;
+
+    // Constrain to min/max bounds
+    const MIN_WIDTH = 280;
+    const MAX_WIDTH = 600;
+    newWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, newWidth));
+
+    sidebarStore.updateDockedWidth(newWidth);
+  }
+
+  function handleDividerMouseUp() {
+    if (!isResizingSidebar) return;
+    isResizingSidebar = false;
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  }
 </script>
 
 <svelte:head>
   <title>Campaign {campaignId} - VTT</title>
 </svelte:head>
 
-<div class="campaign-container">
-  <header class="campaign-header">
+<svelte:window on:click={closeDropdown} />
+
+<div class="campaign-container" bind:this={containerElement}>
+  <header class="campaign-header" bind:this={headerElement}>
     <div class="campaign-controls">
 
-      {#if scenes.length > 0}
-        <div class="scene-selector">
-          <label for="scene-select">Scene:</label>
-          <select
-            id="scene-select"
-            value={activeScene?.id || ''}
-            on:change={(e) => handleSceneChange(e.currentTarget.value)}
-          >
-            {#each scenes as scene}
-              <option value={scene.id}>{scene.name}</option>
-            {/each}
-          </select>
+      {#if scenes.length > 0 || isGM}
+        <div class="scene-tabs">
+          {#each scenes as scene}
+            <div class="scene-tab-wrapper">
+              <button
+                class="scene-tab"
+                class:active={activeScene?.id === scene.id}
+                on:click={() => handleSceneChange(scene.id)}
+                title={scene.name}
+              >
+                {scene.name}
+                {#if isGM}
+                  <span
+                    class="scene-menu-button"
+                    on:click={(e) => toggleDropdown(scene.id, e)}
+                    on:keydown={(e) => e.key === 'Enter' && toggleDropdown(scene.id, e)}
+                    role="button"
+                    tabindex="0"
+                    aria-label="Scene menu"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M3.5 6.5a.5.5 0 0 1 .5.5L8 11l4-4a.5.5 0 0 1 .707.707l-4.5 4.5a.5.5 0 0 1-.707 0l-4.5-4.5A.5.5 0 0 1 3.5 6.5z"/>
+                    </svg>
+                  </span>
+                {/if}
+              </button>
+              {#if isGM && openDropdownId === scene.id}
+                <div class="scene-dropdown" on:click|stopPropagation>
+                  <button
+                    class="dropdown-item"
+                    on:click={() => handleMovePlayersHere(scene.id)}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M8 1a2 2 0 0 1 2 2v2H6V3a2 2 0 0 1 2-2zm3 4V3a3 3 0 1 0-6 0v2H3.36a1.5 1.5 0 0 0-1.483 1.277L.85 13.13A2.5 2.5 0 0 0 3.322 16h9.355a2.5 2.5 0 0 0 2.473-2.87l-1.028-6.853A1.5 1.5 0 0 0 12.64 5H11z"/>
+                    </svg>
+                    Move Players Here
+                  </button>
+                  <button
+                    class="dropdown-item danger"
+                    on:click={() => confirmDeleteScene(scene.id)}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                      <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                    </svg>
+                    Delete Scene
+                  </button>
+                </div>
+              {/if}
+            </div>
+          {/each}
+          {#if isGM}
+            <button
+              class="scene-tab create-scene-tab"
+              on:click={() => showSceneModal = true}
+              title="Create New Scene"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 3.5a.5.5 0 0 1 .5.5v3.5H12a.5.5 0 0 1 0 1H8.5V12a.5.5 0 0 1-1 0V8.5H4a.5.5 0 0 1 0-1h3.5V4a.5.5 0 0 1 .5-.5z"/>
+              </svg>
+            </button>
+          {/if}
         </div>
-      {/if}
-
-      {#if isGM}
-        <button class="btn btn-primary create-scene-btn" on:click={() => showSceneModal = true}>
-          Create Scene
-        </button>
       {/if}
     </div>
     <div class="connection-status">
@@ -428,60 +576,84 @@
   </header>
 
   <div class="campaign-content">
-    <div class="canvas-container">
-      {#if activeScene}
-        <SceneCanvas
-          scene={activeScene}
-          {tokens}
-          {walls}
-          {isGM}
-          {activeTool}
-          gridSnap={currentCampaign?.settings?.snapToGrid ?? false}
-          onTokenMove={handleTokenMove}
-          onTokenAdd={handleTokenAdd}
-          onTokenSelect={handleTokenSelect}
-          onTokenDoubleClick={handleTokenDoubleClick}
-          onWallAdd={handleWallAdd}
-          onWallRemove={handleWallRemove}
-          onWallUpdate={handleWallUpdate}
-          onLightAdd={handleLightAdd}
-          onLightSelect={handleLightSelect}
-          onLightDoubleClick={handleLightDoubleClick}
-          onLightMove={handleLightMove}
-        />
-        {#if isGM}
-          <div class="scene-controls-overlay">
-            <SceneControls
-              {isGM}
-              {activeTool}
-              onToolChange={handleToolChange}
-            />
+    <div class="canvas-frame">
+      <div class="canvas-container">
+        {#if activeScene}
+          <SceneCanvas
+            scene={activeScene}
+            {tokens}
+            {walls}
+            {isGM}
+            {activeTool}
+            gridSnap={currentCampaign?.settings?.snapToGrid ?? false}
+            onTokenMove={handleTokenMove}
+            onTokenAdd={handleTokenAdd}
+            onTokenSelect={handleTokenSelect}
+            onTokenDoubleClick={handleTokenDoubleClick}
+            onWallAdd={handleWallAdd}
+            onWallRemove={handleWallRemove}
+            onWallUpdate={handleWallUpdate}
+            onLightAdd={handleLightAdd}
+            onLightSelect={handleLightSelect}
+            onLightDoubleClick={handleLightDoubleClick}
+            onLightMove={handleLightMove}
+          />
+          {#if isGM}
+            <div class="scene-controls-overlay">
+              <SceneControls
+                {isGM}
+                {activeTool}
+                onToolChange={handleToolChange}
+              />
+            </div>
+          {/if}
+        {:else}
+          <div class="placeholder">
+            <p>No Scene Available</p>
+            {#if isGM}
+              <button class="btn btn-primary" on:click={() => showSceneModal = true}>
+                Create Scene
+              </button>
+            {:else}
+              <p class="placeholder-text">Waiting for GM to create a scene</p>
+            {/if}
           </div>
         {/if}
-      {:else}
-        <div class="placeholder">
-          <p>No Scene Available</p>
-          {#if isGM}
-            <button class="btn btn-primary" on:click={() => showSceneModal = true}>
-              Create Scene
-            </button>
-          {:else}
-            <p class="placeholder-text">Waiting for GM to create a scene</p>
-          {/if}
-        </div>
-      {/if}
+      </div>
     </div>
-  </div>
 
-  <OverlaySidebar
-    {tabs}
-    bind:activeTabId
-    width={350}
-    headerHeight={60}
-    on:create-actor={handleCreateActor}
-    on:edit-actor={handleEditActor}
-    on:select-token={handleSelectToken}
-  />
+    {#if $sidebarStore.docked && !$sidebarStore.collapsed}
+      <div
+        class="sidebar-divider"
+        class:resizing={isResizingSidebar}
+        on:mousedown={handleDividerMouseDown}
+        role="separator"
+        aria-orientation="vertical"
+      ></div>
+    {/if}
+
+    {#if $sidebarStore.docked}
+      <div class="sidebar-frame" style="width: {$sidebarStore.collapsed ? '45px' : $sidebarStore.dockedWidth + 'px'}">
+        <OverlaySidebar
+          {tabs}
+          bind:activeTabId
+          headerHeight={calculatedHeaderHeight}
+          on:create-actor={handleCreateActor}
+          on:edit-actor={handleEditActor}
+          on:select-token={handleSelectToken}
+        />
+      </div>
+    {:else}
+      <OverlaySidebar
+        {tabs}
+        bind:activeTabId
+        headerHeight={calculatedHeaderHeight}
+        on:create-actor={handleCreateActor}
+        on:edit-actor={handleEditActor}
+        on:select-token={handleSelectToken}
+      />
+    {/if}
+  </div>
 
   <WindowManager
     {tabs}
@@ -537,6 +709,18 @@
     onClose={() => showActorCreateModal = false}
     onActorCreated={handleActorCreated}
   />
+
+  {#if showDeleteConfirm && sceneToDelete}
+    <ConfirmDialog
+      title="Delete Scene"
+      message="Are you sure you want to delete this scene? This action cannot be undone."
+      confirmText="Delete"
+      cancelText="Cancel"
+      danger={true}
+      on:confirm={handleDeleteScene}
+      on:cancel={cancelDeleteScene}
+    />
+  {/if}
 </div>
 
 <style>
@@ -552,8 +736,8 @@
     justify-content: space-between;
     align-items: center;
     padding: var(--spacing-md) var(--spacing-lg);
-    background-color: var(--color-bg-secondary);
-    border-bottom: 1px solid var(--color-border);
+    background-color: #111827;
+    border-bottom: 2px solid #374151;
   }
 
   .campaign-controls {
@@ -562,36 +746,62 @@
     gap: var(--spacing-md);
   }
 
-  .scene-selector {
+  .scene-tabs {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: 4px;
+    max-width: 600px;
+    padding: 2px 0;
   }
 
-  .scene-selector label {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
-  }
-
-  .scene-selector select {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    border: 1px solid var(--color-border);
+  .scene-tab {
+    padding: 8px 16px;
+    border: 1px solid #374151;
     border-radius: var(--border-radius-sm);
-    background-color: var(--color-bg-primary);
-    color: var(--color-text-primary);
+    background-color: #1f2937;
+    color: #9ca3af;
     font-size: var(--font-size-sm);
+    font-weight: 500;
     cursor: pointer;
-  }
-
-  .scene-selector select:focus {
-    outline: none;
-    border-color: #4a90e2;
-  }
-
-  .create-scene-btn {
-    padding: var(--spacing-xs) var(--spacing-md);
-    font-size: var(--font-size-sm);
     white-space: nowrap;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .scene-tab:hover {
+    background-color: #374151;
+    color: #d1d5db;
+    border-color: #4b5563;
+  }
+
+  .scene-tab.active {
+    background-color: #1e3a5f;
+    color: #60a5fa;
+    border-color: #3b82f6;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+  }
+
+  .scene-tab.active:hover {
+    background-color: #1e3a5f;
+    border-color: #3b82f6;
+  }
+
+  .create-scene-tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    min-width: 40px;
+  }
+
+  .create-scene-tab:hover {
+    background-color: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+  }
+
+  .create-scene-tab svg {
+    display: block;
   }
 
   .connection-status {
@@ -624,8 +834,16 @@
   .campaign-content {
     flex: 1;
     display: flex;
+    flex-direction: row;
     overflow: hidden;
     position: relative;
+  }
+
+  .canvas-frame {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    min-width: 0;
   }
 
   .canvas-container {
@@ -633,6 +851,28 @@
     background-color: var(--color-bg-primary);
     overflow: hidden;
     width: 100%;
+    height: 100%;
+  }
+
+  .sidebar-divider {
+    width: 6px;
+    background: var(--color-border, #333);
+    cursor: col-resize;
+    flex-shrink: 0;
+    transition: background-color 0.15s ease;
+  }
+
+  .sidebar-divider:hover {
+    background: rgba(59, 130, 246, 0.5);
+  }
+
+  .sidebar-divider.resizing {
+    background: rgba(59, 130, 246, 0.8);
+  }
+
+  .sidebar-frame {
+    flex-shrink: 0;
+    position: relative;
     height: 100%;
   }
 
@@ -686,6 +926,77 @@
     border-radius: var(--border-radius-lg);
     overflow: hidden;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  }
+
+  .scene-tab-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+
+  .scene-menu-button {
+    margin-left: 8px;
+    padding: 2px 4px;
+    background: transparent;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    transition: background-color 0.2s ease;
+  }
+
+  .scene-menu-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .scene-menu-button svg {
+    display: block;
+  }
+
+  .scene-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    background-color: #1f2937;
+    border: 1px solid #374151;
+    border-radius: 6px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    min-width: 180px;
+    overflow: hidden;
+  }
+
+  .dropdown-item {
+    width: 100%;
+    padding: 10px 16px;
+    background: transparent;
+    border: none;
+    color: #d1d5db;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background-color 0.15s ease;
+  }
+
+  .dropdown-item:hover {
+    background-color: #374151;
+  }
+
+  .dropdown-item.danger {
+    color: #ef4444;
+  }
+
+  .dropdown-item.danger:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+  }
+
+  .dropdown-item svg {
+    flex-shrink: 0;
   }
 
   @media (max-width: 768px) {
