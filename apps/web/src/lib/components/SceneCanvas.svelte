@@ -1,8 +1,10 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
+  import { get } from 'svelte/store';
   import type { Scene, Token, Wall, AmbientLight, FogGrid } from '@vtt/shared';
   import { lightsStore } from '$lib/stores/lights';
   import { fogStore } from '$lib/stores/fog';
+  import { pathsStore } from '$lib/stores/paths';
   import { websocket } from '$lib/stores/websocket';
   import SceneContextMenu from './SceneContextMenu.svelte';
   import ConfirmDialog from './ConfirmDialog.svelte';
@@ -41,6 +43,10 @@
   export let onLightSelect: ((lightId: string | null) => void) | undefined = undefined;
   export let onLightDoubleClick: ((lightId: string) => void) | undefined = undefined;
   export let onLightMove: ((lightId: string, x: number, y: number) => void) | undefined = undefined;
+  export let onPathAdd: ((nodes: Array<{ x: number; y: number }>) => void) | undefined = undefined;
+  export let onPathUpdate: ((pathId: string, updates: any) => void) | undefined = undefined;
+  export let onPathRemove: ((pathId: string) => void) | undefined = undefined;
+  export let onPathSelect: ((pathId: string | null) => void) | undefined = undefined;
   export let wallEndpointSnapRange: number = 4; // Pixel range for wall endpoint snapping
 
   // Canvas refs
@@ -98,6 +104,11 @@
   let draggedControlPoint: { wallId: string; controlPointIndex: number } | null = null;
   let draggedControlPointRequiresGridSnap = false;
   let isHoveringControlPoint = false;
+
+  // Path tool state
+  let isDrawingPath = false;
+  let currentPathNodes: Array<{ x: number; y: number }> = [];
+  let selectedPathId: string | null = null;
 
   // Selection box state
   let isDrawingSelectionBox = false;
@@ -607,6 +618,7 @@
     }
     if (isGM) {
       renderWalls();
+      renderPaths();
     }
     renderControls();
   }
@@ -1344,6 +1356,86 @@
       wallsCtx.arc(nearbyEndpoint.x, nearbyEndpoint.y, highlightRadius - 2 / scale, 0, Math.PI * 2);
       wallsCtx.fill();
       wallsCtx.globalAlpha = 1.0;
+    }
+
+    wallsCtx.restore();
+  }
+
+  function renderPaths() {
+    if (!wallsCtx || !wallsCanvas || !isGM) return;
+
+    // Get paths from store
+    const state = get(pathsStore);
+    const paths = Array.from(state.paths.values()).filter(p => p.sceneId === scene.id);
+
+    wallsCtx.save();
+
+    // Apply transform
+    wallsCtx.translate(-viewX * scale, -viewY * scale);
+    wallsCtx.scale(scale, scale);
+
+    // Render each path
+    paths.forEach(path => {
+      if (!path.visible && !isGM) return; // Skip invisible paths for non-GMs
+
+      const isSelected = selectedPathId === path.id;
+
+      // Render path line using spline
+      wallsCtx.beginPath();
+      wallsCtx.strokeStyle = path.color || '#00ff00';
+      wallsCtx.lineWidth = isSelected ? 3 / scale : 2 / scale;
+
+      if (path.nodes.length >= 2) {
+        const splinePoints = catmullRomSpline(path.nodes);
+        renderSplinePath(wallsCtx, splinePoints);
+      }
+      wallsCtx.stroke();
+
+      // Render nodes (only for GMs)
+      if (isGM) {
+        path.nodes.forEach((node) => {
+          wallsCtx.beginPath();
+          wallsCtx.arc(node.x, node.y, 5 / scale, 0, Math.PI * 2);
+          wallsCtx.fillStyle = isSelected ? '#ffff00' : '#ffffff';
+          wallsCtx.fill();
+          wallsCtx.strokeStyle = '#000000';
+          wallsCtx.lineWidth = 1 / scale;
+          wallsCtx.stroke();
+        });
+      }
+    });
+
+    // Render current drawing path preview
+    if (isDrawingPath && currentPathNodes.length > 0) {
+      wallsCtx.beginPath();
+      wallsCtx.strokeStyle = '#00ff00';
+      wallsCtx.lineWidth = 2 / scale;
+      wallsCtx.setLineDash([5 / scale, 5 / scale]);
+
+      if (currentPathNodes.length >= 2) {
+        const splinePoints = catmullRomSpline(currentPathNodes);
+        renderSplinePath(wallsCtx, splinePoints);
+      } else if (currentPathNodes.length === 1) {
+        // Draw a small circle for the first node
+        wallsCtx.beginPath();
+        wallsCtx.arc(currentPathNodes[0].x, currentPathNodes[0].y, 5 / scale, 0, Math.PI * 2);
+        wallsCtx.fillStyle = '#00ff00';
+        wallsCtx.fill();
+      }
+
+      wallsCtx.stroke();
+      wallsCtx.setLineDash([]);
+
+      // Render nodes
+      currentPathNodes.forEach((node) => {
+        wallsCtx.beginPath();
+        wallsCtx.arc(node.x, node.y, 5 / scale, 0, Math.PI * 2);
+        wallsCtx.fillStyle = '#00ff00';
+        wallsCtx.fill();
+        wallsCtx.strokeStyle = '#000000';
+        wallsCtx.lineWidth = 1 / scale;
+        wallsCtx.stroke();
+      });
     }
 
     wallsCtx.restore();
@@ -2892,6 +2984,28 @@
       return;
     }
 
+    // Handle path tool
+    if (activeTool === 'path' && isGM) {
+      // Check for double-click to complete path
+      const currentTime = Date.now();
+      const timeSinceLastClick = currentTime - lastClickTime;
+      const isDoubleClick = timeSinceLastClick < DOUBLE_CLICK_THRESHOLD;
+
+      if (isDoubleClick && currentPathNodes.length >= 2) {
+        // Complete path on double-click
+        completePath();
+        lastClickTime = 0;
+        return;
+      }
+
+      // Add node to current path
+      currentPathNodes = [...currentPathNodes, snappedPos];
+      isDrawingPath = true;
+      lastClickTime = currentTime;
+      renderPaths();
+      return;
+    }
+
     // Handle light tool
     if (activeTool === 'light' && isGM) {
       // Place light at clicked position (no snapping by default)
@@ -3043,6 +3157,22 @@
         } else {
           selectedWallIds = new Set();
         }
+
+        // Check for path selection (GM only)
+        const pathId = findPathAtPoint(worldPos.x, worldPos.y);
+        if (pathId) {
+          selectedPathId = pathId;
+          selectedTokenId = null;
+          selectedLightId = null;
+          selectedWallIds = new Set();
+          onPathSelect?.(pathId);
+          onTokenSelect?.(null);
+          onLightSelect?.(null);
+          renderPaths();
+          return;
+        } else {
+          selectedPathId = null;
+        }
       }
 
       // Check if clicking on a token
@@ -3176,6 +3306,46 @@
     wallStartPoint = null;
     wallPreview = null;
     renderWalls();
+  }
+
+  function completePath() {
+    if (currentPathNodes.length < 2) {
+      cancelPath();
+      return;
+    }
+
+    onPathAdd?.(currentPathNodes);
+    currentPathNodes = [];
+    isDrawingPath = false;
+    renderPaths();
+  }
+
+  function cancelPath() {
+    currentPathNodes = [];
+    isDrawingPath = false;
+    renderPaths();
+  }
+
+  function handlePathKeydown(e: KeyboardEvent) {
+    if (activeTool !== 'path' || !isDrawingPath) return;
+
+    if (e.key === 'Enter' && currentPathNodes.length >= 2) {
+      // Complete path
+      completePath();
+      e.preventDefault();
+    } else if (e.key === 'Escape') {
+      // Cancel path drawing
+      cancelPath();
+      e.preventDefault();
+    } else if ((e.key === 'Backspace' || e.key === 'Delete') && currentPathNodes.length > 0) {
+      // Remove last node
+      currentPathNodes = currentPathNodes.slice(0, -1);
+      if (currentPathNodes.length === 0) {
+        isDrawingPath = false;
+      }
+      renderPaths();
+      e.preventDefault();
+    }
   }
 
   function handleMouseMove(e: MouseEvent) {
@@ -3639,6 +3809,38 @@
   }
 
   /**
+   * Find a path at the given point (checks both nodes and path lines)
+   */
+  function findPathAtPoint(x: number, y: number): string | null {
+    const state = get(pathsStore);
+    const paths = Array.from(state.paths.values()).filter(p => p.sceneId === scene.id);
+    const threshold = 10 / scale; // 10 pixels in screen space
+
+    for (const path of paths) {
+      // Check if clicking on a node
+      for (const node of path.nodes) {
+        const dx = x - node.x;
+        const dy = y - node.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist <= threshold) {
+          return path.id;
+        }
+      }
+
+      // Check if clicking on the path line
+      if (path.nodes.length >= 2) {
+        const splinePoints = catmullRomSpline(path.nodes);
+        const dist = distanceToSpline(x, y, splinePoints);
+        if (dist <= threshold) {
+          return path.id;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /**
    * Find the nearest wall endpoint within range, excluding the currently dragged endpoint(s)
    */
   function findNearbyWallEndpoint(
@@ -4046,6 +4248,8 @@
   }
 </script>
 
+<svelte:window on:keydown={handlePathKeydown} />
+
 <div class="scene-canvas-container" bind:this={canvasContainer}>
   <canvas class="canvas-layer" bind:this={backgroundCanvas}></canvas>
   <canvas class="canvas-layer" bind:this={gridCanvas}></canvas>
@@ -4059,7 +4263,7 @@
   {/if}
   <canvas
     class="canvas-layer canvas-interactive"
-    class:cursor-crosshair={activeTool === 'wall' || activeTool === 'curved-wall' || activeTool === 'light'}
+    class:cursor-crosshair={activeTool === 'wall' || activeTool === 'curved-wall' || activeTool === 'light' || activeTool === 'path'}
     class:cursor-grab={activeTool === 'select' && !isHoveringControlPoint && !isDraggingControlPoint}
     class:cursor-control-point-hover={isHoveringControlPoint && !isDraggingControlPoint}
     class:cursor-control-point-drag={isDraggingControlPoint}
