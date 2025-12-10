@@ -32,7 +32,6 @@
     PersonIcon,
     ImageIcon,
     GearIcon,
-    PopOutIcon,
   } from '$lib/components/icons';
 
   // Tab interface
@@ -157,27 +156,19 @@
     <div class="floating-sidebar-content">
       <div class="tab-bar">
         {#each visibleTabs as tab}
-          <div class="tab-wrapper">
-            <button
-              class="tab-button"
-              class:active={activeTabId === tab.id}
-              on:click={() => handleTabClick(tab.id)}
-              type="button"
-            >
-              {#if tab.icon && iconMap[tab.icon]}
-                <svelte:component this={iconMap[tab.icon]} size={16} />
-              {/if}
-              <span class="tab-label">{tab.label}</span>
-            </button>
-            <button
-              class="pop-out-button"
-              on:click|stopPropagation={() => handlePopOut(tab.id)}
-              type="button"
-              title="Pop out {tab.label}"
-            >
-              <PopOutIcon size={12} />
-            </button>
-          </div>
+          <button
+            class="tab-button"
+            class:active={activeTabId === tab.id}
+            on:click={() => handleTabClick(tab.id)}
+            on:contextmenu|preventDefault={() => handlePopOut(tab.id)}
+            type="button"
+            title="Right-click to pop out"
+          >
+            {#if tab.icon && iconMap[tab.icon]}
+              <svelte:component this={iconMap[tab.icon]} size={16} />
+            {/if}
+            <span class="tab-label">{tab.label}</span>
+          </button>
         {/each}
 
         <button
@@ -261,27 +252,19 @@
       <!-- Expanded state: Tab bar and content -->
       <div class="tab-bar">
         {#each visibleTabs as tab}
-          <div class="tab-wrapper">
-            <button
-              class="tab-button"
-              class:active={activeTabId === tab.id}
-              on:click={() => handleTabClick(tab.id)}
-              type="button"
-            >
-              {#if tab.icon && iconMap[tab.icon]}
-                <svelte:component this={iconMap[tab.icon]} size={16} />
-              {/if}
-              <span class="tab-label">{tab.label}</span>
-            </button>
-            <button
-              class="pop-out-button"
-              on:click|stopPropagation={() => handlePopOut(tab.id)}
-              type="button"
-              title="Pop out {tab.label}"
-            >
-              <PopOutIcon size={12} />
-            </button>
-          </div>
+          <button
+            class="tab-button"
+            class:active={activeTabId === tab.id}
+            on:click={() => handleTabClick(tab.id)}
+            on:contextmenu|preventDefault={() => handlePopOut(tab.id)}
+            type="button"
+            title="Right-click to pop out"
+          >
+            {#if tab.icon && iconMap[tab.icon]}
+              <svelte:component this={iconMap[tab.icon]} size={16} />
+            {/if}
+            <span class="tab-label">{tab.label}</span>
+          </button>
         {/each}
 
         <button
@@ -424,17 +407,6 @@
     align-items: center;
   }
 
-  .tab-wrapper {
-    flex: 1;
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-
-  .tab-wrapper:hover .pop-out-button {
-    opacity: 1;
-  }
-
   .tab-button {
     flex: 1;
     padding: 0.75rem 1rem;
@@ -452,31 +424,6 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-  }
-
-  .pop-out-button {
-    position: absolute;
-    right: 4px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(17, 24, 39, 0.9);
-    border: 1px solid #374151;
-    border-radius: 3px;
-    color: #9ca3af;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.2s ease, background-color 0.2s ease, color 0.2s ease;
-    z-index: 1;
-  }
-
-  .pop-out-button:hover {
-    background-color: #374151;
-    color: #d1d5db;
   }
 
   .tab-button:hover {
@@ -548,38 +495,6 @@
   .icon-tabs {
     -ms-overflow-style: none;
     scrollbar-width: none;
-  }
-
-  /* Floating sidebar content */
-  .floating-sidebar-content {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    min-height: 0;
-  }
-
-  .pop-out-button {
-    position: absolute;
-    right: 0.25rem;
-    top: 50%;
-    transform: translateY(-50%);
-    padding: 0.25rem;
-    background-color: #374151;
-    border: none;
-    border-radius: 0.25rem;
-    color: #9ca3af;
-    cursor: pointer;
-    opacity: 0;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1;
-  }
-
-  .pop-out-button:hover {
-    background-color: #4b5563;
-    color: #f3f4f6;
   }
 
   /* Floating sidebar content */
