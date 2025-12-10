@@ -4486,6 +4486,8 @@
     on:toggleSnapToGrid={handleContextMenuToggleSnapToGrid}
     on:addSplinePoint={handleAddSplinePoint}
     on:deleteSplinePoint={handleDeleteSplinePoint}
+    on:editPathName={handleEditPathName}
+    on:editPathIndex={handleEditPathIndex}
     on:delete={handleContextMenuDelete}
     on:close={() => showContextMenu = false}
   />
