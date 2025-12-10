@@ -4,7 +4,7 @@
   import type { Scene, Token, Wall, AmbientLight, FogGrid } from '@vtt/shared';
   import { lightsStore } from '$lib/stores/lights';
   import { fogStore } from '$lib/stores/fog';
-  import { pathsStore } from '$lib/stores/paths';
+  import { pathPointsStore, assembledPaths } from '$lib/stores/paths';
   import { websocket } from '$lib/stores/websocket';
   import SceneContextMenu from './SceneContextMenu.svelte';
   import ConfirmDialog from './ConfirmDialog.svelte';
@@ -47,6 +47,10 @@
   export let onPathUpdate: ((pathId: string, updates: any) => void) | undefined = undefined;
   export let onPathRemove: ((pathId: string) => void) | undefined = undefined;
   export let onPathSelect: ((pathId: string | null) => void) | undefined = undefined;
+  export let onPathPointAdd: ((point: { pathName: string; pathIndex: number; x: number; y: number; color: string; visible: boolean }) => void) | undefined = undefined;
+  export let onPathPointUpdate: ((pointId: string, updates: { pathName?: string; pathIndex?: number; x?: number; y?: number }) => void) | undefined = undefined;
+  export let onPathPointRemove: ((pointId: string) => void) | undefined = undefined;
+  export let onPathPointSelect: ((pointId: string | null) => void) | undefined = undefined;
   export let wallEndpointSnapRange: number = 4; // Pixel range for wall endpoint snapping
 
   // Canvas refs
@@ -109,6 +113,11 @@
   let isDrawingPath = false;
   let currentPathNodes: Array<{ x: number; y: number }> = [];
   let selectedPathId: string | null = null;
+  let selectedPathPointId: string | null = null;
+  let currentPathName = 'New Path';
+  let currentPathIndex = 0;
+  let isDraggingPathPoint = false;
+  let draggedPathPointId: string | null = null;
 
   // Selection box state
   let isDrawingSelectionBox = false;
@@ -125,7 +134,7 @@
   let showContextMenu = false;
   let contextMenuX = 0;
   let contextMenuY = 0;
-  let contextMenuElementType: 'token' | 'light' | 'wall' | null = null;
+  let contextMenuElementType: 'token' | 'light' | 'wall' | 'pathpoint' | null = null;
   let contextMenuElementId: string | null = null;
   let contextMenuElementVisible = true;
   let contextMenuElementSnapToGrid = true;
@@ -192,6 +201,9 @@
 
   // Subscribe to lights store
   $: lights = Array.from($lightsStore.lights.values()).filter(light => light.sceneId === scene.id);
+
+  // Subscribe to path points store
+  $: pathPoints = Array.from($pathPointsStore.pathPoints.values()).filter(point => point.sceneId === scene.id);
 
   // Subscribe to fog store
   $: fogData = scene ? $fogStore.fog.get(scene.id) : undefined;
