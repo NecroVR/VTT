@@ -197,6 +197,8 @@ export interface WallAddPayload {
   door?: string;
   doorState?: string;
   data?: Record<string, unknown>;
+  wallShape?: 'straight' | 'curved';
+  controlPoints?: Array<{ x: number; y: number }>;
 }
 
 export interface WallAddedPayload {

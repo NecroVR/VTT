@@ -52,6 +52,8 @@ const wallsRoute: FastifyPluginAsync = async (fastify) => {
           y1: wall.y1,
           x2: wall.x2,
           y2: wall.y2,
+          wallShape: wall.wallShape as 'straight' | 'curved',
+          controlPoints: wall.controlPoints as Array<{ x: number; y: number }> || [],
           wallType: wall.wallType,
           move: wall.move,
           sense: wall.sense,
@@ -107,6 +109,8 @@ const wallsRoute: FastifyPluginAsync = async (fastify) => {
           y1: wall.y1,
           x2: wall.x2,
           y2: wall.y2,
+          wallShape: wall.wallShape as 'straight' | 'curved',
+          controlPoints: wall.controlPoints as Array<{ x: number; y: number }> || [],
           wallType: wall.wallType,
           move: wall.move,
           sense: wall.sense,
@@ -178,6 +182,8 @@ const wallsRoute: FastifyPluginAsync = async (fastify) => {
             y1: wallData.y1,
             x2: wallData.x2,
             y2: wallData.y2,
+            wallShape: wallData.wallShape ?? 'straight',
+            controlPoints: wallData.controlPoints ?? [],
             wallType: wallData.wallType ?? 'normal',
             move: wallData.move ?? 'block',
             sense: wallData.sense ?? 'block',
@@ -199,6 +205,8 @@ const wallsRoute: FastifyPluginAsync = async (fastify) => {
           y1: newWall.y1,
           x2: newWall.x2,
           y2: newWall.y2,
+          wallShape: newWall.wallShape as 'straight' | 'curved',
+          controlPoints: newWall.controlPoints as Array<{ x: number; y: number }> || [],
           wallType: newWall.wallType,
           move: newWall.move,
           sense: newWall.sense,
@@ -276,6 +284,12 @@ const wallsRoute: FastifyPluginAsync = async (fastify) => {
         if (updates.y2 !== undefined) {
           updateData.y2 = updates.y2;
         }
+        if (updates.wallShape !== undefined) {
+          updateData.wallShape = updates.wallShape;
+        }
+        if (updates.controlPoints !== undefined) {
+          updateData.controlPoints = updates.controlPoints;
+        }
         if (updates.wallType !== undefined) {
           updateData.wallType = updates.wallType;
         }
@@ -318,6 +332,8 @@ const wallsRoute: FastifyPluginAsync = async (fastify) => {
           y1: updatedWall.y1,
           x2: updatedWall.x2,
           y2: updatedWall.y2,
+          wallShape: updatedWall.wallShape as 'straight' | 'curved',
+          controlPoints: updatedWall.controlPoints as Array<{ x: number; y: number }> || [],
           wallType: updatedWall.wallType,
           move: updatedWall.move,
           sense: updatedWall.sense,

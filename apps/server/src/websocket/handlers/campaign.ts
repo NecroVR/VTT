@@ -1205,6 +1205,8 @@ async function handleWallAdd(
       door = 'none',
       doorState = 'closed',
       data = {},
+      wallShape = 'straight',
+      controlPoints = [],
     } = message.payload;
 
     // Create wall in database
@@ -1220,6 +1222,8 @@ async function handleWallAdd(
         move,
         sense,
         sound,
+        wallShape,
+        controlPoints,
         door,
         doorState,
         data,
@@ -1236,6 +1240,8 @@ async function handleWallAdd(
       y1: newWall.y1,
       x2: newWall.x2,
       y2: newWall.y2,
+      wallShape: newWall.wallShape as 'straight' | 'curved',
+      controlPoints: newWall.controlPoints as Array<{ x: number; y: number }> || [],
       wallType: newWall.wallType,
       move: newWall.move,
       sense: newWall.sense,
@@ -1304,6 +1310,8 @@ async function handleWallUpdate(
       y1: updatedWall.y1,
       x2: updatedWall.x2,
       y2: updatedWall.y2,
+      wallShape: updatedWall.wallShape as 'straight' | 'curved',
+      controlPoints: updatedWall.controlPoints as Array<{ x: number; y: number }> || [],
       wallType: updatedWall.wallType,
       move: updatedWall.move,
       sense: updatedWall.sense,
