@@ -1,0 +1,595 @@
+<!--
+  OverlaySidebar.svelte
+
+  A fixed-position sidebar that overlays the canvas without affecting its size.
+  Supports docked/collapsed states and tab-based content.
+
+  Usage:
+    <OverlaySidebar
+      tabs={[
+        { id: 'chat', label: 'Chat', icon: 'chat', component: ChatPanel, props: {} },
+        { id: 'actors', label: 'Actors', icon: 'person', component: ActorPanel, props: {} }
+      ]}
+      activeTabId="chat"
+      width={350}
+      headerHeight={60}
+      on:create-actor={handleCreateActor}
+      on:edit-actor={handleEditActor}
+      on:select-token={handleSelectToken}
+    />
+-->
+<script lang="ts">
+  import type { ComponentType, SvelteComponent } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
+  import { sidebarStore, floatingWindows } from '$lib/stores/sidebar';
+  import FloatingWindow from './FloatingWindow.svelte';
+  import {
+    ChatIcon,
+    SwordsIcon,
+    PersonIcon,
+    ImageIcon,
+    GearIcon,
+    PopOutIcon,
+  } from '$lib/components/icons';
+
+  // Tab interface
+  interface Tab {
+    id: string;
+    label: string;
+    icon?: string;
+    component: ComponentType<SvelteComponent>;
+    props?: Record<string, any>;
+  }
+
+  // Props
+  export let tabs: Tab[] = [];
+  export let activeTabId: string = '';
+  export let width: number = 350;
+  export let headerHeight: number = 60;
+
+  const dispatch = createEventDispatcher();
+
+  // Subscribe to sidebar store
+  $: docked = $sidebarStore.docked;
+  $: collapsed = $sidebarStore.collapsed;
+
+  // Filter out popped-out tabs
+  $: visibleTabs = tabs.filter(t => !$sidebarStore.poppedOutTabs.has(t.id));
+
+  // If no active tab is set, use the first visible tab
+  $: if (!activeTabId && visibleTabs.length > 0) {
+    activeTabId = visibleTabs[0].id;
+  }
+
+  // Get the active tab object
+  $: activeTab = visibleTabs.find((tab) => tab.id === activeTabId);
+
+  // Map icon names to components
+  const iconMap: Record<string, ComponentType<SvelteComponent>> = {
+    chat: ChatIcon,
+    swords: SwordsIcon,
+    person: PersonIcon,
+    image: ImageIcon,
+    gear: GearIcon,
+  };
+
+  function handleTabClick(tabId: string) {
+    if (!collapsed) {
+      activeTabId = tabId;
+      sidebarStore.setActiveTab(tabId);
+    } else {
+      // If collapsed, expand and set active tab
+      sidebarStore.toggleCollapse();
+      activeTabId = tabId;
+      sidebarStore.setActiveTab(tabId);
+    }
+  }
+
+  function toggleCollapse() {
+    sidebarStore.toggleCollapse();
+  }
+
+  function toggleDock() {
+    sidebarStore.toggleDock();
+  }
+
+  // Forward events from child components
+  function forwardEvent(event: CustomEvent) {
+    dispatch(event.type, event.detail);
+  }
+
+  // Handle floating sidebar position and size updates
+  function handleFloatingMove(e: CustomEvent) {
+    sidebarStore.updateFloatingPosition(e.detail.x, e.detail.y);
+  }
+
+  function handleFloatingResize(e: CustomEvent) {
+    sidebarStore.updateFloatingSize(e.detail.width, e.detail.height);
+  }
+
+  // Handle pop-out tab
+  function handlePopOut(tabId: string) {
+    const tab = tabs.find(t => t.id === tabId);
+    if (!tab) return;
+
+    // Add to popped out tabs set
+    sidebarStore.popOutTab(tabId);
+
+    // Create a floating window for this tab
+    floatingWindows.addWindow({
+      id: `window-${tabId}`,
+      tabId: tabId,
+      title: tab.label,
+      position: { x: 100, y: 100 },
+      size: { width: 350, height: 400 },
+      zIndex: $sidebarStore.highestZIndex,
+      minimized: false
+    });
+
+    // If this was the active tab, switch to another
+    if (activeTabId === tabId) {
+      const remainingTabs = visibleTabs.filter(t => t.id !== tabId);
+      if (remainingTabs.length > 0) {
+        activeTabId = remainingTabs[0].id;
+        sidebarStore.setActiveTab(remainingTabs[0].id);
+      }
+    }
+  }
+</script>
+
+{#if !docked}
+  <!-- Undocked/Floating mode: Sidebar as a floating window -->
+  <FloatingWindow
+    id="sidebar-main"
+    title="Sidebar"
+    initialPosition={$sidebarStore.floatingPosition}
+    initialSize={$sidebarStore.floatingSize}
+    zIndex={500}
+    closeable={false}
+    on:move={handleFloatingMove}
+    on:resize={handleFloatingResize}
+  >
+    <!-- Tab bar and content -->
+    <div class="floating-sidebar-content">
+      <div class="tab-bar">
+        {#each visibleTabs as tab}
+          <div class="tab-wrapper">
+            <button
+              class="tab-button"
+              class:active={activeTabId === tab.id}
+              on:click={() => handleTabClick(tab.id)}
+              type="button"
+            >
+              {#if tab.icon && iconMap[tab.icon]}
+                <svelte:component this={iconMap[tab.icon]} size={16} />
+              {/if}
+              <span class="tab-label">{tab.label}</span>
+            </button>
+            <button
+              class="pop-out-button"
+              on:click|stopPropagation={() => handlePopOut(tab.id)}
+              type="button"
+              title="Pop out {tab.label}"
+            >
+              <PopOutIcon size={12} />
+            </button>
+          </div>
+        {/each}
+
+        <button
+          class="collapse-button"
+          on:click={toggleDock}
+          type="button"
+          title="Dock sidebar"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M18 6v12M6 12h12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="tab-content">
+        {#if activeTab}
+          <svelte:component
+            this={activeTab.component}
+            {...activeTab.props}
+            on:create-actor={forwardEvent}
+            on:edit-actor={forwardEvent}
+            on:select-token={forwardEvent}
+          />
+        {/if}
+      </div>
+    </div>
+  </FloatingWindow>
+{:else}
+  <!-- Docked mode: Fixed sidebar -->
+  <div
+    class="overlay-sidebar"
+    class:collapsed
+    style="top: {headerHeight}px; width: {collapsed ? 45 : width}px;"
+  >
+    {#if collapsed}
+      <!-- Collapsed state: Vertical icon strip -->
+      <div class="collapsed-strip">
+        <button
+          class="toggle-button"
+          on:click={toggleCollapse}
+          type="button"
+          title="Expand sidebar"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+        </button>
+
+        <div class="icon-tabs">
+          {#each visibleTabs as tab}
+            <button
+              class="icon-tab-button"
+              class:active={activeTabId === tab.id}
+              on:click={() => handleTabClick(tab.id)}
+              type="button"
+              title={tab.label}
+            >
+              {#if tab.icon && iconMap[tab.icon]}
+                <svelte:component this={iconMap[tab.icon]} size={20} />
+              {:else}
+                <span class="tab-label-char">{tab.label.charAt(0)}</span>
+              {/if}
+            </button>
+          {/each}
+        </div>
+      </div>
+    {:else}
+      <!-- Expanded state: Tab bar and content -->
+      <div class="tab-bar">
+        {#each visibleTabs as tab}
+          <div class="tab-wrapper">
+            <button
+              class="tab-button"
+              class:active={activeTabId === tab.id}
+              on:click={() => handleTabClick(tab.id)}
+              type="button"
+            >
+              {#if tab.icon && iconMap[tab.icon]}
+                <svelte:component this={iconMap[tab.icon]} size={16} />
+              {/if}
+              <span class="tab-label">{tab.label}</span>
+            </button>
+            <button
+              class="pop-out-button"
+              on:click|stopPropagation={() => handlePopOut(tab.id)}
+              type="button"
+              title="Pop out {tab.label}"
+            >
+              <PopOutIcon size={12} />
+            </button>
+          </div>
+        {/each}
+
+        <button
+          class="collapse-button"
+          on:click={toggleDock}
+          type="button"
+          title="Undock sidebar"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+        </button>
+
+        <button
+          class="collapse-button"
+          on:click={toggleCollapse}
+          type="button"
+          title="Collapse sidebar"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="tab-content">
+        {#if activeTab}
+          <svelte:component
+            this={activeTab.component}
+            {...activeTab.props}
+            on:create-actor={forwardEvent}
+            on:edit-actor={forwardEvent}
+            on:select-token={forwardEvent}
+          />
+        {/if}
+      </div>
+    {/if}
+  </div>
+{/if}
+
+<style>
+  .overlay-sidebar {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    z-index: 400;
+    pointer-events: auto;
+    background-color: #1f2937;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    transition: width 0.2s ease;
+  }
+
+  .overlay-sidebar.collapsed {
+    width: 45px;
+  }
+
+  /* Collapsed state styles */
+  .collapsed-strip {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: #1f2937;
+  }
+
+  .toggle-button {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #111827;
+    border: none;
+    border-bottom: 1px solid #374151;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  .toggle-button:hover {
+    background-color: #1f2937;
+    color: #d1d5db;
+  }
+
+  .icon-tabs {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .icon-tab-button {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    border-bottom: 1px solid #374151;
+  }
+
+  .icon-tab-button:hover {
+    background-color: #374151;
+    color: #d1d5db;
+  }
+
+  .icon-tab-button.active {
+    color: #60a5fa;
+    background-color: #1e3a5f;
+    border-left: 3px solid #3b82f6;
+  }
+
+  .tab-label-char {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  /* Expanded state styles */
+  .tab-bar {
+    display: flex;
+    background-color: #111827;
+    border-bottom: 2px solid #374151;
+    flex-shrink: 0;
+    align-items: center;
+  }
+
+  .tab-wrapper {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .tab-wrapper:hover .pop-out-button {
+    opacity: 1;
+  }
+
+  .tab-button {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    background-color: transparent;
+    border: none;
+    color: #9ca3af;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    white-space: nowrap;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .pop-out-button {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(17, 24, 39, 0.9);
+    border: 1px solid #374151;
+    border-radius: 3px;
+    color: #9ca3af;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+    z-index: 1;
+  }
+
+  .pop-out-button:hover {
+    background-color: #374151;
+    color: #d1d5db;
+  }
+
+  .tab-button:hover {
+    background-color: #1f2937;
+    color: #d1d5db;
+  }
+
+  .tab-button.active {
+    color: #60a5fa;
+    background-color: #1f2937;
+  }
+
+  .tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #3b82f6;
+  }
+
+  .tab-label {
+    display: inline-block;
+  }
+
+  .collapse-button {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    border: none;
+    border-left: 1px solid #374151;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  .collapse-button:hover {
+    background-color: #1f2937;
+    color: #d1d5db;
+  }
+
+  .tab-content {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  /* Only the direct child component should fill the space */
+  .tab-content > :global(*) {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Hide scrollbar but allow scrolling for collapsed icon tabs */
+  .icon-tabs::-webkit-scrollbar {
+    width: 0;
+    display: none;
+  }
+
+  .icon-tabs {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Floating sidebar content */
+  .floating-sidebar-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .pop-out-button {
+    position: absolute;
+    right: 0.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 0.25rem;
+    background-color: #374151;
+    border: none;
+    border-radius: 0.25rem;
+    color: #9ca3af;
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+
+  .pop-out-button:hover {
+    background-color: #4b5563;
+    color: #f3f4f6;
+  }
+
+  /* Floating sidebar content */
+  .floating-sidebar-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+</style>

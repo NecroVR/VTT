@@ -22,10 +22,19 @@
   import AssetBrowser from '$lib/components/assets/AssetBrowser.svelte';
   import AdminPanel from '$lib/components/campaign/AdminPanel.svelte';
   import LightingConfig from '$lib/components/LightingConfig.svelte';
-  import TabbedSidebar, { type Tab } from '$lib/components/campaign/TabbedSidebar.svelte';
-  import ResizableDivider from '$lib/components/campaign/ResizableDivider.svelte';
+  import OverlaySidebar from '$lib/components/sidebar/OverlaySidebar.svelte';
+  import WindowManager from '$lib/components/sidebar/WindowManager.svelte';
+  import type { ComponentType, SvelteComponent } from 'svelte';
   import type { Scene, Token, Wall } from '@vtt/shared';
   import { getWebSocketUrl } from '$lib/config/api';
+
+  interface Tab {
+    id: string;
+    label: string;
+    icon?: string;
+    component: ComponentType<SvelteComponent>;
+    props?: Record<string, any>;
+  }
 
   let wsState: { connected: boolean; reconnecting: boolean; error: string | null };
   let activeTool = 'select';
@@ -37,9 +46,7 @@
   let selectedLightId: string | null = null;
   let showSceneModal = false;
   let showActorCreateModal = false;
-  let sidebarWidth = 350;
   let activeTabId = 'chat';
-  let sidebarCollapsed = false;
 
   // Use auto-subscription with $ prefix - Svelte handles cleanup automatically
   $: campaignId = $page.params.id;
@@ -74,24 +81,28 @@
     {
       id: 'chat',
       label: 'Chat',
+      icon: 'chat',
       component: ChatPanel,
       props: { campaignId: campaignId }
     },
     {
       id: 'combat',
       label: 'Combat',
+      icon: 'swords',
       component: CombatTracker,
       props: { campaignId: campaignId, isGM }
     },
     {
       id: 'tokens',
       label: 'Tokens',
+      icon: 'person',
       component: ActorManager,
       props: { campaignId: campaignId, isGM, currentSceneId: activeScene?.id || null }
     },
     {
       id: 'assets',
       label: 'Assets',
+      icon: 'image',
       component: AssetBrowser,
       props: { campaignId: campaignId }
     },
@@ -99,18 +110,13 @@
     ...(isGM ? [{
       id: 'admin',
       label: 'Admin',
+      icon: 'gear',
       component: AdminPanel,
       props: { campaignId: campaignId }
     }] : [])
   ] as Tab[];
 
   onMount(async () => {
-    // Load sidebar collapsed state from localStorage
-    const savedCollapsedState = localStorage.getItem('vtt-sidebar-collapsed');
-    if (savedCollapsedState !== null) {
-      sidebarCollapsed = savedCollapsedState === 'true';
-    }
-
     // Check if user is authenticated
     const isAuthenticated = await authStore.checkSession();
     if (!isAuthenticated) {
@@ -360,10 +366,6 @@
     scenesStore.setActiveScene(scene.id, campaignId);
   }
 
-  function handleSidebarWidthChange(event: CustomEvent<number>) {
-    sidebarWidth = event.detail;
-  }
-
   function handleCreateActor() {
     showActorCreateModal = true;
   }
@@ -382,11 +384,6 @@
   function handleSelectToken(event: CustomEvent<{ tokenId: string }>) {
     // Token selection is already handled by tokensStore, just ensure UI updates
     tokensStore.selectToken(event.detail.tokenId);
-  }
-
-  function handleSidebarCollapse(event: CustomEvent<{ collapsed: boolean }>) {
-    sidebarCollapsed = event.detail.collapsed;
-    localStorage.setItem('vtt-sidebar-collapsed', String(sidebarCollapsed));
   }
 </script>
 
@@ -476,26 +473,24 @@
         </div>
       {/if}
     </div>
-
-    <ResizableDivider
-      initialWidth={350}
-      minWidth={250}
-      maxWidth={600}
-      storageKey="vtt-sidebar-width"
-      on:widthChange={handleSidebarWidthChange}
-    />
-
-    <TabbedSidebar
-      {tabs}
-      bind:activeTabId
-      {sidebarWidth}
-      collapsed={sidebarCollapsed}
-      on:collapse={handleSidebarCollapse}
-      on:create-actor={handleCreateActor}
-      on:edit-actor={handleEditActor}
-      on:select-token={handleSelectToken}
-    />
   </div>
+
+  <OverlaySidebar
+    {tabs}
+    bind:activeTabId
+    width={350}
+    headerHeight={60}
+    on:create-actor={handleCreateActor}
+    on:edit-actor={handleEditActor}
+    on:select-token={handleSelectToken}
+  />
+
+  <WindowManager
+    {tabs}
+    on:create-actor={handleCreateActor}
+    on:edit-actor={handleEditActor}
+    on:select-token={handleSelectToken}
+  />
 
   {#if showActorSheet && selectedActorId}
     <div class="actor-sheet-overlay">
@@ -643,14 +638,15 @@
     flex: 1;
     display: flex;
     overflow: hidden;
+    position: relative;
   }
 
   .canvas-container {
     position: relative;
     background-color: var(--color-bg-primary);
     overflow: hidden;
-    flex: 1;
-    min-width: 0;
+    width: 100%;
+    height: 100%;
   }
 
   .scene-controls-overlay {

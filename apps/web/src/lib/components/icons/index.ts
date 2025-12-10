@@ -1,0 +1,8 @@
+export { default as ChatIcon } from './ChatIcon.svelte';
+export { default as SwordsIcon } from './SwordsIcon.svelte';
+export { default as PersonIcon } from './PersonIcon.svelte';
+export { default as ImageIcon } from './ImageIcon.svelte';
+export { default as GearIcon } from './GearIcon.svelte';
+export { default as PinPlusIcon } from './PinPlusIcon.svelte';
+export { default as PinMinusIcon } from './PinMinusIcon.svelte';
+export { default as PopOutIcon } from './PopOutIcon.svelte';

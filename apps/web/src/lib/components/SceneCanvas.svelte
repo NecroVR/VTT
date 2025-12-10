@@ -30,6 +30,7 @@
 
   // Canvas refs
   let canvasContainer: HTMLDivElement;
+  let resizeObserver: ResizeObserver | null = null;
   let backgroundCanvas: HTMLCanvasElement;
   let gridCanvas: HTMLCanvasElement;
   let tokensCanvas: HTMLCanvasElement;
@@ -187,9 +188,25 @@
     window.addEventListener('resize', resizeCanvases);
     window.addEventListener('keydown', handleKeyDown);
 
+    // Set up ResizeObserver to detect container size changes (e.g., sidebar collapse)
+    resizeObserver = new ResizeObserver((entries) => {
+      // Use requestAnimationFrame to debounce multiple resize events
+      requestAnimationFrame(() => {
+        resizeCanvases();
+      });
+    });
+    resizeObserver.observe(canvasContainer);
+
     return () => {
       window.removeEventListener('resize', resizeCanvases);
       window.removeEventListener('keydown', handleKeyDown);
+
+      // Disconnect ResizeObserver
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+        resizeObserver = null;
+      }
+
       stopAnimationLoop();
     };
   });
