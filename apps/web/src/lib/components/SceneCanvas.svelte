@@ -185,7 +185,7 @@
   let showContextMenu = false;
   let contextMenuX = 0;
   let contextMenuY = 0;
-  let contextMenuElementType: 'token' | 'light' | 'wall' | 'pathpoint' | null = null;
+  let contextMenuElementType: 'token' | 'light' | 'wall' | 'window' | 'door' | 'pathpoint' | null = null;
   let contextMenuElementId: string | null = null;
   let contextMenuElementVisible = true;
   let contextMenuElementSnapToGrid = true;
@@ -4107,22 +4107,29 @@
               draggedWalls = [{ wallId: endpointHit.wallId, endpoint: endpointHit.endpoint }];
             }
 
-            // Also find all selected windows sharing this endpoint
+            // Also find all selected windows and doors sharing this endpoint
             draggedWindows = findSelectedWindowsAtEndpoint(endpointX, endpointY, selectedWindowIds);
+            draggedDoors = findSelectedDoorsAtEndpoint(endpointX, endpointY, selectedDoorIds);
 
-            // Determine if grid snapping should be applied (if ANY wall OR window has snapToGrid)
+            // Determine if grid snapping should be applied (if ANY wall, window, OR door has snapToGrid)
             draggedEndpointRequiresGridSnap = draggedWalls.some(dw => {
               const wall = walls.find(w => w.id === dw.wallId);
               return wall?.snapToGrid === true;
             }) || draggedWindows.some(dw => {
               const window = windows.find(w => w.id === dw.windowId);
               return window?.snapToGrid === true;
+            }) || draggedDoors.some(dd => {
+              const door = doors.find(d => d.id === dd.doorId);
+              return door?.snapToGrid === true;
             });
 
             draggedWindowEndpointRequiresGridSnap = draggedEndpointRequiresGridSnap;
             isDraggingWallEndpoint = true;
             if (draggedWindows.length > 0) {
               isDraggingWindowEndpoint = true;
+            }
+            if (draggedDoors.length > 0) {
+              isDraggingDoorEndpoint = true;
             }
           }
 
@@ -4203,22 +4210,29 @@
               draggedWindows = [{ windowId: windowEndpointHit.windowId, endpoint: windowEndpointHit.endpoint }];
             }
 
-            // Also find all selected walls sharing this endpoint
+            // Also find all selected walls and doors sharing this endpoint
             draggedWalls = findSelectedWallsAtEndpoint(endpointX, endpointY, selectedWallIds);
+            draggedDoors = findSelectedDoorsAtEndpoint(endpointX, endpointY, selectedDoorIds);
 
-            // Determine if grid snapping should be applied (if ANY window OR wall has snapToGrid)
+            // Determine if grid snapping should be applied (if ANY window, wall, OR door has snapToGrid)
             draggedWindowEndpointRequiresGridSnap = draggedWindows.some(dw => {
               const window = windows.find(w => w.id === dw.windowId);
               return window?.snapToGrid === true;
             }) || draggedWalls.some(dw => {
               const wall = walls.find(w => w.id === dw.wallId);
               return wall?.snapToGrid === true;
+            }) || draggedDoors.some(dd => {
+              const door = doors.find(d => d.id === dd.doorId);
+              return door?.snapToGrid === true;
             });
 
             draggedEndpointRequiresGridSnap = draggedWindowEndpointRequiresGridSnap;
             isDraggingWindowEndpoint = true;
             if (draggedWalls.length > 0) {
               isDraggingWallEndpoint = true;
+            }
+            if (draggedDoors.length > 0) {
+              isDraggingDoorEndpoint = true;
             }
           }
 
@@ -4303,6 +4317,63 @@
           return;
         } else {
           selectedWindowIds = new Set();
+        }
+
+        // Check for door endpoint dragging (higher priority than door selection)
+        const doorEndpointHit = findDoorEndpointAtPoint(worldPos.x, worldPos.y);
+        if (doorEndpointHit) {
+          // Find the exact position of the clicked endpoint
+          const clickedDoor = doors.find(d => d.id === doorEndpointHit.doorId);
+          if (clickedDoor) {
+            const endpointX = doorEndpointHit.endpoint === 'start' ? clickedDoor.x1 : clickedDoor.x2;
+            const endpointY = doorEndpointHit.endpoint === 'start' ? clickedDoor.y1 : clickedDoor.y2;
+
+            // If the clicked door is not selected, select only that door
+            if (!selectedDoorIds.has(doorEndpointHit.doorId)) {
+              selectedDoorIds = new Set([doorEndpointHit.doorId]);
+            }
+
+            // Find all selected doors sharing this endpoint
+            draggedDoors = findSelectedDoorsAtEndpoint(endpointX, endpointY, selectedDoorIds);
+
+            // If no doors found (shouldn't happen), fall back to just the clicked door
+            if (draggedDoors.length === 0) {
+              draggedDoors = [{ doorId: doorEndpointHit.doorId, endpoint: doorEndpointHit.endpoint }];
+            }
+
+            // Also find all selected walls and windows sharing this endpoint
+            draggedWalls = findSelectedWallsAtEndpoint(endpointX, endpointY, selectedWallIds);
+            draggedWindows = findSelectedWindowsAtEndpoint(endpointX, endpointY, selectedWindowIds);
+
+            // Determine if grid snapping should be applied (if ANY door, wall, OR window has snapToGrid)
+            const draggedDoorEndpointRequiresGridSnap = draggedDoors.some(dd => {
+              const door = doors.find(d => d.id === dd.doorId);
+              return door?.snapToGrid === true;
+            }) || draggedWalls.some(dw => {
+              const wall = walls.find(w => w.id === dw.wallId);
+              return wall?.snapToGrid === true;
+            }) || draggedWindows.some(dw => {
+              const window = windows.find(w => w.id === dw.windowId);
+              return window?.snapToGrid === true;
+            });
+
+            draggedEndpointRequiresGridSnap = draggedDoorEndpointRequiresGridSnap;
+            draggedWindowEndpointRequiresGridSnap = draggedDoorEndpointRequiresGridSnap;
+            isDraggingDoorEndpoint = true;
+            if (draggedWalls.length > 0) {
+              isDraggingWallEndpoint = true;
+            }
+            if (draggedWindows.length > 0) {
+              isDraggingWindowEndpoint = true;
+            }
+          }
+
+          selectedTokenId = null;
+          selectedLightId = null;
+          onTokenSelect?.(null);
+          onLightSelect?.(null);
+          renderWalls(); // renderWalls also renders doors
+          return;
         }
 
         // Check for door selection
@@ -4720,14 +4791,21 @@
       }
     }
 
-    // Handle shared wall and window endpoint dragging
-    if (isDraggingWallEndpoint && isDraggingWindowEndpoint && draggedWalls.length > 0 && draggedWindows.length > 0) {
-      // Apply snapping based on whether any wall or window requires grid snap
+    // Handle shared wall, window, and door endpoint dragging
+    if ((isDraggingWallEndpoint || isDraggingWindowEndpoint || isDraggingDoorEndpoint) &&
+        (draggedWalls.length > 0 || draggedWindows.length > 0 || draggedDoors.length > 0)) {
+      // Apply snapping based on whether any wall, window, or door requires grid snap
       const targetPos = draggedEndpointRequiresGridSnap ? snapToGrid(worldPos.x, worldPos.y) : worldPos;
 
-      // For snap-to-endpoint, use the first dragged wall for exclusion logic
-      const firstDragged = draggedWalls[0];
-      nearbyEndpoint = findNearbyWallEndpoint(targetPos.x, targetPos.y, firstDragged.wallId, firstDragged.endpoint);
+      // For snap-to-endpoint, use the first dragged item for exclusion logic
+      const firstDragged = draggedWalls[0] || draggedWindows[0] || draggedDoors[0];
+      if (draggedWalls[0]) {
+        nearbyEndpoint = findNearbyWallEndpoint(targetPos.x, targetPos.y, draggedWalls[0].wallId, draggedWalls[0].endpoint);
+      } else if (draggedWindows[0]) {
+        nearbyEndpoint = findNearbyWallEndpoint(targetPos.x, targetPos.y, '', '');
+      } else if (draggedDoors[0]) {
+        nearbyEndpoint = findNearbyWallEndpoint(targetPos.x, targetPos.y, '', '');
+      }
 
       // Update all dragged wall endpoints locally for immediate feedback
       for (const dw of draggedWalls) {
@@ -4757,9 +4835,23 @@
         }
       }
 
-      // Invalidate visibility cache so walls and windows update during drag
+      // Update all dragged door endpoints locally for immediate feedback
+      for (const dd of draggedDoors) {
+        const door = doors.find(d => d.id === dd.doorId);
+        if (door) {
+          if (dd.endpoint === 'start') {
+            door.x1 = targetPos.x;
+            door.y1 = targetPos.y;
+          } else {
+            door.x2 = targetPos.x;
+            door.y2 = targetPos.y;
+          }
+        }
+      }
+
+      // Invalidate visibility cache so walls, windows, and doors update during drag
       invalidateVisibilityCache();
-      renderWalls(); // renderWalls also renders windows
+      renderWalls(); // renderWalls also renders windows and doors
       return;
     }
 
@@ -5019,8 +5111,9 @@
 
       isDraggingToken = false;
       draggedTokenId = null;
-    } else if (isDraggingWallEndpoint && isDraggingWindowEndpoint && draggedWalls.length > 0 && draggedWindows.length > 0) {
-      // Handle shared wall and window endpoint dragging
+    } else if ((isDraggingWallEndpoint || isDraggingWindowEndpoint || isDraggingDoorEndpoint) &&
+               (draggedWalls.length > 0 || draggedWindows.length > 0 || draggedDoors.length > 0)) {
+      // Handle shared wall, window, and door endpoint dragging
       let finalPos: { x: number; y: number };
 
       // Check if we should snap to a nearby endpoint
@@ -5029,7 +5122,7 @@
         finalPos = { x: nearbyEndpoint.x, y: nearbyEndpoint.y };
       } else {
         const worldPos = screenToWorld(e.clientX, e.clientY);
-        // Apply snapping based on whether any wall or window requires grid snap
+        // Apply snapping based on whether any wall, window, or door requires grid snap
         finalPos = draggedEndpointRequiresGridSnap ? snapToGrid(worldPos.x, worldPos.y) : worldPos;
       }
 
@@ -5051,11 +5144,22 @@
         onWindowUpdate?.(dw.windowId, updates);
       }
 
+      // Send updates for ALL dragged doors
+      for (const dd of draggedDoors) {
+        const updates: Partial<Door> = dd.endpoint === 'start'
+          ? { x1: finalPos.x, y1: finalPos.y }
+          : { x2: finalPos.x, y2: finalPos.y };
+
+        onDoorUpdate?.(dd.doorId, updates);
+      }
+
       // Reset drag state
       isDraggingWallEndpoint = false;
       isDraggingWindowEndpoint = false;
+      isDraggingDoorEndpoint = false;
       draggedWalls = [];
       draggedWindows = [];
+      draggedDoors = [];
       draggedEndpointRequiresGridSnap = false;
       draggedWindowEndpointRequiresGridSnap = false;
       nearbyEndpoint = null;
@@ -5870,6 +5974,42 @@
         contextMenuControlPointIndex = null; // Not clicking on a control point
         return;
       }
+
+      // Check for door control point at position (for curved doors)
+      const doorControlPointHit = findDoorControlPointAtPoint(worldX, worldY);
+      if (doorControlPointHit) {
+        const door = doors.find(d => d.id === doorControlPointHit.doorId);
+        if (door) {
+          showContextMenu = true;
+          contextMenuX = e.clientX;
+          contextMenuY = e.clientY;
+          contextMenuElementType = 'door';
+          contextMenuElementId = doorControlPointHit.doorId;
+          contextMenuElementVisible = true; // Doors don't have visibility toggle
+          contextMenuElementSnapToGrid = door.snapToGrid !== false; // Default to true if undefined
+          contextMenuWallShape = door.wallShape;
+          contextMenuClickWorldPos = { x: worldX, y: worldY };
+          contextMenuControlPointIndex = doorControlPointHit.controlPointIndex;
+          return;
+        }
+      }
+
+      // Check for door at position
+      const clickedDoorId = findDoorAtPoint(worldX, worldY);
+      if (clickedDoorId) {
+        const door = doors.find(d => d.id === clickedDoorId);
+        showContextMenu = true;
+        contextMenuX = e.clientX;
+        contextMenuY = e.clientY;
+        contextMenuElementType = 'door';
+        contextMenuElementId = clickedDoorId;
+        contextMenuElementVisible = true; // Doors don't have visibility toggle
+        contextMenuElementSnapToGrid = door?.snapToGrid !== false; // Default to true if undefined
+        contextMenuWallShape = door?.wallShape;
+        contextMenuClickWorldPos = { x: worldX, y: worldY };
+        contextMenuControlPointIndex = null; // Not clicking on a control point
+        return;
+      }
     }
 
     // No element clicked - close any existing menu
@@ -5926,6 +6066,16 @@
           updates: { snapToGrid: !contextMenuElementSnapToGrid }
         });
       }
+    } else if (contextMenuElementType === 'window' && contextMenuElementId) {
+      const window = windows.find(w => w.id === contextMenuElementId);
+      if (window) {
+        onWindowUpdate?.(contextMenuElementId, { snapToGrid: !contextMenuElementSnapToGrid });
+      }
+    } else if (contextMenuElementType === 'door' && contextMenuElementId) {
+      const door = doors.find(d => d.id === contextMenuElementId);
+      if (door) {
+        onDoorUpdate?.(contextMenuElementId, { snapToGrid: !contextMenuElementSnapToGrid });
+      }
     }
   }
 
@@ -5962,6 +6112,40 @@
         // Update the wall with the new control points
         onWallUpdate?.(contextMenuElementId, { controlPoints: newControlPoints });
       }
+    } else if (contextMenuElementType === 'window' && contextMenuElementId) {
+      const window = windows.find(w => w.id === contextMenuElementId);
+      if (window && window.wallShape === 'curved') {
+        const splinePoints = getSplinePoints(window);
+        const curvePoints = catmullRomSpline(splinePoints);
+        const clickPos = event.detail.worldPos;
+        const closestInfo = findClosestPointOnSpline(clickPos.x, clickPos.y, curvePoints);
+        const existingControlPoints = window.controlPoints || [];
+        const numSegmentsPerControlSegment = 20;
+        const controlSegmentIndex = Math.floor(closestInfo.segmentIndex / numSegmentsPerControlSegment);
+        const newControlPoints = insertControlPoint(
+          existingControlPoints,
+          closestInfo.point,
+          controlSegmentIndex
+        );
+        onWindowUpdate?.(contextMenuElementId, { controlPoints: newControlPoints });
+      }
+    } else if (contextMenuElementType === 'door' && contextMenuElementId) {
+      const door = doors.find(d => d.id === contextMenuElementId);
+      if (door && door.wallShape === 'curved') {
+        const splinePoints = getSplinePoints(door);
+        const curvePoints = catmullRomSpline(splinePoints);
+        const clickPos = event.detail.worldPos;
+        const closestInfo = findClosestPointOnSpline(clickPos.x, clickPos.y, curvePoints);
+        const existingControlPoints = door.controlPoints || [];
+        const numSegmentsPerControlSegment = 20;
+        const controlSegmentIndex = Math.floor(closestInfo.segmentIndex / numSegmentsPerControlSegment);
+        const newControlPoints = insertControlPoint(
+          existingControlPoints,
+          closestInfo.point,
+          controlSegmentIndex
+        );
+        onDoorUpdate?.(contextMenuElementId, { controlPoints: newControlPoints });
+      }
     }
   }
 
@@ -5982,6 +6166,26 @@
         // If this was the last control point, the wall becomes effectively straight
         // (but remains wallShape: 'curved' with empty controlPoints)
         onWallUpdate?.(contextMenuElementId, { controlPoints: newControlPoints });
+      }
+    } else if (contextMenuElementType === 'window' && contextMenuElementId) {
+      const window = windows.find(w => w.id === contextMenuElementId);
+      if (window && window.wallShape === 'curved') {
+        const existingControlPoints = window.controlPoints || [];
+        const newControlPoints = [
+          ...existingControlPoints.slice(0, event.detail.controlPointIndex),
+          ...existingControlPoints.slice(event.detail.controlPointIndex + 1)
+        ];
+        onWindowUpdate?.(contextMenuElementId, { controlPoints: newControlPoints });
+      }
+    } else if (contextMenuElementType === 'door' && contextMenuElementId) {
+      const door = doors.find(d => d.id === contextMenuElementId);
+      if (door && door.wallShape === 'curved') {
+        const existingControlPoints = door.controlPoints || [];
+        const newControlPoints = [
+          ...existingControlPoints.slice(0, event.detail.controlPointIndex),
+          ...existingControlPoints.slice(event.detail.controlPointIndex + 1)
+        ];
+        onDoorUpdate?.(contextMenuElementId, { controlPoints: newControlPoints });
       }
     }
   }
@@ -6020,6 +6224,9 @@
     } else if (contextMenuElementType === 'window') {
       deleteDialogTitle = 'Delete Window';
       deleteDialogMessage = 'Are you sure you want to delete this window? This action cannot be undone.';
+    } else if (contextMenuElementType === 'door') {
+      deleteDialogTitle = 'Delete Door';
+      deleteDialogMessage = 'Are you sure you want to delete this door? This action cannot be undone.';
     } else if (contextMenuElementType === 'pathpoint') {
       deleteDialogTitle = 'Delete Path Point';
       deleteDialogMessage = 'Are you sure you want to delete this path point? This action cannot be undone.';
@@ -6039,6 +6246,8 @@
       websocket.sendWallRemove({ wallId: contextMenuElementId });
     } else if (contextMenuElementType === 'window' && contextMenuElementId) {
       onWindowRemove?.(contextMenuElementId);
+    } else if (contextMenuElementType === 'door' && contextMenuElementId) {
+      onDoorRemove?.(contextMenuElementId);
     } else if (contextMenuElementType === 'pathpoint' && contextMenuElementId) {
       onPathPointRemove?.(contextMenuElementId);
     }
@@ -6058,6 +6267,10 @@
     if (contextMenuElementType === 'window') {
       selectedWindowIds = new Set();
       onWindowSelect?.(null);
+    }
+    if (contextMenuElementType === 'door') {
+      selectedDoorIds = new Set();
+      onDoorSelect?.(null);
     }
     if (contextMenuElementType === 'pathpoint') {
       selectedPathPointId = null;
