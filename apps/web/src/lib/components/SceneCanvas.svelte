@@ -4095,6 +4095,11 @@
                     id: l.id,
                     x: l.x,
                     y: l.y
+                  })),
+                  tokens: tokens.filter(t => selectedTokenIds.has(t.id)).map(t => ({
+                    id: t.id,
+                    x: t.x,
+                    y: t.y
                   }))
                 };
 
@@ -4103,7 +4108,8 @@
                   walls.filter(w => selectedWallIds.has(w.id)).some(w => w.snapToGrid === true) ||
                   windows.filter(w => selectedWindowIds.has(w.id)).some(w => w.snapToGrid === true) ||
                   doors.filter(d => selectedDoorIds.has(d.id)).some(d => d.snapToGrid === true) ||
-                  lights.filter(l => selectedLightIds.has(l.id)).some(l => l.snapToGrid === true);
+                  lights.filter(l => selectedLightIds.has(l.id)).some(l => l.snapToGrid === true) ||
+                  tokens.filter(t => selectedTokenIds.has(t.id)).some(t => t.snapToGrid === true);
               } else {
                 // Regular click: Select only this light, clear all other selections
                 selectedLightIds = new Set([lightId]);
@@ -4347,15 +4353,25 @@
                 x1: d.x1, y1: d.y1, x2: d.x2, y2: d.y2,
                 controlPoints: d.controlPoints ? [...d.controlPoints.map(cp => ({...cp}))] : undefined
               })),
-              lights: [],
-              tokens: []
+              lights: lights.filter(l => selectedLightIds.has(l.id)).map(l => ({
+                id: l.id,
+                x: l.x,
+                y: l.y
+              })),
+              tokens: tokens.filter(t => selectedTokenIds.has(t.id)).map(t => ({
+                id: t.id,
+                x: t.x,
+                y: t.y
+              }))
             };
 
             // Check if any selected object requires grid snap
             bodyDragRequiresGridSnap =
               walls.filter(w => selectedWallIds.has(w.id)).some(w => w.snapToGrid === true) ||
               windows.filter(w => selectedWindowIds.has(w.id)).some(w => w.snapToGrid === true) ||
-              doors.filter(d => selectedDoorIds.has(d.id)).some(d => d.snapToGrid === true);
+              doors.filter(d => selectedDoorIds.has(d.id)).some(d => d.snapToGrid === true) ||
+              lights.filter(l => selectedLightIds.has(l.id)).some(l => l.snapToGrid === true) ||
+              tokens.filter(t => selectedTokenIds.has(t.id)).some(t => t.snapToGrid === true);
 
             return;
           }
@@ -4413,15 +4429,25 @@
                 x1: d.x1, y1: d.y1, x2: d.x2, y2: d.y2,
                 controlPoints: d.controlPoints ? [...d.controlPoints.map(cp => ({...cp}))] : undefined
               })),
-              lights: [],
-              tokens: []
+              lights: lights.filter(l => selectedLightIds.has(l.id)).map(l => ({
+                id: l.id,
+                x: l.x,
+                y: l.y
+              })),
+              tokens: tokens.filter(t => selectedTokenIds.has(t.id)).map(t => ({
+                id: t.id,
+                x: t.x,
+                y: t.y
+              }))
             };
 
             // Check if any selected object requires grid snap
             bodyDragRequiresGridSnap =
               walls.filter(w => selectedWallIds.has(w.id)).some(w => w.snapToGrid === true) ||
               windows.filter(w => selectedWindowIds.has(w.id)).some(w => w.snapToGrid === true) ||
-              doors.filter(d => selectedDoorIds.has(d.id)).some(d => d.snapToGrid === true);
+              doors.filter(d => selectedDoorIds.has(d.id)).some(d => d.snapToGrid === true) ||
+              lights.filter(l => selectedLightIds.has(l.id)).some(l => l.snapToGrid === true) ||
+              tokens.filter(t => selectedTokenIds.has(t.id)).some(t => t.snapToGrid === true);
 
             return;
           }
@@ -4545,15 +4571,25 @@
                 x1: d.x1, y1: d.y1, x2: d.x2, y2: d.y2,
                 controlPoints: d.controlPoints ? [...d.controlPoints.map(cp => ({...cp}))] : undefined
               })),
-              lights: [],
-              tokens: []
+              lights: lights.filter(l => selectedLightIds.has(l.id)).map(l => ({
+                id: l.id,
+                x: l.x,
+                y: l.y
+              })),
+              tokens: tokens.filter(t => selectedTokenIds.has(t.id)).map(t => ({
+                id: t.id,
+                x: t.x,
+                y: t.y
+              }))
             };
 
             // Check if any selected object requires grid snap
             bodyDragRequiresGridSnap =
               walls.filter(w => selectedWallIds.has(w.id)).some(w => w.snapToGrid === true) ||
               windows.filter(w => selectedWindowIds.has(w.id)).some(w => w.snapToGrid === true) ||
-              doors.filter(d => selectedDoorIds.has(d.id)).some(d => d.snapToGrid === true);
+              doors.filter(d => selectedDoorIds.has(d.id)).some(d => d.snapToGrid === true) ||
+              lights.filter(l => selectedLightIds.has(l.id)).some(l => l.snapToGrid === true) ||
+              tokens.filter(t => selectedTokenIds.has(t.id)).some(t => t.snapToGrid === true);
 
             return;
           }
