@@ -97,7 +97,7 @@
   let isDraggingLight = false;
   let lastMouseX = 0;
   let lastMouseY = 0;
-  let selectedTokenId: string | null = null;
+  let selectedTokenIds: Set<string> = new Set();
   let selectedLightIds: Set<string> = new Set();
   let draggedTokenId: string | null = null;
   let draggedLightId: string | null = null;
@@ -173,6 +173,7 @@
     windows: Array<{ id: string; x1: number; y1: number; x2: number; y2: number; controlPoints?: Array<{x: number, y: number}> }>;
     doors: Array<{ id: string; x1: number; y1: number; x2: number; y2: number; controlPoints?: Array<{x: number, y: number}> }>;
     lights: Array<{ id: string; x: number; y: number }>;
+    tokens: Array<{ id: string; x: number; y: number }>;
   } | null = null;
   let bodyDragRequiresGridSnap = false;
 
@@ -1194,7 +1195,7 @@
       const imageState = token.imageUrl ? tokenImageLoadingState.get(token.imageUrl) : null;
 
       // Render vision indicator before the token (if selected)
-      if (selectedTokenId === token.id) {
+      if (selectedTokenIds.has(token.id)) {
         renderTokenVision(tokensCtx, token);
       }
 
@@ -1241,7 +1242,7 @@
       tokensCtx.restore();
 
       // Draw selection highlight (outside the clip)
-      tokensCtx.strokeStyle = selectedTokenId === token.id ? '#fbbf24' : '#ffffff';
+      tokensCtx.strokeStyle = selectedTokenIds.has(token.id) ? '#fbbf24' : '#ffffff';
       tokensCtx.lineWidth = 2 / scale;
       tokensCtx.beginPath();
       tokensCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
@@ -3140,7 +3141,7 @@
     ctx.save();
 
     // Draw vision range indicator (subtle circle for selected tokens)
-    const isSelected = selectedTokenId === token.id;
+    const isSelected = selectedTokenIds.has(token.id);
 
     if (isSelected) {
       // Draw a subtle vision range circle
@@ -3721,9 +3722,9 @@
     if (ctrlKey) {
       // Add to existing selection
       if (selectedTokens.length > 0) {
-        // For tokens, just select the first one (single selection)
-        selectedTokenId = selectedTokens[0];
-        onTokenSelect?.(selectedTokenId);
+        // For tokens, add to existing set
+        selectedTokens.forEach(id => selectedTokenIds.add(id));
+        selectedTokenIds = selectedTokenIds; // trigger reactivity
       }
 
       if (selectedWalls.length > 0) {
@@ -3746,10 +3747,10 @@
     } else {
       // Replace selection
       if (selectedTokens.length > 0) {
-        selectedTokenId = selectedTokens[0];
-        onTokenSelect?.(selectedTokenId);
+        selectedTokenIds = new Set(selectedTokens);
+        onTokenSelect?.(selectedTokens[0]);
       } else {
-        selectedTokenId = null;
+        selectedTokenIds = new Set();
         onTokenSelect?.(null);
       }
 
@@ -4109,7 +4110,7 @@
                 selectedWallIds = new Set();
                 selectedWindowIds = new Set();
                 selectedDoorIds = new Set();
-                selectedTokenId = null;
+                selectedTokenIds = new Set();
                 onTokenSelect?.(null);
                 renderControls();
                 renderLights();
@@ -4135,7 +4136,7 @@
               isDraggingControlPoint = true;
 
               // Clear other selections
-              selectedTokenId = null;
+              selectedTokenIds = new Set();
               selectedLightIds = new Set();
               onTokenSelect?.(null);
               onLightSelect?.(null);
@@ -4194,7 +4195,7 @@
             }
           }
 
-          selectedTokenId = null;
+          selectedTokenIds = new Set();
           selectedLightIds = new Set();
           onTokenSelect?.(null);
           onLightSelect?.(null);
@@ -4208,7 +4209,7 @@
           const pathPoint = pathPoints.find(pp => pp.id === pathPointId);
           if (pathPoint) {
             selectedPathPointId = pathPointId;
-            selectedTokenId = null;
+            selectedTokenIds = new Set();
             selectedLightIds = new Set();
             selectedWallIds = new Set();
             selectedPathId = null;
@@ -4237,7 +4238,7 @@
               isDraggingWindowControlPoint = true;
 
               // Clear other selections
-              selectedTokenId = null;
+              selectedTokenIds = new Set();
               selectedLightIds = new Set();
               selectedWallIds = new Set();
               onTokenSelect?.(null);
@@ -4297,7 +4298,7 @@
             }
           }
 
-          selectedTokenId = null;
+          selectedTokenIds = new Set();
           selectedLightIds = new Set();
           onTokenSelect?.(null);
           onLightSelect?.(null);
@@ -4345,7 +4346,9 @@
                 id: d.id,
                 x1: d.x1, y1: d.y1, x2: d.x2, y2: d.y2,
                 controlPoints: d.controlPoints ? [...d.controlPoints.map(cp => ({...cp}))] : undefined
-              }))
+              })),
+              lights: [],
+              tokens: []
             };
 
             // Check if any selected object requires grid snap
@@ -4371,7 +4374,7 @@
             selectedWallIds = new Set([wallId]);
             selectedWindowIds = new Set();
             selectedDoorIds = new Set();
-            selectedTokenId = null;
+            selectedTokenIds = new Set();
             selectedLightIds = new Set();
             onTokenSelect?.(null);
             onLightSelect?.(null);
@@ -4409,7 +4412,9 @@
                 id: d.id,
                 x1: d.x1, y1: d.y1, x2: d.x2, y2: d.y2,
                 controlPoints: d.controlPoints ? [...d.controlPoints.map(cp => ({...cp}))] : undefined
-              }))
+              })),
+              lights: [],
+              tokens: []
             };
 
             // Check if any selected object requires grid snap
@@ -4435,7 +4440,7 @@
             selectedWindowIds = new Set([windowId]);
             selectedWallIds = new Set();
             selectedDoorIds = new Set();
-            selectedTokenId = null;
+            selectedTokenIds = new Set();
             selectedLightIds = new Set();
             onTokenSelect?.(null);
             onLightSelect?.(null);
@@ -4497,7 +4502,7 @@
             }
           }
 
-          selectedTokenId = null;
+          selectedTokenIds = new Set();
           selectedLightIds = new Set();
           onTokenSelect?.(null);
           onLightSelect?.(null);
@@ -4539,7 +4544,9 @@
                 id: d.id,
                 x1: d.x1, y1: d.y1, x2: d.x2, y2: d.y2,
                 controlPoints: d.controlPoints ? [...d.controlPoints.map(cp => ({...cp}))] : undefined
-              }))
+              })),
+              lights: [],
+              tokens: []
             };
 
             // Check if any selected object requires grid snap
@@ -4565,7 +4572,7 @@
             selectedDoorIds = new Set([doorId]);
             selectedWallIds = new Set();
             selectedWindowIds = new Set();
-            selectedTokenId = null;
+            selectedTokenIds = new Set();
             selectedLightIds = new Set();
             onTokenSelect?.(null);
             onLightSelect?.(null);
@@ -4582,7 +4589,7 @@
         const pathId = findPathAtPoint(worldPos.x, worldPos.y);
         if (pathId) {
           selectedPathId = pathId;
-          selectedTokenId = null;
+          selectedTokenIds = new Set();
           selectedLightIds = new Set();
           selectedWallIds = new Set();
           selectedPathPointId = null;
@@ -4618,16 +4625,73 @@
           lastClickTime = 0; // Reset to prevent triple-click
           lastClickTokenId = null;
         } else {
-          // Single click - prepare for drag
-          selectedTokenId = clickedToken.id;
-          selectedLightIds = new Set();
-          draggedTokenId = clickedToken.id;
-          isDraggingToken = true;
-          dragOffsetX = clickedToken.x - worldPos.x;
-          dragOffsetY = clickedToken.y - worldPos.y;
-          onTokenSelect?.(clickedToken.id);
-          onLightSelect?.(null);
-          renderControls();
+          // Single click - handle selection and drag
+          if (e.ctrlKey) {
+            // Ctrl+Click: Toggle token in/out of selection
+            if (selectedTokenIds.has(clickedToken.id)) {
+              selectedTokenIds = new Set([...selectedTokenIds].filter(id => id !== clickedToken.id));
+            } else {
+              selectedTokenIds = new Set([...selectedTokenIds, clickedToken.id]);
+            }
+            // Don't clear other selections when Ctrl+clicking tokens
+            renderControls();
+            renderTokens();
+          } else if (selectedTokenIds.has(clickedToken.id)) {
+            // Token is already selected - initiate body drag of all selected objects
+            isDraggingBodies = true;
+            bodyDragStartPos = { x: worldPos.x, y: worldPos.y };
+
+            // Store original positions of all selected objects
+            bodyDragOriginalPositions = {
+              walls: walls.filter(w => selectedWallIds.has(w.id)).map(w => ({
+                id: w.id,
+                x1: w.x1, y1: w.y1, x2: w.x2, y2: w.y2,
+                controlPoints: w.controlPoints ? [...w.controlPoints.map(cp => ({...cp}))] : undefined
+              })),
+              windows: windows.filter(w => selectedWindowIds.has(w.id)).map(w => ({
+                id: w.id,
+                x1: w.x1, y1: w.y1, x2: w.x2, y2: w.y2,
+                controlPoints: w.controlPoints ? [...w.controlPoints.map(cp => ({...cp}))] : undefined
+              })),
+              doors: doors.filter(d => selectedDoorIds.has(d.id)).map(d => ({
+                id: d.id,
+                x1: d.x1, y1: d.y1, x2: d.x2, y2: d.y2,
+                controlPoints: d.controlPoints ? [...d.controlPoints.map(cp => ({...cp}))] : undefined
+              })),
+              lights: lights.filter(l => selectedLightIds.has(l.id)).map(l => ({
+                id: l.id,
+                x: l.x,
+                y: l.y
+              })),
+              tokens: tokens.filter(t => selectedTokenIds.has(t.id)).map(t => ({
+                id: t.id,
+                x: t.x,
+                y: t.y
+              }))
+            };
+
+            // Check if any selected object requires grid snap
+            bodyDragRequiresGridSnap =
+              walls.filter(w => selectedWallIds.has(w.id)).some(w => w.snapToGrid === true) ||
+              windows.filter(w => selectedWindowIds.has(w.id)).some(w => w.snapToGrid === true) ||
+              doors.filter(d => selectedDoorIds.has(d.id)).some(d => d.snapToGrid === true) ||
+              lights.filter(l => selectedLightIds.has(l.id)).some(l => l.snapToGrid === true) ||
+              tokens.filter(t => selectedTokenIds.has(t.id)).some(t => t.snapToGrid === true);
+          } else {
+            // Regular click: Select only this token, prepare for old-style single token drag
+            selectedTokenIds = new Set([clickedToken.id]);
+            selectedLightIds = new Set();
+            selectedWallIds = new Set();
+            selectedWindowIds = new Set();
+            selectedDoorIds = new Set();
+            draggedTokenId = clickedToken.id;
+            isDraggingToken = true;
+            dragOffsetX = clickedToken.x - worldPos.x;
+            dragOffsetY = clickedToken.y - worldPos.y;
+            onTokenSelect?.(clickedToken.id);
+            onLightSelect?.(null);
+            renderControls();
+          }
 
           // Store click time and token for double-click detection
           lastClickTime = currentTime;
@@ -4645,7 +4709,7 @@
           // Clear selections unless Ctrl is held
           if (!e.ctrlKey) {
             exitPossession();
-            selectedTokenId = null;
+            selectedTokenIds = new Set();
             selectedLightIds = new Set();
             selectedWallIds = new Set();
             selectedWindowIds = new Set();
@@ -4660,7 +4724,7 @@
         } else {
           // Right click - pan
           exitPossession();
-          selectedTokenId = null;
+          selectedTokenIds = new Set();
           selectedLightIds = new Set();
           selectedWindowIds = new Set();
           onTokenSelect?.(null);
@@ -4674,7 +4738,7 @@
       }
     } else {
       // Non-select tool - clear selections and start panning if clicking empty space
-      selectedTokenId = null;
+      selectedTokenIds = new Set();
       selectedLightIds = new Set();
       selectedWindowIds = new Set();
       onTokenSelect?.(null);
@@ -5146,6 +5210,13 @@
         const snapped = snapToGrid(newX, newY);
         deltaX = snapped.x - anchor.x;
         deltaY = snapped.y - anchor.y;
+      } else if (bodyDragRequiresGridSnap && effectiveGridSnap && bodyDragOriginalPositions.tokens.length > 0) {
+        const anchor = bodyDragOriginalPositions.tokens[0];
+        const newX = anchor.x + deltaX;
+        const newY = anchor.y + deltaY;
+        const snapped = snapToGrid(newX, newY);
+        deltaX = snapped.x - anchor.x;
+        deltaY = snapped.y - anchor.y;
       }
 
       // Update all walls
@@ -5218,10 +5289,24 @@
         return light;
       });
 
+      // Update all tokens
+      tokens = tokens.map(token => {
+        const original = bodyDragOriginalPositions!.tokens.find(t => t.id === token.id);
+        if (original) {
+          return {
+            ...token,
+            x: original.x + deltaX,
+            y: original.y + deltaY
+          };
+        }
+        return token;
+      });
+
       // Invalidate visibility cache so objects update during drag
       invalidateVisibilityCache();
       renderWalls(); // renderWalls also renders windows and doors
       renderLights();
+      renderTokens();
       return;
     }
 
@@ -5581,6 +5666,14 @@
         const light = lights.find(l => l.id === original.id);
         if (light && onLightMove) {
           onLightMove(light.id, light.x, light.y);
+        }
+      }
+
+      // Call update for each moved token
+      for (const original of bodyDragOriginalPositions.tokens) {
+        const token = tokens.find(t => t.id === original.id);
+        if (token && onTokenMove) {
+          onTokenMove(token.id, token.x, token.y);
         }
       }
 
@@ -6600,7 +6693,7 @@
 
     // Clear selection
     if (contextMenuElementType === 'token') {
-      selectedTokenId = null;
+      selectedTokenIds = new Set();
       onTokenSelect?.(null);
     }
     if (contextMenuElementType === 'light') {
