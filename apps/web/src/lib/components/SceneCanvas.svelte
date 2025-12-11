@@ -4412,7 +4412,50 @@
       }
     }
 
-    // Handle wall endpoint dragging
+    // Handle shared wall and window endpoint dragging
+    if (isDraggingWallEndpoint && isDraggingWindowEndpoint && draggedWalls.length > 0 && draggedWindows.length > 0) {
+      // Apply snapping based on whether any wall or window requires grid snap
+      const targetPos = draggedEndpointRequiresGridSnap ? snapToGrid(worldPos.x, worldPos.y) : worldPos;
+
+      // For snap-to-endpoint, use the first dragged wall for exclusion logic
+      const firstDragged = draggedWalls[0];
+      nearbyEndpoint = findNearbyWallEndpoint(targetPos.x, targetPos.y, firstDragged.wallId, firstDragged.endpoint);
+
+      // Update all dragged wall endpoints locally for immediate feedback
+      for (const dw of draggedWalls) {
+        const wall = walls.find(w => w.id === dw.wallId);
+        if (wall) {
+          if (dw.endpoint === 'start') {
+            wall.x1 = targetPos.x;
+            wall.y1 = targetPos.y;
+          } else {
+            wall.x2 = targetPos.x;
+            wall.y2 = targetPos.y;
+          }
+        }
+      }
+
+      // Update all dragged window endpoints locally for immediate feedback
+      for (const dw of draggedWindows) {
+        const window = windows.find(w => w.id === dw.windowId);
+        if (window) {
+          if (dw.endpoint === 'start') {
+            window.x1 = targetPos.x;
+            window.y1 = targetPos.y;
+          } else {
+            window.x2 = targetPos.x;
+            window.y2 = targetPos.y;
+          }
+        }
+      }
+
+      // Invalidate visibility cache so walls and windows update during drag
+      invalidateVisibilityCache();
+      renderWalls(); // renderWalls also renders windows
+      return;
+    }
+
+    // Handle wall endpoint dragging only
     if (isDraggingWallEndpoint && draggedWalls.length > 0) {
       // Apply snapping based on whether any wall requires grid snap
       const targetPos = draggedEndpointRequiresGridSnap ? snapToGrid(worldPos.x, worldPos.y) : worldPos;
@@ -4461,7 +4504,7 @@
       return;
     }
 
-    // Handle window endpoint dragging
+    // Handle window endpoint dragging only
     if (isDraggingWindowEndpoint && draggedWindows.length > 0) {
       // Apply snapping based on whether any window requires grid snap
       const targetPos = draggedWindowEndpointRequiresGridSnap ? snapToGrid(worldPos.x, worldPos.y) : worldPos;
@@ -4668,7 +4711,48 @@
 
       isDraggingToken = false;
       draggedTokenId = null;
+    } else if (isDraggingWallEndpoint && isDraggingWindowEndpoint && draggedWalls.length > 0 && draggedWindows.length > 0) {
+      // Handle shared wall and window endpoint dragging
+      let finalPos: { x: number; y: number };
+
+      // Check if we should snap to a nearby endpoint
+      if (nearbyEndpoint) {
+        // Snap to the nearby endpoint
+        finalPos = { x: nearbyEndpoint.x, y: nearbyEndpoint.y };
+      } else {
+        const worldPos = screenToWorld(e.clientX, e.clientY);
+        // Apply snapping based on whether any wall or window requires grid snap
+        finalPos = draggedEndpointRequiresGridSnap ? snapToGrid(worldPos.x, worldPos.y) : worldPos;
+      }
+
+      // Send updates for ALL dragged walls
+      for (const dw of draggedWalls) {
+        const updates: Partial<Wall> = dw.endpoint === 'start'
+          ? { x1: finalPos.x, y1: finalPos.y }
+          : { x2: finalPos.x, y2: finalPos.y };
+
+        onWallUpdate?.(dw.wallId, updates);
+      }
+
+      // Send updates for ALL dragged windows
+      for (const dw of draggedWindows) {
+        const updates: Partial<Window> = dw.endpoint === 'start'
+          ? { x1: finalPos.x, y1: finalPos.y }
+          : { x2: finalPos.x, y2: finalPos.y };
+
+        onWindowUpdate?.(dw.windowId, updates);
+      }
+
+      // Reset drag state
+      isDraggingWallEndpoint = false;
+      isDraggingWindowEndpoint = false;
+      draggedWalls = [];
+      draggedWindows = [];
+      draggedEndpointRequiresGridSnap = false;
+      draggedWindowEndpointRequiresGridSnap = false;
+      nearbyEndpoint = null;
     } else if (isDraggingWallEndpoint && draggedWalls.length > 0) {
+      // Handle wall endpoint dragging only
       let finalPos: { x: number; y: number };
 
       // Check if we should snap to a nearby endpoint
@@ -4719,6 +4803,7 @@
       draggedControlPoint = null;
       draggedControlPointRequiresGridSnap = false;
     } else if (isDraggingWindowEndpoint && draggedWindows.length > 0) {
+      // Handle window endpoint dragging only
       const worldPos = screenToWorld(e.clientX, e.clientY);
       // Apply snapping based on whether any window requires grid snap
       const finalPos = draggedWindowEndpointRequiresGridSnap ? snapToGrid(worldPos.x, worldPos.y) : worldPos;
