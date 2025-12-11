@@ -69,6 +69,7 @@ CREATE TABLE "tokens" (
   "visible" boolean DEFAULT true NOT NULL,
   "vision" boolean DEFAULT false NOT NULL,
   "vision_range" real DEFAULT 0 NOT NULL,
+  "snap_to_grid" boolean DEFAULT true NOT NULL,
   "bars" jsonb DEFAULT '{}'::jsonb NOT NULL,
   "light_bright" real DEFAULT 0 NOT NULL,
   "light_dim" real DEFAULT 0 NOT NULL,

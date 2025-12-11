@@ -184,6 +184,18 @@
       {/if}
     </div>
 
+    <!-- Grid Snapping -->
+    <div class="section">
+      <label class="checkbox-label">
+        <input
+          type="checkbox"
+          checked={token.snapToGrid}
+          on:change={(e) => handleChange('snapToGrid', e.currentTarget.checked)}
+        />
+        Snap to grid
+      </label>
+    </div>
+
     <!-- Light Emission -->
     <div class="section">
       <div class="section-title">Light Emission</div>

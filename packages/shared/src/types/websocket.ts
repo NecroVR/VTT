@@ -106,6 +106,7 @@ export interface TokenAddPayload {
   lightDim?: number;
   lightColor?: string | null;
   lightAngle?: number;
+  snapToGrid?: boolean;
 }
 
 export interface TokenAddedPayload {

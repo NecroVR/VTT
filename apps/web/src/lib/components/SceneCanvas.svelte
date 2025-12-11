@@ -4104,6 +4104,7 @@
                 };
 
                 // Check if any selected object requires grid snap
+                // Note: Tokens use the global gridSnap setting since they don't have per-token snap settings
                 bodyDragRequiresGridSnap =
                   walls.filter(w => selectedWallIds.has(w.id)).some(w => w.snapToGrid === true) ||
                   windows.filter(w => selectedWindowIds.has(w.id)).some(w => w.snapToGrid === true) ||
@@ -5485,8 +5486,8 @@
         let newX = worldPos.x + dragOffsetX;
         let newY = worldPos.y + dragOffsetY;
 
-        // Apply grid snapping if enabled (use snapToGrid for offset support)
-        if (gridSnap) {
+        // Apply grid snapping if the token has it enabled
+        if (token.snapToGrid) {
           const snappedPos = snapToGrid(newX, newY);
           newX = snappedPos.x;
           newY = snappedPos.y;

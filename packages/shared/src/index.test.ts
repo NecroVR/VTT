@@ -85,6 +85,7 @@ describe('Index Exports', () => {
         visible: true,
         vision: false,
         visionRange: 0,
+        snapToGrid: true,
         bars: {},
         lightBright: 0,
         lightDim: 0,

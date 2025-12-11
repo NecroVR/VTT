@@ -63,6 +63,7 @@ const tokensRoute: FastifyPluginAsync = async (fastify) => {
           visible: token.visible,
           vision: token.vision,
           visionRange: token.visionRange,
+          snapToGrid: token.snapToGrid,
           bars: token.bars as Record<string, unknown>,
           lightBright: token.lightBright,
           lightDim: token.lightDim,
@@ -127,6 +128,7 @@ const tokensRoute: FastifyPluginAsync = async (fastify) => {
           visible: token.visible,
           vision: token.vision,
           visionRange: token.visionRange,
+          snapToGrid: token.snapToGrid,
           bars: token.bars as Record<string, unknown>,
           lightBright: token.lightBright,
           lightDim: token.lightDim,
@@ -167,6 +169,7 @@ const tokensRoute: FastifyPluginAsync = async (fastify) => {
       locked?: boolean;
       vision?: boolean;
       visionRange?: number;
+      snapToGrid?: boolean;
       bars?: Record<string, unknown>;
       lightBright?: number;
       lightDim?: number;
@@ -242,6 +245,7 @@ const tokensRoute: FastifyPluginAsync = async (fastify) => {
             visible: tokenData.visible ?? true,
             vision: tokenData.vision ?? false,
             visionRange: tokenData.visionRange ?? 0,
+            snapToGrid: tokenData.snapToGrid ?? true,
             bars: tokenData.bars ?? {},
             lightBright: tokenData.lightBright ?? 0,
             lightDim: tokenData.lightDim ?? 0,
@@ -274,6 +278,7 @@ const tokensRoute: FastifyPluginAsync = async (fastify) => {
           visible: newToken.visible,
           vision: newToken.vision,
           visionRange: newToken.visionRange,
+          snapToGrid: newToken.snapToGrid,
           bars: newToken.bars as Record<string, unknown>,
           lightBright: newToken.lightBright,
           lightDim: newToken.lightDim,
@@ -314,6 +319,7 @@ const tokensRoute: FastifyPluginAsync = async (fastify) => {
       locked?: boolean;
       vision?: boolean;
       visionRange?: number;
+      snapToGrid?: boolean;
       bars?: Record<string, unknown>;
       lightBright?: number;
       lightDim?: number;
@@ -397,6 +403,9 @@ const tokensRoute: FastifyPluginAsync = async (fastify) => {
         if (updates.visionRange !== undefined) {
           updateData.visionRange = updates.visionRange;
         }
+        if (updates.snapToGrid !== undefined) {
+          updateData.snapToGrid = updates.snapToGrid;
+        }
         if (updates.bars !== undefined) {
           updateData.bars = updates.bars;
         }
@@ -449,6 +458,7 @@ const tokensRoute: FastifyPluginAsync = async (fastify) => {
           visible: updatedToken.visible,
           vision: updatedToken.vision,
           visionRange: updatedToken.visionRange,
+          snapToGrid: updatedToken.snapToGrid,
           bars: updatedToken.bars as Record<string, unknown>,
           lightBright: updatedToken.lightBright,
           lightDim: updatedToken.lightDim,

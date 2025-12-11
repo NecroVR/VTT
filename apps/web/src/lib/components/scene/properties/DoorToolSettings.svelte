@@ -110,7 +110,6 @@
     font-size: 0.75rem;
     min-width: 0;
     flex: 1;
-    max-width: 120px;
   }
 
   select:focus {

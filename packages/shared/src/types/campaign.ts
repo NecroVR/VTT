@@ -34,6 +34,8 @@ export interface Token {
   // Vision
   vision: boolean;
   visionRange: number;
+  // Grid snapping
+  snapToGrid: boolean;
   // Bars (HP display, etc.)
   bars: Record<string, unknown>;
   // Light emission
@@ -66,6 +68,7 @@ export interface CreateTokenRequest {
   visible?: boolean;
   vision?: boolean;
   visionRange?: number;
+  snapToGrid?: boolean;
   bars?: Record<string, unknown>;
   lightBright?: number;
   lightDim?: number;
@@ -92,6 +95,7 @@ export interface UpdateTokenRequest {
   visible?: boolean;
   vision?: boolean;
   visionRange?: number;
+  snapToGrid?: boolean;
   bars?: Record<string, unknown>;
   lightBright?: number;
   lightDim?: number;

@@ -14,6 +14,7 @@
   import { pathPointsStore } from '$lib/stores/paths';
   import { actorsStore } from '$lib/stores/actors';
   import { sidebarStore } from '$lib/stores/sidebar';
+  import { toolbarStore } from '$lib/stores/toolbar';
   import SceneCanvas from '$lib/components/SceneCanvas.svelte';
   import SceneControls from '$lib/components/scene/SceneControls.svelte';
   import PropertiesPanel from '$lib/components/scene/PropertiesPanel.svelte';
@@ -79,9 +80,13 @@
   let resizeStartWidth = 0;
 
   // Toolbar resize state
-  let toolbarWidth = 140;
   let isResizingToolbar = false;
   const MIN_TOOLBAR_WIDTH = 48;
+  const COLLAPSED_TOOLBAR_WIDTH = 45;
+
+  // Subscribe to toolbar store
+  $: toolbarCollapsed = $toolbarStore.collapsed;
+  $: toolbarWidth = $toolbarStore.width;
 
   // Use auto-subscription with $ prefix - Svelte handles cleanup automatically
   $: campaignId = $page.params.id;
@@ -279,11 +284,7 @@
       calculatedHeaderHeight = headerElement.offsetHeight;
     }
 
-    // Load saved toolbar width
-    const savedToolbarWidth = localStorage.getItem('vtt-toolbar-width');
-    if (savedToolbarWidth) {
-      toolbarWidth = Math.max(MIN_TOOLBAR_WIDTH, parseInt(savedToolbarWidth));
-    }
+    // Toolbar width is now managed by toolbarStore (loaded from localStorage automatically)
 
     // Check if user is authenticated
     const isAuthenticated = await authStore.checkSession();
@@ -794,7 +795,7 @@
     // Handle toolbar resize
     if (isResizingToolbar) {
       const newWidth = e.clientX;
-      toolbarWidth = Math.max(MIN_TOOLBAR_WIDTH, newWidth);
+      toolbarStore.updateWidth(Math.max(MIN_TOOLBAR_WIDTH, newWidth));
       return;
     }
 
@@ -816,7 +817,7 @@
   function handleDividerMouseUp() {
     if (isResizingToolbar) {
       isResizingToolbar = false;
-      localStorage.setItem('vtt-toolbar-width', toolbarWidth.toString());
+      // Width is already saved by the store
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
       return;
@@ -827,6 +828,10 @@
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
     }
+  }
+
+  function handleToolbarExpand() {
+    toolbarStore.setCollapsed(false);
   }
 </script>
 
@@ -918,51 +923,67 @@
 
   <div class="campaign-content">
     {#if isGM}
-      <div class="toolbar-frame" style="width: {toolbarWidth}px">
-        <SceneControls
-          {isGM}
-          {activeTool}
-          onToolChange={handleToolChange}
-        >
-          <PropertiesPanel
-            slot="properties"
-            {activeTool}
-            tokens={$tokensStore.tokens}
-            lights={$lightsStore.lights}
-            {walls}
-            {doors}
-            {windows}
-            drawings={[]}
-            tiles={[]}
-            regions={[]}
-            {selectedTokenIds}
-            {selectedLightIds}
-            {selectedWallIds}
-            {selectedDoorIds}
-            {selectedWindowIds}
-            {selectedDrawingIds}
-            {selectedTileIds}
-            {selectedRegionIds}
-            sceneId={activeScene?.id || ''}
-            {campaignId}
+      {#if toolbarCollapsed}
+        <!-- Collapsed toolbar: just an expand button strip -->
+        <div class="toolbar-collapsed">
+          <button
+            class="toolbar-expand-button"
+            on:click={handleToolbarExpand}
+            type="button"
+            title="Expand toolbar"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          </button>
+        </div>
+      {:else}
+        <div class="toolbar-frame" style="width: {toolbarWidth}px">
+          <SceneControls
             {isGM}
-            {gridSnapEnabled}
-            on:toolSettingsChange={handleToolSettingsChange}
-            on:objectPropertyChange={handleObjectPropertyChange}
-            on:objectDelete={handleObjectDelete}
-            on:objectsDelete={handleObjectsDelete}
-            on:openFullEditor={handleOpenFullEditor}
-            on:gridSnapToggle={handleGridSnapToggle}
-          />
-        </SceneControls>
-      </div>
-      <div
-        class="toolbar-divider"
-        class:resizing={isResizingToolbar}
-        on:mousedown={handleToolbarDividerMouseDown}
-        role="separator"
-        aria-orientation="vertical"
-      ></div>
+            {activeTool}
+            onToolChange={handleToolChange}
+          >
+            <PropertiesPanel
+              slot="properties"
+              {activeTool}
+              tokens={$tokensStore.tokens}
+              lights={$lightsStore.lights}
+              {walls}
+              {doors}
+              {windows}
+              drawings={[]}
+              tiles={[]}
+              regions={[]}
+              {selectedTokenIds}
+              {selectedLightIds}
+              {selectedWallIds}
+              {selectedDoorIds}
+              {selectedWindowIds}
+              {selectedDrawingIds}
+              {selectedTileIds}
+              {selectedRegionIds}
+              sceneId={activeScene?.id || ''}
+              {campaignId}
+              {isGM}
+              {gridSnapEnabled}
+              on:toolSettingsChange={handleToolSettingsChange}
+              on:objectPropertyChange={handleObjectPropertyChange}
+              on:objectDelete={handleObjectDelete}
+              on:objectsDelete={handleObjectsDelete}
+              on:openFullEditor={handleOpenFullEditor}
+              on:gridSnapToggle={handleGridSnapToggle}
+            />
+          </SceneControls>
+        </div>
+        <div
+          class="toolbar-divider"
+          class:resizing={isResizingToolbar}
+          on:mousedown={handleToolbarDividerMouseDown}
+          role="separator"
+          aria-orientation="vertical"
+        ></div>
+      {/if}
     {/if}
 
     <div class="canvas-frame">
@@ -1273,8 +1294,39 @@
     flex-shrink: 0;
     height: 100%;
     display: flex;
+    flex-direction: column;
     background-color: #111827;
-    padding: 0.75rem 0.5rem;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .toolbar-collapsed {
+    flex-shrink: 0;
+    width: 45px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: #111827;
+    border-right: 1px solid #374151;
+  }
+
+  .toolbar-expand-button {
+    width: 100%;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid #374151;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .toolbar-expand-button:hover {
+    background-color: #1f2937;
+    color: #d1d5db;
   }
 
   .toolbar-divider {

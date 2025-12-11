@@ -24,6 +24,8 @@ export const tokens = pgTable('tokens', {
   // Vision
   vision: boolean('vision').notNull().default(false),
   visionRange: real('vision_range').notNull().default(0),
+  // Grid snapping
+  snapToGrid: boolean('snap_to_grid').notNull().default(true),
   // Bars (HP display, etc.)
   bars: jsonb('bars').notNull().default({}),
   // Light emission

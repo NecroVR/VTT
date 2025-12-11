@@ -685,6 +685,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+    width: 100%;
     background-color: #1e1e1e;
     color: #e0e0e0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
