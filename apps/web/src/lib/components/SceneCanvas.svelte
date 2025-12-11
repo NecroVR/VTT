@@ -1512,11 +1512,18 @@
       if (!path.visible && !isGM) return; // Skip invisible paths for non-GMs
 
       const isSelected = selectedPathId === path.pathName;
+      const isHidden = !path.visible;
 
       // Render path line using spline (closed loop)
       wallsCtx.beginPath();
       wallsCtx.strokeStyle = path.color || '#00ff00';
       wallsCtx.lineWidth = isSelected ? 3 / scale : 2 / scale;
+
+      // Visual indication for hidden paths (GM only)
+      if (isHidden && isGM) {
+        wallsCtx.globalAlpha = 0.3;
+        wallsCtx.setLineDash([10 / scale, 5 / scale]);
+      }
 
       if (path.points.length >= 2) {
         // For closed loop, render each segment individually with proper wrap-around
@@ -1557,6 +1564,12 @@
         wallsCtx.closePath();
       }
       wallsCtx.stroke();
+
+      // Reset alpha and dash for hidden paths
+      if (isHidden && isGM) {
+        wallsCtx.globalAlpha = 1.0;
+        wallsCtx.setLineDash([]);
+      }
 
       // Render path points (only for GMs)
       if (isGM) {
@@ -4364,6 +4377,17 @@
         websocket.sendTokenUpdate({
           tokenId: contextMenuElementId,
           updates: { visible: !contextMenuElementVisible }
+        });
+      }
+    } else if (contextMenuElementType === 'pathpoint' && contextMenuElementId) {
+      // Toggle visibility for all points in the path
+      const pathPoint = pathPoints.find(pp => pp.id === contextMenuElementId);
+      if (pathPoint) {
+        const newVisibility = !contextMenuElementVisible;
+        // Find all points in this path and update them
+        const pointsInPath = pathPoints.filter(pp => pp.pathName === pathPoint.pathName);
+        pointsInPath.forEach(pp => {
+          onPathPointUpdate?.(pp.id, { visible: newVisibility });
         });
       }
     }
