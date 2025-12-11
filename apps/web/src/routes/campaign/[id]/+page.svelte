@@ -413,6 +413,11 @@
     websocket.sendPathPointRemove({ pathPointId });
   }
 
+  function handlePathPointUpdate(pathPointId: string, updates: { pathName?: string; pathIndex?: number; x?: number; y?: number }) {
+    console.log('[Campaign] handlePathPointUpdate called with:', pathPointId, updates);
+    websocket.sendPathPointUpdate({ pathPointId, updates });
+  }
+
   function handleLightDoubleClick(lightId: string) {
     selectedLightId = lightId;
     showLightConfig = true;
@@ -660,6 +665,7 @@
             onLightMove={handleLightMove}
             onPathPointAdd={handlePathPointAdd}
             onPathPointRemove={handlePathPointRemove}
+            onPathPointUpdate={handlePathPointUpdate}
           />
           {#if isGM}
             <div class="scene-controls-overlay">

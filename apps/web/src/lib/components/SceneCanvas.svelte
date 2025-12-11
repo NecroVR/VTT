@@ -3164,6 +3164,31 @@
           return;
         }
 
+        // Check for path point selection first (GM only) - before walls so path points are easier to click
+        const pathPointId = findPathPointAtPoint(worldPos.x, worldPos.y);
+        if (pathPointId) {
+          const pathPoint = pathPoints.find(pp => pp.id === pathPointId);
+          if (pathPoint) {
+            selectedPathPointId = pathPointId;
+            selectedTokenId = null;
+            selectedLightId = null;
+            selectedWallIds = new Set();
+            selectedPathId = null;
+            onPathPointSelect?.(pathPointId);
+            onTokenSelect?.(null);
+            onLightSelect?.(null);
+            renderPaths();
+
+            // Enable dragging
+            isDraggingPathPoint = true;
+            draggedPathPointId = pathPointId;
+            dragOffsetX = pathPoint.x - worldPos.x;
+            dragOffsetY = pathPoint.y - worldPos.y;
+            console.log('[PathTool] Started dragging path point:', pathPointId);
+            return;
+          }
+        }
+
         // Check for wall/door selection
         const wallId = findWallAtPoint(worldPos.x, worldPos.y);
         if (wallId) {
@@ -3202,30 +3227,6 @@
           return;
         } else {
           selectedWallIds = new Set();
-        }
-
-        // Check for path point selection first (GM only)
-        const pathPointId = findPathPointAtPoint(worldPos.x, worldPos.y);
-        if (pathPointId) {
-          const pathPoint = pathPoints.find(pp => pp.id === pathPointId);
-          if (pathPoint) {
-            selectedPathPointId = pathPointId;
-            selectedTokenId = null;
-            selectedLightId = null;
-            selectedWallIds = new Set();
-            selectedPathId = null;
-            onPathPointSelect?.(pathPointId);
-            onTokenSelect?.(null);
-            onLightSelect?.(null);
-            renderPaths();
-
-            // Enable dragging
-            isDraggingPathPoint = true;
-            draggedPathPointId = pathPointId;
-            dragOffsetX = pathPoint.x - worldPos.x;
-            dragOffsetY = pathPoint.y - worldPos.y;
-            return;
-          }
         }
 
         // Check for path selection (GM only)

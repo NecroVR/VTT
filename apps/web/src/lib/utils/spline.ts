@@ -38,22 +38,65 @@ export function catmullRomSpline(
     return result;
   }
 
-  // For exactly 3 points, use quadratic Bezier curve
-  // This avoids division by zero from duplicated endpoints
+  // For exactly 3 points, create virtual endpoints to make Catmull-Rom work
+  // The curve should pass through all 3 points
   if (points.length === 3) {
-    const result: Point[] = [];
+    // Create virtual points by reflecting the first and last points
     const p0 = points[0];
-    const p1 = points[1]; // Control point
+    const p1 = points[1];
     const p2 = points[2];
 
-    for (let i = 0; i <= numSegments * 2; i++) {
-      const t = i / (numSegments * 2);
-      // Quadratic Bezier: B(t) = (1-t)²P0 + 2(1-t)tP1 + t²P2
-      const mt = 1 - t;
-      const x = mt * mt * p0.x + 2 * mt * t * p1.x + t * t * p2.x;
-      const y = mt * mt * p0.y + 2 * mt * t * p1.y + t * t * p2.y;
-      result.push({ x, y });
+    // Virtual point before first: reflect p1 across p0
+    const virtualStart = {
+      x: 2 * p0.x - p1.x,
+      y: 2 * p0.y - p1.y
+    };
+    // Virtual point after last: reflect p1 across p2
+    const virtualEnd = {
+      x: 2 * p2.x - p1.x,
+      y: 2 * p2.y - p1.y
+    };
+
+    // Now treat as 5 points: virtualStart, p0, p1, p2, virtualEnd
+    // But only draw the middle 2 segments (p0->p1 and p1->p2)
+    const result: Point[] = [];
+    const allPoints = [virtualStart, p0, p1, p2, virtualEnd];
+
+    // Segment 1: p0 to p1 (uses virtualStart, p0, p1, p2)
+    for (let j = 0; j <= numSegments; j++) {
+      const t = j / numSegments;
+      const t2 = t * t;
+      const t3 = t2 * t;
+
+      // Catmull-Rom matrix coefficients
+      const c0 = -0.5 * t3 + t2 - 0.5 * t;
+      const c1 = 1.5 * t3 - 2.5 * t2 + 1;
+      const c2 = -1.5 * t3 + 2 * t2 + 0.5 * t;
+      const c3 = 0.5 * t3 - 0.5 * t2;
+
+      result.push({
+        x: c0 * allPoints[0].x + c1 * allPoints[1].x + c2 * allPoints[2].x + c3 * allPoints[3].x,
+        y: c0 * allPoints[0].y + c1 * allPoints[1].y + c2 * allPoints[2].y + c3 * allPoints[3].y
+      });
     }
+
+    // Segment 2: p1 to p2 (uses p0, p1, p2, virtualEnd)
+    for (let j = 1; j <= numSegments; j++) {
+      const t = j / numSegments;
+      const t2 = t * t;
+      const t3 = t2 * t;
+
+      const c0 = -0.5 * t3 + t2 - 0.5 * t;
+      const c1 = 1.5 * t3 - 2.5 * t2 + 1;
+      const c2 = -1.5 * t3 + 2 * t2 + 0.5 * t;
+      const c3 = 0.5 * t3 - 0.5 * t2;
+
+      result.push({
+        x: c0 * allPoints[1].x + c1 * allPoints[2].x + c2 * allPoints[3].x + c3 * allPoints[4].x,
+        y: c0 * allPoints[1].y + c1 * allPoints[2].y + c2 * allPoints[3].y + c3 * allPoints[4].y
+      });
+    }
+
     return result;
   }
 
