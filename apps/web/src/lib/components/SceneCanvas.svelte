@@ -2964,7 +2964,8 @@
       animationTime = timestamp;
 
       // Update path-animated object positions
-      const pathAnimatedPositions = pathAnimationManager.getAllAnimatedPositions(animationTime);
+      // Use Date.now() since PathAnimationManager uses Date.now() for startTime
+      const pathAnimatedPositions = pathAnimationManager.getAllAnimatedPositions(Date.now());
       const hasPathAnimations = pathAnimatedPositions.size > 0;
 
       if (hasPathAnimations) {
