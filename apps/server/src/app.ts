@@ -1,16 +1,16 @@
-import Fastify from 'fastify';
-import type { FastifyInstance, FastifyServerOptions } from 'fastify';
-import fs from 'fs';
-import https from 'https';
-import corsPlugin from './plugins/cors.js';
-import websocketPlugin from './plugins/websocket.js';
-import redisPlugin from './plugins/redis.js';
-import databasePlugin from './plugins/database.js';
-import multipartPlugin from './plugins/multipart.js';
-import staticPlugin from './plugins/static.js';
-import routes from './routes/index.js';
-import websocketHandlers from './websocket/index.js';
-import type { EnvConfig } from './types/index.js';
+import Fastify from "fastify";
+import type { FastifyInstance, FastifyServerOptions } from "fastify";
+import fs from "fs";
+import https from "https";
+import corsPlugin from "./plugins/cors.js";
+import websocketPlugin from "./plugins/websocket.js";
+import redisPlugin from "./plugins/redis.js";
+import databasePlugin from "./plugins/database.js";
+import multipartPlugin from "./plugins/multipart.js";
+import staticPlugin from "./plugins/static.js";
+import routes from "./routes/index.js";
+import websocketHandlers from "./websocket/index.js";
+import type { EnvConfig } from "./types/index.js";
 
 /**
  * Build and configure the Fastify application
@@ -19,18 +19,21 @@ export async function buildApp(config: EnvConfig): Promise<FastifyInstance> {
   // Prepare Fastify options
   const fastifyOptions: FastifyServerOptions = {
     logger: {
-      level: config.NODE_ENV === 'production' ? 'info' : 'debug',
-      transport: config.NODE_ENV === 'development' ? {
-        target: 'pino-pretty',
-        options: {
-          translateTime: 'HH:MM:ss Z',
-          ignore: 'pid,hostname',
-        },
-      } : undefined,
+      level: config.NODE_ENV === "production" ? "info" : "debug",
+      transport:
+        config.NODE_ENV === "development"
+          ? {
+              target: "pino-pretty",
+              options: {
+                translateTime: "HH:MM:ss Z",
+                ignore: "pid,hostname",
+              },
+            }
+          : undefined,
     },
-    requestIdLogLabel: 'reqId',
+    requestIdLogLabel: "reqId",
     disableRequestLogging: false,
-    requestIdHeader: 'x-request-id',
+    requestIdHeader: "x-request-id",
   };
 
   // Add HTTPS configuration if enabled
@@ -44,7 +47,7 @@ export async function buildApp(config: EnvConfig): Promise<FastifyInstance> {
   const app = Fastify(fastifyOptions);
 
   // Decorate app with config
-  app.decorate('config', config);
+  app.decorate("config", config);
 
   // Register plugins
   await app.register(corsPlugin);
@@ -60,7 +63,7 @@ export async function buildApp(config: EnvConfig): Promise<FastifyInstance> {
   // Register WebSocket handlers
   await app.register(websocketHandlers);
 
-  app.log.info('Fastify app built successfully');
+  app.log.info("Fastify app built successfully");
 
   return app;
 }

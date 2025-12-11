@@ -6,6 +6,7 @@ import type {
   Token,
   Scene,
   Wall,
+  Window,
   AmbientLight,
   TokenMovePayload,
   TokenAddPayload,
@@ -33,6 +34,12 @@ import type {
   WallUpdatedPayload,
   WallRemovePayload,
   WallRemovedPayload,
+  WindowAddPayload,
+  WindowAddedPayload,
+  WindowUpdatePayload,
+  WindowUpdatedPayload,
+  WindowRemovePayload,
+  WindowRemovedPayload,
   LightAddPayload,
   LightAddedPayload,
   LightUpdatePayload,
@@ -109,7 +116,7 @@ import type {
 import { parseDiceNotation, type DiceGroup } from '@vtt/shared/dice';
 import { roomManager } from '../rooms.js';
 import { validateSession, extractSessionToken } from '../auth.js';
-import { tokens, scenes, walls, ambientLights, paths, pathPoints } from '@vtt/database';
+import { tokens, scenes, walls, windows, ambientLights, paths, pathPoints } from '@vtt/database';
 import { eq, and, asc } from 'drizzle-orm';
 import {
   handleActorCreate,
@@ -186,6 +193,11 @@ import {
   handleCompendiumEntryUpdate,
   handleCompendiumEntryDelete,
 } from './compendiums.js';
+import {
+  handleWindowAdd,
+  handleWindowUpdate,
+  handleWindowRemove,
+} from './windows.js';
 
 /**
  * Campaign session WebSocket handler
@@ -311,6 +323,18 @@ export async function handleCampaignWebSocket(
 
         case 'wall:remove':
           await handleWallRemove(socket, message as WSMessage<WallRemovePayload>, request);
+          break;
+
+        case 'window:add':
+          await handleWindowAdd(socket, message as WSMessage<WindowAddPayload>, request);
+          break;
+
+        case 'window:update':
+          await handleWindowUpdate(socket, message as WSMessage<WindowUpdatePayload>, request);
+          break;
+
+        case 'window:remove':
+          await handleWindowRemove(socket, message as WSMessage<WindowRemovePayload>, request);
           break;
 
         case 'light:add':

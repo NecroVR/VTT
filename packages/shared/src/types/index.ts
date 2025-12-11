@@ -3,6 +3,7 @@ export * from './campaign.js';
 export * from './websocket.js';
 export * from './scene.js';
 export * from './wall.js';
+export * from './window.js';
 export * from './ambientLight.js';
 export * from './actor.js';
 export * from './item.js';

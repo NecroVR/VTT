@@ -1,37 +1,37 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { FastifyInstance } from 'fastify';
-import type { EnvConfig } from './types/index.js';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import type { FastifyInstance } from "fastify";
+import type { EnvConfig } from "./types/index.js";
 
 // Mock all dependencies
-vi.mock('fastify', () => ({
+vi.mock("fastify", () => ({
   default: vi.fn(),
 }));
 
-vi.mock('./plugins/cors.js', () => ({
+vi.mock("./plugins/cors.js", () => ({
   default: vi.fn(),
 }));
 
-vi.mock('./plugins/database.js', () => ({
+vi.mock("./plugins/database.js", () => ({
   default: vi.fn(),
 }));
 
-vi.mock('./plugins/redis.js', () => ({
+vi.mock("./plugins/redis.js", () => ({
   default: vi.fn(),
 }));
 
-vi.mock('./plugins/websocket.js', () => ({
+vi.mock("./plugins/websocket.js", () => ({
   default: vi.fn(),
 }));
 
-vi.mock('./routes/index.js', () => ({
+vi.mock("./routes/index.js", () => ({
   default: vi.fn(),
 }));
 
-vi.mock('./websocket/index.js', () => ({
+vi.mock("./websocket/index.js", () => ({
   default: vi.fn(),
 }));
 
-describe('Application Builder', () => {
+describe("Application Builder", () => {
   let buildApp: any;
   let FastifyMock: any;
   let mockFastifyInstance: any;
@@ -61,77 +61,77 @@ describe('Application Builder', () => {
     };
 
     // Import and setup mocks
-    const fastifyModule = await import('fastify');
+    const fastifyModule = await import("fastify");
     FastifyMock = fastifyModule.default;
     FastifyMock.mockReturnValue(mockFastifyInstance);
 
-    const corsModule = await import('./plugins/cors.js');
+    const corsModule = await import("./plugins/cors.js");
     corsPluginMock = corsModule.default;
 
-    const dbModule = await import('./plugins/database.js');
+    const dbModule = await import("./plugins/database.js");
     databasePluginMock = dbModule.default;
 
-    const redisModule = await import('./plugins/redis.js');
+    const redisModule = await import("./plugins/redis.js");
     redisPluginMock = redisModule.default;
 
-    const wsModule = await import('./plugins/websocket.js');
+    const wsModule = await import("./plugins/websocket.js");
     websocketPluginMock = wsModule.default;
 
-    const routesModule = await import('./routes/index.js');
+    const routesModule = await import("./routes/index.js");
     routesMock = routesModule.default;
 
-    const wsHandlersModule = await import('./websocket/index.js');
+    const wsHandlersModule = await import("./websocket/index.js");
     websocketHandlersMock = wsHandlersModule.default;
 
     // Import the app builder
-    const appModule = await import('./app.js');
+    const appModule = await import("./app.js");
     buildApp = appModule.buildApp;
   });
 
   const testConfig: EnvConfig = {
-    DATABASE_URL: 'postgresql://localhost:5432/vtt',
-    REDIS_URL: 'redis://localhost:6379',
+    DATABASE_URL: "postgresql://localhost:5432/vtt",
+    REDIS_URL: "redis://localhost:6379",
     PORT: 3000,
-    HOST: '0.0.0.0',
-    NODE_ENV: 'test',
-    CORS_ORIGIN: 'http://localhost:5173',
+    HOST: "0.0.0.0",
+    NODE_ENV: "test",
+    CORS_ORIGIN: "http://localhost:5173",
   };
 
-  describe('buildApp', () => {
-    it('should be a function', () => {
-      expect(typeof buildApp).toBe('function');
+  describe("buildApp", () => {
+    it("should be a function", () => {
+      expect(typeof buildApp).toBe("function");
     });
 
-    it('should create Fastify instance with correct logger config for production', async () => {
-      const prodConfig = { ...testConfig, NODE_ENV: 'production' as const };
+    it("should create Fastify instance with correct logger config for production", async () => {
+      const prodConfig = { ...testConfig, NODE_ENV: "production" as const };
 
       await buildApp(prodConfig);
 
       expect(FastifyMock).toHaveBeenCalledWith(
         expect.objectContaining({
           logger: expect.objectContaining({
-            level: 'info',
+            level: "info",
           }),
-        })
+        }),
       );
     });
 
-    it('should create Fastify instance with debug logger for development', async () => {
-      const devConfig = { ...testConfig, NODE_ENV: 'development' as const };
+    it("should create Fastify instance with debug logger for development", async () => {
+      const devConfig = { ...testConfig, NODE_ENV: "development" as const };
 
       await buildApp(devConfig);
 
       expect(FastifyMock).toHaveBeenCalledWith(
         expect.objectContaining({
           logger: expect.objectContaining({
-            level: 'debug',
+            level: "debug",
           }),
-        })
+        }),
       );
     });
 
-    it('should enable pino-pretty transport for development', async () => {
-      const devConfig = { ...testConfig, NODE_ENV: 'development' as const };
+    it("should enable pino-pretty transport for development", async () => {
+      const devConfig = { ...testConfig, NODE_ENV: "development" as const };
 
       await buildApp(devConfig);
 
@@ -139,15 +139,15 @@ describe('Application Builder', () => {
         expect.objectContaining({
           logger: expect.objectContaining({
             transport: expect.objectContaining({
-              target: 'pino-pretty',
+              target: "pino-pretty",
             }),
           }),
-        })
+        }),
       );
     });
 
-    it('should not use pino-pretty transport for production', async () => {
-      const prodConfig = { ...testConfig, NODE_ENV: 'production' as const };
+    it("should not use pino-pretty transport for production", async () => {
+      const prodConfig = { ...testConfig, NODE_ENV: "production" as const };
 
       await buildApp(prodConfig);
 
@@ -156,74 +156,85 @@ describe('Application Builder', () => {
           logger: expect.objectContaining({
             transport: undefined,
           }),
-        })
+        }),
       );
     });
 
-    it('should configure request ID header', async () => {
+    it("should configure request ID header", async () => {
       await buildApp(testConfig);
 
       expect(FastifyMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          requestIdHeader: 'x-request-id',
-          requestIdLogLabel: 'reqId',
-        })
+          requestIdHeader: "x-request-id",
+          requestIdLogLabel: "reqId",
+        }),
       );
     });
 
-    it('should not disable request logging', async () => {
+    it("should not disable request logging", async () => {
       await buildApp(testConfig);
 
       expect(FastifyMock).toHaveBeenCalledWith(
         expect.objectContaining({
           disableRequestLogging: false,
-        })
+        }),
       );
     });
 
-    it('should decorate app with config', async () => {
+    it("should decorate app with config", async () => {
       await buildApp(testConfig);
 
-      expect(mockFastifyInstance.decorate).toHaveBeenCalledWith('config', testConfig);
+      expect(mockFastifyInstance.decorate).toHaveBeenCalledWith(
+        "config",
+        testConfig,
+      );
     });
 
-    it('should register CORS plugin', async () => {
+    it("should register CORS plugin", async () => {
       await buildApp(testConfig);
 
       expect(mockFastifyInstance.register).toHaveBeenCalledWith(corsPluginMock);
     });
 
-    it('should register database plugin', async () => {
+    it("should register database plugin", async () => {
       await buildApp(testConfig);
 
-      expect(mockFastifyInstance.register).toHaveBeenCalledWith(databasePluginMock);
+      expect(mockFastifyInstance.register).toHaveBeenCalledWith(
+        databasePluginMock,
+      );
     });
 
-    it('should register WebSocket plugin', async () => {
+    it("should register WebSocket plugin", async () => {
       await buildApp(testConfig);
 
-      expect(mockFastifyInstance.register).toHaveBeenCalledWith(websocketPluginMock);
+      expect(mockFastifyInstance.register).toHaveBeenCalledWith(
+        websocketPluginMock,
+      );
     });
 
-    it('should register Redis plugin', async () => {
+    it("should register Redis plugin", async () => {
       await buildApp(testConfig);
 
-      expect(mockFastifyInstance.register).toHaveBeenCalledWith(redisPluginMock);
+      expect(mockFastifyInstance.register).toHaveBeenCalledWith(
+        redisPluginMock,
+      );
     });
 
-    it('should register routes', async () => {
+    it("should register routes", async () => {
       await buildApp(testConfig);
 
       expect(mockFastifyInstance.register).toHaveBeenCalledWith(routesMock);
     });
 
-    it('should register WebSocket handlers', async () => {
+    it("should register WebSocket handlers", async () => {
       await buildApp(testConfig);
 
-      expect(mockFastifyInstance.register).toHaveBeenCalledWith(websocketHandlersMock);
+      expect(mockFastifyInstance.register).toHaveBeenCalledWith(
+        websocketHandlersMock,
+      );
     });
 
-    it('should register all plugins in correct order', async () => {
+    it("should register all plugins in correct order", async () => {
       await buildApp(testConfig);
 
       const registerCalls = mockFastifyInstance.register.mock.calls;
@@ -236,26 +247,32 @@ describe('Application Builder', () => {
       expect(registerCalls[5][0]).toBe(websocketHandlersMock);
     });
 
-    it('should register exactly 6 items', async () => {
+    it("should register exactly 6 items", async () => {
       await buildApp(testConfig);
 
       expect(mockFastifyInstance.register).toHaveBeenCalledTimes(6);
     });
 
-    it('should log success message', async () => {
+    it("should log success message", async () => {
       await buildApp(testConfig);
 
-      expect(mockFastifyInstance.log.info).toHaveBeenCalledWith('Fastify app built successfully');
+      expect(mockFastifyInstance.log.info).toHaveBeenCalledWith(
+        "Fastify app built successfully",
+      );
     });
 
-    it('should return Fastify instance', async () => {
+    it("should return Fastify instance", async () => {
       const app = await buildApp(testConfig);
 
       expect(app).toBe(mockFastifyInstance);
     });
 
-    it('should handle different NODE_ENV values', async () => {
-      const environments: Array<'development' | 'production' | 'test'> = ['development', 'production', 'test'];
+    it("should handle different NODE_ENV values", async () => {
+      const environments: Array<"development" | "production" | "test"> = [
+        "development",
+        "production",
+        "test",
+      ];
 
       for (const env of environments) {
         vi.clearAllMocks();
@@ -264,15 +281,20 @@ describe('Application Builder', () => {
         const app = await buildApp(config);
 
         expect(app).toBe(mockFastifyInstance);
-        expect(mockFastifyInstance.decorate).toHaveBeenCalledWith('config', config);
+        expect(mockFastifyInstance.decorate).toHaveBeenCalledWith(
+          "config",
+          config,
+        );
       }
     });
 
-    it('should propagate errors from plugin registration', async () => {
-      const error = new Error('Plugin registration failed');
+    it("should propagate errors from plugin registration", async () => {
+      const error = new Error("Plugin registration failed");
       mockFastifyInstance.register.mockRejectedValueOnce(error);
 
-      await expect(buildApp(testConfig)).rejects.toThrow('Plugin registration failed');
+      await expect(buildApp(testConfig)).rejects.toThrow(
+        "Plugin registration failed",
+      );
     });
   });
 });

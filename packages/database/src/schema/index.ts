@@ -4,6 +4,7 @@ export * from './scenes.js';
 export * from './sceneViewports.js';
 export * from './tokens.js';
 export * from './walls.js';
+export * from './windows.js';
 export * from './ambientLights.js';
 export * from './actors.js';
 export * from './items.js';

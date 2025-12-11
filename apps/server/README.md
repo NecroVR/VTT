@@ -62,11 +62,13 @@ pnpm install
 ### Configuration
 
 1. Copy `.env.example` to `.env`:
+
 ```bash
 cp .env.example .env
 ```
 
 2. Update environment variables in `.env`:
+
 ```env
 PORT=3000
 HOST=0.0.0.0
@@ -120,6 +122,7 @@ pnpm start
 #### WebSocket Message Types
 
 **Ping/Pong:**
+
 ```json
 // Client sends:
 { "type": "ping", "timestamp": 1234567890 }
@@ -129,6 +132,7 @@ pnpm start
 ```
 
 **Game Session:**
+
 ```json
 // Join game:
 {
