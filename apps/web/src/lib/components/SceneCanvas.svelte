@@ -3507,10 +3507,12 @@
       const newY = worldPos.y + dragOffsetY;
 
       // Update path point position locally for immediate feedback
-      const pathPoint = pathPoints.find(pp => pp.id === draggedPathPointId);
-      if (pathPoint) {
-        pathPoint.x = newX;
-        pathPoint.y = newY;
+      // Path points do NOT snap to grid during drag
+      const pathPointIndex = pathPoints.findIndex(pp => pp.id === draggedPathPointId);
+      if (pathPointIndex !== -1) {
+        // Create new array to trigger Svelte reactivity
+        pathPoints[pathPointIndex] = { ...pathPoints[pathPointIndex], x: newX, y: newY };
+        pathPoints = pathPoints; // Trigger reactivity
         renderPaths();
       }
     } else if (isDraggingLight && draggedLightId) {
@@ -3581,27 +3583,21 @@
     }
 
     if (isDraggingPathPoint && draggedPathPointId) {
-      const pathPoint = pathPoints.find(pp => pp.id === draggedPathPointId);
-      if (pathPoint) {
+      const pathPointIndex = pathPoints.findIndex(pp => pp.id === draggedPathPointId);
+      if (pathPointIndex !== -1) {
+        const pathPoint = pathPoints[pathPointIndex];
         const worldPos = screenToWorld(e.clientX, e.clientY);
-        let newX = worldPos.x + dragOffsetX;
-        let newY = worldPos.y + dragOffsetY;
+        // Path points do NOT snap to grid - use raw position
+        const newX = worldPos.x + dragOffsetX;
+        const newY = worldPos.y + dragOffsetY;
 
-        // Apply grid snapping if enabled
-        if (gridSnap) {
-          const snappedPos = snapToGrid(newX, newY);
-          newX = snappedPos.x;
-          newY = snappedPos.y;
-        }
+        // Send update to server
+        onPathPointUpdate?.(draggedPathPointId, { x: newX, y: newY });
 
-        // Only send update if position actually changed
-        const positionChanged = Math.abs(newX - pathPoint.x) > 1 || Math.abs(newY - pathPoint.y) > 1;
-        if (positionChanged) {
-          pathPoint.x = newX;
-          pathPoint.y = newY;
-          onPathPointUpdate?.(draggedPathPointId, { x: newX, y: newY });
-          renderPaths();
-        }
+        // Update local state for immediate feedback
+        pathPoints[pathPointIndex] = { ...pathPoint, x: newX, y: newY };
+        pathPoints = pathPoints; // Trigger reactivity
+        renderPaths();
       }
 
       isDraggingPathPoint = false;
