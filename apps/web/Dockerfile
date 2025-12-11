@@ -38,10 +38,18 @@ WORKDIR /app
 # Copy built application from builder stage
 # SvelteKit node adapter outputs to build/
 COPY --from=builder /app/apps/web/build ./build
-COPY --from=builder /app/apps/web/package.json ./
+COPY --from=builder /app/apps/web/package.json ./package.json.orig
 
-# Install only production dependencies for the built app
-RUN npm install --omit=dev 2>/dev/null || true
+# Create a clean package.json without workspace dependencies for production
+RUN cat ./package.json.orig | sed 's/"@vtt\/shared": "workspace:\*"/"@vtt\/shared": "file:..\/shared"/g' > ./package.json && \
+    rm ./package.json.orig
+
+# Copy the shared package dist for the file: reference
+COPY --from=builder /app/packages/shared/dist ./shared/dist
+COPY --from=builder /app/packages/shared/package.json ./shared/
+
+# Install only production dependencies
+RUN npm install --omit=dev --ignore-scripts
 
 # Set environment variables
 ENV NODE_ENV=production
