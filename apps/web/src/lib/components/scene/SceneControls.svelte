@@ -92,12 +92,9 @@
   }
 
   .tools-container {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
     gap: 0.5rem;
-  }
-
-  .scene-controls.horizontal .tools-container {
-    flex-direction: row;
+    width: 100%;
   }
 </style>

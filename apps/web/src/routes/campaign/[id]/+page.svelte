@@ -64,6 +64,12 @@
   let resizeStartX = 0;
   let resizeStartWidth = 0;
 
+  // Toolbar resize state
+  let toolbarWidth = 76;
+  let isResizingToolbar = false;
+  const MIN_TOOLBAR_WIDTH = 76;
+  const MAX_TOOLBAR_WIDTH = 230;
+
   // Use auto-subscription with $ prefix - Svelte handles cleanup automatically
   $: campaignId = $page.params.id;
   $: currentCampaign = $campaignsStore.currentCampaign;
@@ -145,6 +151,12 @@
     // Calculate header height for sidebar positioning
     if (headerElement) {
       calculatedHeaderHeight = headerElement.offsetHeight;
+    }
+
+    // Load saved toolbar width
+    const savedToolbarWidth = localStorage.getItem('vtt-toolbar-width');
+    if (savedToolbarWidth) {
+      toolbarWidth = Math.max(MIN_TOOLBAR_WIDTH, Math.min(MAX_TOOLBAR_WIDTH, parseInt(savedToolbarWidth)));
     }
 
     // Check if user is authenticated
@@ -642,26 +654,51 @@
     e.preventDefault();
   }
 
+  // Toolbar resize handlers
+  function handleToolbarDividerMouseDown(e: MouseEvent) {
+    isResizingToolbar = true;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  }
+
   function handleDividerMouseMove(e: MouseEvent) {
-    if (!isResizingSidebar) return;
+    // Handle toolbar resize
+    if (isResizingToolbar) {
+      const newWidth = e.clientX;
+      toolbarWidth = Math.max(MIN_TOOLBAR_WIDTH, Math.min(MAX_TOOLBAR_WIDTH, newWidth));
+      return;
+    }
 
-    // Moving left increases sidebar width, moving right decreases it
-    const delta = resizeStartX - e.clientX;
-    let newWidth = resizeStartWidth + delta;
+    // Handle sidebar resize
+    if (isResizingSidebar) {
+      // Moving left increases sidebar width, moving right decreases it
+      const delta = resizeStartX - e.clientX;
+      let newWidth = resizeStartWidth + delta;
 
-    // Constrain to min/max bounds
-    const MIN_WIDTH = 280;
-    const MAX_WIDTH = 600;
-    newWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, newWidth));
+      // Constrain to min/max bounds
+      const MIN_WIDTH = 280;
+      const MAX_WIDTH = 600;
+      newWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, newWidth));
 
-    sidebarStore.updateDockedWidth(newWidth);
+      sidebarStore.updateDockedWidth(newWidth);
+    }
   }
 
   function handleDividerMouseUp() {
-    if (!isResizingSidebar) return;
-    isResizingSidebar = false;
-    document.body.style.cursor = '';
-    document.body.style.userSelect = '';
+    if (isResizingToolbar) {
+      isResizingToolbar = false;
+      localStorage.setItem('vtt-toolbar-width', toolbarWidth.toString());
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      return;
+    }
+
+    if (isResizingSidebar) {
+      isResizingSidebar = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    }
   }
 </script>
 
@@ -753,13 +790,20 @@
 
   <div class="campaign-content">
     {#if isGM}
-      <div class="toolbar-frame">
+      <div class="toolbar-frame" style="width: {toolbarWidth}px">
         <SceneControls
           {isGM}
           {activeTool}
           onToolChange={handleToolChange}
         />
       </div>
+      <div
+        class="toolbar-divider"
+        class:resizing={isResizingToolbar}
+        on:mousedown={handleToolbarDividerMouseDown}
+        role="separator"
+        aria-orientation="vertical"
+      ></div>
     {/if}
 
     <div class="canvas-frame">
@@ -1066,8 +1110,23 @@
     height: 100%;
     display: flex;
     background-color: #111827;
-    border-right: 2px solid #374151;
     padding: 0.75rem 0.5rem;
+  }
+
+  .toolbar-divider {
+    width: 6px;
+    background: var(--color-border, #333);
+    cursor: col-resize;
+    flex-shrink: 0;
+    transition: background-color 0.15s ease;
+  }
+
+  .toolbar-divider:hover {
+    background: rgba(59, 130, 246, 0.5);
+  }
+
+  .toolbar-divider.resizing {
+    background: rgba(59, 130, 246, 0.8);
   }
 
   .sidebar-frame {
