@@ -65,10 +65,9 @@
   let resizeStartWidth = 0;
 
   // Toolbar resize state
-  let toolbarWidth = 76;
+  let toolbarWidth = 140;
   let isResizingToolbar = false;
-  const MIN_TOOLBAR_WIDTH = 76;
-  const MAX_TOOLBAR_WIDTH = 230;
+  const MIN_TOOLBAR_WIDTH = 48;
 
   // Use auto-subscription with $ prefix - Svelte handles cleanup automatically
   $: campaignId = $page.params.id;
@@ -156,7 +155,7 @@
     // Load saved toolbar width
     const savedToolbarWidth = localStorage.getItem('vtt-toolbar-width');
     if (savedToolbarWidth) {
-      toolbarWidth = Math.max(MIN_TOOLBAR_WIDTH, Math.min(MAX_TOOLBAR_WIDTH, parseInt(savedToolbarWidth)));
+      toolbarWidth = Math.max(MIN_TOOLBAR_WIDTH, parseInt(savedToolbarWidth));
     }
 
     // Check if user is authenticated
@@ -666,7 +665,7 @@
     // Handle toolbar resize
     if (isResizingToolbar) {
       const newWidth = e.clientX;
-      toolbarWidth = Math.max(MIN_TOOLBAR_WIDTH, Math.min(MAX_TOOLBAR_WIDTH, newWidth));
+      toolbarWidth = Math.max(MIN_TOOLBAR_WIDTH, newWidth);
       return;
     }
 

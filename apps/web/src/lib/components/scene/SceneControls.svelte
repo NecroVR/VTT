@@ -92,9 +92,9 @@
   }
 
   .tools-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-    gap: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
     width: 100%;
   }
 </style>

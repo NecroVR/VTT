@@ -34,17 +34,19 @@
 <style>
   .tool-button {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 0.25rem;
-    padding: 0.625rem 0.5rem;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
     background-color: #1f2937;
     border: 1px solid #374151;
     border-radius: 0.375rem;
     color: #d1d5db;
     cursor: pointer;
     transition: all 0.2s ease;
-    min-width: 60px;
+    white-space: nowrap;
+    width: 100%;
+    text-align: left;
   }
 
   .tool-button:hover:not(:disabled):not(.disabled) {
@@ -70,14 +72,15 @@
   }
 
   .tool-icon {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     line-height: 1;
+    flex-shrink: 0;
   }
 
   .tool-label {
-    font-size: 0.625rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    font-size: 0.75rem;
     font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 </style>
