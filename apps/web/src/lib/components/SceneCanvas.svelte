@@ -4399,9 +4399,8 @@
           }
           renderWalls();
           return;
-        } else {
-          selectedWallIds = new Set();
         }
+        // Note: Don't clear selectedWallIds here - only clear selections when clicking on empty space
 
         // Check for window selection
         const windowId = findWindowAtPoint(worldPos.x, worldPos.y);
@@ -4475,9 +4474,8 @@
           onWindowSelect?.(windowId);
           renderWalls(); // renderWalls also renders windows
           return;
-        } else {
-          selectedWindowIds = new Set();
         }
+        // Note: Don't clear selectedWindowIds here - only clear selections when clicking on empty space
 
         // Check for door endpoint dragging (higher priority than door selection)
         const doorEndpointHit = findDoorEndpointAtPoint(worldPos.x, worldPos.y);
@@ -4617,9 +4615,8 @@
           onDoorSelect?.(doorId);
           renderWalls(); // renderWalls also renders doors
           return;
-        } else {
-          selectedDoorIds = new Set();
         }
+        // Note: Don't clear selectedDoorIds here - only clear selections when clicking on empty space
 
         // Check for path selection (GM only)
         const pathId = findPathAtPoint(worldPos.x, worldPos.y);
