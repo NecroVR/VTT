@@ -4,6 +4,7 @@ import {
   circleIntersectsRect,
   lineSegmentsIntersect,
   lineIntersectsRect,
+  lineIntersectsCircle,
 } from './geometry';
 
 describe('pointInRect', () => {
@@ -324,6 +325,264 @@ describe('lineIntersectsRect', () => {
     it('should handle very small rectangles', () => {
       expect(lineIntersectsRect(-10, 5, 20, 5, 0, 0, 10, 10)).toBe(true);
       expect(lineIntersectsRect(5, -10, 5, 20, 0, 0, 10, 10)).toBe(true);
+    });
+  });
+});
+
+describe('lineIntersectsCircle', () => {
+  describe('Line intersects circle', () => {
+    it('should detect intersection when line passes through circle center', () => {
+      // Line from (0, 0) to (100, 0), circle at (50, 0) with radius 10
+      const result = lineIntersectsCircle(0, 0, 100, 0, 50, 0, 10);
+      expect(result).toBe(true);
+    });
+
+    it('should detect intersection when line passes through circle at angle', () => {
+      // Diagonal line from (0, 0) to (100, 100), circle at (50, 50) with radius 10
+      const result = lineIntersectsCircle(0, 0, 100, 100, 50, 50, 10);
+      expect(result).toBe(true);
+    });
+
+    it('should detect intersection when line enters circle from left', () => {
+      // Horizontal line from (0, 50) to (100, 50), circle at (60, 50) with radius 20
+      const result = lineIntersectsCircle(0, 50, 100, 50, 60, 50, 20);
+      expect(result).toBe(true);
+    });
+
+    it('should detect intersection when line enters circle from above', () => {
+      // Vertical line from (50, 0) to (50, 100), circle at (50, 60) with radius 20
+      const result = lineIntersectsCircle(50, 0, 50, 100, 50, 60, 20);
+      expect(result).toBe(true);
+    });
+
+    it('should detect intersection at 45-degree angle', () => {
+      // Line from (0, 0) to (100, 100), circle at (40, 60) with radius 15
+      const result = lineIntersectsCircle(0, 0, 100, 100, 40, 60, 15);
+      expect(result).toBe(true);
+    });
+
+    it('should detect intersection with large radius', () => {
+      // Small line from (45, 45) to (55, 55), circle at (100, 100) with large radius 100
+      const result = lineIntersectsCircle(45, 45, 55, 55, 100, 100, 100);
+      expect(result).toBe(true);
+    });
+  });
+
+  describe('Line misses circle', () => {
+    it('should detect no intersection when line is far from circle', () => {
+      // Line from (0, 0) to (100, 0), circle at (50, 100) with radius 10
+      const result = lineIntersectsCircle(0, 0, 100, 0, 50, 100, 10);
+      expect(result).toBe(false);
+    });
+
+    it('should detect no intersection when circle is to the left of line segment', () => {
+      // Line from (100, 0) to (200, 0), circle at (50, 0) with radius 10
+      const result = lineIntersectsCircle(100, 0, 200, 0, 50, 0, 10);
+      expect(result).toBe(false);
+    });
+
+    it('should detect no intersection when circle is to the right of line segment', () => {
+      // Line from (0, 0) to (100, 0), circle at (200, 0) with radius 10
+      const result = lineIntersectsCircle(0, 0, 100, 0, 200, 0, 10);
+      expect(result).toBe(false);
+    });
+
+    it('should detect no intersection when line is above circle', () => {
+      // Line from (0, 0) to (100, 0), circle at (50, 50) with radius 10
+      const result = lineIntersectsCircle(0, 0, 100, 0, 50, 50, 10);
+      expect(result).toBe(false);
+    });
+
+    it('should detect no intersection when line is below circle', () => {
+      // Line from (0, 100) to (100, 100), circle at (50, 50) with radius 10
+      const result = lineIntersectsCircle(0, 100, 100, 100, 50, 50, 10);
+      expect(result).toBe(false);
+    });
+
+    it('should detect no intersection with diagonal line and offset circle', () => {
+      // Line from (0, 0) to (100, 100), circle at (0, 100) with radius 10
+      const result = lineIntersectsCircle(0, 0, 100, 100, 0, 100, 10);
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('Line tangent to circle', () => {
+    it('should detect tangent intersection (horizontal line)', () => {
+      // Horizontal line from (0, 10) to (100, 10), circle at (50, 0) with radius 10
+      const result = lineIntersectsCircle(0, 10, 100, 10, 50, 0, 10);
+      expect(result).toBe(true);
+    });
+
+    it('should detect tangent intersection (vertical line)', () => {
+      // Vertical line from (10, 0) to (10, 100), circle at (0, 50) with radius 10
+      const result = lineIntersectsCircle(10, 0, 10, 100, 0, 50, 10);
+      expect(result).toBe(true);
+    });
+
+    it('should detect near-tangent intersection', () => {
+      // Line from (0, 9.5) to (100, 9.5), circle at (50, 0) with radius 10
+      const result = lineIntersectsCircle(0, 9.5, 100, 9.5, 50, 0, 10);
+      expect(result).toBe(true);
+    });
+
+    it('should detect no intersection when just beyond tangent', () => {
+      // Line from (0, 10.5) to (100, 10.5), circle at (50, 0) with radius 10
+      const result = lineIntersectsCircle(0, 10.5, 100, 10.5, 50, 0, 10);
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('Line endpoint inside circle', () => {
+    it('should detect intersection when line starts inside circle', () => {
+      // Line from (50, 0) to (200, 0), circle at (50, 0) with radius 10
+      const result = lineIntersectsCircle(50, 0, 200, 0, 50, 0, 10);
+      expect(result).toBe(true);
+    });
+
+    it('should detect intersection when line ends inside circle', () => {
+      // Line from (0, 0) to (50, 0), circle at (50, 0) with radius 10
+      const result = lineIntersectsCircle(0, 0, 50, 0, 50, 0, 10);
+      expect(result).toBe(true);
+    });
+
+    it('should detect intersection when both endpoints are inside circle', () => {
+      // Line from (48, 0) to (52, 0), circle at (50, 0) with radius 10
+      const result = lineIntersectsCircle(48, 0, 52, 0, 50, 0, 10);
+      expect(result).toBe(true);
+    });
+
+    it('should detect intersection when line starts near edge of circle', () => {
+      // Line from (55, 0) to (100, 0), circle at (50, 0) with radius 10
+      const result = lineIntersectsCircle(55, 0, 100, 0, 50, 0, 10);
+      expect(result).toBe(true);
+    });
+  });
+
+  describe('Degenerate line (point)', () => {
+    it('should detect intersection when point is at circle center', () => {
+      // Point at (50, 50), circle at (50, 50) with radius 10
+      const result = lineIntersectsCircle(50, 50, 50, 50, 50, 50, 10);
+      expect(result).toBe(true);
+    });
+
+    it('should detect intersection when point is inside circle', () => {
+      // Point at (52, 50), circle at (50, 50) with radius 10
+      const result = lineIntersectsCircle(52, 50, 52, 50, 50, 50, 10);
+      expect(result).toBe(true);
+    });
+
+    it('should detect intersection when point is on circle edge', () => {
+      // Point at (60, 50), circle at (50, 50) with radius 10
+      const result = lineIntersectsCircle(60, 50, 60, 50, 50, 50, 10);
+      expect(result).toBe(true);
+    });
+
+    it('should detect no intersection when point is outside circle', () => {
+      // Point at (65, 50), circle at (50, 50) with radius 10
+      const result = lineIntersectsCircle(65, 50, 65, 50, 50, 50, 10);
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('Edge cases', () => {
+    it('should handle zero radius circle', () => {
+      // Line from (0, 0) to (100, 0), circle at (50, 0) with radius 0
+      const result = lineIntersectsCircle(0, 0, 100, 0, 50, 0, 0);
+      expect(result).toBe(true);
+    });
+
+    it('should handle very small radius', () => {
+      // Line from (0, 0) to (100, 0), circle at (50, 0) with radius 0.1
+      const result = lineIntersectsCircle(0, 0, 100, 0, 50, 0, 0.1);
+      expect(result).toBe(true);
+    });
+
+    it('should handle very large radius', () => {
+      // Short line from (0, 0) to (10, 0), circle at (500, 500) with radius 1000
+      const result = lineIntersectsCircle(0, 0, 10, 0, 500, 500, 1000);
+      expect(result).toBe(true);
+    });
+
+    it('should handle negative coordinates', () => {
+      // Line from (-100, -100) to (0, 0), circle at (-50, -50) with radius 10
+      const result = lineIntersectsCircle(-100, -100, 0, 0, -50, -50, 10);
+      expect(result).toBe(true);
+    });
+
+    it('should handle line with negative slope', () => {
+      // Line from (0, 100) to (100, 0), circle at (50, 50) with radius 10
+      const result = lineIntersectsCircle(0, 100, 100, 0, 50, 50, 10);
+      expect(result).toBe(true);
+    });
+
+    it('should handle circle at origin', () => {
+      // Line from (-10, 0) to (10, 0), circle at (0, 0) with radius 5
+      const result = lineIntersectsCircle(-10, 0, 10, 0, 0, 0, 5);
+      expect(result).toBe(true);
+    });
+  });
+
+  describe('Real-world VTT scenarios', () => {
+    it('should detect token collision with horizontal wall', () => {
+      // Wall from (0, 100) to (200, 100), token at (100, 105) with radius 25
+      const result = lineIntersectsCircle(0, 100, 200, 100, 100, 105, 25);
+      expect(result).toBe(true);
+    });
+
+    it('should detect token collision with vertical wall', () => {
+      // Wall from (100, 0) to (100, 200), token at (105, 100) with radius 25
+      const result = lineIntersectsCircle(100, 0, 100, 200, 105, 100, 25);
+      expect(result).toBe(true);
+    });
+
+    it('should detect token collision with diagonal wall', () => {
+      // Wall from (0, 0) to (200, 200), token at (100, 110) with radius 25
+      const result = lineIntersectsCircle(0, 0, 200, 200, 100, 110, 25);
+      expect(result).toBe(true);
+    });
+
+    it('should detect no collision when token is far from wall', () => {
+      // Wall from (0, 0) to (200, 0), token at (100, 100) with radius 25
+      const result = lineIntersectsCircle(0, 0, 200, 0, 100, 100, 25);
+      expect(result).toBe(false);
+    });
+
+    it('should handle window detection with small token', () => {
+      // Window from (100, 100) to (200, 100), small token at (150, 95) with radius 10
+      const result = lineIntersectsCircle(100, 100, 200, 100, 150, 95, 10);
+      expect(result).toBe(true);
+    });
+
+    it('should handle window detection with large token', () => {
+      // Window from (100, 100) to (200, 100), large token at (150, 150) with radius 60
+      const result = lineIntersectsCircle(100, 100, 200, 100, 150, 150, 60);
+      expect(result).toBe(true);
+    });
+
+    it('should detect when token passes completely over short wall segment', () => {
+      // Short wall from (95, 100) to (105, 100), large token at (100, 100) with radius 50
+      const result = lineIntersectsCircle(95, 100, 105, 100, 100, 100, 50);
+      expect(result).toBe(true);
+    });
+  });
+
+  describe('Precision and floating point', () => {
+    it('should handle floating point coordinates', () => {
+      // Line from (0.5, 0.5) to (100.5, 0.5), circle at (50.5, 0.5) with radius 10.5
+      const result = lineIntersectsCircle(0.5, 0.5, 100.5, 0.5, 50.5, 0.5, 10.5);
+      expect(result).toBe(true);
+    });
+
+    it('should handle very close but non-intersecting line', () => {
+      // Line from (0, 10.01) to (100, 10.01), circle at (50, 0) with radius 10
+      const result = lineIntersectsCircle(0, 10.01, 100, 10.01, 50, 0, 10);
+      expect(result).toBe(false);
+    });
+
+    it('should handle very small line segment', () => {
+      // Very small line from (50, 0) to (50.01, 0), circle at (50, 0) with radius 10
+      const result = lineIntersectsCircle(50, 0, 50.01, 0, 50, 0, 10);
+      expect(result).toBe(true);
     });
   });
 });
