@@ -391,12 +391,9 @@
   }
 
   function handlePathPointAdd(pointData: { pathName: string; pathIndex: number; x: number; y: number; color: string; visible: boolean }) {
-    console.log('[Campaign] handlePathPointAdd called with:', pointData);
     if (!activeScene) {
-      console.log('[Campaign] No active scene, aborting');
       return;
     }
-    console.log('[Campaign] Sending pathPoint:add via websocket');
     websocket.sendPathPointAdd({
       sceneId: activeScene.id,
       pathName: pointData.pathName,
@@ -409,12 +406,10 @@
   }
 
   function handlePathPointRemove(pathPointId: string) {
-    console.log('[Campaign] handlePathPointRemove called with:', pathPointId);
     websocket.sendPathPointRemove({ pathPointId });
   }
 
   function handlePathPointUpdate(pathPointId: string, updates: { pathName?: string; pathIndex?: number; x?: number; y?: number }) {
-    console.log('[Campaign] handlePathPointUpdate called with:', pathPointId, updates);
     websocket.sendPathPointUpdate({ pathPointId, updates });
   }
 

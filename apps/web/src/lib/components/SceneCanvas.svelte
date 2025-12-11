@@ -24,6 +24,7 @@
     findClosestPointOnSpline,
     insertControlPoint,
   } from '$lib/utils/spline';
+  import { PathAnimationManager } from '$lib/utils/pathAnimation';
 
   // Props
   export let scene: Scene;
@@ -170,6 +171,12 @@
   let animationFrameId: number | null = null;
   let animationTime = 0;
 
+  // Path animation manager
+  const pathAnimationManager = new PathAnimationManager();
+
+  // Animated positions for objects following paths (objectId -> {x, y})
+  let animatedPositions = new Map<string, { x: number; y: number }>();
+
   const MIN_SCALE = 0.25;
   const MAX_SCALE = 4;
 
@@ -210,6 +217,76 @@
 
   // Subscribe to fog store
   $: fogData = scene ? $fogStore.fog.get(scene.id) : undefined;
+
+  // Path animation: Initialize animations for lights with followPathName
+  $: {
+    if (lights && assembledPathsForScene) {
+      lights.forEach(light => {
+        const animationKey = `light-${light.id}`;
+
+        if (light.followPathName && light.pathSpeed) {
+          // Find the path in assembledPathsForScene
+          const path = assembledPathsForScene.find(p => p.pathName === light.followPathName);
+
+          if (path && path.points.length >= 2) {
+            // Check if animation is already running
+            if (!pathAnimationManager.isAnimating(animationKey)) {
+              // Start animation
+              pathAnimationManager.startAnimation(
+                animationKey,
+                light.id,
+                'light',
+                path.points,
+                light.pathSpeed,
+                true // loop
+              );
+            }
+          } else {
+            // Path not found or invalid, stop animation if running
+            pathAnimationManager.stopAnimation(animationKey);
+          }
+        } else {
+          // No followPathName or pathSpeed, stop animation if running
+          pathAnimationManager.stopAnimation(animationKey);
+        }
+      });
+    }
+  }
+
+  // Path animation: Initialize animations for tokens with followPathName
+  $: {
+    if (tokens && assembledPathsForScene) {
+      tokens.forEach(token => {
+        const animationKey = `token-${token.id}`;
+
+        if (token.followPathName && token.pathSpeed) {
+          // Find the path in assembledPathsForScene
+          const path = assembledPathsForScene.find(p => p.pathName === token.followPathName);
+
+          if (path && path.points.length >= 2) {
+            // Check if animation is already running
+            if (!pathAnimationManager.isAnimating(animationKey)) {
+              // Start animation
+              pathAnimationManager.startAnimation(
+                animationKey,
+                token.id,
+                'token',
+                path.points,
+                token.pathSpeed,
+                true // loop
+              );
+            }
+          } else {
+            // Path not found or invalid, stop animation if running
+            pathAnimationManager.stopAnimation(animationKey);
+          }
+        } else {
+          // No followPathName or pathSpeed, stop animation if running
+          pathAnimationManager.stopAnimation(animationKey);
+        }
+      });
+    }
+  }
 
   // Handle scene switching - save old viewport and load new viewport
   $: if (scene.id && scene.id !== previousSceneId) {
@@ -898,8 +975,12 @@
     if (shouldApplyVisionHiding && possessedToken) {
       const tokenWidth = (possessedToken.width || 1) * (scene.gridWidth ?? scene.gridSize);
       const tokenHeight = (possessedToken.height || 1) * (scene.gridHeight ?? scene.gridSize);
-      const tokenCenterX = possessedToken.x + tokenWidth / 2;
-      const tokenCenterY = possessedToken.y + tokenHeight / 2;
+      // Use animated position if available
+      const possessedAnimatedPos = animatedPositions.get(possessedToken.id);
+      const possessedX = possessedAnimatedPos ? possessedAnimatedPos.x : possessedToken.x;
+      const possessedY = possessedAnimatedPos ? possessedAnimatedPos.y : possessedToken.y;
+      const tokenCenterX = possessedX + tokenWidth / 2;
+      const tokenCenterY = possessedY + tokenHeight / 2;
       // Vision radius = token edge radius + vision range in cells
       const tokenRadius = (tokenWidth + tokenHeight) / 4; // Average radius to token edge
       const avgCellSize = ((scene.gridWidth ?? scene.gridSize) + (scene.gridHeight ?? scene.gridSize)) / 2;
@@ -917,11 +998,16 @@
     const visibleTokens = tokens.filter(token => {
       if (!token.visible) return false;
 
+      // Use animated position if available, otherwise use base position
+      const animatedPos = animatedPositions.get(token.id);
+      const tokenX = animatedPos ? animatedPos.x : token.x;
+      const tokenY = animatedPos ? animatedPos.y : token.y;
+
       const width = (token.width || 1) * (scene.gridWidth ?? scene.gridSize);
       const height = (token.height || 1) * (scene.gridHeight ?? scene.gridSize);
 
       // Check viewport visibility
-      if (!isInViewport(token.x, token.y, width, height)) {
+      if (!isInViewport(tokenX, tokenY, width, height)) {
         return false;
       }
 
@@ -933,12 +1019,15 @@
         }
 
         // Check if token is within vision range
-        const tokenCenterX = token.x + width / 2;
-        const tokenCenterY = token.y + height / 2;
+        const tokenCenterX = tokenX + width / 2;
+        const tokenCenterY = tokenY + height / 2;
         const possessedWidth = (possessedToken.width || 1) * (scene.gridWidth ?? scene.gridSize);
         const possessedHeight = (possessedToken.height || 1) * (scene.gridHeight ?? scene.gridSize);
-        const possessedCenterX = possessedToken.x + possessedWidth / 2;
-        const possessedCenterY = possessedToken.y + possessedHeight / 2;
+        const possessedAnimatedPos = animatedPositions.get(possessedToken.id);
+        const possessedX = possessedAnimatedPos ? possessedAnimatedPos.x : possessedToken.x;
+        const possessedY = possessedAnimatedPos ? possessedAnimatedPos.y : possessedToken.y;
+        const possessedCenterX = possessedX + possessedWidth / 2;
+        const possessedCenterY = possessedY + possessedHeight / 2;
 
         const dx = tokenCenterX - possessedCenterX;
         const dy = tokenCenterY - possessedCenterY;
@@ -965,9 +1054,11 @@
     });
 
     visibleTokens.forEach(token => {
+      // Use animated position if available, otherwise use base position
+      const animatedPos = animatedPositions.get(token.id);
+      const x = animatedPos ? animatedPos.x : token.x;
+      const y = animatedPos ? animatedPos.y : token.y;
 
-      const x = token.x;
-      const y = token.y;
       const width = (token.width || 1) * (scene.gridWidth ?? scene.gridSize);
       const height = (token.height || 1) * (scene.gridHeight ?? scene.gridSize);
       const centerX = x + width / 2;
@@ -2027,10 +2118,15 @@
   }
 
   function renderLight(ctx: CanvasRenderingContext2D, light: AmbientLight, time: number) {
+    // Use animated position if available, otherwise use base position
+    const animatedPos = animatedPositions.get(light.id);
+    const baseX = animatedPos ? animatedPos.x : light.x;
+    const baseY = animatedPos ? animatedPos.y : light.y;
+
     // Use floor + 0.5 to center on pixel and avoid exact grid boundaries
     // This prevents edge cases when light is at grid cell corners
-    const x = Math.floor(light.x) + 0.5;
-    const y = Math.floor(light.y) + 0.5;
+    const x = Math.floor(baseX) + 0.5;
+    const y = Math.floor(baseY) + 0.5;
     const { bright, dim, color, alpha, angle, rotation, animationType, animationSpeed, animationIntensity, walls: wallsEnabled, hidden, negative } = light;
 
     // Skip hidden lights
@@ -2299,9 +2395,14 @@
     const width = (token.width || 1) * gridSize;
     const height = (token.height || 1) * gridSize;
 
+    // Use animated position if available, otherwise use base position
+    const animatedPos = animatedPositions.get(token.id);
+    const tokenX = animatedPos ? animatedPos.x : token.x;
+    const tokenY = animatedPos ? animatedPos.y : token.y;
+
     // Token center position
-    const x = token.x + width / 2;
-    const y = token.y + height / 2;
+    const x = tokenX + width / 2;
+    const y = tokenY + height / 2;
 
     // Convert light ranges from grid units to pixels
     const bright = token.lightBright * gridSize;
@@ -2396,9 +2497,14 @@
     const width = (token.width || 1) * cellWidth;
     const height = (token.height || 1) * cellHeight;
 
+    // Use animated position if available, otherwise use base position
+    const animatedPos = animatedPositions.get(token.id);
+    const tokenX = animatedPos ? animatedPos.x : token.x;
+    const tokenY = animatedPos ? animatedPos.y : token.y;
+
     // Token center position
-    const x = token.x + width / 2;
-    const y = token.y + height / 2;
+    const x = tokenX + width / 2;
+    const y = tokenY + height / 2;
 
     // Vision radius = token edge radius + vision range in cells
     const tokenRadius = (width + height) / 4; // Average radius to token edge
@@ -2437,9 +2543,14 @@
     const width = (token.width || 1) * cellWidth;
     const height = (token.height || 1) * cellHeight;
 
+    // Use animated position if available, otherwise use base position
+    const animatedPos = animatedPositions.get(token.id);
+    const tokenX = animatedPos ? animatedPos.x : token.x;
+    const tokenY = animatedPos ? animatedPos.y : token.y;
+
     // Token center position
-    const x = token.x + width / 2;
-    const y = token.y + height / 2;
+    const x = tokenX + width / 2;
+    const y = tokenY + height / 2;
 
     // Vision radius = token edge radius + vision range in cells
     const tokenRadius = (width + height) / 4; // Average radius to token edge
@@ -2839,6 +2950,19 @@
 
       animationTime = timestamp;
 
+      // Update path-animated object positions
+      const pathAnimatedPositions = pathAnimationManager.getAllAnimatedPositions(animationTime);
+      const hasPathAnimations = pathAnimatedPositions.size > 0;
+
+      if (hasPathAnimations) {
+        // Update animated positions map
+        const newPositions = new Map<string, { x: number; y: number }>();
+        pathAnimatedPositions.forEach((pos, key) => {
+          newPositions.set(pos.objectId, { x: pos.x, y: pos.y });
+        });
+        animatedPositions = newPositions;
+      }
+
       // Only re-render lights if there are animated lights or token lights
       const hasAnimatedLights = lights.some(light =>
         light.animationType === 'torch' || light.animationType === 'pulse' || light.animationType === 'chroma' || light.animationType === 'wave' || light.animationType === 'sparkle'
@@ -2849,8 +2973,13 @@
         token.visible && (token.lightBright > 0 || token.lightDim > 0)
       );
 
-      if (hasAnimatedLights || hasTokenLights) {
+      if (hasAnimatedLights || hasTokenLights || hasPathAnimations) {
         renderLights();
+      }
+
+      // Re-render tokens if any are path-animated
+      if (hasPathAnimations) {
+        renderTokens();
       }
 
       animationFrameId = requestAnimationFrame(animate);
@@ -3079,15 +3208,11 @@
 
     // Handle path tool
     if (activeTool === 'path' && isGM) {
-      console.log('[PathTool] Click detected, activeTool:', activeTool, 'isGM:', isGM);
       // Get the current highest pathIndex for this pathName
       const existingPoints = pathPoints.filter(p => p.pathName === currentPathName);
       const nextIndex = existingPoints.length > 0
         ? Math.max(...existingPoints.map(p => p.pathIndex)) + 1
         : 0;
-
-      console.log('[PathTool] Creating point:', { pathName: currentPathName, pathIndex: nextIndex, x: snappedPos.x, y: snappedPos.y });
-      console.log('[PathTool] onPathPointAdd callback exists:', !!onPathPointAdd);
 
       // Create new path point
       onPathPointAdd?.({
@@ -3234,7 +3359,6 @@
             draggedPathPointId = pathPointId;
             dragOffsetX = pathPoint.x - worldPos.x;
             dragOffsetY = pathPoint.y - worldPos.y;
-            console.log('[PathTool] Started dragging path point:', pathPointId);
             return;
           }
         }
@@ -3383,16 +3507,12 @@
   }
 
   function completeWallDrawing(endPos: { x: number; y: number }) {
-    console.log('completeWallDrawing called', { endPos, wallStartPoint, activeTool });
-
     if (!wallStartPoint) {
-      console.log('No wallStartPoint, returning');
       return;
     }
 
     // Don't create zero-length walls
     if (wallStartPoint.x === endPos.x && wallStartPoint.y === endPos.y) {
-      console.log('Zero-length wall, cancelling');
       cancelWallDrawing();
       return;
     }

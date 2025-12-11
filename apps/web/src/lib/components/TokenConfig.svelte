@@ -3,6 +3,7 @@
   import type { Token, Actor } from '@vtt/shared';
   import { websocket } from '$stores/websocket';
   import { actorsStore } from '$lib/stores/actors';
+  import { assembledPaths } from '$lib/stores/paths';
   import { AssetPicker } from '$lib/components/assets';
 
   // Props
@@ -34,11 +35,17 @@
     lightDim: token.lightDim || 0,
     lightColor: token.lightColor || '#ffffff',
     lightAngle: token.lightAngle || 360,
+    // Path following
+    followPathName: token.followPathName ?? null,
+    pathSpeed: token.pathSpeed ?? 100,
   };
 
   // Actors list
   let actors: Actor[] = [];
   $: actors = Array.from($actorsStore.actors.values());
+
+  // Get available paths for this scene
+  $: availablePaths = $assembledPaths.filter(p => p.sceneId === token.sceneId);
 
   // Asset picker state
   let showAssetPicker = false;
@@ -67,6 +74,9 @@
       lightDim: formData.lightDim,
       lightColor: formData.lightColor || null,
       lightAngle: formData.lightAngle,
+      // Path following
+      followPathName: formData.followPathName,
+      pathSpeed: formData.pathSpeed,
     };
 
     websocket.sendTokenUpdate({
@@ -384,6 +394,52 @@
             </label>
           </div>
         </section>
+
+        <!-- Path Following -->
+        <section class="form-section">
+          <h3>Path Following</h3>
+          <span class="help-text">Make this token follow a path on the scene</span>
+
+          <div class="form-row">
+            <label for="token-follow-path">
+              Follow Path
+              <select id="token-follow-path" bind:value={formData.followPathName}>
+                <option value={null}>None</option>
+                {#each availablePaths as path}
+                  <option value={path.pathName}>{path.pathName}</option>
+                {/each}
+              </select>
+            </label>
+          </div>
+
+          {#if formData.followPathName}
+            <div class="form-row">
+              <label for="token-path-speed">
+                Speed (pixels per second): {formData.pathSpeed}
+                <input
+                  id="token-path-speed"
+                  type="range"
+                  bind:value={formData.pathSpeed}
+                  min="10"
+                  max="500"
+                  step="10"
+                />
+              </label>
+            </div>
+            <div class="form-row">
+              <label for="token-path-speed-number">
+                <input
+                  id="token-path-speed-number"
+                  type="number"
+                  bind:value={formData.pathSpeed}
+                  min="1"
+                  max="1000"
+                  step="1"
+                />
+              </label>
+            </div>
+          {/if}
+        </section>
       </form>
     </div>
 
@@ -533,6 +589,14 @@
     cursor: pointer;
   }
 
+  .help-text {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--color-text-secondary, #888);
+    margin-top: 0.25rem;
+    font-weight: normal;
+  }
+
   input[type="text"],
   input[type="number"],
   input[type="color"],
@@ -564,6 +628,35 @@
   input[type="color"] {
     height: 2.5rem;
     cursor: pointer;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    height: 0.5rem;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--color-border, #333);
+    border-radius: 4px;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: #4a90e2;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: #4a90e2;
+    cursor: pointer;
+    border: none;
   }
 
   .image-url-input {
