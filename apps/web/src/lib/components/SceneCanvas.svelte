@@ -165,6 +165,16 @@
   let draggedDoorControlPointRequiresGridSnap = false;
   let isHoveringDoorControlPoint = false;
 
+  // Body drag state
+  let isDraggingBodies = false;
+  let bodyDragStartPos: { x: number; y: number } | null = null;
+  let bodyDragOriginalPositions: {
+    walls: Array<{ id: string; x1: number; y1: number; x2: number; y2: number; controlPoints?: Array<{x: number, y: number}> }>;
+    windows: Array<{ id: string; x1: number; y1: number; x2: number; y2: number; controlPoints?: Array<{x: number, y: number}> }>;
+    doors: Array<{ id: string; x1: number; y1: number; x2: number; y2: number; controlPoints?: Array<{x: number, y: number}> }>;
+  } | null = null;
+  let bodyDragRequiresGridSnap = false;
+
   // Path tool state
   let isDrawingPath = false;
   let currentPathNodes: Array<{ x: number; y: number }> = [];
@@ -4268,6 +4278,40 @@
             }
           }
 
+          // Check if this wall is already selected
+          if (selectedWallIds.has(wallId) && !e.ctrlKey) {
+            // Initiate body drag of all selected objects
+            isDraggingBodies = true;
+            bodyDragStartPos = { x: worldPos.x, y: worldPos.y };
+
+            // Store original positions of all selected objects
+            bodyDragOriginalPositions = {
+              walls: walls.filter(w => selectedWallIds.has(w.id)).map(w => ({
+                id: w.id,
+                x1: w.x1, y1: w.y1, x2: w.x2, y2: w.y2,
+                controlPoints: w.controlPoints ? [...w.controlPoints.map(cp => ({...cp}))] : undefined
+              })),
+              windows: windows.filter(w => selectedWindowIds.has(w.id)).map(w => ({
+                id: w.id,
+                x1: w.x1, y1: w.y1, x2: w.x2, y2: w.y2,
+                controlPoints: w.controlPoints ? [...w.controlPoints.map(cp => ({...cp}))] : undefined
+              })),
+              doors: doors.filter(d => selectedDoorIds.has(d.id)).map(d => ({
+                id: d.id,
+                x1: d.x1, y1: d.y1, x2: d.x2, y2: d.y2,
+                controlPoints: d.controlPoints ? [...d.controlPoints.map(cp => ({...cp}))] : undefined
+              }))
+            };
+
+            // Check if any selected object requires grid snap
+            bodyDragRequiresGridSnap =
+              walls.filter(w => selectedWallIds.has(w.id)).some(w => w.snapToGrid === true) ||
+              windows.filter(w => selectedWindowIds.has(w.id)).some(w => w.snapToGrid === true) ||
+              doors.filter(d => selectedDoorIds.has(d.id)).some(d => d.snapToGrid === true);
+
+            return;
+          }
+
           // Regular wall selection
           if (e.ctrlKey) {
             // Ctrl+Click: Toggle wall in/out of selection
@@ -4298,6 +4342,40 @@
         // Check for window selection
         const windowId = findWindowAtPoint(worldPos.x, worldPos.y);
         if (windowId) {
+          // Check if this window is already selected
+          if (selectedWindowIds.has(windowId) && !e.ctrlKey) {
+            // Initiate body drag of all selected objects
+            isDraggingBodies = true;
+            bodyDragStartPos = { x: worldPos.x, y: worldPos.y };
+
+            // Store original positions of all selected objects
+            bodyDragOriginalPositions = {
+              walls: walls.filter(w => selectedWallIds.has(w.id)).map(w => ({
+                id: w.id,
+                x1: w.x1, y1: w.y1, x2: w.x2, y2: w.y2,
+                controlPoints: w.controlPoints ? [...w.controlPoints.map(cp => ({...cp}))] : undefined
+              })),
+              windows: windows.filter(w => selectedWindowIds.has(w.id)).map(w => ({
+                id: w.id,
+                x1: w.x1, y1: w.y1, x2: w.x2, y2: w.y2,
+                controlPoints: w.controlPoints ? [...w.controlPoints.map(cp => ({...cp}))] : undefined
+              })),
+              doors: doors.filter(d => selectedDoorIds.has(d.id)).map(d => ({
+                id: d.id,
+                x1: d.x1, y1: d.y1, x2: d.x2, y2: d.y2,
+                controlPoints: d.controlPoints ? [...d.controlPoints.map(cp => ({...cp}))] : undefined
+              }))
+            };
+
+            // Check if any selected object requires grid snap
+            bodyDragRequiresGridSnap =
+              walls.filter(w => selectedWallIds.has(w.id)).some(w => w.snapToGrid === true) ||
+              windows.filter(w => selectedWindowIds.has(w.id)).some(w => w.snapToGrid === true) ||
+              doors.filter(d => selectedDoorIds.has(d.id)).some(d => d.snapToGrid === true);
+
+            return;
+          }
+
           // Regular window selection
           if (e.ctrlKey) {
             // Ctrl+Click: Toggle window in/out of selection
@@ -4393,6 +4471,40 @@
           }
           lastClickTime = now;
           lastClickDoorId = doorId;
+
+          // Check if this door is already selected
+          if (selectedDoorIds.has(doorId) && !e.ctrlKey) {
+            // Initiate body drag of all selected objects
+            isDraggingBodies = true;
+            bodyDragStartPos = { x: worldPos.x, y: worldPos.y };
+
+            // Store original positions of all selected objects
+            bodyDragOriginalPositions = {
+              walls: walls.filter(w => selectedWallIds.has(w.id)).map(w => ({
+                id: w.id,
+                x1: w.x1, y1: w.y1, x2: w.x2, y2: w.y2,
+                controlPoints: w.controlPoints ? [...w.controlPoints.map(cp => ({...cp}))] : undefined
+              })),
+              windows: windows.filter(w => selectedWindowIds.has(w.id)).map(w => ({
+                id: w.id,
+                x1: w.x1, y1: w.y1, x2: w.x2, y2: w.y2,
+                controlPoints: w.controlPoints ? [...w.controlPoints.map(cp => ({...cp}))] : undefined
+              })),
+              doors: doors.filter(d => selectedDoorIds.has(d.id)).map(d => ({
+                id: d.id,
+                x1: d.x1, y1: d.y1, x2: d.x2, y2: d.y2,
+                controlPoints: d.controlPoints ? [...d.controlPoints.map(cp => ({...cp}))] : undefined
+              }))
+            };
+
+            // Check if any selected object requires grid snap
+            bodyDragRequiresGridSnap =
+              walls.filter(w => selectedWallIds.has(w.id)).some(w => w.snapToGrid === true) ||
+              windows.filter(w => selectedWindowIds.has(w.id)).some(w => w.snapToGrid === true) ||
+              doors.filter(d => selectedDoorIds.has(d.id)).some(d => d.snapToGrid === true);
+
+            return;
+          }
 
           // Regular door selection
           if (e.ctrlKey) {
@@ -4955,6 +5067,98 @@
       return;
     }
 
+    // Body dragging - move all selected objects
+    if (isDraggingBodies && bodyDragStartPos && bodyDragOriginalPositions) {
+      let deltaX = worldPos.x - bodyDragStartPos.x;
+      let deltaY = worldPos.y - bodyDragStartPos.y;
+
+      // If grid snap required, calculate snapped delta using the first wall as anchor
+      if (bodyDragRequiresGridSnap && effectiveGridSnap && bodyDragOriginalPositions.walls.length > 0) {
+        const anchor = bodyDragOriginalPositions.walls[0];
+        const newX1 = anchor.x1 + deltaX;
+        const newY1 = anchor.y1 + deltaY;
+        const snapped = snapToGrid(newX1, newY1);
+        deltaX = snapped.x - anchor.x1;
+        deltaY = snapped.y - anchor.y1;
+      } else if (bodyDragRequiresGridSnap && effectiveGridSnap && bodyDragOriginalPositions.windows.length > 0) {
+        const anchor = bodyDragOriginalPositions.windows[0];
+        const newX1 = anchor.x1 + deltaX;
+        const newY1 = anchor.y1 + deltaY;
+        const snapped = snapToGrid(newX1, newY1);
+        deltaX = snapped.x - anchor.x1;
+        deltaY = snapped.y - anchor.y1;
+      } else if (bodyDragRequiresGridSnap && effectiveGridSnap && bodyDragOriginalPositions.doors.length > 0) {
+        const anchor = bodyDragOriginalPositions.doors[0];
+        const newX1 = anchor.x1 + deltaX;
+        const newY1 = anchor.y1 + deltaY;
+        const snapped = snapToGrid(newX1, newY1);
+        deltaX = snapped.x - anchor.x1;
+        deltaY = snapped.y - anchor.y1;
+      }
+
+      // Update all walls
+      walls = walls.map(wall => {
+        const original = bodyDragOriginalPositions!.walls.find(w => w.id === wall.id);
+        if (original) {
+          return {
+            ...wall,
+            x1: original.x1 + deltaX,
+            y1: original.y1 + deltaY,
+            x2: original.x2 + deltaX,
+            y2: original.y2 + deltaY,
+            controlPoints: original.controlPoints?.map(cp => ({
+              x: cp.x + deltaX,
+              y: cp.y + deltaY
+            }))
+          };
+        }
+        return wall;
+      });
+
+      // Update all windows
+      windows = windows.map(win => {
+        const original = bodyDragOriginalPositions!.windows.find(w => w.id === win.id);
+        if (original) {
+          return {
+            ...win,
+            x1: original.x1 + deltaX,
+            y1: original.y1 + deltaY,
+            x2: original.x2 + deltaX,
+            y2: original.y2 + deltaY,
+            controlPoints: original.controlPoints?.map(cp => ({
+              x: cp.x + deltaX,
+              y: cp.y + deltaY
+            }))
+          };
+        }
+        return win;
+      });
+
+      // Update all doors
+      doors = doors.map(door => {
+        const original = bodyDragOriginalPositions!.doors.find(d => d.id === door.id);
+        if (original) {
+          return {
+            ...door,
+            x1: original.x1 + deltaX,
+            y1: original.y1 + deltaY,
+            x2: original.x2 + deltaX,
+            y2: original.y2 + deltaY,
+            controlPoints: original.controlPoints?.map(cp => ({
+              x: cp.x + deltaX,
+              y: cp.y + deltaY
+            }))
+          };
+        }
+        return door;
+      });
+
+      // Invalidate visibility cache so objects update during drag
+      invalidateVisibilityCache();
+      renderWalls(); // renderWalls also renders windows and doors
+      return;
+    }
+
     if (isDraggingPathPoint && draggedPathPointId) {
       const newX = worldPos.x + dragOffsetX;
       const newY = worldPos.y + dragOffsetY;
@@ -5262,6 +5466,55 @@
       isDraggingWindowControlPoint = false;
       draggedWindowControlPoint = null;
       draggedWindowControlPointRequiresGridSnap = false;
+    } else if (isDraggingBodies && bodyDragOriginalPositions) {
+      // Finalize body drag
+      // Call update for each moved wall
+      for (const original of bodyDragOriginalPositions.walls) {
+        const wall = walls.find(w => w.id === original.id);
+        if (wall && onWallUpdate) {
+          onWallUpdate(wall.id, {
+            x1: wall.x1,
+            y1: wall.y1,
+            x2: wall.x2,
+            y2: wall.y2,
+            controlPoints: wall.controlPoints
+          });
+        }
+      }
+
+      // Call update for each moved window
+      for (const original of bodyDragOriginalPositions.windows) {
+        const win = windows.find(w => w.id === original.id);
+        if (win && onWindowUpdate) {
+          onWindowUpdate(win.id, {
+            x1: win.x1,
+            y1: win.y1,
+            x2: win.x2,
+            y2: win.y2,
+            controlPoints: win.controlPoints
+          });
+        }
+      }
+
+      // Call update for each moved door
+      for (const original of bodyDragOriginalPositions.doors) {
+        const door = doors.find(d => d.id === original.id);
+        if (door && onDoorUpdate) {
+          onDoorUpdate(door.id, {
+            x1: door.x1,
+            y1: door.y1,
+            x2: door.x2,
+            y2: door.y2,
+            controlPoints: door.controlPoints
+          });
+        }
+      }
+
+      // Reset body drag state
+      isDraggingBodies = false;
+      bodyDragStartPos = null;
+      bodyDragOriginalPositions = null;
+      bodyDragRequiresGridSnap = false;
     }
 
     isPanning = false;
@@ -6399,9 +6652,10 @@
   <canvas
     class="canvas-layer canvas-interactive"
     class:cursor-crosshair={activeTool === 'wall' || activeTool === 'window' || activeTool === 'door' || activeTool === 'light' || activeTool === 'path'}
-    class:cursor-grab={activeTool === 'select' && !isHoveringControlPoint && !isDraggingControlPoint}
+    class:cursor-grab={activeTool === 'select' && !isHoveringControlPoint && !isDraggingControlPoint && !isDraggingBodies}
     class:cursor-control-point-hover={isHoveringControlPoint && !isDraggingControlPoint}
     class:cursor-control-point-drag={isDraggingControlPoint}
+    class:cursor-move={isDraggingBodies}
     class:drag-over={isDragOver}
     bind:this={controlsCanvas}
     on:mousedown={handleMouseDown}
@@ -6543,6 +6797,10 @@
 
   .canvas-interactive.cursor-control-point-drag {
     cursor: grabbing;
+  }
+
+  .canvas-interactive.cursor-move {
+    cursor: move;
   }
 
   .canvas-controls {
