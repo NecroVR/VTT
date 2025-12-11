@@ -2,6 +2,7 @@
   import { createEventDispatcher } from 'svelte';
   import type { AmbientLight } from '@vtt/shared';
   import { websocket } from '$stores/websocket';
+  import { assembledPaths } from '$lib/stores/paths';
 
   // Props
   export let isOpen: boolean = false;
@@ -10,6 +11,9 @@
   export let defaultX: number = 0;
   export let defaultY: number = 0;
   export let token: string = '';
+
+  // Get available paths for this scene
+  $: availablePaths = $assembledPaths.filter(p => p.sceneId === sceneId);
 
   const dispatch = createEventDispatcher<{
     close: void;
@@ -52,6 +56,9 @@
     darknessMax: light?.darknessMax ?? 1,
     // Animation-specific data (e.g., sparkle configuration)
     data: light?.data ?? {},
+    // Path following
+    followPathName: light?.followPathName ?? null,
+    pathSpeed: light?.pathSpeed ?? 50,
   };
 
   // Local state for sparkle sliders (for immediate UI feedback)
@@ -656,6 +663,52 @@
                 />
               </label>
             </div>
+          </section>
+
+          <!-- Path Following -->
+          <section class="form-section">
+            <h3>Path Following</h3>
+            <span class="help-text">Make this light follow a path on the scene</span>
+
+            <div class="form-row">
+              <label for="light-follow-path">
+                Follow Path
+                <select id="light-follow-path" bind:value={formData.followPathName}>
+                  <option value={null}>None</option>
+                  {#each availablePaths as path}
+                    <option value={path.pathName}>{path.pathName}</option>
+                  {/each}
+                </select>
+              </label>
+            </div>
+
+            {#if formData.followPathName}
+              <div class="form-row">
+                <label for="light-path-speed">
+                  Speed (pixels per second): {formData.pathSpeed}
+                  <input
+                    id="light-path-speed"
+                    type="range"
+                    bind:value={formData.pathSpeed}
+                    min="10"
+                    max="500"
+                    step="10"
+                  />
+                </label>
+              </div>
+              <div class="form-row">
+                <label for="light-path-speed-number">
+                  <input
+                    id="light-path-speed-number"
+                    type="number"
+                    bind:value={formData.pathSpeed}
+                    min="1"
+                    max="1000"
+                    step="1"
+                  />
+                </label>
+              </div>
+            {/if}
           </section>
         </form>
       </div>
