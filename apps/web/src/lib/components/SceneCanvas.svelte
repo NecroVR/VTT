@@ -218,6 +218,9 @@
   // Subscribe to fog store
   $: fogData = scene ? $fogStore.fog.get(scene.id) : undefined;
 
+  // Track animation configs to detect changes
+  let lightAnimationConfigs = new Map<string, { pathName: string; speed: number; pathPointCount: number }>();
+
   // Path animation: Initialize animations for lights with followPathName
   $: {
     if (lights && assembledPathsForScene) {
@@ -229,9 +232,16 @@
           const path = assembledPathsForScene.find(p => p.pathName === light.followPathName);
 
           if (path && path.points.length >= 2) {
-            // Check if animation is already running
-            if (!pathAnimationManager.isAnimating(animationKey)) {
-              // Start animation
+            // Check if config has changed (path, speed, or path points)
+            const currentConfig = lightAnimationConfigs.get(animationKey);
+            const configChanged = !currentConfig ||
+              currentConfig.pathName !== light.followPathName ||
+              currentConfig.speed !== light.pathSpeed ||
+              currentConfig.pathPointCount !== path.points.length;
+
+            if (configChanged) {
+              // Stop existing animation and restart with new config
+              pathAnimationManager.stopAnimation(animationKey);
               pathAnimationManager.startAnimation(
                 animationKey,
                 light.id,
@@ -240,18 +250,29 @@
                 light.pathSpeed,
                 true // loop
               );
+              // Update tracked config
+              lightAnimationConfigs.set(animationKey, {
+                pathName: light.followPathName,
+                speed: light.pathSpeed,
+                pathPointCount: path.points.length
+              });
             }
           } else {
             // Path not found or invalid, stop animation if running
             pathAnimationManager.stopAnimation(animationKey);
+            lightAnimationConfigs.delete(animationKey);
           }
         } else {
           // No followPathName or pathSpeed, stop animation if running
           pathAnimationManager.stopAnimation(animationKey);
+          lightAnimationConfigs.delete(animationKey);
         }
       });
     }
   }
+
+  // Track token animation configs to detect changes
+  let tokenAnimationConfigs = new Map<string, { pathName: string; speed: number; pathPointCount: number }>();
 
   // Path animation: Initialize animations for tokens with followPathName
   $: {
@@ -264,9 +285,16 @@
           const path = assembledPathsForScene.find(p => p.pathName === token.followPathName);
 
           if (path && path.points.length >= 2) {
-            // Check if animation is already running
-            if (!pathAnimationManager.isAnimating(animationKey)) {
-              // Start animation
+            // Check if config has changed (path, speed, or path points)
+            const currentConfig = tokenAnimationConfigs.get(animationKey);
+            const configChanged = !currentConfig ||
+              currentConfig.pathName !== token.followPathName ||
+              currentConfig.speed !== token.pathSpeed ||
+              currentConfig.pathPointCount !== path.points.length;
+
+            if (configChanged) {
+              // Stop existing animation and restart with new config
+              pathAnimationManager.stopAnimation(animationKey);
               pathAnimationManager.startAnimation(
                 animationKey,
                 token.id,
@@ -275,14 +303,22 @@
                 token.pathSpeed,
                 true // loop
               );
+              // Update tracked config
+              tokenAnimationConfigs.set(animationKey, {
+                pathName: token.followPathName,
+                speed: token.pathSpeed,
+                pathPointCount: path.points.length
+              });
             }
           } else {
             // Path not found or invalid, stop animation if running
             pathAnimationManager.stopAnimation(animationKey);
+            tokenAnimationConfigs.delete(animationKey);
           }
         } else {
           // No followPathName or pathSpeed, stop animation if running
           pathAnimationManager.stopAnimation(animationKey);
+          tokenAnimationConfigs.delete(animationKey);
         }
       });
     }
