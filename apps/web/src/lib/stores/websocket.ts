@@ -35,6 +35,12 @@ import type {
   LightUpdatedPayload,
   LightRemovePayload,
   LightRemovedPayload,
+  PathPointAddPayload,
+  PathPointAddedPayload,
+  PathPointUpdatePayload,
+  PathPointUpdatedPayload,
+  PathPointRemovePayload,
+  PathPointRemovedPayload,
   CombatStartPayload,
   CombatStartedPayload,
   CombatEndPayload,
@@ -294,6 +300,33 @@ class WebSocketStore {
 
   onLightRemoved(handler: TypedMessageHandler<LightRemovedPayload>): () => void {
     return this.on('light:removed', handler);
+  }
+
+  /**
+   * Path point methods
+   */
+  sendPathPointAdd(payload: PathPointAddPayload): void {
+    this.send('pathPoint:add', payload);
+  }
+
+  sendPathPointUpdate(payload: PathPointUpdatePayload): void {
+    this.send('pathPoint:update', payload);
+  }
+
+  sendPathPointRemove(payload: PathPointRemovePayload): void {
+    this.send('pathPoint:remove', payload);
+  }
+
+  onPathPointAdded(handler: TypedMessageHandler<PathPointAddedPayload>): () => void {
+    return this.on('pathPoint:added', handler);
+  }
+
+  onPathPointUpdated(handler: TypedMessageHandler<PathPointUpdatedPayload>): () => void {
+    return this.on('pathPoint:updated', handler);
+  }
+
+  onPathPointRemoved(handler: TypedMessageHandler<PathPointRemovedPayload>): () => void {
+    return this.on('pathPoint:removed', handler);
   }
 
   /**

@@ -9,6 +9,7 @@
   import { tokensStore } from '$lib/stores/tokens';
   import { wallsStore } from '$lib/stores/walls';
   import { lightsStore } from '$lib/stores/lights';
+  import { pathPointsStore } from '$lib/stores/paths';
   import { actorsStore } from '$lib/stores/actors';
   import { sidebarStore } from '$lib/stores/sidebar';
   import SceneCanvas from '$lib/components/SceneCanvas.svelte';
@@ -219,6 +220,19 @@
       lightsStore.removeLight(payload.lightId);
     });
 
+    // Subscribe to path point events
+    const unsubscribePathPointAdded = websocket.onPathPointAdded((payload) => {
+      pathPointsStore.addPathPoint(payload.pathPoint);
+    });
+
+    const unsubscribePathPointUpdated = websocket.onPathPointUpdated((payload) => {
+      pathPointsStore.updatePathPoint(payload.pathPoint.id, payload.pathPoint);
+    });
+
+    const unsubscribePathPointRemoved = websocket.onPathPointRemoved((payload) => {
+      pathPointsStore.removePathPoint(payload.pathPointId);
+    });
+
     // Join campaign room
     const token = localStorage.getItem('vtt_session_id') || sessionStorage.getItem('vtt_session_id') || '';
     websocket.joinCampaign(campaignId, token);
@@ -242,6 +256,9 @@
       unsubscribeLightAdded();
       unsubscribeLightUpdated();
       unsubscribeLightRemoved();
+      unsubscribePathPointAdded();
+      unsubscribePathPointUpdated();
+      unsubscribePathPointRemoved();
 
       // Remove window event listeners
       window.removeEventListener('mousemove', handleDividerMouseMove);
@@ -252,6 +269,7 @@
       tokensStore.clear();
       wallsStore.clear();
       lightsStore.clear();
+      pathPointsStore.clearPathPoints();
       actorsStore.clear();
       websocket.disconnect();
     };
@@ -369,6 +387,19 @@
   function handleLightSelect(lightId: string | null) {
     selectedLightId = lightId;
     lightsStore.selectLight(lightId);
+  }
+
+  function handlePathPointAdd(pointData: { pathName: string; pathIndex: number; x: number; y: number; color: string; visible: boolean }) {
+    if (!activeScene) return;
+    websocket.sendPathPointAdd({
+      sceneId: activeScene.id,
+      pathName: pointData.pathName,
+      pathIndex: pointData.pathIndex,
+      x: pointData.x,
+      y: pointData.y,
+      color: pointData.color,
+      visible: pointData.visible
+    });
   }
 
   function handleLightDoubleClick(lightId: string) {
@@ -616,6 +647,7 @@
             onLightSelect={handleLightSelect}
             onLightDoubleClick={handleLightDoubleClick}
             onLightMove={handleLightMove}
+            onPathPointAdd={handlePathPointAdd}
           />
           {#if isGM}
             <div class="scene-controls-overlay">
