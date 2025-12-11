@@ -40,6 +40,12 @@ import type {
   WindowUpdatedPayload,
   WindowRemovePayload,
   WindowRemovedPayload,
+  DoorAddPayload,
+  DoorAddedPayload,
+  DoorUpdatePayload,
+  DoorUpdatedPayload,
+  DoorRemovePayload,
+  DoorRemovedPayload,
   LightAddPayload,
   LightAddedPayload,
   LightUpdatePayload,
@@ -116,7 +122,7 @@ import type {
 import { parseDiceNotation, type DiceGroup } from '@vtt/shared/dice';
 import { roomManager } from '../rooms.js';
 import { validateSession, extractSessionToken } from '../auth.js';
-import { tokens, scenes, walls, windows, ambientLights, paths, pathPoints } from '@vtt/database';
+import { tokens, scenes, walls, windows, doors, ambientLights, paths, pathPoints } from '@vtt/database';
 import { eq, and, asc } from 'drizzle-orm';
 import {
   handleActorCreate,
@@ -198,6 +204,11 @@ import {
   handleWindowUpdate,
   handleWindowRemove,
 } from './windows.js';
+import {
+  handleDoorAdd,
+  handleDoorUpdate,
+  handleDoorRemove,
+} from './doors.js';
 
 /**
  * Campaign session WebSocket handler
@@ -335,6 +346,18 @@ export async function handleCampaignWebSocket(
 
         case 'window:remove':
           await handleWindowRemove(socket, message as WSMessage<WindowRemovePayload>, request);
+          break;
+
+        case 'door:add':
+          await handleDoorAdd(socket, message as WSMessage<DoorAddPayload>, request);
+          break;
+
+        case 'door:update':
+          await handleDoorUpdate(socket, message as WSMessage<DoorUpdatePayload>, request);
+          break;
+
+        case 'door:remove':
+          await handleDoorRemove(socket, message as WSMessage<DoorRemovePayload>, request);
           break;
 
         case 'light:add':

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import { get } from 'svelte/store';
-  import type { Scene, Token, Wall, Window, AmbientLight, FogGrid } from '@vtt/shared';
+  import type { Scene, Token, Wall, Window, Door, AmbientLight, FogGrid } from '@vtt/shared';
   import { lightsStore } from '$lib/stores/lights';
   import { fogStore } from '$lib/stores/fog';
   import { pathPointsStore, assembledPaths } from '$lib/stores/paths';
@@ -32,6 +32,7 @@
   export let tokens: Token[] = [];
   export let walls: Wall[] = [];
   export let windows: Window[] = [];
+  export let doors: Door[] = [];
   export let isGM: boolean = false;
   export let activeTool: string = 'select';
   export let gridSnap: boolean = false;
@@ -45,6 +46,10 @@
   export let onWindowRemove: ((windowId: string) => void) | undefined = undefined;
   export let onWindowUpdate: ((windowId: string, updates: Partial<Window>) => void) | undefined = undefined;
   export let onWindowSelect: ((windowId: string | null) => void) | undefined = undefined;
+  export let onDoorAdd: ((door: { x1: number; y1: number; x2: number; y2: number; snapToGrid?: boolean; wallShape?: 'straight' | 'curved' }) => void) | undefined = undefined;
+  export let onDoorRemove: ((doorId: string) => void) | undefined = undefined;
+  export let onDoorUpdate: ((doorId: string, updates: Partial<Door>) => void) | undefined = undefined;
+  export let onDoorSelect: ((doorId: string | null) => void) | undefined = undefined;
   export let onTokenAdd: ((tokenData: any) => void) | undefined = undefined;
   export let onLightAdd: ((lightData: { x: number; y: number }) => void) | undefined = undefined;
   export let onLightSelect: ((lightId: string | null) => void) | undefined = undefined;
@@ -136,6 +141,24 @@
   let draggedWindowControlPointRequiresGridSnap = false;
   let isHoveringWindowControlPoint = false;
 
+  // Door drawing state
+  let isDrawingDoor = false;
+  let doorStartPoint: { x: number; y: number } | null = null;
+  let doorPreview: { x1: number; y1: number; x2: number; y2: number } | null = null;
+  let selectedDoorIds: Set<string> = new Set();
+  let hoveredDoorId: string | null = null;
+
+  // Door endpoint dragging state
+  let isDraggingDoorEndpoint = false;
+  let draggedDoors: Array<{doorId: string, endpoint: 'start' | 'end'}> = [];
+  let draggedDoorEndpointRequiresGridSnap = false;
+
+  // Door control point dragging state
+  let isDraggingDoorControlPoint = false;
+  let draggedDoorControlPoint: { doorId: string; controlPointIndex: number } | null = null;
+  let draggedDoorControlPointRequiresGridSnap = false;
+  let isHoveringDoorControlPoint = false;
+
   // Path tool state
   let isDrawingPath = false;
   let currentPathNodes: Array<{ x: number; y: number }> = [];
@@ -155,6 +178,7 @@
   let lastClickTime = 0;
   let lastClickTokenId: string | null = null;
   let lastClickLightId: string | null = null;
+  let lastClickDoorId: string | null = null;
   const DOUBLE_CLICK_THRESHOLD = 300; // ms
 
   // Context menu state
@@ -1539,8 +1563,9 @@
 
     wallsCtx.restore();
 
-    // Also render windows and paths on the same canvas (don't clear, just draw on top)
+    // Also render windows, doors, and paths on the same canvas (don't clear, just draw on top)
     renderWindowsInternal();
+    renderDoorsInternal();
     renderPathsInternal();
   }
 
@@ -1732,6 +1757,299 @@
 
       wallsCtx.beginPath();
       wallsCtx.arc(windowPreview.x2, windowPreview.y2, endpointRadius, 0, Math.PI * 2);
+      wallsCtx.fill();
+    }
+
+    wallsCtx.restore();
+  }
+
+  // Internal door rendering - doesn't clear canvas, called by renderWalls()
+  function renderDoorsInternal() {
+    if (!wallsCtx || !wallsCanvas) return;
+
+    wallsCtx.save();
+
+    // Apply transform (should already be applied, but ensure consistency)
+    wallsCtx.translate(-viewX * scale, -viewY * scale);
+    wallsCtx.scale(scale, scale);
+
+    // Render existing doors
+    doors.forEach(door => {
+      const isSelected = selectedDoorIds.has(door.id);
+      const isHovered = door.id === hoveredDoorId;
+
+      // Draw selection/hover glow
+      if (isSelected || isHovered) {
+        wallsCtx.strokeStyle = isSelected ? '#fbbf24' : '#60a5fa';
+        wallsCtx.lineWidth = 6 / scale;
+        wallsCtx.globalAlpha = 0.5;
+
+        wallsCtx.beginPath();
+        if (door.wallShape === 'curved') {
+          const points = getSplinePoints(door);
+          renderSplinePath(wallsCtx, points);
+        } else {
+          wallsCtx.moveTo(door.x1, door.y1);
+          wallsCtx.lineTo(door.x2, door.y2);
+        }
+        wallsCtx.stroke();
+
+        wallsCtx.globalAlpha = 1.0;
+      }
+
+      // Door color - brown wood color
+      const doorColor = '#8B4513';
+
+      // Draw door based on status
+      if (door.status === 'open') {
+        // Open door - dashed line with door swing arc
+        wallsCtx.strokeStyle = doorColor;
+        wallsCtx.lineWidth = 4 / scale;
+        wallsCtx.setLineDash([8 / scale, 4 / scale]);
+
+        wallsCtx.beginPath();
+        if (door.wallShape === 'curved') {
+          const points = getSplinePoints(door);
+          renderSplinePath(wallsCtx, points);
+        } else {
+          wallsCtx.moveTo(door.x1, door.y1);
+          wallsCtx.lineTo(door.x2, door.y2);
+        }
+        wallsCtx.stroke();
+
+        // Draw door swing arc (quarter circle from start point)
+        if (door.wallShape !== 'curved') {
+          const dx = door.x2 - door.x1;
+          const dy = door.y2 - door.y1;
+          const doorLength = Math.sqrt(dx * dx + dy * dy);
+          const angle = Math.atan2(dy, dx);
+
+          wallsCtx.strokeStyle = doorColor;
+          wallsCtx.lineWidth = 2 / scale;
+          wallsCtx.setLineDash([4 / scale, 2 / scale]);
+          wallsCtx.beginPath();
+          wallsCtx.arc(door.x1, door.y1, doorLength, angle, angle + Math.PI / 2);
+          wallsCtx.stroke();
+        }
+
+        wallsCtx.setLineDash([]);
+      } else if (door.status === 'broken') {
+        // Broken door - jagged line with X pattern
+        wallsCtx.strokeStyle = doorColor;
+        wallsCtx.lineWidth = 4 / scale;
+
+        if (door.wallShape === 'curved') {
+          const points = getSplinePoints(door);
+          renderSplinePath(wallsCtx, points);
+        } else {
+          // Draw jagged line
+          const segments = 10;
+          const dx = (door.x2 - door.x1) / segments;
+          const dy = (door.y2 - door.y1) / segments;
+          const perpX = -dy;
+          const perpY = dx;
+          const jagSize = 3 / scale;
+
+          wallsCtx.beginPath();
+          wallsCtx.moveTo(door.x1, door.y1);
+          for (let i = 1; i < segments; i++) {
+            const x = door.x1 + dx * i;
+            const y = door.y1 + dy * i;
+            const offset = (i % 2 === 0 ? jagSize : -jagSize);
+            wallsCtx.lineTo(x + perpX * offset, y + perpY * offset);
+          }
+          wallsCtx.lineTo(door.x2, door.y2);
+          wallsCtx.stroke();
+
+          // Draw X pattern
+          const centerX = (door.x1 + door.x2) / 2;
+          const centerY = (door.y1 + door.y2) / 2;
+          const crossSize = 10 / scale;
+
+          wallsCtx.beginPath();
+          wallsCtx.moveTo(centerX - crossSize, centerY - crossSize);
+          wallsCtx.lineTo(centerX + crossSize, centerY + crossSize);
+          wallsCtx.moveTo(centerX + crossSize, centerY - crossSize);
+          wallsCtx.lineTo(centerX - crossSize, centerY + crossSize);
+          wallsCtx.stroke();
+        }
+      } else {
+        // Closed door - solid line (default)
+        wallsCtx.strokeStyle = doorColor;
+        wallsCtx.lineWidth = 5 / scale;
+
+        wallsCtx.beginPath();
+        if (door.wallShape === 'curved') {
+          const points = getSplinePoints(door);
+          renderSplinePath(wallsCtx, points);
+        } else {
+          wallsCtx.moveTo(door.x1, door.y1);
+          wallsCtx.lineTo(door.x2, door.y2);
+        }
+        wallsCtx.stroke();
+      }
+
+      // Draw lock icon if door is locked
+      if (door.isLocked) {
+        const centerX = (door.x1 + door.x2) / 2;
+        const centerY = (door.y1 + door.y2) / 2;
+        const lockSize = 8 / scale;
+
+        // Draw padlock
+        wallsCtx.fillStyle = '#FFD700'; // Gold color
+        wallsCtx.strokeStyle = '#000000';
+        wallsCtx.lineWidth = 1 / scale;
+
+        // Lock body (rectangle)
+        wallsCtx.fillRect(centerX - lockSize/2, centerY - lockSize/4, lockSize, lockSize * 0.7);
+        wallsCtx.strokeRect(centerX - lockSize/2, centerY - lockSize/4, lockSize, lockSize * 0.7);
+
+        // Lock shackle (arc)
+        wallsCtx.beginPath();
+        wallsCtx.arc(centerX, centerY - lockSize/4, lockSize/3, Math.PI, 0);
+        wallsCtx.stroke();
+
+        // Keyhole
+        wallsCtx.fillStyle = '#000000';
+        wallsCtx.beginPath();
+        wallsCtx.arc(centerX, centerY + lockSize/8, lockSize/6, 0, Math.PI * 2);
+        wallsCtx.fill();
+      }
+
+      // Draw endpoints for selected door
+      if (isSelected) {
+        wallsCtx.fillStyle = doorColor;
+        const endpointRadius = 4 / scale;
+
+        wallsCtx.beginPath();
+        wallsCtx.arc(door.x1, door.y1, endpointRadius, 0, Math.PI * 2);
+        wallsCtx.fill();
+
+        wallsCtx.beginPath();
+        wallsCtx.arc(door.x2, door.y2, endpointRadius, 0, Math.PI * 2);
+        wallsCtx.fill();
+
+        // Draw control points for curved doors
+        if (door.wallShape === 'curved' && door.controlPoints && door.controlPoints.length > 0) {
+          const controlPointRadius = 8 / scale;
+
+          // Get all points including endpoints for direction calculation
+          const allPoints = [
+            { x: door.x1, y: door.y1 },
+            ...door.controlPoints,
+            { x: door.x2, y: door.y2 }
+          ];
+
+          door.controlPoints.forEach((cp, index) => {
+            // Check if this control point is being dragged
+            const isBeingDragged = isDraggingDoorControlPoint &&
+                                   draggedDoorControlPoint?.doorId === door.id &&
+                                   draggedDoorControlPoint?.controlPointIndex === index;
+
+            // Calculate direction arrow
+            const prevPoint = allPoints[index];
+            const nextPoint = allPoints[index + 2];
+
+            const midX = (prevPoint.x + nextPoint.x) / 2;
+            const midY = (prevPoint.y + nextPoint.y) / 2;
+
+            const dx = cp.x - midX;
+            const dy = cp.y - midY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (isBeingDragged) {
+              // Outer glow for dragged control point
+              wallsCtx.fillStyle = 'rgba(34, 197, 94, 0.3)';
+              wallsCtx.beginPath();
+              wallsCtx.arc(cp.x, cp.y, controlPointRadius * 1.8, 0, Math.PI * 2);
+              wallsCtx.fill();
+
+              // Main circle
+              wallsCtx.fillStyle = '#22c55e';
+              wallsCtx.strokeStyle = '#ffffff';
+              wallsCtx.lineWidth = 2 / scale;
+              wallsCtx.beginPath();
+              wallsCtx.arc(cp.x, cp.y, controlPointRadius, 0, Math.PI * 2);
+              wallsCtx.fill();
+              wallsCtx.stroke();
+            } else {
+              // Normal control point - brown to match door
+              wallsCtx.fillStyle = doorColor;
+              wallsCtx.strokeStyle = '#ffffff';
+              wallsCtx.lineWidth = 2 / scale;
+              wallsCtx.beginPath();
+              wallsCtx.arc(cp.x, cp.y, controlPointRadius, 0, Math.PI * 2);
+              wallsCtx.fill();
+              wallsCtx.stroke();
+            }
+
+            // Draw direction arrow if there's meaningful deformation
+            if (dist > 5) {
+              const arrowColor = '#ffffff';
+              const normalizedDx = dx / dist;
+              const normalizedDy = dy / dist;
+
+              const arrowLength = controlPointRadius * 0.7;
+              const arrowHeadSize = controlPointRadius * 0.4;
+
+              const arrowEndX = cp.x + normalizedDx * arrowLength * 0.3;
+              const arrowEndY = cp.y + normalizedDy * arrowLength * 0.3;
+              const arrowStartX = cp.x - normalizedDx * arrowLength * 0.5;
+              const arrowStartY = cp.y - normalizedDy * arrowLength * 0.5;
+
+              // Draw arrow line
+              wallsCtx.strokeStyle = arrowColor;
+              wallsCtx.lineWidth = 2 / scale;
+              wallsCtx.beginPath();
+              wallsCtx.moveTo(arrowStartX, arrowStartY);
+              wallsCtx.lineTo(arrowEndX, arrowEndY);
+              wallsCtx.stroke();
+
+              // Draw arrow head
+              const angle = Math.atan2(normalizedDy, normalizedDx);
+              const headAngle = Math.PI / 6;
+
+              wallsCtx.beginPath();
+              wallsCtx.moveTo(arrowEndX, arrowEndY);
+              wallsCtx.lineTo(
+                arrowEndX - arrowHeadSize * Math.cos(angle - headAngle),
+                arrowEndY - arrowHeadSize * Math.sin(angle - headAngle)
+              );
+              wallsCtx.moveTo(arrowEndX, arrowEndY);
+              wallsCtx.lineTo(
+                arrowEndX - arrowHeadSize * Math.cos(angle + headAngle),
+                arrowEndY - arrowHeadSize * Math.sin(angle + headAngle)
+              );
+              wallsCtx.stroke();
+            }
+          });
+        }
+      }
+    });
+
+    // Render door preview
+    if (doorPreview) {
+      wallsCtx.strokeStyle = '#8B4513';
+      wallsCtx.lineWidth = 4 / scale;
+      wallsCtx.globalAlpha = 0.7;
+
+      wallsCtx.beginPath();
+      wallsCtx.moveTo(doorPreview.x1, doorPreview.y1);
+      wallsCtx.lineTo(doorPreview.x2, doorPreview.y2);
+      wallsCtx.stroke();
+
+      wallsCtx.globalAlpha = 1.0;
+
+      // Draw preview endpoints
+      wallsCtx.fillStyle = '#8B4513';
+      const endpointRadius = 4 / scale;
+
+      wallsCtx.beginPath();
+      wallsCtx.arc(doorPreview.x1, doorPreview.y1, endpointRadius, 0, Math.PI * 2);
+      wallsCtx.fill();
+
+      wallsCtx.beginPath();
+      wallsCtx.arc(doorPreview.x2, doorPreview.y2, endpointRadius, 0, Math.PI * 2);
       wallsCtx.fill();
     }
 
@@ -3579,7 +3897,7 @@
 
   // Mouse event handlers
   function handleMouseDown(e: MouseEvent) {
-    // Right-click cancels wall/window drawing
+    // Right-click cancels wall/window/door drawing
     if (e.button === 2) {
       if (isDrawingWall) {
         cancelWallDrawing();
@@ -3588,6 +3906,11 @@
       }
       if (isDrawingWindow) {
         cancelWindowDrawing();
+        e.preventDefault();
+        return;
+      }
+      if (isDrawingDoor) {
+        cancelDoorDrawing();
         e.preventDefault();
         return;
       }
@@ -3636,6 +3959,24 @@
         // Complete window
         console.log('Completing window drawing');
         completeWindowDrawing(snappedPos);
+      }
+      return;
+    }
+
+    // Handle door tool (both straight and curved)
+    if ((activeTool === 'door' || activeTool === 'curved-door') && isGM) {
+      console.log('Door tool clicked', { activeTool, isDrawingDoor, snappedPos });
+      if (!isDrawingDoor) {
+        // Start drawing door
+        console.log('Starting door drawing');
+        isDrawingDoor = true;
+        doorStartPoint = snappedPos;
+        doorPreview = { x1: snappedPos.x, y1: snappedPos.y, x2: snappedPos.x, y2: snappedPos.y };
+        renderWalls(); // renderWalls also renders doors
+      } else {
+        // Complete door
+        console.log('Completing door drawing');
+        completeDoorDrawing(snappedPos);
       }
       return;
     }
@@ -3905,15 +4246,18 @@
             } else {
               selectedWallIds = new Set([...selectedWallIds, wallId]);
             }
-            // Don't clear window selection when Ctrl+clicking walls
+            // Don't clear window or door selection when Ctrl+clicking walls
           } else {
             // Regular click: Select only this wall, clear all other selections
             selectedWallIds = new Set([wallId]);
             selectedWindowIds = new Set();
+            selectedDoorIds = new Set();
             selectedTokenId = null;
             selectedLightId = null;
             onTokenSelect?.(null);
             onLightSelect?.(null);
+            onWindowSelect?.(null);
+            onDoorSelect?.(null);
           }
           renderWalls();
           return;
@@ -3932,21 +4276,62 @@
             } else {
               selectedWindowIds = new Set([...selectedWindowIds, windowId]);
             }
-            // Don't clear wall selection when Ctrl+clicking windows
+            // Don't clear wall or door selection when Ctrl+clicking windows
           } else {
             // Regular click: Select only this window, clear all other selections
             selectedWindowIds = new Set([windowId]);
             selectedWallIds = new Set();
+            selectedDoorIds = new Set();
             selectedTokenId = null;
             selectedLightId = null;
             onTokenSelect?.(null);
             onLightSelect?.(null);
+            onDoorSelect?.(null);
           }
           onWindowSelect?.(windowId);
           renderWalls(); // renderWalls also renders windows
           return;
         } else {
           selectedWindowIds = new Set();
+        }
+
+        // Check for door selection
+        const doorId = findDoorAtPoint(worldPos.x, worldPos.y);
+        if (doorId) {
+          // Double-click to cycle door status
+          const now = Date.now();
+          if (now - lastClickTime < DOUBLE_CLICK_THRESHOLD && doorId === lastClickDoorId) {
+            cycleDoorStatus(doorId);
+            return;
+          }
+          lastClickTime = now;
+          lastClickDoorId = doorId;
+
+          // Regular door selection
+          if (e.ctrlKey) {
+            // Ctrl+Click: Toggle door in/out of selection
+            if (selectedDoorIds.has(doorId)) {
+              selectedDoorIds = new Set([...selectedDoorIds].filter(id => id !== doorId));
+            } else {
+              selectedDoorIds = new Set([...selectedDoorIds, doorId]);
+            }
+            // Don't clear wall or window selection when Ctrl+clicking doors
+          } else {
+            // Regular click: Select only this door, clear all other selections
+            selectedDoorIds = new Set([doorId]);
+            selectedWallIds = new Set();
+            selectedWindowIds = new Set();
+            selectedTokenId = null;
+            selectedLightId = null;
+            onTokenSelect?.(null);
+            onLightSelect?.(null);
+            onWindowSelect?.(null);
+          }
+          onDoorSelect?.(doorId);
+          renderWalls(); // renderWalls also renders doors
+          return;
+        } else {
+          selectedDoorIds = new Set();
         }
 
         // Check for path selection (GM only)
@@ -4146,6 +4531,68 @@
     renderWalls();
   }
 
+  function completeDoorDrawing(endPos: { x: number; y: number }) {
+    if (!doorStartPoint) {
+      return;
+    }
+
+    // Don't create zero-length doors
+    if (doorStartPoint.x === endPos.x && doorStartPoint.y === endPos.y) {
+      cancelDoorDrawing();
+      return;
+    }
+
+    // Determine door shape based on active tool
+    const wallShape = activeTool === 'curved-door' ? 'curved' : 'straight';
+    console.log('Door shape determined:', wallShape);
+
+    const doorData = {
+      x1: doorStartPoint.x,
+      y1: doorStartPoint.y,
+      x2: endPos.x,
+      y2: endPos.y,
+      snapToGrid: gridSnap,
+      wallShape,
+    };
+
+    console.log('Calling onDoorAdd with:', doorData);
+
+    // Create door via callback
+    onDoorAdd?.(doorData);
+
+    // Reset drawing state
+    isDrawingDoor = false;
+    doorStartPoint = null;
+    doorPreview = null;
+    renderWalls();
+    console.log('Door drawing complete');
+  }
+
+  function cancelDoorDrawing() {
+    isDrawingDoor = false;
+    doorStartPoint = null;
+    doorPreview = null;
+    renderWalls();
+  }
+
+  function cycleDoorStatus(doorId: string) {
+    const door = doors.find(d => d.id === doorId);
+    if (!door) return;
+
+    // Cycle: closed -> open -> broken -> closed
+    let newStatus: 'open' | 'closed' | 'broken';
+    if (door.status === 'closed') {
+      newStatus = 'open';
+    } else if (door.status === 'open') {
+      newStatus = 'broken';
+    } else {
+      newStatus = 'closed';
+    }
+
+    console.log(`Cycling door ${doorId} status from ${door.status} to ${newStatus}`);
+    onDoorUpdate?.(doorId, { status: newStatus });
+  }
+
   function completePath() {
     if (currentPathNodes.length < 2) {
       cancelPath();
@@ -4215,6 +4662,19 @@
       return;
     }
 
+    // Update door preview
+    if (isDrawingDoor && doorStartPoint) {
+      const snappedPos = snapToGrid(worldPos.x, worldPos.y);
+      doorPreview = {
+        x1: doorStartPoint.x,
+        y1: doorStartPoint.y,
+        x2: snappedPos.x,
+        y2: snappedPos.y,
+      };
+      renderWalls(); // renderWalls also renders doors
+      return;
+    }
+
     // Update control point hover (when Shift is held)
     if (activeTool === 'select' && isGM && e.shiftKey && !isDraggingToken && !isDraggingLight && !isPanning && !isDraggingWallEndpoint && !isDraggingControlPoint) {
       const controlPointHit = findControlPointAtPoint(worldPos.x, worldPos.y);
@@ -4238,6 +4698,15 @@
       if (windowId !== hoveredWindowId) {
         hoveredWindowId = windowId;
         renderWalls(); // renderWalls also renders windows
+      }
+    }
+
+    // Update door hover
+    if (activeTool === 'select' && isGM && !isDraggingToken && !isDraggingLight && !isPanning && !isDraggingWallEndpoint && !isDraggingWindowEndpoint && !isDraggingDoorEndpoint) {
+      const doorId = findDoorAtPoint(worldPos.x, worldPos.y);
+      if (doorId !== hoveredDoorId) {
+        hoveredDoorId = doorId;
+        renderWalls(); // renderWalls also renders doors
       }
     }
 
@@ -4977,6 +5446,100 @@
     return result;
   }
 
+  function findDoorAtPoint(worldX: number, worldY: number): string | null {
+    const threshold = 10 / scale;
+
+    for (const door of doors) {
+      let distance: number;
+
+      if (door.wallShape === 'curved') {
+        const points = getSplinePoints(door);
+        const splinePoints = catmullRomSpline(points);
+        distance = distanceToSpline(worldX, worldY, splinePoints, threshold);
+      } else {
+        distance = distanceToLineSegment(worldX, worldY, door.x1, door.y1, door.x2, door.y2);
+      }
+
+      if (distance <= threshold) {
+        return door.id;
+      }
+    }
+
+    return null;
+  }
+
+  function findDoorEndpointAtPoint(worldX: number, worldY: number): { doorId: string; endpoint: 'start' | 'end' } | null {
+    const threshold = 8 / scale;
+
+    for (const door of doors) {
+      const dx1 = worldX - door.x1;
+      const dy1 = worldY - door.y1;
+      const dist1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
+      if (dist1 <= threshold) {
+        return { doorId: door.id, endpoint: 'start' };
+      }
+
+      const dx2 = worldX - door.x2;
+      const dy2 = worldY - door.y2;
+      const dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+      if (dist2 <= threshold) {
+        return { doorId: door.id, endpoint: 'end' };
+      }
+    }
+
+    return null;
+  }
+
+  function findDoorControlPointAtPoint(worldX: number, worldY: number): { doorId: string; controlPointIndex: number } | null {
+    const threshold = 8 / scale;
+
+    for (const door of doors) {
+      if (door.wallShape === 'curved' && door.controlPoints && door.controlPoints.length > 0) {
+        for (let i = 0; i < door.controlPoints.length; i++) {
+          const cp = door.controlPoints[i];
+          const dx = worldX - cp.x;
+          const dy = worldY - cp.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist <= threshold) {
+            return { doorId: door.id, controlPointIndex: i };
+          }
+        }
+      }
+    }
+
+    return null;
+  }
+
+  function findSelectedDoorsAtEndpoint(
+    worldX: number,
+    worldY: number,
+    selectedIds: Set<string>
+  ): Array<{doorId: string, endpoint: 'start' | 'end'}> {
+    const threshold = 8 / scale;
+    const result: Array<{doorId: string, endpoint: 'start' | 'end'}> = [];
+
+    for (const door of doors) {
+      if (!selectedIds.has(door.id)) continue;
+
+      const dx1 = worldX - door.x1;
+      const dy1 = worldY - door.y1;
+      const dist1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
+      if (dist1 <= threshold) {
+        result.push({ doorId: door.id, endpoint: 'start' });
+        continue;
+      }
+
+      const dx2 = worldX - door.x2;
+      const dy2 = worldY - door.y2;
+      const dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+      if (dist2 <= threshold) {
+        result.push({ doorId: door.id, endpoint: 'end' });
+      }
+    }
+
+    return result;
+  }
+
 
   /**
    * Find a path at the given point (checks both nodes and path lines)
@@ -5113,18 +5676,23 @@
       } else if (isDrawingWindow) {
         cancelWindowDrawing();
         e.preventDefault();
-      } else if (selectedWindowIds.size > 0 || selectedWallIds.size > 0) {
-        // Clear both wall and window selections with a single Escape press
+      } else if (isDrawingDoor) {
+        cancelDoorDrawing();
+        e.preventDefault();
+      } else if (selectedWindowIds.size > 0 || selectedWallIds.size > 0 || selectedDoorIds.size > 0) {
+        // Clear wall, window, and door selections with a single Escape press
         selectedWindowIds = new Set();
         selectedWallIds = new Set();
+        selectedDoorIds = new Set();
         onWindowSelect?.(null);
-        renderWalls(); // renderWalls also renders windows
+        onDoorSelect?.(null);
+        renderWalls(); // renderWalls also renders windows and doors
         e.preventDefault();
       }
     }
 
-    // Delete/Backspace - remove selected wall(s) and window(s)
-    if ((e.key === 'Delete' || e.key === 'Backspace') && (selectedWallIds.size > 0 || selectedWindowIds.size > 0) && isGM) {
+    // Delete/Backspace - remove selected wall(s), window(s), and door(s)
+    if ((e.key === 'Delete' || e.key === 'Backspace') && (selectedWallIds.size > 0 || selectedWindowIds.size > 0 || selectedDoorIds.size > 0) && isGM) {
       // Delete all selected walls
       selectedWallIds.forEach(wallId => {
         onWallRemove?.(wallId);
@@ -5135,11 +5703,18 @@
         onWindowRemove?.(windowId);
       });
 
-      // Clear both selections
+      // Delete all selected doors
+      selectedDoorIds.forEach(doorId => {
+        onDoorRemove?.(doorId);
+      });
+
+      // Clear all selections
       selectedWallIds = new Set();
       selectedWindowIds = new Set();
+      selectedDoorIds = new Set();
       onWindowSelect?.(null);
-      renderWalls(); // renderWalls also renders windows
+      onDoorSelect?.(null);
+      renderWalls(); // renderWalls also renders windows and doors
       e.preventDefault();
     }
   }
@@ -5581,7 +6156,7 @@
   {/if}
   <canvas
     class="canvas-layer canvas-interactive"
-    class:cursor-crosshair={activeTool === 'wall' || activeTool === 'curved-wall' || activeTool === 'window' || activeTool === 'curved-window' || activeTool === 'light' || activeTool === 'path'}
+    class:cursor-crosshair={activeTool === 'wall' || activeTool === 'curved-wall' || activeTool === 'window' || activeTool === 'curved-window' || activeTool === 'door' || activeTool === 'curved-door' || activeTool === 'light' || activeTool === 'path'}
     class:cursor-grab={activeTool === 'select' && !isHoveringControlPoint && !isDraggingControlPoint}
     class:cursor-control-point-hover={isHoveringControlPoint && !isDraggingControlPoint}
     class:cursor-control-point-drag={isDraggingControlPoint}

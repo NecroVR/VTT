@@ -2,6 +2,7 @@ import type { Token } from './campaign.js';
 import type { Scene } from './scene.js';
 import type { Wall } from './wall.js';
 import type { Window } from './window.js';
+import type { Door } from './door.js';
 import type { AmbientLight } from './ambientLight.js';
 import type { PathPoint, AssembledPath } from './path.js';
 import type { ActiveEffect } from './activeEffect.js';
@@ -18,6 +19,7 @@ export type WSMessageType =
   | 'scene:switch' | 'scene:switched' | 'scene:update' | 'scene:updated'
   | 'wall:add' | 'wall:added' | 'wall:update' | 'wall:updated' | 'wall:remove' | 'wall:removed'
   | 'window:add' | 'window:added' | 'window:update' | 'window:updated' | 'window:remove' | 'window:removed'
+  | 'door:add' | 'door:added' | 'door:update' | 'door:updated' | 'door:remove' | 'door:removed'
   | 'light:add' | 'light:added' | 'light:update' | 'light:updated' | 'light:remove' | 'light:removed'
   | 'path:add' | 'path:added' | 'path:update' | 'path:updated' | 'path:remove' | 'path:removed'
   | 'pathPoint:add' | 'pathPoint:added' | 'pathPoint:update' | 'pathPoint:updated' | 'pathPoint:remove' | 'pathPoint:removed'
@@ -260,6 +262,42 @@ export interface WindowRemovePayload {
 
 export interface WindowRemovedPayload {
   windowId: string;
+}
+
+// Door payloads
+export interface DoorAddPayload {
+  sceneId: string;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  wallShape?: 'straight' | 'curved';
+  controlPoints?: Array<{ x: number; y: number }>;
+  status?: 'open' | 'closed' | 'broken';
+  isLocked?: boolean;
+  snapToGrid?: boolean;
+  data?: Record<string, unknown>;
+}
+
+export interface DoorAddedPayload {
+  door: Door;
+}
+
+export interface DoorUpdatePayload {
+  doorId: string;
+  updates: Partial<Omit<Door, 'id' | 'sceneId' | 'createdAt'>>;
+}
+
+export interface DoorUpdatedPayload {
+  door: Door;
+}
+
+export interface DoorRemovePayload {
+  doorId: string;
+}
+
+export interface DoorRemovedPayload {
+  doorId: string;
 }
 
 // Light payloads

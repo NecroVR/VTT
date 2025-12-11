@@ -10,6 +10,7 @@ import combatsRoute from './combats.js';
 import chatRoute from './chat.js';
 import wallsRoute from './walls.js';
 import windowsRoute from './windows.js';
+import doorsRoute from './doors.js';
 import lightsRoute from './lights.js';
 import effectsRoute from './effects.js';
 import assetsRoute from './assets.js';
@@ -48,6 +49,7 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
         chat: '/api/v1/campaigns/:campaignId/chat',
         walls: '/api/v1/walls',
         windows: '/api/v1/windows',
+        doors: '/api/v1/doors',
         lights: '/api/v1/lights',
         effects: '/api/v1/effects',
         assets: '/api/v1/assets',
@@ -81,6 +83,7 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
   await fastify.register(chatRoute);
   await fastify.register(wallsRoute);
   await fastify.register(windowsRoute);
+  await fastify.register(doorsRoute);
   await fastify.register(lightsRoute);
   await fastify.register(effectsRoute);
   await fastify.register(assetsRoute);
