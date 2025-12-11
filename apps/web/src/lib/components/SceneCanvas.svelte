@@ -4200,6 +4200,19 @@
       return;
     }
 
+    // Update window preview
+    if (isDrawingWindow && windowStartPoint) {
+      const snappedPos = snapToGrid(worldPos.x, worldPos.y);
+      windowPreview = {
+        x1: windowStartPoint.x,
+        y1: windowStartPoint.y,
+        x2: snappedPos.x,
+        y2: snappedPos.y,
+      };
+      renderWalls(); // renderWalls also renders windows
+      return;
+    }
+
     // Update control point hover (when Shift is held)
     if (activeTool === 'select' && isGM && e.shiftKey && !isDraggingToken && !isDraggingLight && !isPanning && !isDraggingWallEndpoint && !isDraggingControlPoint) {
       const controlPointHit = findControlPointAtPoint(worldPos.x, worldPos.y);
