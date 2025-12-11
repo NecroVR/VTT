@@ -1379,9 +1379,13 @@
     }
 
     wallsCtx.restore();
+
+    // Also render paths on the same canvas (paths don't clear, just draw on top)
+    renderPathsInternal();
   }
 
-  function renderPaths() {
+  // Internal path rendering - doesn't clear canvas, called by renderWalls()
+  function renderPathsInternal() {
     if (!wallsCtx || !wallsCanvas || !isGM) return;
 
     // Use the reactive assembled paths (already filtered by scene)
@@ -1473,6 +1477,11 @@
     }
 
     wallsCtx.restore();
+  }
+
+  // Public function to trigger path re-render (renders walls + paths together)
+  function renderPaths() {
+    renderWalls();
   }
 
   function hexToRgba(hex: string, alpha: number): string {
