@@ -815,6 +815,8 @@ async function handleTokenAdd(
       lightDim: newToken.lightDim,
       lightColor: newToken.lightColor,
       lightAngle: newToken.lightAngle,
+      followPathName: newToken.followPathName ?? null,
+      pathSpeed: newToken.pathSpeed ?? null,
       data: newToken.data as Record<string, unknown>,
       createdAt: newToken.createdAt,
       updatedAt: newToken.updatedAt
@@ -895,6 +897,8 @@ async function handleTokenUpdate(
       lightDim: updatedToken.lightDim,
       lightColor: updatedToken.lightColor,
       lightAngle: updatedToken.lightAngle,
+      followPathName: updatedToken.followPathName ?? null,
+      pathSpeed: updatedToken.pathSpeed ?? null,
       data: updatedToken.data as Record<string, unknown>,
       createdAt: updatedToken.createdAt,
       updatedAt: updatedToken.updatedAt,

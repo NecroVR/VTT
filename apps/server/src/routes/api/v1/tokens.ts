@@ -68,6 +68,8 @@ const tokensRoute: FastifyPluginAsync = async (fastify) => {
           lightDim: token.lightDim,
           lightColor: token.lightColor,
           lightAngle: token.lightAngle,
+          followPathName: token.followPathName ?? null,
+          pathSpeed: token.pathSpeed ?? null,
           data: token.data as Record<string, unknown>,
           createdAt: token.createdAt,
           updatedAt: token.updatedAt,
@@ -130,6 +132,8 @@ const tokensRoute: FastifyPluginAsync = async (fastify) => {
           lightDim: token.lightDim,
           lightColor: token.lightColor,
           lightAngle: token.lightAngle,
+          followPathName: token.followPathName ?? null,
+          pathSpeed: token.pathSpeed ?? null,
           data: token.data as Record<string, unknown>,
           createdAt: token.createdAt,
           updatedAt: token.updatedAt,
@@ -168,6 +172,8 @@ const tokensRoute: FastifyPluginAsync = async (fastify) => {
       lightDim?: number;
       lightColor?: string | null;
       lightAngle?: number;
+      followPathName?: string | null;
+      pathSpeed?: number | null;
       data?: Record<string, unknown>;
     };
   }>(
@@ -241,6 +247,8 @@ const tokensRoute: FastifyPluginAsync = async (fastify) => {
             lightDim: tokenData.lightDim ?? 0,
             lightColor: tokenData.lightColor ?? null,
             lightAngle: tokenData.lightAngle ?? 360,
+            followPathName: tokenData.followPathName ?? null,
+            pathSpeed: tokenData.pathSpeed ?? null,
             data: tokenData.data ?? {},
             ownerId: request.user.id,
           })
@@ -271,6 +279,8 @@ const tokensRoute: FastifyPluginAsync = async (fastify) => {
           lightDim: newToken.lightDim,
           lightColor: newToken.lightColor,
           lightAngle: newToken.lightAngle,
+          followPathName: newToken.followPathName ?? null,
+          pathSpeed: newToken.pathSpeed ?? null,
           data: newToken.data as Record<string, unknown>,
           createdAt: newToken.createdAt,
           updatedAt: newToken.updatedAt,
@@ -309,6 +319,8 @@ const tokensRoute: FastifyPluginAsync = async (fastify) => {
       lightDim?: number;
       lightColor?: string | null;
       lightAngle?: number;
+      followPathName?: string | null;
+      pathSpeed?: number | null;
       data?: Record<string, unknown>;
     };
   }>(
@@ -400,6 +412,12 @@ const tokensRoute: FastifyPluginAsync = async (fastify) => {
         if (updates.lightAngle !== undefined) {
           updateData.lightAngle = updates.lightAngle;
         }
+        if (updates.followPathName !== undefined) {
+          updateData.followPathName = updates.followPathName;
+        }
+        if (updates.pathSpeed !== undefined) {
+          updateData.pathSpeed = updates.pathSpeed;
+        }
         if (updates.data !== undefined) {
           updateData.data = updates.data;
         }
@@ -436,6 +454,8 @@ const tokensRoute: FastifyPluginAsync = async (fastify) => {
           lightDim: updatedToken.lightDim,
           lightColor: updatedToken.lightColor,
           lightAngle: updatedToken.lightAngle,
+          followPathName: updatedToken.followPathName ?? null,
+          pathSpeed: updatedToken.pathSpeed ?? null,
           data: updatedToken.data as Record<string, unknown>,
           createdAt: updatedToken.createdAt,
           updatedAt: updatedToken.updatedAt,
