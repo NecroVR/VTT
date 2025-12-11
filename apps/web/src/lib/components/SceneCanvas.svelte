@@ -205,6 +205,9 @@
   // Subscribe to path points store
   $: pathPoints = Array.from($pathPointsStore.pathPoints.values()).filter(point => point.sceneId === scene.id);
 
+  // Subscribe to assembled paths (derived store that groups points by pathName)
+  $: assembledPathsForScene = $assembledPaths.filter(p => p.sceneId === scene.id);
+
   // Subscribe to fog store
   $: fogData = scene ? $fogStore.fog.get(scene.id) : undefined;
 
@@ -368,7 +371,7 @@
   }
 
   // Watch for path point changes - re-render paths when points are added/updated/removed
-  $: if (pathPoints) {
+  $: if (assembledPathsForScene) {
     renderPaths();
   }
 
@@ -1381,8 +1384,8 @@
   function renderPaths() {
     if (!wallsCtx || !wallsCanvas || !isGM) return;
 
-    // Get assembled paths from store (groups PathPoints by pathName)
-    const paths = get(assembledPaths).filter(p => p.sceneId === scene.id);
+    // Use the reactive assembled paths (already filtered by scene)
+    const paths = assembledPathsForScene;
 
     wallsCtx.save();
 
