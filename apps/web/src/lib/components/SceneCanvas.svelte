@@ -1388,8 +1388,27 @@
   function renderPathsInternal() {
     if (!wallsCtx || !wallsCanvas || !isGM) return;
 
-    // Use the reactive assembled paths (already filtered by scene)
-    const paths = assembledPathsForScene;
+    // Build paths from local pathPoints array (supports real-time drag updates)
+    // Group points by pathName and sort by pathIndex
+    const pathsMap = new Map<string, typeof pathPoints>();
+    pathPoints.forEach(point => {
+      const existing = pathsMap.get(point.pathName) || [];
+      existing.push(point);
+      pathsMap.set(point.pathName, existing);
+    });
+
+    // Convert to array of assembled paths
+    const paths: Array<{ pathName: string; color: string; visible: boolean; points: typeof pathPoints }> = [];
+    pathsMap.forEach((points, pathName) => {
+      // Sort by pathIndex
+      points.sort((a, b) => a.pathIndex - b.pathIndex);
+      paths.push({
+        pathName,
+        color: points[0]?.color || '#00ff00',
+        visible: points.every(p => p.visible),
+        points
+      });
+    });
 
     wallsCtx.save();
 
@@ -1416,10 +1435,7 @@
 
       // Render path points (only for GMs)
       if (isGM) {
-        path.points.forEach((point, index) => {
-          const pathPoint = pathPoints.find(pp => pp.id === point.id);
-          if (!pathPoint) return;
-
+        path.points.forEach((point) => {
           const isPointSelected = selectedPathPointId === point.id;
 
           // Draw node circle
@@ -1437,7 +1453,7 @@
           wallsCtx.fillStyle = '#000000';
           wallsCtx.textAlign = 'left';
           wallsCtx.textBaseline = 'middle';
-          wallsCtx.fillText(String(pathPoint.pathIndex), point.x + 12 / scale, point.y);
+          wallsCtx.fillText(String(point.pathIndex), point.x + 12 / scale, point.y);
           wallsCtx.restore();
         });
       }
