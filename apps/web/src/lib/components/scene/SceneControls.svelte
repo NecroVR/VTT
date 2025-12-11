@@ -7,6 +7,7 @@
   export let orientation: 'vertical' | 'horizontal' = 'vertical';
   export let activeTool: string = 'select';
   export let onToolChange: ((tool: string) => void) | undefined = undefined;
+  export let propertiesContent: any = null;
 
   // Available tools
   const tools = [
@@ -63,17 +64,41 @@
 </script>
 
 <div class="scene-controls" class:horizontal={orientation === 'horizontal'}>
-  <div class="tools-container">
-    {#each tools as tool (tool.id)}
-      <ToolButton
-        tool={tool.id}
-        label={tool.label}
-        icon={tool.icon}
-        active={activeTool === tool.id}
-        visible={isGM || !tool.gmOnly}
-        onClick={() => handleToolClick(tool.id)}
-      />
-    {/each}
+  <!-- Tools Section -->
+  <div class="tools-section">
+    <div class="tools-container">
+      {#each tools as tool (tool.id)}
+        <ToolButton
+          tool={tool.id}
+          label={tool.label}
+          icon={tool.icon}
+          active={activeTool === tool.id}
+          visible={isGM || !tool.gmOnly}
+          onClick={() => handleToolClick(tool.id)}
+        />
+      {/each}
+    </div>
+  </div>
+
+  <!-- Divider -->
+  <div class="divider"></div>
+
+  <!-- Properties Section -->
+  <div class="properties-section">
+    <div class="properties-header">
+      <span class="properties-label">Properties</span>
+    </div>
+    <div class="properties-content">
+      <slot name="properties">
+        {#if propertiesContent}
+          {@html propertiesContent}
+        {:else}
+          <div class="properties-placeholder">
+            <span>No selection</span>
+          </div>
+        {/if}
+      </slot>
+    </div>
   </div>
 </div>
 
@@ -83,12 +108,20 @@
     flex-direction: column;
     background-color: transparent;
     padding: 0;
-    gap: 0.5rem;
     height: 100%;
+    overflow: hidden;
   }
 
   .scene-controls.horizontal {
     flex-direction: row;
+  }
+
+  /* Tools Section */
+  .tools-section {
+    flex-shrink: 0;
+    min-height: 200px;
+    overflow-y: auto;
+    padding: 0.5rem;
   }
 
   .tools-container {
@@ -96,5 +129,54 @@
     flex-direction: column;
     gap: 0.25rem;
     width: 100%;
+  }
+
+  /* Divider */
+  .divider {
+    flex-shrink: 0;
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 0 0.5rem;
+  }
+
+  /* Properties Section */
+  .properties-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .properties-header {
+    flex-shrink: 0;
+    padding: 0.5rem 0.75rem;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .properties-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .properties-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.75rem;
+    min-height: 0;
+  }
+
+  .properties-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.875rem;
+    font-style: italic;
   }
 </style>

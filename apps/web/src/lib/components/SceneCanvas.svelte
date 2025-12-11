@@ -97,8 +97,8 @@
   let isDraggingLight = false;
   let lastMouseX = 0;
   let lastMouseY = 0;
-  let selectedTokenIds: Set<string> = new Set();
-  let selectedLightIds: Set<string> = new Set();
+  export let selectedTokenIds: Set<string> = new Set();
+  export let selectedLightIds: Set<string> = new Set();
   let draggedTokenId: string | null = null;
   let draggedLightId: string | null = null;
   let dragOffsetX = 0;
@@ -114,7 +114,7 @@
   let isDrawingWall = false;
   let wallStartPoint: { x: number; y: number } | null = null;
   let wallPreview: { x1: number; y1: number; x2: number; y2: number } | null = null;
-  let selectedWallIds: Set<string> = new Set();
+  export let selectedWallIds: Set<string> = new Set();
   let hoveredWallId: string | null = null;
 
   // Wall endpoint dragging state
@@ -133,7 +133,7 @@
   let isDrawingWindow = false;
   let windowStartPoint: { x: number; y: number } | null = null;
   let windowPreview: { x1: number; y1: number; x2: number; y2: number } | null = null;
-  let selectedWindowIds: Set<string> = new Set();
+  export let selectedWindowIds: Set<string> = new Set();
   let hoveredWindowId: string | null = null;
 
   // Window endpoint dragging state
@@ -151,7 +151,7 @@
   let isDrawingDoor = false;
   let doorStartPoint: { x: number; y: number } | null = null;
   let doorPreview: { x1: number; y1: number; x2: number; y2: number } | null = null;
-  let selectedDoorIds: Set<string> = new Set();
+  export let selectedDoorIds: Set<string> = new Set();
   let hoveredDoorId: string | null = null;
 
   // Door endpoint dragging state

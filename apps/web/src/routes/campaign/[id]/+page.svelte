@@ -16,6 +16,7 @@
   import { sidebarStore } from '$lib/stores/sidebar';
   import SceneCanvas from '$lib/components/SceneCanvas.svelte';
   import SceneControls from '$lib/components/scene/SceneControls.svelte';
+  import PropertiesPanel from '$lib/components/scene/PropertiesPanel.svelte';
   import SceneManagementModal from '$lib/components/scene/SceneManagementModal.svelte';
   import ChatPanel from '$lib/components/chat/ChatPanel.svelte';
   import CombatTracker from '$lib/components/combat/CombatTracker.svelte';
@@ -58,6 +59,19 @@
   let headerElement: HTMLElement;
   let containerElement: HTMLElement;
   let calculatedHeaderHeight = 0;
+
+  // Selection state (bound to SceneCanvas)
+  let selectedTokenIds: Set<string> = new Set();
+  let selectedLightIds: Set<string> = new Set();
+  let selectedWallIds: Set<string> = new Set();
+  let selectedDoorIds: Set<string> = new Set();
+  let selectedWindowIds: Set<string> = new Set();
+  let selectedDrawingIds: Set<string> = new Set();
+  let selectedTileIds: Set<string> = new Set();
+  let selectedRegionIds: Set<string> = new Set();
+
+  // Grid snap state
+  let gridSnapEnabled = false;
 
   // Sidebar resize state
   let isResizingSidebar = false;
@@ -145,6 +159,112 @@
       props: { campaignId: campaignId }
     }] : [])
   ] as Tab[];
+
+  // PropertiesPanel handlers
+  function handleToolSettingsChange(event: CustomEvent<{ tool: string; settings: Record<string, any> }>) {
+    // Store tool settings for future use when placing objects
+    console.log('Tool settings changed:', event.detail);
+    // TODO: Store these settings in a local state or store for use when placing objects
+  }
+
+  function handleObjectPropertyChange(event: CustomEvent<{ objectType: string; objectId: string; property: string; value: any }>) {
+    const { objectType, objectId, property, value } = event.detail;
+
+    switch (objectType) {
+      case 'token':
+        websocket.sendTokenUpdate({ tokenId: objectId, updates: { [property]: value } });
+        break;
+      case 'light':
+        websocket.sendLightUpdate({ lightId: objectId, updates: { [property]: value } });
+        break;
+      case 'wall':
+        websocket.sendWallUpdate({ wallId: objectId, updates: { [property]: value } });
+        break;
+      case 'door':
+        websocket.sendDoorUpdate({ doorId: objectId, updates: { [property]: value } });
+        break;
+      case 'window':
+        websocket.sendWindowUpdate({ windowId: objectId, updates: { [property]: value } });
+        break;
+      default:
+        console.warn(`Unknown object type: ${objectType}`);
+    }
+  }
+
+  function handleObjectDelete(event: CustomEvent<{ objectType: string; objectId: string }>) {
+    const { objectType, objectId } = event.detail;
+
+    switch (objectType) {
+      case 'token':
+        websocket.sendTokenRemove({ tokenId: objectId });
+        break;
+      case 'light':
+        websocket.sendLightRemove({ lightId: objectId });
+        break;
+      case 'wall':
+        websocket.sendWallRemove({ wallId: objectId });
+        break;
+      case 'door':
+        websocket.sendDoorRemove({ doorId: objectId });
+        break;
+      case 'window':
+        websocket.sendWindowRemove({ windowId: objectId });
+        break;
+      default:
+        console.warn(`Unknown object type: ${objectType}`);
+    }
+  }
+
+  function handleObjectsDelete(event: CustomEvent<{ objectType: string; objectIds: string[] }>) {
+    const { objectType, objectIds } = event.detail;
+
+    // Delete each object in the array
+    for (const objectId of objectIds) {
+      switch (objectType) {
+        case 'token':
+          websocket.sendTokenRemove({ tokenId: objectId });
+          break;
+        case 'light':
+          websocket.sendLightRemove({ lightId: objectId });
+          break;
+        case 'wall':
+          websocket.sendWallRemove({ wallId: objectId });
+          break;
+        case 'door':
+          websocket.sendDoorRemove({ doorId: objectId });
+          break;
+        case 'window':
+          websocket.sendWindowRemove({ windowId: objectId });
+          break;
+        default:
+          console.warn(`Unknown object type: ${objectType}`);
+      }
+    }
+  }
+
+  function handleOpenFullEditor(event: CustomEvent<{ objectType: string; objectId: string }>) {
+    const { objectType, objectId } = event.detail;
+
+    switch (objectType) {
+      case 'token':
+        const token = Array.from($tokensStore.tokens.values()).find(t => t.id === objectId);
+        if (token) {
+          selectedToken = token;
+          showTokenConfig = true;
+        }
+        break;
+      case 'light':
+        selectedLightId = objectId;
+        showLightConfig = true;
+        break;
+      default:
+        console.log(`Full editor not implemented for ${objectType}`);
+    }
+  }
+
+  function handleGridSnapToggle(event: CustomEvent<boolean>) {
+    gridSnapEnabled = event.detail;
+  }
 
   onMount(async () => {
     // Calculate header height for sidebar positioning
@@ -794,7 +914,38 @@
           {isGM}
           {activeTool}
           onToolChange={handleToolChange}
-        />
+        >
+          <PropertiesPanel
+            slot="properties"
+            {activeTool}
+            tokens={$tokensStore.tokens}
+            lights={$lightsStore.lights}
+            {walls}
+            {doors}
+            {windows}
+            drawings={[]}
+            tiles={[]}
+            regions={[]}
+            {selectedTokenIds}
+            {selectedLightIds}
+            {selectedWallIds}
+            {selectedDoorIds}
+            {selectedWindowIds}
+            {selectedDrawingIds}
+            {selectedTileIds}
+            {selectedRegionIds}
+            sceneId={activeScene?.id || ''}
+            {campaignId}
+            {isGM}
+            {gridSnapEnabled}
+            on:toolSettingsChange={handleToolSettingsChange}
+            on:objectPropertyChange={handleObjectPropertyChange}
+            on:objectDelete={handleObjectDelete}
+            on:objectsDelete={handleObjectsDelete}
+            on:openFullEditor={handleOpenFullEditor}
+            on:gridSnapToggle={handleGridSnapToggle}
+          />
+        </SceneControls>
       </div>
       <div
         class="toolbar-divider"
@@ -816,8 +967,13 @@
             {doors}
             {isGM}
             {activeTool}
-            gridSnap={currentCampaign?.settings?.snapToGrid ?? false}
+            gridSnap={gridSnapEnabled || (currentCampaign?.settings?.snapToGrid ?? false)}
             wallEndpointSnapRange={currentCampaign?.settings?.wallEndpointSnapRange ?? 4}
+            bind:selectedTokenIds
+            bind:selectedLightIds
+            bind:selectedWallIds
+            bind:selectedDoorIds
+            bind:selectedWindowIds
             onTokenMove={handleTokenMove}
             onTokenAdd={handleTokenAdd}
             onTokenSelect={handleTokenSelect}
