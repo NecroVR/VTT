@@ -104,6 +104,12 @@
   let dragOffsetX = 0;
   let dragOffsetY = 0;
 
+  // Grid snap override (null = use campaign setting, true/false = temporary override)
+  let gridSnapOverride: boolean | null = null;
+
+  // Computed effective grid snap setting (use override if set, otherwise campaign setting)
+  $: effectiveGridSnap = gridSnapOverride !== null ? gridSnapOverride : gridSnap;
+
   // Wall drawing state
   let isDrawingWall = false;
   let wallStartPoint: { x: number; y: number } | null = null;
@@ -4544,7 +4550,7 @@
       y1: wallStartPoint.y,
       x2: endPos.x,
       y2: endPos.y,
-      snapToGrid: gridSnap,
+      snapToGrid: effectiveGridSnap,
       wallShape,
     };
 
@@ -4588,7 +4594,7 @@
       y1: windowStartPoint.y,
       x2: endPos.x,
       y2: endPos.y,
-      snapToGrid: gridSnap,
+      snapToGrid: effectiveGridSnap,
       wallShape,
     };
 
@@ -4632,7 +4638,7 @@
       y1: doorStartPoint.y,
       x2: endPos.x,
       y2: endPos.y,
-      snapToGrid: gridSnap,
+      snapToGrid: effectiveGridSnap,
       wallShape,
     };
 
@@ -5831,6 +5837,19 @@
       renderWalls(); // renderWalls also renders windows and doors
       e.preventDefault();
     }
+
+    // 'G' key - toggle grid snapping
+    if (e.key.toLowerCase() === 'g' && !e.ctrlKey && !e.altKey && !e.metaKey) {
+      if (gridSnapOverride === null) {
+        // First press: override with opposite of campaign setting
+        gridSnapOverride = !gridSnap;
+      } else {
+        // Subsequent presses: toggle between true and false
+        gridSnapOverride = !gridSnapOverride;
+      }
+      console.log(`Grid snap toggled: ${effectiveGridSnap ? 'ON' : 'OFF'} (override: ${gridSnapOverride}, campaign: ${gridSnap})`);
+      e.preventDefault();
+    }
   }
 
   function handleContextMenu(e: MouseEvent) {
@@ -6423,6 +6442,20 @@
     <div class="zoom-display">
       {Math.round(scale * 100)}%
     </div>
+    {#if gridSnapOverride !== null || effectiveGridSnap}
+      <div class="grid-snap-indicator" class:active={effectiveGridSnap} class:override={gridSnapOverride !== null}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"></rect>
+          <rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="3" y="14" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect>
+        </svg>
+        <span>{effectiveGridSnap ? 'Grid Snap ON' : 'Grid Snap OFF'}</span>
+        {#if gridSnapOverride !== null}
+          <span class="override-badge">Override</span>
+        {/if}
+      </div>
+    {/if}
   </div>
 </div>
 
@@ -6464,124 +6497,36 @@
 {/if}
 
 <style>
-  .scene-canvas-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background-color: #1a1a1a;
-  }
 
-  .canvas-layer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-  }
-
-  .canvas-interactive {
-    cursor: grab;
-  }
-
-  .canvas-interactive:active {
-    cursor: grabbing;
-  }
-
-  .canvas-interactive.cursor-crosshair {
-    cursor: crosshair;
-  }
-
-  .canvas-interactive.cursor-crosshair:active {
-    cursor: crosshair;
-  }
-
-  .canvas-interactive.cursor-grab {
-    cursor: grab;
-  }
-
-  .canvas-interactive.cursor-grab:active {
-    cursor: grabbing;
-  }
-
-  .canvas-interactive.cursor-control-point-hover {
-    cursor: grab;
-  }
-
-  .canvas-interactive.cursor-control-point-drag {
-    cursor: grabbing;
-  }
-
-  .canvas-controls {
-    position: absolute;
-    bottom: 16px;
-    right: 16px;
-    display: flex;
-    gap: 8px;
-    pointer-events: none;
-  }
-
-  .zoom-display {
+  .grid-snap-indicator {
     background-color: rgba(0, 0, 0, 0.7);
-    color: white;
+    color: #999;
     padding: 8px 12px;
     border-radius: 4px;
     font-size: 14px;
     font-weight: 500;
-  }
-
-  .possession-indicator {
-    position: absolute;
-    top: 16px;
-    left: 16px;
-    pointer-events: all;
-    z-index: 100;
-  }
-
-  .possession-content {
     display: flex;
     align-items: center;
-    gap: 8px;
-    background-color: rgba(251, 191, 36, 0.95);
-    color: #1f2937;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 600;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    animation: possession-pulse 2s ease-in-out infinite;
+    gap: 6px;
+    transition: color 0.2s, background-color 0.2s;
   }
 
-  @keyframes possession-pulse {
-    0%, 100% {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
-    50% {
-      box-shadow: 0 4px 16px rgba(251, 191, 36, 0.5);
-    }
+  .grid-snap-indicator.active {
+    color: #4ade80;
+    background-color: rgba(74, 222, 128, 0.1);
   }
 
-  .possession-content svg {
+  .grid-snap-indicator svg {
     flex-shrink: 0;
   }
 
-  .exit-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.2);
-    border: none;
+  .grid-snap-indicator .override-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    background-color: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
     border-radius: 3px;
-    padding: 2px;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
+    margin-left: 4px;
   }
 
-  .exit-button:hover {
-    background: rgba(0, 0, 0, 0.35);
-  }
-
-  .canvas-interactive.drag-over {
-    background-color: rgba(74, 144, 226, 0.1);
-  }
 </style>
