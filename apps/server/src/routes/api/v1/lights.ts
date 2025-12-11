@@ -75,6 +75,8 @@ const lightsRoute: FastifyPluginAsync = async (fastify) => {
           darknessMax: light.darknessMax ?? 1,
           hidden: light.hidden ?? false,
           elevation: light.elevation ?? 0,
+          followPathName: light.followPathName ?? null,
+          pathSpeed: light.pathSpeed ?? null,
           data: light.data as Record<string, unknown>,
           createdAt: light.createdAt,
         }));
@@ -146,6 +148,8 @@ const lightsRoute: FastifyPluginAsync = async (fastify) => {
           darknessMax: light.darknessMax ?? 1,
           hidden: light.hidden ?? false,
           elevation: light.elevation ?? 0,
+          followPathName: light.followPathName ?? null,
+          pathSpeed: light.pathSpeed ?? null,
           data: light.data as Record<string, unknown>,
           createdAt: light.createdAt,
         };
@@ -228,6 +232,8 @@ const lightsRoute: FastifyPluginAsync = async (fastify) => {
             darknessMax: lightData.darknessMax ?? 1,
             hidden: lightData.hidden ?? false,
             elevation: lightData.elevation ?? 0,
+            followPathName: lightData.followPathName ?? null,
+            pathSpeed: lightData.pathSpeed ?? null,
             data: lightData.data ?? {},
           })
           .returning();
@@ -265,6 +271,8 @@ const lightsRoute: FastifyPluginAsync = async (fastify) => {
           darknessMax: newLight.darknessMax ?? 1,
           hidden: newLight.hidden ?? false,
           elevation: newLight.elevation ?? 0,
+          followPathName: newLight.followPathName ?? null,
+          pathSpeed: newLight.pathSpeed ?? null,
           data: newLight.data as Record<string, unknown>,
           createdAt: newLight.createdAt,
         };
@@ -390,6 +398,12 @@ const lightsRoute: FastifyPluginAsync = async (fastify) => {
         if (updates.elevation !== undefined) {
           updateData.elevation = updates.elevation;
         }
+        if (updates.followPathName !== undefined) {
+          updateData.followPathName = updates.followPathName;
+        }
+        if (updates.pathSpeed !== undefined) {
+          updateData.pathSpeed = updates.pathSpeed;
+        }
         if (updates.data !== undefined) {
           updateData.data = updates.data;
         }
@@ -434,6 +448,8 @@ const lightsRoute: FastifyPluginAsync = async (fastify) => {
           darknessMax: updatedLight.darknessMax ?? 1,
           hidden: updatedLight.hidden ?? false,
           elevation: updatedLight.elevation ?? 0,
+          followPathName: updatedLight.followPathName ?? null,
+          pathSpeed: updatedLight.pathSpeed ?? null,
           data: updatedLight.data as Record<string, unknown>,
           createdAt: updatedLight.createdAt,
         };
