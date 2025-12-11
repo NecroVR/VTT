@@ -9,6 +9,7 @@
   import { tokensStore } from '$lib/stores/tokens';
   import { wallsStore } from '$lib/stores/walls';
   import { windowsStore } from '$lib/stores/windows';
+  import { doorsStore } from '$lib/stores/doors';
   import { lightsStore } from '$lib/stores/lights';
   import { pathPointsStore } from '$lib/stores/paths';
   import { actorsStore } from '$lib/stores/actors';
@@ -29,7 +30,7 @@
   import WindowManager from '$lib/components/sidebar/WindowManager.svelte';
   import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
   import type { ComponentType, SvelteComponent } from 'svelte';
-  import type { Scene, Token, Wall } from '@vtt/shared';
+  import type { Scene, Token, Wall, Door } from '@vtt/shared';
   import { getWebSocketUrl } from '$lib/config/api';
 
   interface Tab {
@@ -71,13 +72,14 @@
   $: activeScene = $scenesStore.activeSceneId
     ? $scenesStore.scenes.get($scenesStore.activeSceneId)
     : null;
-  // Load tokens, lights, and walls when active scene changes
+  // Load tokens, lights, walls, windows, and doors when active scene changes
   $: if (activeScene?.id) {
     tokensStore.loadTokens(activeScene.id);
     const token = localStorage.getItem('vtt_session_id') || sessionStorage.getItem('vtt_session_id') || '';
     lightsStore.loadLights(activeScene.id, token);
     wallsStore.loadWalls(activeScene.id, token);
     windowsStore.loadWindows(activeScene.id, token);
+    doorsStore.loadDoors(activeScene.id, token);
     pathPointsStore.loadPathPoints(activeScene.id, token);
   }
   $: tokens = Array.from($tokensStore.tokens.values()).filter(
@@ -88,6 +90,9 @@
   );
   $: windows = Array.from($windowsStore.windows.values()).filter(
     window => activeScene && window.sceneId === activeScene.id
+  );
+  $: doors = Array.from($doorsStore.doors.values()).filter(
+    door => activeScene && door.sceneId === activeScene.id
   );
 
   // Determine if current user is GM
@@ -227,6 +232,20 @@
       windowsStore.removeWindow(payload.windowId);
     });
 
+    // Subscribe to door events
+    const unsubscribeDoorAdded = websocket.onDoorAdded((payload) => {
+      console.log('door:added received:', payload);
+      doorsStore.addDoor(payload.door);
+    });
+
+    const unsubscribeDoorUpdated = websocket.onDoorUpdated((payload) => {
+      doorsStore.updateDoorLocal(payload.door.id, payload.door);
+    });
+
+    const unsubscribeDoorRemoved = websocket.onDoorRemoved((payload) => {
+      doorsStore.removeDoor(payload.doorId);
+    });
+
     // Subscribe to light events
     const unsubscribeLightAdded = websocket.onLightAdded((payload) => {
       lightsStore.addLight(payload.light);
@@ -276,6 +295,9 @@
       unsubscribeWindowAdded();
       unsubscribeWindowUpdated();
       unsubscribeWindowRemoved();
+      unsubscribeDoorAdded();
+      unsubscribeDoorUpdated();
+      unsubscribeDoorRemoved();
       unsubscribeLightAdded();
       unsubscribeLightUpdated();
       unsubscribeLightRemoved();
@@ -292,6 +314,7 @@
       tokensStore.clear();
       wallsStore.clear();
       windowsStore.clear();
+      doorsStore.clear();
       lightsStore.clear();
       pathPointsStore.clearPathPoints();
       actorsStore.clear();
@@ -420,6 +443,42 @@
   function handleWindowSelect(windowId: string | null) {
     console.log('Window selected:', windowId);
     // TODO: Implement window selection handling (e.g., open config panel)
+  }
+
+  function handleDoorAdd(door: { x1: number; y1: number; x2: number; y2: number; snapToGrid?: boolean; wallShape?: 'straight' | 'curved' }) {
+    console.log('handleDoorAdd called with:', door);
+    if (!activeScene) {
+      console.log('No active scene, cannot add door');
+      return;
+    }
+
+    const doorPayload = {
+      sceneId: activeScene.id,
+      x1: door.x1,
+      y1: door.y1,
+      x2: door.x2,
+      y2: door.y2,
+      wallShape: door.wallShape || 'straight',
+      snapToGrid: door.snapToGrid,
+      status: 'closed' as const,
+      isLocked: false
+    };
+
+    console.log('Sending door to WebSocket:', doorPayload);
+    websocket.sendDoorAdd(doorPayload);
+  }
+
+  function handleDoorRemove(doorId: string) {
+    websocket.sendDoorRemove({ doorId });
+  }
+
+  function handleDoorUpdate(doorId: string, updates: Partial<Door>) {
+    websocket.sendDoorUpdate({ doorId, updates });
+  }
+
+  function handleDoorSelect(doorId: string | null) {
+    console.log('Door selected:', doorId);
+    // TODO: Implement door selection handling (e.g., open config panel)
   }
 
   function handleLightAdd(lightData: { x: number; y: number }) {
@@ -701,6 +760,7 @@
             {tokens}
             {walls}
             {windows}
+            {doors}
             {isGM}
             {activeTool}
             gridSnap={currentCampaign?.settings?.snapToGrid ?? false}
@@ -716,6 +776,10 @@
             onWindowRemove={handleWindowRemove}
             onWindowUpdate={handleWindowUpdate}
             onWindowSelect={handleWindowSelect}
+            onDoorAdd={handleDoorAdd}
+            onDoorRemove={handleDoorRemove}
+            onDoorUpdate={handleDoorUpdate}
+            onDoorSelect={handleDoorSelect}
             onLightAdd={handleLightAdd}
             onLightSelect={handleLightSelect}
             onLightDoubleClick={handleLightDoubleClick}

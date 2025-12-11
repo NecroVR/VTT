@@ -29,6 +29,12 @@ import type {
   WallUpdatedPayload,
   WallRemovePayload,
   WallRemovedPayload,
+  DoorAddPayload,
+  DoorAddedPayload,
+  DoorUpdatePayload,
+  DoorUpdatedPayload,
+  DoorRemovePayload,
+  DoorRemovedPayload,
   LightAddPayload,
   LightAddedPayload,
   LightUpdatePayload,
@@ -300,6 +306,31 @@ class WebSocketStore {
 
   onWindowRemoved(handler: TypedMessageHandler<any>): () => void {
     return this.on('window:removed', handler);
+  }
+
+  // Door methods
+  sendDoorAdd(payload: DoorAddPayload): void {
+    this.send('door:add', payload);
+  }
+
+  sendDoorUpdate(payload: DoorUpdatePayload): void {
+    this.send('door:update', payload);
+  }
+
+  sendDoorRemove(payload: DoorRemovePayload): void {
+    this.send('door:remove', payload);
+  }
+
+  onDoorAdded(handler: TypedMessageHandler<DoorAddedPayload>): () => void {
+    return this.on('door:added', handler);
+  }
+
+  onDoorUpdated(handler: TypedMessageHandler<DoorUpdatedPayload>): () => void {
+    return this.on('door:updated', handler);
+  }
+
+  onDoorRemoved(handler: TypedMessageHandler<DoorRemovedPayload>): () => void {
+    return this.on('door:removed', handler);
   }
 
   // Light methods
