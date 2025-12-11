@@ -3520,6 +3520,16 @@
       }
     }
 
+    // Find overlapping windows (GM only)
+    const selectedWindows: string[] = [];
+    if (isGM) {
+      for (const window of windows) {
+        if (lineIntersectsRect(window.x1, window.y1, window.x2, window.y2, minX, minY, boxWidth, boxHeight)) {
+          selectedWindows.push(window.id);
+        }
+      }
+    }
+
     // Find overlapping lights (GM only)
     const selectedLights: string[] = [];
     if (isGM) {
@@ -3545,6 +3555,12 @@
         selectedWallIds = selectedWallIds; // trigger reactivity
       }
 
+      if (selectedWindows.length > 0) {
+        // For windows, add to existing set
+        selectedWindows.forEach(id => selectedWindowIds.add(id));
+        selectedWindowIds = selectedWindowIds; // trigger reactivity
+      }
+
       if (selectedLights.length > 0) {
         // For lights, just select the first one (single selection)
         selectedLightId = selectedLights[0];
@@ -3564,6 +3580,12 @@
         selectedWallIds = new Set(selectedWalls);
       } else {
         selectedWallIds = new Set();
+      }
+
+      if (selectedWindows.length > 0) {
+        selectedWindowIds = new Set(selectedWindows);
+      } else {
+        selectedWindowIds = new Set();
       }
 
       if (selectedLights.length > 0) {
@@ -3902,13 +3924,23 @@
               draggedWalls = [{ wallId: endpointHit.wallId, endpoint: endpointHit.endpoint }];
             }
 
-            // Determine if grid snapping should be applied (if ANY wall has snapToGrid)
+            // Also find all selected windows sharing this endpoint
+            draggedWindows = findSelectedWindowsAtEndpoint(endpointX, endpointY, selectedWindowIds);
+
+            // Determine if grid snapping should be applied (if ANY wall OR window has snapToGrid)
             draggedEndpointRequiresGridSnap = draggedWalls.some(dw => {
               const wall = walls.find(w => w.id === dw.wallId);
               return wall?.snapToGrid === true;
+            }) || draggedWindows.some(dw => {
+              const window = windows.find(w => w.id === dw.windowId);
+              return window?.snapToGrid === true;
             });
 
+            draggedWindowEndpointRequiresGridSnap = draggedEndpointRequiresGridSnap;
             isDraggingWallEndpoint = true;
+            if (draggedWindows.length > 0) {
+              isDraggingWindowEndpoint = true;
+            }
           }
 
           selectedTokenId = null;
@@ -3988,18 +4020,27 @@
               draggedWindows = [{ windowId: windowEndpointHit.windowId, endpoint: windowEndpointHit.endpoint }];
             }
 
-            // Determine if grid snapping should be applied (if ANY window has snapToGrid)
+            // Also find all selected walls sharing this endpoint
+            draggedWalls = findSelectedWallsAtEndpoint(endpointX, endpointY, selectedWallIds);
+
+            // Determine if grid snapping should be applied (if ANY window OR wall has snapToGrid)
             draggedWindowEndpointRequiresGridSnap = draggedWindows.some(dw => {
               const window = windows.find(w => w.id === dw.windowId);
               return window?.snapToGrid === true;
+            }) || draggedWalls.some(dw => {
+              const wall = walls.find(w => w.id === dw.wallId);
+              return wall?.snapToGrid === true;
             });
 
+            draggedEndpointRequiresGridSnap = draggedWindowEndpointRequiresGridSnap;
             isDraggingWindowEndpoint = true;
+            if (draggedWalls.length > 0) {
+              isDraggingWallEndpoint = true;
+            }
           }
 
           selectedTokenId = null;
           selectedLightId = null;
-          selectedWallIds = new Set();
           onTokenSelect?.(null);
           onLightSelect?.(null);
           renderWalls(); // renderWalls also renders windows
@@ -4032,15 +4073,16 @@
             } else {
               selectedWallIds = new Set([...selectedWallIds, wallId]);
             }
+            // Don't clear window selection when Ctrl+clicking walls
           } else {
-            // Regular click: Select only this wall
+            // Regular click: Select only this wall, clear all other selections
             selectedWallIds = new Set([wallId]);
+            selectedWindowIds = new Set();
+            selectedTokenId = null;
+            selectedLightId = null;
+            onTokenSelect?.(null);
+            onLightSelect?.(null);
           }
-          selectedTokenId = null;
-          selectedLightId = null;
-          selectedWindowIds = new Set();
-          onTokenSelect?.(null);
-          onLightSelect?.(null);
           renderWalls();
           return;
         } else {
@@ -4058,15 +4100,16 @@
             } else {
               selectedWindowIds = new Set([...selectedWindowIds, windowId]);
             }
+            // Don't clear wall selection when Ctrl+clicking windows
           } else {
-            // Regular click: Select only this window
+            // Regular click: Select only this window, clear all other selections
             selectedWindowIds = new Set([windowId]);
+            selectedWallIds = new Set();
+            selectedTokenId = null;
+            selectedLightId = null;
+            onTokenSelect?.(null);
+            onLightSelect?.(null);
           }
-          selectedTokenId = null;
-          selectedLightId = null;
-          selectedWallIds = new Set();
-          onTokenSelect?.(null);
-          onLightSelect?.(null);
           onWindowSelect?.(windowId);
           renderWalls(); // renderWalls also renders windows
           return;
@@ -5156,35 +5199,30 @@
       } else if (isDrawingWindow) {
         cancelWindowDrawing();
         e.preventDefault();
-      } else if (selectedWindowIds.size > 0) {
+      } else if (selectedWindowIds.size > 0 || selectedWallIds.size > 0) {
+        // Clear both wall and window selections with a single Escape press
         selectedWindowIds = new Set();
+        selectedWallIds = new Set();
         onWindowSelect?.(null);
         renderWalls(); // renderWalls also renders windows
-        e.preventDefault();
-      } else if (selectedWallIds.size > 0) {
-        selectedWallIds = new Set();
-        renderWalls();
         e.preventDefault();
       }
     }
 
-    // Delete/Backspace - remove selected wall(s)
-    if ((e.key === 'Delete' || e.key === 'Backspace') && selectedWallIds.size > 0 && isGM) {
+    // Delete/Backspace - remove selected wall(s) and window(s)
+    if ((e.key === 'Delete' || e.key === 'Backspace') && (selectedWallIds.size > 0 || selectedWindowIds.size > 0) && isGM) {
       // Delete all selected walls
       selectedWallIds.forEach(wallId => {
         onWallRemove?.(wallId);
       });
-      selectedWallIds = new Set();
-      renderWalls();
-      e.preventDefault();
-    }
 
-    // Delete/Backspace - remove selected window(s)
-    if ((e.key === 'Delete' || e.key === 'Backspace') && selectedWindowIds.size > 0 && isGM) {
       // Delete all selected windows
       selectedWindowIds.forEach(windowId => {
         onWindowRemove?.(windowId);
       });
+
+      // Clear both selections
+      selectedWallIds = new Set();
       selectedWindowIds = new Set();
       onWindowSelect?.(null);
       renderWalls(); // renderWalls also renders windows
