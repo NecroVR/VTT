@@ -12,10 +12,6 @@ export const windows = pgTable('windows', {
   // Wall shape and curve control
   wallShape: text('wall_shape').notNull().default('straight'),
   controlPoints: jsonb('control_points').notNull().default('[]'),
-  // Window light properties
-  opacity: real('opacity').notNull().default(1.0),
-  tint: text('tint').notNull().default('#ffffff'),
-  tintIntensity: real('tint_intensity').notNull().default(0.5),
   // Grid snapping
   snapToGrid: boolean('snap_to_grid').notNull().default(true),
   // Metadata

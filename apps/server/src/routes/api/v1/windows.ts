@@ -54,9 +54,6 @@ const windowsRoute: FastifyPluginAsync = async (fastify) => {
           y2: window.y2,
           wallShape: window.wallShape as 'straight' | 'curved',
           controlPoints: window.controlPoints as Array<{ x: number; y: number }> || [],
-          opacity: window.opacity,
-          tint: window.tint,
-          tintIntensity: window.tintIntensity,
           snapToGrid: window.snapToGrid,
           data: window.data as Record<string, unknown>,
           createdAt: window.createdAt,
@@ -108,9 +105,6 @@ const windowsRoute: FastifyPluginAsync = async (fastify) => {
           y2: window.y2,
           wallShape: window.wallShape as 'straight' | 'curved',
           controlPoints: window.controlPoints as Array<{ x: number; y: number }> || [],
-          opacity: window.opacity,
-          tint: window.tint,
-          tintIntensity: window.tintIntensity,
           snapToGrid: window.snapToGrid,
           data: window.data as Record<string, unknown>,
           createdAt: window.createdAt,
@@ -180,9 +174,6 @@ const windowsRoute: FastifyPluginAsync = async (fastify) => {
             y2: windowData.y2,
             wallShape: windowData.wallShape ?? 'straight',
             controlPoints: windowData.controlPoints ?? [],
-            opacity: windowData.opacity ?? 0.5,
-            tint: windowData.tint ?? '#FFFFFF',
-            tintIntensity: windowData.tintIntensity ?? 0.0,
             snapToGrid: windowData.snapToGrid ?? true,
             data: windowData.data ?? {},
           })
@@ -200,9 +191,6 @@ const windowsRoute: FastifyPluginAsync = async (fastify) => {
           y2: newWindow.y2,
           wallShape: newWindow.wallShape as 'straight' | 'curved',
           controlPoints: newWindow.controlPoints as Array<{ x: number; y: number }> || [],
-          opacity: newWindow.opacity,
-          tint: newWindow.tint,
-          tintIntensity: newWindow.tintIntensity,
           snapToGrid: newWindow.snapToGrid,
           data: newWindow.data as Record<string, unknown>,
           createdAt: newWindow.createdAt,
@@ -259,14 +247,6 @@ const windowsRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(400).send({ error: 'y2 must be a number' });
         }
 
-        // Validate window-specific fields
-        if (updates.opacity !== undefined && (typeof updates.opacity !== 'number' || updates.opacity < 0 || updates.opacity > 1)) {
-          return reply.status(400).send({ error: 'opacity must be a number between 0 and 1' });
-        }
-        if (updates.tintIntensity !== undefined && (typeof updates.tintIntensity !== 'number' || updates.tintIntensity < 0 || updates.tintIntensity > 1)) {
-          return reply.status(400).send({ error: 'tintIntensity must be a number between 0 and 1' });
-        }
-
         // Build update object
         const updateData: any = {};
 
@@ -287,15 +267,6 @@ const windowsRoute: FastifyPluginAsync = async (fastify) => {
         }
         if (updates.controlPoints !== undefined) {
           updateData.controlPoints = updates.controlPoints;
-        }
-        if (updates.opacity !== undefined) {
-          updateData.opacity = updates.opacity;
-        }
-        if (updates.tint !== undefined) {
-          updateData.tint = updates.tint;
-        }
-        if (updates.tintIntensity !== undefined) {
-          updateData.tintIntensity = updates.tintIntensity;
         }
         if (updates.snapToGrid !== undefined) {
           updateData.snapToGrid = updates.snapToGrid;
@@ -323,9 +294,6 @@ const windowsRoute: FastifyPluginAsync = async (fastify) => {
           y2: updatedWindow.y2,
           wallShape: updatedWindow.wallShape as 'straight' | 'curved',
           controlPoints: updatedWindow.controlPoints as Array<{ x: number; y: number }> || [],
-          opacity: updatedWindow.opacity,
-          tint: updatedWindow.tint,
-          tintIntensity: updatedWindow.tintIntensity,
           snapToGrid: updatedWindow.snapToGrid,
           data: updatedWindow.data as Record<string, unknown>,
           createdAt: updatedWindow.createdAt,

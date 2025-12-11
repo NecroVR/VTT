@@ -9,10 +9,6 @@ export interface Window {
   // Wall shape and curve control
   wallShape: 'straight' | 'curved';
   controlPoints?: Array<{ x: number; y: number }>;
-  // Window light properties
-  opacity: number;
-  tint: string;
-  tintIntensity: number;
   // Grid snapping
   snapToGrid?: boolean;
   // Metadata
@@ -28,9 +24,6 @@ export interface CreateWindowRequest {
   y2: number;
   wallShape?: 'straight' | 'curved';
   controlPoints?: Array<{ x: number; y: number }>;
-  opacity?: number;
-  tint?: string;
-  tintIntensity?: number;
   snapToGrid?: boolean;
   data?: Record<string, unknown>;
 }
@@ -42,9 +35,6 @@ export interface UpdateWindowRequest {
   y2?: number;
   wallShape?: 'straight' | 'curved';
   controlPoints?: Array<{ x: number; y: number }>;
-  opacity?: number;
-  tint?: string;
-  tintIntensity?: number;
   snapToGrid?: boolean;
   data?: Record<string, unknown>;
 }

@@ -97,9 +97,6 @@ describe('Windows Routes', () => {
           y2: 0,
           wallShape: 'straight',
           controlPoints: [],
-          opacity: 0.5,
-          tint: '#FFFFFF',
-          tintIntensity: 0.0,
           snapToGrid: true,
           data: {},
         },
@@ -111,9 +108,6 @@ describe('Windows Routes', () => {
           y2: 100,
           wallShape: 'curved',
           controlPoints: [{ x: 110, y: 50 }],
-          opacity: 0.7,
-          tint: '#0000FF',
-          tintIntensity: 0.3,
           snapToGrid: false,
           data: { name: 'Stained Glass' },
         },
@@ -157,9 +151,6 @@ describe('Windows Routes', () => {
       expect(window).toHaveProperty('y2');
       expect(window).toHaveProperty('wallShape');
       expect(window).toHaveProperty('controlPoints');
-      expect(window).toHaveProperty('opacity');
-      expect(window).toHaveProperty('tint');
-      expect(window).toHaveProperty('tintIntensity');
       expect(window).toHaveProperty('snapToGrid');
       expect(window).toHaveProperty('data');
       expect(window).toHaveProperty('createdAt');
@@ -184,9 +175,6 @@ describe('Windows Routes', () => {
       expect(window.y2).toBe(0);
       expect(window.wallShape).toBe('straight');
       expect(window.controlPoints).toEqual([]);
-      expect(window.opacity).toBe(0.5);
-      expect(window.tint).toBe('#FFFFFF');
-      expect(window.tintIntensity).toBe(0.0);
       expect(window.snapToGrid).toBe(true);
       expect(window.data).toEqual({});
     });
@@ -206,9 +194,6 @@ describe('Windows Routes', () => {
 
       expect(curvedWindow.wallShape).toBe('curved');
       expect(curvedWindow.controlPoints).toEqual([{ x: 110, y: 50 }]);
-      expect(curvedWindow.opacity).toBe(0.7);
-      expect(curvedWindow.tint).toBe('#0000FF');
-      expect(curvedWindow.tintIntensity).toBe(0.3);
       expect(curvedWindow.data).toEqual({ name: 'Stained Glass' });
     });
 
@@ -291,9 +276,6 @@ describe('Windows Routes', () => {
         y2: 150,
         wallShape: 'straight',
         controlPoints: [],
-        opacity: 0.6,
-        tint: '#FF0000',
-        tintIntensity: 0.5,
         snapToGrid: true,
         data: { test: 'value' },
       }).returning();
@@ -337,9 +319,6 @@ describe('Windows Routes', () => {
       expect(window.sceneId).toBe(sceneId);
       expect(window.wallShape).toBe('straight');
       expect(window.controlPoints).toEqual([]);
-      expect(window.opacity).toBe(0.6);
-      expect(window.tint).toBe('#FF0000');
-      expect(window.tintIntensity).toBe(0.5);
       expect(window.snapToGrid).toBe(true);
       expect(window.data).toEqual({ test: 'value' });
     });
@@ -410,9 +389,6 @@ describe('Windows Routes', () => {
           y2: 100,
           wallShape: 'straight',
           controlPoints: [],
-          opacity: 0.5,
-          tint: '#FFFFFF',
-          tintIntensity: 0.0,
           snapToGrid: true,
           data: { custom: 'data' },
         },
@@ -427,9 +403,6 @@ describe('Windows Routes', () => {
       expect(body.window.y2).toBe(100);
       expect(body.window.wallShape).toBe('straight');
       expect(body.window.controlPoints).toEqual([]);
-      expect(body.window.opacity).toBe(0.5);
-      expect(body.window.tint).toBe('#FFFFFF');
-      expect(body.window.tintIntensity).toBe(0.0);
       expect(body.window.snapToGrid).toBe(true);
       expect(body.window.data).toEqual({ custom: 'data' });
     });
@@ -459,9 +432,6 @@ describe('Windows Routes', () => {
       expect(body.window.y2).toBe(40);
       expect(body.window.wallShape).toBe('straight');
       expect(body.window.controlPoints).toEqual([]);
-      expect(body.window.opacity).toBe(0.5);
-      expect(body.window.tint).toBe('#FFFFFF');
-      expect(body.window.tintIntensity).toBe(0.0);
       expect(body.window.snapToGrid).toBe(true);
       expect(body.window.data).toEqual({});
     });
@@ -481,9 +451,6 @@ describe('Windows Routes', () => {
           y2: 0,
           wallShape: 'curved',
           controlPoints: [{ x: 50, y: 25 }],
-          opacity: 0.8,
-          tint: '#00FF00',
-          tintIntensity: 0.4,
           data: { type: 'arch' },
         },
       });
@@ -492,9 +459,6 @@ describe('Windows Routes', () => {
       const body = JSON.parse(response.body);
       expect(body.window.wallShape).toBe('curved');
       expect(body.window.controlPoints).toEqual([{ x: 50, y: 25 }]);
-      expect(body.window.opacity).toBe(0.8);
-      expect(body.window.tint).toBe('#00FF00');
-      expect(body.window.tintIntensity).toBe(0.4);
       expect(body.window.data).toEqual({ type: 'arch' });
     });
 
@@ -689,9 +653,6 @@ describe('Windows Routes', () => {
         y2: 100,
         wallShape: 'straight',
         controlPoints: [],
-        opacity: 0.5,
-        tint: '#FFFFFF',
-        tintIntensity: 0.0,
         snapToGrid: true,
         data: { version: 1 },
       }).returning();
@@ -730,18 +691,12 @@ describe('Windows Routes', () => {
           authorization: `Bearer ${sessionId}`,
         },
         payload: {
-          opacity: 0.8,
-          tint: '#0000FF',
-          tintIntensity: 0.6,
           snapToGrid: false,
         },
       });
 
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
-      expect(body.window.opacity).toBe(0.8);
-      expect(body.window.tint).toBe('#0000FF');
-      expect(body.window.tintIntensity).toBe(0.6);
       expect(body.window.snapToGrid).toBe(false);
     });
 
@@ -778,9 +733,6 @@ describe('Windows Routes', () => {
           y2: 80,
           wallShape: 'curved',
           controlPoints: [{ x: 50, y: 50 }],
-          opacity: 0.9,
-          tint: '#FF00FF',
-          tintIntensity: 0.7,
           snapToGrid: false,
           data: { version: 2, new: 'field' },
         },
@@ -794,9 +746,6 @@ describe('Windows Routes', () => {
       expect(body.window.y2).toBe(80);
       expect(body.window.wallShape).toBe('curved');
       expect(body.window.controlPoints).toEqual([{ x: 50, y: 50 }]);
-      expect(body.window.opacity).toBe(0.9);
-      expect(body.window.tint).toBe('#FF00FF');
-      expect(body.window.tintIntensity).toBe(0.7);
       expect(body.window.snapToGrid).toBe(false);
       expect(body.window.data).toEqual({ version: 2, new: 'field' });
     });
@@ -867,74 +816,6 @@ describe('Windows Routes', () => {
       expect(response.statusCode).toBe(400);
       const body = JSON.parse(response.body);
       expect(body.error).toBe('y2 must be a number');
-    });
-
-    it('should return 400 if opacity is less than 0', async () => {
-      const response = await app.inject({
-        method: 'PATCH',
-        url: `/api/v1/windows/${windowId}`,
-        headers: {
-          authorization: `Bearer ${sessionId}`,
-        },
-        payload: {
-          opacity: -0.1,
-        },
-      });
-
-      expect(response.statusCode).toBe(400);
-      const body = JSON.parse(response.body);
-      expect(body.error).toBe('opacity must be a number between 0 and 1');
-    });
-
-    it('should return 400 if opacity is greater than 1', async () => {
-      const response = await app.inject({
-        method: 'PATCH',
-        url: `/api/v1/windows/${windowId}`,
-        headers: {
-          authorization: `Bearer ${sessionId}`,
-        },
-        payload: {
-          opacity: 1.1,
-        },
-      });
-
-      expect(response.statusCode).toBe(400);
-      const body = JSON.parse(response.body);
-      expect(body.error).toBe('opacity must be a number between 0 and 1');
-    });
-
-    it('should return 400 if tintIntensity is less than 0', async () => {
-      const response = await app.inject({
-        method: 'PATCH',
-        url: `/api/v1/windows/${windowId}`,
-        headers: {
-          authorization: `Bearer ${sessionId}`,
-        },
-        payload: {
-          tintIntensity: -0.1,
-        },
-      });
-
-      expect(response.statusCode).toBe(400);
-      const body = JSON.parse(response.body);
-      expect(body.error).toBe('tintIntensity must be a number between 0 and 1');
-    });
-
-    it('should return 400 if tintIntensity is greater than 1', async () => {
-      const response = await app.inject({
-        method: 'PATCH',
-        url: `/api/v1/windows/${windowId}`,
-        headers: {
-          authorization: `Bearer ${sessionId}`,
-        },
-        payload: {
-          tintIntensity: 1.1,
-        },
-      });
-
-      expect(response.statusCode).toBe(400);
-      const body = JSON.parse(response.body);
-      expect(body.error).toBe('tintIntensity must be a number between 0 and 1');
     });
 
     it('should return 404 if window does not exist', async () => {
@@ -1012,9 +893,6 @@ describe('Windows Routes', () => {
         y2: 100,
         wallShape: 'straight',
         controlPoints: [],
-        opacity: 0.5,
-        tint: '#FFFFFF',
-        tintIntensity: 0.0,
         snapToGrid: true,
         data: {},
       }).returning();

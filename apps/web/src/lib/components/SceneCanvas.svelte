@@ -41,7 +41,7 @@
   export let onWallAdd: ((wall: { x1: number; y1: number; x2: number; y2: number; snapToGrid?: boolean; wallShape?: 'straight' | 'curved' }) => void) | undefined = undefined;
   export let onWallRemove: ((wallId: string) => void) | undefined = undefined;
   export let onWallUpdate: ((wallId: string, updates: Partial<Wall>) => void) | undefined = undefined;
-  export let onWindowAdd: ((window: { x1: number; y1: number; x2: number; y2: number; snapToGrid?: boolean; wallShape?: 'straight' | 'curved'; opacity?: number; tint?: string; tintIntensity?: number }) => void) | undefined = undefined;
+  export let onWindowAdd: ((window: { x1: number; y1: number; x2: number; y2: number; snapToGrid?: boolean; wallShape?: 'straight' | 'curved' }) => void) | undefined = undefined;
   export let onWindowRemove: ((windowId: string) => void) | undefined = undefined;
   export let onWindowUpdate: ((windowId: string, updates: Partial<Window>) => void) | undefined = undefined;
   export let onWindowSelect: ((windowId: string | null) => void) | undefined = undefined;
@@ -1596,27 +1596,6 @@
       // Reset line dash
       wallsCtx.setLineDash([]);
 
-      // Draw tint overlay if tint intensity > 0
-      if (window.tintIntensity > 0 && window.tint) {
-        // Parse tint color and apply with intensity
-        const tintAlpha = window.tintIntensity * window.opacity;
-        wallsCtx.strokeStyle = hexToRgba(window.tint, tintAlpha);
-        wallsCtx.lineWidth = 5 / scale;
-        wallsCtx.globalAlpha = tintAlpha;
-
-        wallsCtx.beginPath();
-        if (window.wallShape === 'curved') {
-          const points = getSplinePoints(window);
-          renderSplinePath(wallsCtx, points);
-        } else {
-          wallsCtx.moveTo(window.x1, window.y1);
-          wallsCtx.lineTo(window.x2, window.y2);
-        }
-        wallsCtx.stroke();
-
-        wallsCtx.globalAlpha = 1.0;
-      }
-
       // Draw endpoints for selected window
       if (isSelected) {
         wallsCtx.fillStyle = '#00FFFF';
@@ -1923,6 +1902,10 @@
   }
 
   function hexToRgba(hex: string, alpha: number): string {
+    // Handle undefined/null - default to white
+    if (!hex) {
+      hex = '#ffffff';
+    }
     // Remove # if present
     hex = hex.replace(/^#/, '');
 
@@ -2177,11 +2160,29 @@
     }
 
     // Convert walls to visibility-polygon segment format: [[x1, y1], [x2, y2]]
-    // Create fresh arrays to avoid any mutation issues with the library
-    const segments: [number, number][][] = blockingWalls.map(w => [
-      [w.x1, w.y1] as [number, number],
-      [w.x2, w.y2] as [number, number]
-    ]);
+    // For curved walls, approximate the curve with multiple line segments
+    const segments: [number, number][][] = [];
+    for (const w of blockingWalls) {
+      if (w.wallShape === 'curved' && w.controlPoints && w.controlPoints.length > 0) {
+        // Get spline points for the curved wall
+        const splineControlPoints = getSplinePoints(w);
+        const curvePoints = catmullRomSpline(splineControlPoints, 0.5, 10);
+
+        // Create line segments between consecutive curve points
+        for (let i = 0; i < curvePoints.length - 1; i++) {
+          segments.push([
+            [curvePoints[i].x, curvePoints[i].y] as [number, number],
+            [curvePoints[i + 1].x, curvePoints[i + 1].y] as [number, number]
+          ]);
+        }
+      } else {
+        // Straight wall - single segment
+        segments.push([
+          [w.x1, w.y1] as [number, number],
+          [w.x2, w.y2] as [number, number]
+        ]);
+      }
+    }
 
     // Define viewport bounds (light radius circle bounding box)
     const viewportMin: [number, number] = [source.x - maxRadius, source.y - maxRadius];
@@ -2418,145 +2419,6 @@
   /**
    * Find windows that intersect with a light's range
    */
-  /**
-   * Blend two hex colors with a given intensity (0-1)
-   */
-  function blendColors(baseColor: string, tintColor: string, tintIntensity: number): string {
-    const base = hexToRgba(baseColor, 1);
-    const tint = hexToRgba(tintColor, 1);
-
-    // Parse RGB values from rgba strings
-    const baseMatch = base.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-    const tintMatch = tint.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-
-    if (!baseMatch || !tintMatch) return baseColor;
-
-    const r = Math.round(parseInt(baseMatch[1]) * (1 - tintIntensity) + parseInt(tintMatch[1]) * tintIntensity);
-    const g = Math.round(parseInt(baseMatch[2]) * (1 - tintIntensity) + parseInt(tintMatch[2]) * tintIntensity);
-    const b = Math.round(parseInt(baseMatch[3]) * (1 - tintIntensity) + parseInt(tintMatch[3]) * tintIntensity);
-
-    return ;
-  }
-
-  function getWindowsInLightRange(lightSource: Point, lightRadius: number): Window[] {
-    const radiusSq = lightRadius * lightRadius;
-    const intersectingWindows: Window[] = [];
-
-    for (const window of windows) {
-      // Check if either endpoint is within radius
-      const d1Sq = (window.x1 - lightSource.x) ** 2 + (window.y1 - lightSource.y) ** 2;
-      const d2Sq = (window.x2 - lightSource.x) ** 2 + (window.y2 - lightSource.y) ** 2;
-
-      if (d1Sq <= radiusSq || d2Sq <= radiusSq) {
-        intersectingWindows.push(window);
-        continue;
-      }
-
-      // Check closest point on line segment to light source
-      const dx = window.x2 - window.x1;
-      const dy = window.y2 - window.y1;
-      const lenSq = dx * dx + dy * dy;
-
-      if (lenSq > 0) {
-        const t = Math.max(0, Math.min(1, ((lightSource.x - window.x1) * dx + (lightSource.y - window.y1) * dy) / lenSq));
-        const closestX = window.x1 + t * dx;
-        const closestY = window.y1 + t * dy;
-        const distSq = (lightSource.x - closestX) ** 2 + (lightSource.y - closestY) ** 2;
-
-        if (distSq <= radiusSq) {
-          intersectingWindows.push(window);
-        }
-      }
-    }
-
-    return intersectingWindows;
-  }
-
-  /**
-   * Render light transmission through a window
-   * Creates a secondary light on the far side of the window with reduced intensity and tint
-   */
-  function renderLightThroughWindow(
-    ctx: CanvasRenderingContext2D,
-    lightSource: Point,
-    lightRadius: number,
-    lightColor: string,
-    lightAlpha: number,
-    window: Window,
-    bright: number
-  ) {
-    // Calculate window properties
-    const windowOpacity = window.opacity ?? 1.0; // 1.0 = fully transparent
-    const windowTint = window.tint ?? '#ffffff';
-    const windowTintIntensity = window.tintIntensity ?? 0.0;
-
-    // If window is completely opaque (opacity = 0), don't render transmission
-    if (windowOpacity <= 0.01) return;
-
-    // Calculate window midpoint and normal vector
-    const windowMidX = (window.x1 + window.x2) / 2;
-    const windowMidY = (window.y1 + window.y2) / 2;
-
-    const windowDx = window.x2 - window.x1;
-    const windowDy = window.y2 - window.y1;
-    const windowLen = Math.sqrt(windowDx * windowDx + windowDy * windowDy);
-
-    if (windowLen === 0) return; // Degenerate window
-
-    // Normal vector (perpendicular to window)
-    const normalX = -windowDy / windowLen;
-    const normalY = windowDx / windowLen;
-
-    // Determine which side of the window the light is on
-    const toLight = {
-      x: lightSource.x - windowMidX,
-      y: lightSource.y - windowMidY
-    };
-    const dotProduct = toLight.x * normalX + toLight.y * normalY;
-
-    // Flip normal to point away from light (toward far side)
-    const finalNormalX = dotProduct > 0 ? -normalX : normalX;
-    const finalNormalY = dotProduct > 0 ? -normalY : normalY;
-
-    // Calculate transmission point (on the far side of the window)
-    const transmissionDistance = Math.max(20, lightRadius * 0.3); // Minimum 20 pixels from window
-    const transmissionX = windowMidX + finalNormalX * transmissionDistance;
-    const transmissionY = windowMidY + finalNormalY * transmissionDistance;
-
-    // Calculate transmitted light properties
-    const transmittedAlpha = lightAlpha * windowOpacity * 0.6; // Reduce alpha based on window opacity
-    const transmittedRadius = lightRadius * windowOpacity * 0.7; // Reduce radius
-
-    // Skip if transmitted light would be too dim
-    if (transmittedAlpha < 0.01 || transmittedRadius < 5) return;
-
-    // Apply tint to light color
-    const transmittedColor = blendColors(lightColor, windowTint, windowTintIntensity);
-
-    // Render transmitted light (simplified - no wall occlusion on far side for performance)
-    ctx.save();
-
-    // Create radial gradient for transmitted light
-    const gradient = ctx.createRadialGradient(
-      transmissionX, transmissionY, 0,
-      transmissionX, transmissionY, transmittedRadius
-    );
-
-    const baseColor = hexToRgba(transmittedColor, transmittedAlpha);
-    const dimColor = hexToRgba(transmittedColor, 0);
-
-    // Simple gradient (no bright/dim zones for transmitted light)
-    gradient.addColorStop(0, baseColor);
-    gradient.addColorStop(0.5, hexToRgba(transmittedColor, transmittedAlpha * 0.5));
-    gradient.addColorStop(1, dimColor);
-
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.arc(transmissionX, transmissionY, transmittedRadius, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.restore();
-  }
 
   function renderLight(ctx: CanvasRenderingContext2D, light: AmbientLight, time: number) {
     // Use animated position if available, otherwise use base position
@@ -2826,14 +2688,6 @@
       }
       renderLightGradient();
     }
-  
-    // Render light transmission through windows
-    if (windows && windows.length > 0) {
-      const affectedWindows = getWindowsInLightRange({ x, y }, animatedDim);
-      for (const window of affectedWindows) {
-        renderLightThroughWindow(ctx, { x, y }, animatedDim, color, alpha, window, animatedBright);
-      }
-    }
   }
 
     function renderTokenLight(ctx: CanvasRenderingContext2D, token: Token, time: number) {
@@ -2893,36 +2747,14 @@
 
       // Parse color with alpha (using default 0.8 alpha for token lights)
       const baseColor = hexToRgba(color, 0.8);
-      const dimColor = hexToRgba(effectiveColor, 0);
+      const dimColor = hexToRgba(color, 0);
 
-        // Wave animation - create ripple effect with multiple rings
-        if (animationType === "wave") {
-          const speed = animationSpeed / 5;
-          const intensity = animationIntensity / 10;
-          const wavePhase = (time * speed * 0.002) % 1;
-          
-          // Create multiple wave rings
-          const numRings = 3;
-          for (let i = 0; i < numRings; i++) {
-            const ringPhase = (wavePhase + i / numRings) % 1;
-            const ringPos = ringPhase;
-            const ringAlpha = Math.abs(Math.sin(ringPhase * Math.PI)) * intensity;
-            
-            if (ringPos > 0 && ringPos < 1) {
-              const waveColor = hexToRgba(effectiveColor, alpha * ringAlpha);
-              gradient.addColorStop(ringPos, waveColor);
-            }
-          }
-        } else {
-          // Normal gradient (non-wave animations)
-          gradient.addColorStop(0, baseColor);
-          if (animatedBright > 0 && animatedDim > 0) {
-            gradient.addColorStop(Math.min(1, animatedBright / animatedDim), baseColor);
-          }
-          gradient.addColorStop(1, dimColor);
-        }
+      // Simple gradient for token lights
+      gradient.addColorStop(0, baseColor);
       if (bright > 0 && dim > 0) {
+        gradient.addColorStop(Math.min(1, bright / dim), baseColor);
       }
+      gradient.addColorStop(1, dimColor);
 
       ctx.fillStyle = gradient;
       if (angle < 360) {
@@ -4292,9 +4124,6 @@
       y2: endPos.y,
       snapToGrid: gridSnap,
       wallShape,
-      opacity: 0.5,
-      tint: '#FFFFFF',
-      tintIntensity: 0.0,
     };
 
     console.log('Calling onWindowAdd with:', windowData);

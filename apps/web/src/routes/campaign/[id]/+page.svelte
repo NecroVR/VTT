@@ -388,7 +388,7 @@
     websocket.sendWallUpdate({ wallId, updates });
   }
 
-  function handleWindowAdd(window: { x1: number; y1: number; x2: number; y2: number; snapToGrid?: boolean; wallShape?: 'straight' | 'curved'; opacity?: number; tint?: string; tintIntensity?: number }) {
+  function handleWindowAdd(window: { x1: number; y1: number; x2: number; y2: number; snapToGrid?: boolean; wallShape?: 'straight' | 'curved' }) {
     console.log('handleWindowAdd called with:', window);
     if (!activeScene) {
       console.log('No active scene, cannot add window');
@@ -402,9 +402,6 @@
       x2: window.x2,
       y2: window.y2,
       wallShape: window.wallShape || 'straight',
-      opacity: window.opacity ?? 0.5,
-      tint: window.tint || '#FFFFFF',
-      tintIntensity: window.tintIntensity ?? 0.0,
       snapToGrid: window.snapToGrid
     };
 

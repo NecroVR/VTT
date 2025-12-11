@@ -71,9 +71,6 @@ function createWindowsStore() {
       y2: number;
       wallShape?: 'straight' | 'curved';
       controlPoints?: Array<{ x: number; y: number }>;
-      opacity?: number;
-      tint?: string;
-      tintIntensity?: number;
       snapToGrid?: boolean;
       data?: Record<string, unknown>;
     }): Promise<Window | null> {
@@ -122,9 +119,6 @@ function createWindowsStore() {
       y2?: number;
       wallShape?: 'straight' | 'curved';
       controlPoints?: Array<{ x: number; y: number }>;
-      opacity?: number;
-      tint?: string;
-      tintIntensity?: number;
       snapToGrid?: boolean;
       data?: Record<string, unknown>;
     }): Promise<Window | null> {
