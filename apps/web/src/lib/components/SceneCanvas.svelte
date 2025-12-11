@@ -5343,6 +5343,7 @@
       renderWalls(); // renderWalls also renders windows and doors
       renderLights();
       renderTokens();
+      renderControls(); // Update light handles during drag
       return;
     }
 
