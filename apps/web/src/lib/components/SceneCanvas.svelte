@@ -98,7 +98,7 @@
   let lastMouseX = 0;
   let lastMouseY = 0;
   let selectedTokenId: string | null = null;
-  let selectedLightId: string | null = null;
+  let selectedLightIds: Set<string> = new Set();
   let draggedTokenId: string | null = null;
   let draggedLightId: string | null = null;
   let dragOffsetX = 0;
@@ -172,6 +172,7 @@
     walls: Array<{ id: string; x1: number; y1: number; x2: number; y2: number; controlPoints?: Array<{x: number, y: number}> }>;
     windows: Array<{ id: string; x1: number; y1: number; x2: number; y2: number; controlPoints?: Array<{x: number, y: number}> }>;
     doors: Array<{ id: string; x1: number; y1: number; x2: number; y2: number; controlPoints?: Array<{x: number, y: number}> }>;
+    lights: Array<{ id: string; x: number; y: number }>;
   } | null = null;
   let bodyDragRequiresGridSnap = false;
 
@@ -3331,7 +3332,7 @@
     });
 
     visibleLights.forEach(light => {
-      const isSelected = selectedLightId === light.id;
+      const isSelected = selectedLightIds.has(light.id);
       const handleRadius = 12 / scale; // Keep constant size in screen space
 
       // Draw outer glow for selection
@@ -3738,9 +3739,9 @@
       }
 
       if (selectedLights.length > 0) {
-        // For lights, just select the first one (single selection)
-        selectedLightId = selectedLights[0];
-        onLightSelect?.(selectedLightId);
+        // For lights, add to existing set
+        selectedLights.forEach(id => selectedLightIds.add(id));
+        selectedLightIds = selectedLightIds; // trigger reactivity
       }
     } else {
       // Replace selection
@@ -3765,11 +3766,9 @@
       }
 
       if (selectedLights.length > 0) {
-        selectedLightId = selectedLights[0];
-        onLightSelect?.(selectedLightId);
+        selectedLightIds = new Set(selectedLights);
       } else {
-        selectedLightId = null;
-        onLightSelect?.(null);
+        selectedLightIds = new Set();
       }
     }
 
@@ -4056,19 +4055,65 @@
             lastClickLightId = null;
             return;
           } else {
-            // Single click - prepare for drag
+            // Single click - handle selection and drag
             const light = lights.find(l => l.id === lightId);
             if (light) {
-              selectedLightId = lightId;
-              selectedTokenId = null;
-              selectedWallIds = new Set();
-              draggedLightId = lightId;
-              isDraggingLight = true;
-              dragOffsetX = light.x - worldPos.x;
-              dragOffsetY = light.y - worldPos.y;
-              onLightSelect?.(lightId);
-              onTokenSelect?.(null);
-              renderControls();
+              if (e.ctrlKey) {
+                // Ctrl+Click: Toggle light in/out of selection
+                if (selectedLightIds.has(lightId)) {
+                  selectedLightIds = new Set([...selectedLightIds].filter(id => id !== lightId));
+                } else {
+                  selectedLightIds = new Set([...selectedLightIds, lightId]);
+                }
+                // Don't clear other selections when Ctrl+clicking lights
+                renderControls();
+                renderLights();
+              } else if (selectedLightIds.has(lightId)) {
+                // Light is already selected - initiate body drag of all selected objects
+                isDraggingBodies = true;
+                bodyDragStartPos = { x: worldPos.x, y: worldPos.y };
+
+                // Store original positions of all selected objects
+                bodyDragOriginalPositions = {
+                  walls: walls.filter(w => selectedWallIds.has(w.id)).map(w => ({
+                    id: w.id,
+                    x1: w.x1, y1: w.y1, x2: w.x2, y2: w.y2,
+                    controlPoints: w.controlPoints ? [...w.controlPoints.map(cp => ({...cp}))] : undefined
+                  })),
+                  windows: windows.filter(w => selectedWindowIds.has(w.id)).map(w => ({
+                    id: w.id,
+                    x1: w.x1, y1: w.y1, x2: w.x2, y2: w.y2,
+                    controlPoints: w.controlPoints ? [...w.controlPoints.map(cp => ({...cp}))] : undefined
+                  })),
+                  doors: doors.filter(d => selectedDoorIds.has(d.id)).map(d => ({
+                    id: d.id,
+                    x1: d.x1, y1: d.y1, x2: d.x2, y2: d.y2,
+                    controlPoints: d.controlPoints ? [...d.controlPoints.map(cp => ({...cp}))] : undefined
+                  })),
+                  lights: lights.filter(l => selectedLightIds.has(l.id)).map(l => ({
+                    id: l.id,
+                    x: l.x,
+                    y: l.y
+                  }))
+                };
+
+                // Check if any selected object requires grid snap
+                bodyDragRequiresGridSnap =
+                  walls.filter(w => selectedWallIds.has(w.id)).some(w => w.snapToGrid === true) ||
+                  windows.filter(w => selectedWindowIds.has(w.id)).some(w => w.snapToGrid === true) ||
+                  doors.filter(d => selectedDoorIds.has(d.id)).some(d => d.snapToGrid === true) ||
+                  lights.filter(l => selectedLightIds.has(l.id)).some(l => l.snapToGrid === true);
+              } else {
+                // Regular click: Select only this light, clear all other selections
+                selectedLightIds = new Set([lightId]);
+                selectedWallIds = new Set();
+                selectedWindowIds = new Set();
+                selectedDoorIds = new Set();
+                selectedTokenId = null;
+                onTokenSelect?.(null);
+                renderControls();
+                renderLights();
+              }
 
               // Store click time and light for double-click detection
               lastClickTime = currentTime;
@@ -4091,7 +4136,7 @@
 
               // Clear other selections
               selectedTokenId = null;
-              selectedLightId = null;
+              selectedLightIds = new Set();
               onTokenSelect?.(null);
               onLightSelect?.(null);
 
@@ -4150,7 +4195,7 @@
           }
 
           selectedTokenId = null;
-          selectedLightId = null;
+          selectedLightIds = new Set();
           onTokenSelect?.(null);
           onLightSelect?.(null);
           renderWalls();
@@ -4164,7 +4209,7 @@
           if (pathPoint) {
             selectedPathPointId = pathPointId;
             selectedTokenId = null;
-            selectedLightId = null;
+            selectedLightIds = new Set();
             selectedWallIds = new Set();
             selectedPathId = null;
             onPathPointSelect?.(pathPointId);
@@ -4193,7 +4238,7 @@
 
               // Clear other selections
               selectedTokenId = null;
-              selectedLightId = null;
+              selectedLightIds = new Set();
               selectedWallIds = new Set();
               onTokenSelect?.(null);
               onLightSelect?.(null);
@@ -4253,7 +4298,7 @@
           }
 
           selectedTokenId = null;
-          selectedLightId = null;
+          selectedLightIds = new Set();
           onTokenSelect?.(null);
           onLightSelect?.(null);
           renderWalls(); // renderWalls also renders windows
@@ -4327,7 +4372,7 @@
             selectedWindowIds = new Set();
             selectedDoorIds = new Set();
             selectedTokenId = null;
-            selectedLightId = null;
+            selectedLightIds = new Set();
             onTokenSelect?.(null);
             onLightSelect?.(null);
             onWindowSelect?.(null);
@@ -4391,7 +4436,7 @@
             selectedWallIds = new Set();
             selectedDoorIds = new Set();
             selectedTokenId = null;
-            selectedLightId = null;
+            selectedLightIds = new Set();
             onTokenSelect?.(null);
             onLightSelect?.(null);
             onDoorSelect?.(null);
@@ -4453,7 +4498,7 @@
           }
 
           selectedTokenId = null;
-          selectedLightId = null;
+          selectedLightIds = new Set();
           onTokenSelect?.(null);
           onLightSelect?.(null);
           renderWalls(); // renderWalls also renders doors
@@ -4521,7 +4566,7 @@
             selectedWallIds = new Set();
             selectedWindowIds = new Set();
             selectedTokenId = null;
-            selectedLightId = null;
+            selectedLightIds = new Set();
             onTokenSelect?.(null);
             onLightSelect?.(null);
             onWindowSelect?.(null);
@@ -4538,7 +4583,7 @@
         if (pathId) {
           selectedPathId = pathId;
           selectedTokenId = null;
-          selectedLightId = null;
+          selectedLightIds = new Set();
           selectedWallIds = new Set();
           selectedPathPointId = null;
           onPathSelect?.(pathId);
@@ -4575,7 +4620,7 @@
         } else {
           // Single click - prepare for drag
           selectedTokenId = clickedToken.id;
-          selectedLightId = null;
+          selectedLightIds = new Set();
           draggedTokenId = clickedToken.id;
           isDraggingToken = true;
           dragOffsetX = clickedToken.x - worldPos.x;
@@ -4601,7 +4646,7 @@
           if (!e.ctrlKey) {
             exitPossession();
             selectedTokenId = null;
-            selectedLightId = null;
+            selectedLightIds = new Set();
             selectedWallIds = new Set();
             selectedWindowIds = new Set();
             onTokenSelect?.(null);
@@ -4616,7 +4661,7 @@
           // Right click - pan
           exitPossession();
           selectedTokenId = null;
-          selectedLightId = null;
+          selectedLightIds = new Set();
           selectedWindowIds = new Set();
           onTokenSelect?.(null);
           onLightSelect?.(null);
@@ -4630,7 +4675,7 @@
     } else {
       // Non-select tool - clear selections and start panning if clicking empty space
       selectedTokenId = null;
-      selectedLightId = null;
+      selectedLightIds = new Set();
       selectedWindowIds = new Set();
       onTokenSelect?.(null);
       onLightSelect?.(null);
@@ -5094,6 +5139,13 @@
         const snapped = snapToGrid(newX1, newY1);
         deltaX = snapped.x - anchor.x1;
         deltaY = snapped.y - anchor.y1;
+      } else if (bodyDragRequiresGridSnap && effectiveGridSnap && bodyDragOriginalPositions.lights.length > 0) {
+        const anchor = bodyDragOriginalPositions.lights[0];
+        const newX = anchor.x + deltaX;
+        const newY = anchor.y + deltaY;
+        const snapped = snapToGrid(newX, newY);
+        deltaX = snapped.x - anchor.x;
+        deltaY = snapped.y - anchor.y;
       }
 
       // Update all walls
@@ -5153,9 +5205,23 @@
         return door;
       });
 
+      // Update all lights
+      lights = lights.map(light => {
+        const original = bodyDragOriginalPositions!.lights.find(l => l.id === light.id);
+        if (original) {
+          return {
+            ...light,
+            x: original.x + deltaX,
+            y: original.y + deltaY
+          };
+        }
+        return light;
+      });
+
       // Invalidate visibility cache so objects update during drag
       invalidateVisibilityCache();
       renderWalls(); // renderWalls also renders windows and doors
+      renderLights();
       return;
     }
 
@@ -5507,6 +5573,14 @@
             y2: door.y2,
             controlPoints: door.controlPoints
           });
+        }
+      }
+
+      // Call update for each moved light
+      for (const original of bodyDragOriginalPositions.lights) {
+        const light = lights.find(l => l.id === original.id);
+        if (light && onLightMove) {
+          onLightMove(light.id, light.x, light.y);
         }
       }
 
@@ -6530,7 +6604,7 @@
       onTokenSelect?.(null);
     }
     if (contextMenuElementType === 'light') {
-      selectedLightId = null;
+      selectedLightIds = new Set();
       onLightSelect?.(null);
     }
     if (contextMenuElementType === 'wall') {
