@@ -13,6 +13,8 @@
     { id: 'select', label: 'Select', icon: '⬆', gmOnly: false, shortcut: '1' },
     { id: 'wall', label: 'Wall', icon: '▬', gmOnly: true, shortcut: '2' },
     { id: 'curved-wall', label: 'Curved Wall', icon: '⌒', gmOnly: true, shortcut: 'c' },
+    { id: 'window', label: 'Window', icon: '🪟', gmOnly: true, shortcut: 'w' },
+    { id: 'curved-window', label: 'Curved Window', icon: '⌓', gmOnly: true, shortcut: 'shift+w' },
     { id: 'path', label: 'Path', icon: '〰', gmOnly: true, shortcut: 'a' },
     { id: 'light', label: 'Light', icon: '💡', gmOnly: true, shortcut: '3' },
     { id: 'tile', label: 'Tile', icon: '🖼', gmOnly: true, shortcut: 't' },
@@ -38,9 +40,13 @@
       return;
     }
 
-    // Check for tool shortcuts (1-9)
-    const key = e.key;
-    const tool = tools.find(t => t.shortcut === key);
+    // Check for tool shortcuts
+    const key = e.key.toLowerCase();
+
+    // Handle shift+key combinations
+    const shortcutKey = e.shiftKey ? `shift+${key}` : key;
+
+    const tool = tools.find(t => t.shortcut === shortcutKey);
 
     if (tool && (isGM || !tool.gmOnly)) {
       e.preventDefault();

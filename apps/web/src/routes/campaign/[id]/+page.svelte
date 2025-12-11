@@ -8,6 +8,7 @@
   import { scenesStore } from '$lib/stores/scenes';
   import { tokensStore } from '$lib/stores/tokens';
   import { wallsStore } from '$lib/stores/walls';
+  import { windowsStore } from '$lib/stores/windows';
   import { lightsStore } from '$lib/stores/lights';
   import { pathPointsStore } from '$lib/stores/paths';
   import { actorsStore } from '$lib/stores/actors';
@@ -76,6 +77,7 @@
     const token = localStorage.getItem('vtt_session_id') || sessionStorage.getItem('vtt_session_id') || '';
     lightsStore.loadLights(activeScene.id, token);
     wallsStore.loadWalls(activeScene.id, token);
+    windowsStore.loadWindows(activeScene.id, token);
     pathPointsStore.loadPathPoints(activeScene.id, token);
   }
   $: tokens = Array.from($tokensStore.tokens.values()).filter(
@@ -83,6 +85,9 @@
   );
   $: walls = Array.from($wallsStore.walls.values()).filter(
     wall => activeScene && wall.sceneId === activeScene.id
+  );
+  $: windows = Array.from($windowsStore.windows.values()).filter(
+    window => activeScene && window.sceneId === activeScene.id
   );
 
   // Determine if current user is GM
@@ -208,6 +213,20 @@
       wallsStore.removeWall(payload.wallId);
     });
 
+    // Subscribe to window events
+    const unsubscribeWindowAdded = websocket.onWindowAdded((payload) => {
+      console.log('window:added received:', payload);
+      windowsStore.addWindow(payload.window);
+    });
+
+    const unsubscribeWindowUpdated = websocket.onWindowUpdated((payload) => {
+      windowsStore.updateWindowLocal(payload.window.id, payload.window);
+    });
+
+    const unsubscribeWindowRemoved = websocket.onWindowRemoved((payload) => {
+      windowsStore.removeWindow(payload.windowId);
+    });
+
     // Subscribe to light events
     const unsubscribeLightAdded = websocket.onLightAdded((payload) => {
       lightsStore.addLight(payload.light);
@@ -254,6 +273,9 @@
       unsubscribeWallAdded();
       unsubscribeWallUpdated();
       unsubscribeWallRemoved();
+      unsubscribeWindowAdded();
+      unsubscribeWindowUpdated();
+      unsubscribeWindowRemoved();
       unsubscribeLightAdded();
       unsubscribeLightUpdated();
       unsubscribeLightRemoved();
@@ -269,6 +291,7 @@
       scenesStore.clear();
       tokensStore.clear();
       wallsStore.clear();
+      windowsStore.clear();
       lightsStore.clear();
       pathPointsStore.clearPathPoints();
       actorsStore.clear();
@@ -363,6 +386,43 @@
 
   function handleWallUpdate(wallId: string, updates: Partial<Wall>) {
     websocket.sendWallUpdate({ wallId, updates });
+  }
+
+  function handleWindowAdd(window: { x1: number; y1: number; x2: number; y2: number; snapToGrid?: boolean; wallShape?: 'straight' | 'curved'; opacity?: number; tint?: string; tintIntensity?: number }) {
+    console.log('handleWindowAdd called with:', window);
+    if (!activeScene) {
+      console.log('No active scene, cannot add window');
+      return;
+    }
+
+    const windowPayload = {
+      sceneId: activeScene.id,
+      x1: window.x1,
+      y1: window.y1,
+      x2: window.x2,
+      y2: window.y2,
+      wallShape: window.wallShape || 'straight',
+      opacity: window.opacity ?? 0.5,
+      tint: window.tint || '#FFFFFF',
+      tintIntensity: window.tintIntensity ?? 0.0,
+      snapToGrid: window.snapToGrid
+    };
+
+    console.log('Sending window to WebSocket:', windowPayload);
+    websocket.sendWindowAdd(windowPayload);
+  }
+
+  function handleWindowRemove(windowId: string) {
+    websocket.sendWindowRemove({ windowId });
+  }
+
+  function handleWindowUpdate(windowId: string, updates: any) {
+    websocket.sendWindowUpdate({ windowId, updates });
+  }
+
+  function handleWindowSelect(windowId: string | null) {
+    console.log('Window selected:', windowId);
+    // TODO: Implement window selection handling (e.g., open config panel)
   }
 
   function handleLightAdd(lightData: { x: number; y: number }) {
@@ -643,6 +703,7 @@
             scene={activeScene}
             {tokens}
             {walls}
+            {windows}
             {isGM}
             {activeTool}
             gridSnap={currentCampaign?.settings?.snapToGrid ?? false}
@@ -654,6 +715,10 @@
             onWallAdd={handleWallAdd}
             onWallRemove={handleWallRemove}
             onWallUpdate={handleWallUpdate}
+            onWindowAdd={handleWindowAdd}
+            onWindowRemove={handleWindowRemove}
+            onWindowUpdate={handleWindowUpdate}
+            onWindowSelect={handleWindowSelect}
             onLightAdd={handleLightAdd}
             onLightSelect={handleLightSelect}
             onLightDoubleClick={handleLightDoubleClick}

@@ -1728,6 +1728,34 @@
       }
     });
 
+    // Render window preview
+    if (windowPreview) {
+      wallsCtx.strokeStyle = '#00FFFF';
+      wallsCtx.lineWidth = 3 / scale;
+      wallsCtx.globalAlpha = 0.7;
+      wallsCtx.setLineDash([10 / scale, 5 / scale]);
+
+      wallsCtx.beginPath();
+      wallsCtx.moveTo(windowPreview.x1, windowPreview.y1);
+      wallsCtx.lineTo(windowPreview.x2, windowPreview.y2);
+      wallsCtx.stroke();
+
+      wallsCtx.setLineDash([]);
+      wallsCtx.globalAlpha = 1.0;
+
+      // Draw preview endpoints
+      wallsCtx.fillStyle = '#00FFFF';
+      const endpointRadius = 4 / scale;
+
+      wallsCtx.beginPath();
+      wallsCtx.arc(windowPreview.x1, windowPreview.y1, endpointRadius, 0, Math.PI * 2);
+      wallsCtx.fill();
+
+      wallsCtx.beginPath();
+      wallsCtx.arc(windowPreview.x2, windowPreview.y2, endpointRadius, 0, Math.PI * 2);
+      wallsCtx.fill();
+    }
+
     wallsCtx.restore();
   }
 
@@ -3697,10 +3725,15 @@
 
   // Mouse event handlers
   function handleMouseDown(e: MouseEvent) {
-    // Right-click cancels wall drawing
+    // Right-click cancels wall/window drawing
     if (e.button === 2) {
       if (isDrawingWall) {
         cancelWallDrawing();
+        e.preventDefault();
+        return;
+      }
+      if (isDrawingWindow) {
+        cancelWindowDrawing();
         e.preventDefault();
         return;
       }

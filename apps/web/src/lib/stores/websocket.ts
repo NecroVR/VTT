@@ -277,6 +277,31 @@ class WebSocketStore {
     return this.on('wall:removed', handler);
   }
 
+  // Window methods
+  sendWindowAdd(payload: any): void {
+    this.send('window:add', payload);
+  }
+
+  sendWindowUpdate(payload: any): void {
+    this.send('window:update', payload);
+  }
+
+  sendWindowRemove(payload: any): void {
+    this.send('window:remove', payload);
+  }
+
+  onWindowAdded(handler: TypedMessageHandler<any>): () => void {
+    return this.on('window:added', handler);
+  }
+
+  onWindowUpdated(handler: TypedMessageHandler<any>): () => void {
+    return this.on('window:updated', handler);
+  }
+
+  onWindowRemoved(handler: TypedMessageHandler<any>): () => void {
+    return this.on('window:removed', handler);
+  }
+
   // Light methods
   sendLightAdd(payload: LightAddPayload): void {
     this.send('light:add', payload);
