@@ -3937,8 +3937,8 @@
     const worldPos = screenToWorld(e.clientX, e.clientY);
     const snappedPos = snapToGrid(worldPos.x, worldPos.y);
 
-    // Handle wall tool (both straight and curved)
-    if ((activeTool === 'wall' || activeTool === 'curved-wall') && isGM) {
+    // Handle wall tool
+    if (activeTool === 'wall' && isGM) {
       console.log('Wall tool clicked', { activeTool, isDrawingWall, snappedPos });
       if (!isDrawingWall) {
         // Start drawing wall
@@ -3955,8 +3955,8 @@
       return;
     }
 
-    // Handle window tool (both straight and curved)
-    if ((activeTool === 'window' || activeTool === 'curved-window') && isGM) {
+    // Handle window tool
+    if (activeTool === 'window' && isGM) {
       console.log('Window tool clicked', { activeTool, isDrawingWindow, snappedPos });
       if (!isDrawingWindow) {
         // Start drawing window
@@ -3973,8 +3973,8 @@
       return;
     }
 
-    // Handle door tool (both straight and curved)
-    if ((activeTool === 'door' || activeTool === 'curved-door') && isGM) {
+    // Handle door tool
+    if (activeTool === 'door' && isGM) {
       console.log('Door tool clicked', { activeTool, isDrawingDoor, snappedPos });
       if (!isDrawingDoor) {
         // Start drawing door
@@ -4535,8 +4535,8 @@
       return;
     }
 
-    // Determine wall shape based on active tool
-    const wallShape = activeTool === 'curved-wall' ? 'curved' : 'straight';
+    // All walls are now created as curved (can have spline points added later)
+    const wallShape = 'curved';
     console.log('Wall shape determined:', wallShape);
 
     const wallData = {
@@ -4579,8 +4579,8 @@
       return;
     }
 
-    // Determine window shape based on active tool
-    const wallShape = activeTool === 'curved-window' ? 'curved' : 'straight';
+    // All windows are now created as curved (can have spline points added later)
+    const wallShape = 'curved';
     console.log('Window shape determined:', wallShape);
 
     const windowData = {
@@ -4623,8 +4623,8 @@
       return;
     }
 
-    // Determine door shape based on active tool
-    const wallShape = activeTool === 'curved-door' ? 'curved' : 'straight';
+    // All doors are now created as curved (can have spline points added later)
+    const wallShape = 'curved';
     console.log('Door shape determined:', wallShape);
 
     const doorData = {
@@ -6379,7 +6379,7 @@
   {/if}
   <canvas
     class="canvas-layer canvas-interactive"
-    class:cursor-crosshair={activeTool === 'wall' || activeTool === 'curved-wall' || activeTool === 'window' || activeTool === 'curved-window' || activeTool === 'door' || activeTool === 'curved-door' || activeTool === 'light' || activeTool === 'path'}
+    class:cursor-crosshair={activeTool === 'wall' || activeTool === 'window' || activeTool === 'door' || activeTool === 'light' || activeTool === 'path'}
     class:cursor-grab={activeTool === 'select' && !isHoveringControlPoint && !isDraggingControlPoint}
     class:cursor-control-point-hover={isHoveringControlPoint && !isDraggingControlPoint}
     class:cursor-control-point-drag={isDraggingControlPoint}

@@ -37,7 +37,7 @@ async function getCanvasBounds(page: Page) {
 test.describe('Curved Wall Tool Selection', () => {
   const testGameId = '9ef6bb45-ece6-4e65-99d3-4453e9f17cf4';
 
-  test('GM can select curved wall tool with keyboard shortcut', async ({ page }) => {
+  test('GM can select wall tool with keyboard shortcut', async ({ page }) => {
     await login(page, 'testgm@test.com', 'TestPassword123!');
     await navigateToGame(page, testGameId);
 
@@ -45,19 +45,19 @@ test.describe('Curved Wall Tool Selection', () => {
     const sceneControls = page.locator('.scene-controls');
     await expect(sceneControls).toBeVisible({ timeout: 5000 });
 
-    // Select curved wall tool using 'c' keyboard shortcut
-    await page.keyboard.press('c');
+    // Select wall tool using '2' keyboard shortcut
+    await page.keyboard.press('2');
     await page.waitForTimeout(500);
 
-    // Verify curved wall button is active
-    const curvedWallButton = page.locator('button[data-tool="curved-wall"]');
+    // Verify wall button is active
+    const wallButton = page.locator('button[data-tool="wall"]');
 
-    if (await curvedWallButton.count() > 0) {
-      await expect(curvedWallButton.first()).toBeVisible();
+    if (await wallButton.count() > 0) {
+      await expect(wallButton.first()).toBeVisible();
     }
   });
 
-  test('GM can select curved wall tool by clicking button', async ({ page }) => {
+  test('GM can select wall tool by clicking button', async ({ page }) => {
     await login(page, 'testgm@test.com', 'TestPassword123!');
     await navigateToGame(page, testGameId);
 
@@ -65,24 +65,24 @@ test.describe('Curved Wall Tool Selection', () => {
     const sceneControls = page.locator('.scene-controls');
     await expect(sceneControls).toBeVisible({ timeout: 5000 });
 
-    // Click curved wall button
-    const curvedWallButton = page.locator('button[data-tool="curved-wall"]');
+    // Click wall button
+    const wallButton = page.locator('button[data-tool="wall"]');
 
-    if (await curvedWallButton.count() > 0) {
-      await curvedWallButton.first().click();
+    if (await wallButton.count() > 0) {
+      await wallButton.first().click();
       await page.waitForTimeout(500);
 
       // Button should be active
-      await expect(curvedWallButton.first()).toBeVisible();
+      await expect(wallButton.first()).toBeVisible();
     }
   });
 
-  test('Curved wall tool shows correct cursor', async ({ page }) => {
+  test('Wall tool shows correct cursor', async ({ page }) => {
     await login(page, 'testgm@test.com', 'TestPassword123!');
     await navigateToGame(page, testGameId);
 
-    // Select curved wall tool
-    await page.keyboard.press('c');
+    // Select wall tool
+    await page.keyboard.press('2');
     await page.waitForTimeout(500);
 
     // Canvas should be present and have cursor class
@@ -90,15 +90,15 @@ test.describe('Curved Wall Tool Selection', () => {
     await expect(canvas).toBeVisible();
   });
 
-  test('Curved wall tool is only visible to GM', async ({ page }) => {
+  test('Wall tool is only visible to GM', async ({ page }) => {
     await login(page, 'testgm@test.com', 'TestPassword123!');
     await navigateToGame(page, testGameId);
 
-    // GM should see curved wall tool
-    const curvedWallButton = page.locator('button[data-tool="curved-wall"]');
+    // GM should see wall tool
+    const wallButton = page.locator('button[data-tool="wall"]');
 
-    if (await curvedWallButton.count() > 0) {
-      await expect(curvedWallButton.first()).toBeVisible();
+    if (await wallButton.count() > 0) {
+      await expect(wallButton.first()).toBeVisible();
     }
   });
 });
@@ -111,7 +111,7 @@ test.describe('Curved Wall Creation', () => {
     await navigateToGame(page, testGameId);
 
     // Select curved wall tool
-    await page.keyboard.press('c');
+    await page.keyboard.press('2');
     await page.waitForTimeout(500);
 
     // Click two points to create a curved wall
@@ -141,7 +141,7 @@ test.describe('Curved Wall Creation', () => {
     await navigateToGame(page, testGameId);
 
     // Select curved wall tool
-    await page.keyboard.press('c');
+    await page.keyboard.press('2');
     await page.waitForTimeout(500);
 
     const canvasBounds = await getCanvasBounds(page);
@@ -167,7 +167,7 @@ test.describe('Curved Wall Creation', () => {
     await navigateToGame(page, testGameId);
 
     // Select curved wall tool
-    await page.keyboard.press('c');
+    await page.keyboard.press('2');
     await page.waitForTimeout(500);
 
     const canvasBounds = await getCanvasBounds(page);
@@ -203,7 +203,7 @@ test.describe('Curved Wall Selection', () => {
     await navigateToGame(page, testGameId);
 
     // First create a curved wall
-    await page.keyboard.press('c');
+    await page.keyboard.press('2');
     await page.waitForTimeout(500);
 
     const canvasBounds = await getCanvasBounds(page);
@@ -237,7 +237,7 @@ test.describe('Curved Wall Selection', () => {
     await navigateToGame(page, testGameId);
 
     // Create and select a curved wall
-    await page.keyboard.press('c');
+    await page.keyboard.press('2');
     await page.waitForTimeout(500);
 
     const canvasBounds = await getCanvasBounds(page);
@@ -272,7 +272,7 @@ test.describe('Add Spline Point', () => {
     await navigateToGame(page, testGameId);
 
     // Create a curved wall
-    await page.keyboard.press('c');
+    await page.keyboard.press('2');
     await page.waitForTimeout(500);
 
     const canvasBounds = await getCanvasBounds(page);
@@ -306,7 +306,7 @@ test.describe('Add Spline Point', () => {
     await navigateToGame(page, testGameId);
 
     // Create a curved wall
-    await page.keyboard.press('c');
+    await page.keyboard.press('2');
     await page.waitForTimeout(500);
 
     const canvasBounds = await getCanvasBounds(page);
@@ -343,7 +343,7 @@ test.describe('Add Spline Point', () => {
     await navigateToGame(page, testGameId);
 
     // Create a curved wall
-    await page.keyboard.press('c');
+    await page.keyboard.press('2');
     await page.waitForTimeout(500);
 
     const canvasBounds = await getCanvasBounds(page);
@@ -392,7 +392,7 @@ test.describe('Control Point Dragging', () => {
     await navigateToGame(page, testGameId);
 
     // Create a curved wall
-    await page.keyboard.press('c');
+    await page.keyboard.press('2');
     await page.waitForTimeout(500);
 
     const canvasBounds = await getCanvasBounds(page);
@@ -440,7 +440,7 @@ test.describe('Control Point Dragging', () => {
     await navigateToGame(page, testGameId);
 
     // Create curved wall with control point
-    await page.keyboard.press('c');
+    await page.keyboard.press('2');
     await page.waitForTimeout(500);
 
     const canvasBounds = await getCanvasBounds(page);
@@ -487,7 +487,7 @@ test.describe('Control Point Dragging', () => {
     await navigateToGame(page, testGameId);
 
     // Create curved wall with control point
-    await page.keyboard.press('c');
+    await page.keyboard.press('2');
     await page.waitForTimeout(500);
 
     const canvasBounds = await getCanvasBounds(page);
@@ -543,7 +543,7 @@ test.describe('Delete Spline Point', () => {
     await navigateToGame(page, testGameId);
 
     // Create curved wall with control point
-    await page.keyboard.press('c');
+    await page.keyboard.press('2');
     await page.waitForTimeout(500);
 
     const canvasBounds = await getCanvasBounds(page);
@@ -587,7 +587,7 @@ test.describe('Delete Spline Point', () => {
     await navigateToGame(page, testGameId);
 
     // Create curved wall with control point
-    await page.keyboard.press('c');
+    await page.keyboard.press('2');
     await page.waitForTimeout(500);
 
     const canvasBounds = await getCanvasBounds(page);
@@ -632,7 +632,7 @@ test.describe('Delete Spline Point', () => {
     await navigateToGame(page, testGameId);
 
     // Create curved wall with control point
-    await page.keyboard.press('c');
+    await page.keyboard.press('2');
     await page.waitForTimeout(500);
 
     const canvasBounds = await getCanvasBounds(page);
@@ -693,7 +693,7 @@ test.describe('Curved Wall Deletion', () => {
     await navigateToGame(page, testGameId);
 
     // Create curved wall
-    await page.keyboard.press('c');
+    await page.keyboard.press('2');
     await page.waitForTimeout(500);
 
     const canvasBounds = await getCanvasBounds(page);
@@ -731,7 +731,7 @@ test.describe('Curved Wall Deletion', () => {
     await navigateToGame(page, testGameId);
 
     // Create curved wall with control points
-    await page.keyboard.press('c');
+    await page.keyboard.press('2');
     await page.waitForTimeout(500);
 
     const canvasBounds = await getCanvasBounds(page);
@@ -775,18 +775,18 @@ test.describe('Curved Wall Deletion', () => {
 test.describe('Integration and Edge Cases', () => {
   const testGameId = '9ef6bb45-ece6-4e65-99d3-4453e9f17cf4';
 
-  test('Can switch between straight wall and curved wall tools', async ({ page }) => {
+  test('Can switch between different tools', async ({ page }) => {
     await login(page, 'testgm@test.com', 'TestPassword123!');
     await navigateToGame(page, testGameId);
 
-    // Switch between wall types
-    await page.keyboard.press('2'); // Straight wall
+    // Switch between various tools
+    await page.keyboard.press('2'); // Wall tool
     await page.waitForTimeout(300);
-    await page.keyboard.press('c'); // Curved wall
+    await page.keyboard.press('1'); // Select tool
     await page.waitForTimeout(300);
-    await page.keyboard.press('2'); // Straight wall
+    await page.keyboard.press('2'); // Wall tool
     await page.waitForTimeout(300);
-    await page.keyboard.press('c'); // Curved wall
+    await page.keyboard.press('3'); // Light tool
     await page.waitForTimeout(300);
 
     // Application should remain stable
@@ -794,7 +794,7 @@ test.describe('Integration and Edge Cases', () => {
     await expect(sceneControls).toBeVisible();
   });
 
-  test('Curved walls and straight walls can coexist', async ({ page }) => {
+  test('Can create multiple walls with spline points', async ({ page }) => {
     await login(page, 'testgm@test.com', 'TestPassword123!');
     await navigateToGame(page, testGameId);
 
@@ -804,7 +804,7 @@ test.describe('Integration and Edge Cases', () => {
       const centerX = canvasBounds.x + canvasBounds.width / 2;
       const centerY = canvasBounds.y + canvasBounds.height / 2;
 
-      // Create straight wall
+      // Create first wall (initially straight)
       await page.keyboard.press('2');
       await page.waitForTimeout(500);
       await page.mouse.click(centerX - 100, centerY - 100);
@@ -812,8 +812,8 @@ test.describe('Integration and Edge Cases', () => {
       await page.mouse.click(centerX + 100, centerY - 100);
       await page.waitForTimeout(500);
 
-      // Create curved wall
-      await page.keyboard.press('c');
+      // Create second wall
+      await page.keyboard.press('2');
       await page.waitForTimeout(500);
       await page.mouse.click(centerX - 100, centerY + 100);
       await page.waitForTimeout(300);
@@ -831,7 +831,7 @@ test.describe('Integration and Edge Cases', () => {
     await navigateToGame(page, testGameId);
 
     // Create curved wall
-    await page.keyboard.press('c');
+    await page.keyboard.press('2');
     await page.waitForTimeout(500);
 
     const canvasBounds = await getCanvasBounds(page);
@@ -875,7 +875,7 @@ test.describe('Integration and Edge Cases', () => {
       const centerY = canvasBounds.y + canvasBounds.height / 2;
 
       // Create curved wall
-      await page.keyboard.press('c');
+      await page.keyboard.press('2');
       await page.waitForTimeout(500);
       await page.mouse.click(centerX - 150, centerY);
       await page.waitForTimeout(300);
