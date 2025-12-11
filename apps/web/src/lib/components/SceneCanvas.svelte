@@ -6497,6 +6497,126 @@
 {/if}
 
 <style>
+  .scene-canvas-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #1a1a1a;
+  }
+
+  .canvas-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .canvas-interactive {
+    cursor: grab;
+  }
+
+  .canvas-interactive:active {
+    cursor: grabbing;
+  }
+
+  .canvas-interactive.cursor-crosshair {
+    cursor: crosshair;
+  }
+
+  .canvas-interactive.cursor-crosshair:active {
+    cursor: crosshair;
+  }
+
+  .canvas-interactive.cursor-grab {
+    cursor: grab;
+  }
+
+  .canvas-interactive.cursor-grab:active {
+    cursor: grabbing;
+  }
+
+  .canvas-interactive.cursor-control-point-hover {
+    cursor: grab;
+  }
+
+  .canvas-interactive.cursor-control-point-drag {
+    cursor: grabbing;
+  }
+
+  .canvas-controls {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    display: flex;
+    gap: 8px;
+    pointer-events: none;
+  }
+
+  .zoom-display {
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .possession-indicator {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    pointer-events: all;
+    z-index: 100;
+  }
+
+  .possession-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: rgba(251, 191, 36, 0.95);
+    color: #1f2937;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    animation: possession-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes possession-pulse {
+    0%, 100% {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    50% {
+      box-shadow: 0 4px 16px rgba(251, 191, 36, 0.5);
+    }
+  }
+
+  .possession-content svg {
+    flex-shrink: 0;
+  }
+
+  .exit-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.2);
+    border: none;
+    border-radius: 3px;
+    padding: 2px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+  }
+
+  .exit-button:hover {
+    background: rgba(0, 0, 0, 0.35);
+  }
+
+  .canvas-interactive.drag-over {
+    background-color: rgba(74, 144, 226, 0.1);
+  }
 
   .grid-snap-indicator {
     background-color: rgba(0, 0, 0, 0.7);
@@ -6528,5 +6648,4 @@
     border-radius: 3px;
     margin-left: 4px;
   }
-
 </style>
