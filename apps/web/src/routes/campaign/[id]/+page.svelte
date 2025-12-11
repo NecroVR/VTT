@@ -170,20 +170,27 @@
   function handleObjectPropertyChange(event: CustomEvent<{ objectType: string; objectId: string; property: string; value: any }>) {
     const { objectType, objectId, property, value } = event.detail;
 
+    // Optimistic update: Update local store immediately, then send WebSocket message
+    // This ensures the UI updates immediately without waiting for the server round-trip
     switch (objectType) {
       case 'token':
+        tokensStore.updateToken(objectId, { [property]: value });
         websocket.sendTokenUpdate({ tokenId: objectId, updates: { [property]: value } });
         break;
       case 'light':
+        lightsStore.updateLight(objectId, { [property]: value });
         websocket.sendLightUpdate({ lightId: objectId, updates: { [property]: value } });
         break;
       case 'wall':
+        wallsStore.updateWall(objectId, { [property]: value });
         websocket.sendWallUpdate({ wallId: objectId, updates: { [property]: value } });
         break;
       case 'door':
+        doorsStore.updateDoorLocal(objectId, { [property]: value });
         websocket.sendDoorUpdate({ doorId: objectId, updates: { [property]: value } });
         break;
       case 'window':
+        windowsStore.updateWindowLocal(objectId, { [property]: value });
         websocket.sendWindowUpdate({ windowId: objectId, updates: { [property]: value } });
         break;
       default:
@@ -666,6 +673,8 @@
   }
 
   function handleLightMove(lightId: string, x: number, y: number) {
+    // Optimistic update: Update local store immediately, then send WebSocket message
+    lightsStore.updateLight(lightId, { x, y });
     websocket.sendLightUpdate({
       lightId,
       updates: { x, y }
