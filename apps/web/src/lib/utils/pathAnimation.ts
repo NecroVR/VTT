@@ -2,7 +2,7 @@
  * Path animation utilities for smooth object movement along spline paths
  */
 
-import { catmullRomSpline, type Point } from './spline';
+import { catmullRomSplineClosedLoop, type Point } from './spline';
 import type { PathNode } from '@vtt/shared';
 
 /**
@@ -17,8 +17,8 @@ export function calculatePathLength(nodes: PathNode[], tension: number = 0.5): n
     return 0;
   }
 
-  // Generate spline points
-  const splinePoints = catmullRomSpline(nodes, tension);
+  // Generate spline points using closed loop
+  const splinePoints = catmullRomSplineClosedLoop(nodes, tension);
 
   if (splinePoints.length < 2) {
     return 0;
@@ -225,8 +225,8 @@ export function precomputeSplinePath(
     return nodes.map(node => ({ x: node.x, y: node.y, distance: 0 }));
   }
 
-  // Generate spline points
-  const splinePoints = catmullRomSpline(nodes, tension, numSegments);
+  // Generate spline points using closed loop for smooth animation
+  const splinePoints = catmullRomSplineClosedLoop(nodes, tension, numSegments);
 
   if (splinePoints.length === 0) {
     return [];

@@ -1514,6 +1514,8 @@ async function handleLightAdd(
       darknessMax: newLight.darknessMax ?? 1,
       hidden: newLight.hidden ?? false,
       elevation: newLight.elevation ?? 0,
+      followPathName: newLight.followPathName ?? null,
+      pathSpeed: newLight.pathSpeed ?? null,
       data: newLight.data as Record<string, unknown>,
       createdAt: newLight.createdAt,
     };
@@ -1598,6 +1600,8 @@ async function handleLightUpdate(
       darknessMax: updatedLight.darknessMax ?? 1,
       hidden: updatedLight.hidden ?? false,
       elevation: updatedLight.elevation ?? 0,
+      followPathName: updatedLight.followPathName ?? null,
+      pathSpeed: updatedLight.pathSpeed ?? null,
       data: updatedLight.data as Record<string, unknown>,
       createdAt: updatedLight.createdAt,
     };

@@ -151,6 +151,66 @@ export function catmullRomSpline(
   return result;
 }
 
+/**
+ * Generates a smooth closed-loop Catmull-Rom spline through the given points
+ * The curve connects the last point back to the first point
+ *
+ * @param points - Array of control points (minimum 3 points for a closed loop)
+ * @param tension - Controls curve tightness, typically 0.0-1.0 (default 0.5)
+ * @param numSegments - Number of interpolated segments between each pair of points (default 20)
+ * @returns Array of points along the smooth closed curve
+ */
+export function catmullRomSplineClosedLoop(
+  points: Point[],
+  tension: number = 0.5,
+  numSegments: number = 20
+): Point[] {
+  if (points.length < 3) {
+    // For fewer than 3 points, just return the points as a closed polygon
+    return [...points, points[0]];
+  }
+
+  const n = points.length;
+  const result: Point[] = [];
+
+  // For each segment in the closed loop
+  for (let i = 0; i < n; i++) {
+    // Get 4 points for this segment using modular indexing
+    const p0 = points[(i - 1 + n) % n];  // Previous point (wraps around)
+    const p1 = points[i];                 // Current point (segment start)
+    const p2 = points[(i + 1) % n];       // Next point (segment end)
+    const p3 = points[(i + 2) % n];       // Point after next (for tangent calculation)
+
+    // Calculate control points for cubic Bezier that passes through p1 and p2
+    const t = tension;
+    const c1x = p1.x + (p2.x - p0.x) / 6 * (1 - t);
+    const c1y = p1.y + (p2.y - p0.y) / 6 * (1 - t);
+    const c2x = p2.x - (p3.x - p1.x) / 6 * (1 - t);
+    const c2y = p2.y - (p3.y - p1.y) / 6 * (1 - t);
+
+    // Generate points along this cubic Bezier segment
+    for (let j = 0; j < numSegments; j++) {
+      const s = j / numSegments;
+      const s2 = s * s;
+      const s3 = s2 * s;
+      const ms = 1 - s;
+      const ms2 = ms * ms;
+      const ms3 = ms2 * ms;
+
+      // Cubic Bezier formula
+      const x = ms3 * p1.x + 3 * ms2 * s * c1x + 3 * ms * s2 * c2x + s3 * p2.x;
+      const y = ms3 * p1.y + 3 * ms2 * s * c1y + 3 * ms * s2 * c2y + s3 * p2.y;
+
+      result.push({ x, y });
+    }
+  }
+
+  // Add the final point to close the loop exactly
+  result.push({ x: points[0].x, y: points[0].y });
+
+  return result;
+}
+
 
 /**
  * Combines wall endpoints and control points into an ordered array
