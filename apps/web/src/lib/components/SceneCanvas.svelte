@@ -1428,16 +1428,42 @@
       wallsCtx.lineWidth = isSelected ? 3 / scale : 2 / scale;
 
       if (path.points.length >= 2) {
-        // Create closed loop by duplicating points at start/end
-        // For Catmull-Rom, we need: [last, ...points, first, second] to close smoothly
-        const closedPoints = [
-          path.points[path.points.length - 1], // Last point wraps to start
-          ...path.points,
-          path.points[0], // First point wraps to end
-          path.points[1 % path.points.length]  // Second point for smooth end tangent
-        ];
-        const splinePoints = catmullRomSpline(closedPoints);
-        renderSplinePath(wallsCtx, splinePoints);
+        // For closed loop, render each segment individually with proper wrap-around
+        const n = path.points.length;
+
+        // Generate all segments including the closing segment (last -> first)
+        for (let i = 0; i < n; i++) {
+          // Get 4 points for Catmull-Rom: p0, p1, p2, p3
+          // We draw the segment from p1 to p2
+          const p0 = path.points[(i - 1 + n) % n];
+          const p1 = path.points[i];
+          const p2 = path.points[(i + 1) % n];
+          const p3 = path.points[(i + 2) % n];
+
+          // Generate spline points for this segment
+          const numSegments = 20;
+          for (let j = 0; j <= numSegments; j++) {
+            const t = j / numSegments;
+            const t2 = t * t;
+            const t3 = t2 * t;
+
+            // Catmull-Rom matrix coefficients
+            const c0 = -0.5 * t3 + t2 - 0.5 * t;
+            const c1 = 1.5 * t3 - 2.5 * t2 + 1;
+            const c2 = -1.5 * t3 + 2 * t2 + 0.5 * t;
+            const c3 = 0.5 * t3 - 0.5 * t2;
+
+            const x = c0 * p0.x + c1 * p1.x + c2 * p2.x + c3 * p3.x;
+            const y = c0 * p0.y + c1 * p1.y + c2 * p2.y + c3 * p3.y;
+
+            if (i === 0 && j === 0) {
+              wallsCtx.moveTo(x, y);
+            } else {
+              wallsCtx.lineTo(x, y);
+            }
+          }
+        }
+        wallsCtx.closePath();
       }
       wallsCtx.stroke();
 
