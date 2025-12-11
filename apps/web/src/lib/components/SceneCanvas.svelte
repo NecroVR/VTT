@@ -367,6 +367,11 @@
     renderLights();
   }
 
+  // Watch for path point changes - re-render paths when points are added/updated/removed
+  $: if (pathPoints) {
+    renderPaths();
+  }
+
   // Watch for fog changes
   $: if (scene.fogExploration && fogData) {
     renderFog();
@@ -3012,11 +3017,15 @@
 
     // Handle path tool
     if (activeTool === 'path' && isGM) {
+      console.log('[PathTool] Click detected, activeTool:', activeTool, 'isGM:', isGM);
       // Get the current highest pathIndex for this pathName
       const existingPoints = pathPoints.filter(p => p.pathName === currentPathName);
       const nextIndex = existingPoints.length > 0
         ? Math.max(...existingPoints.map(p => p.pathIndex)) + 1
         : 0;
+
+      console.log('[PathTool] Creating point:', { pathName: currentPathName, pathIndex: nextIndex, x: snappedPos.x, y: snappedPos.y });
+      console.log('[PathTool] onPathPointAdd callback exists:', !!onPathPointAdd);
 
       // Create new path point
       onPathPointAdd?.({

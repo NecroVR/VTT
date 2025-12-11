@@ -76,6 +76,7 @@
     const token = localStorage.getItem('vtt_session_id') || sessionStorage.getItem('vtt_session_id') || '';
     lightsStore.loadLights(activeScene.id, token);
     wallsStore.loadWalls(activeScene.id, token);
+    pathPointsStore.loadPathPoints(activeScene.id, token);
   }
   $: tokens = Array.from($tokensStore.tokens.values()).filter(
     token => activeScene && token.sceneId === activeScene.id
@@ -390,7 +391,12 @@
   }
 
   function handlePathPointAdd(pointData: { pathName: string; pathIndex: number; x: number; y: number; color: string; visible: boolean }) {
-    if (!activeScene) return;
+    console.log('[Campaign] handlePathPointAdd called with:', pointData);
+    if (!activeScene) {
+      console.log('[Campaign] No active scene, aborting');
+      return;
+    }
+    console.log('[Campaign] Sending pathPoint:add via websocket');
     websocket.sendPathPointAdd({
       sceneId: activeScene.id,
       pathName: pointData.pathName,
@@ -400,6 +406,11 @@
       color: pointData.color,
       visible: pointData.visible
     });
+  }
+
+  function handlePathPointRemove(pathPointId: string) {
+    console.log('[Campaign] handlePathPointRemove called with:', pathPointId);
+    websocket.sendPathPointRemove({ pathPointId });
   }
 
   function handleLightDoubleClick(lightId: string) {
@@ -648,6 +659,7 @@
             onLightDoubleClick={handleLightDoubleClick}
             onLightMove={handleLightMove}
             onPathPointAdd={handlePathPointAdd}
+            onPathPointRemove={handlePathPointRemove}
           />
           {#if isGM}
             <div class="scene-controls-overlay">
