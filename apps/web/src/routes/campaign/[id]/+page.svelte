@@ -752,6 +752,16 @@
   </header>
 
   <div class="campaign-content">
+    {#if isGM}
+      <div class="toolbar-frame">
+        <SceneControls
+          {isGM}
+          {activeTool}
+          onToolChange={handleToolChange}
+        />
+      </div>
+    {/if}
+
     <div class="canvas-frame">
       <div class="canvas-container">
         {#if activeScene}
@@ -788,15 +798,6 @@
             onPathPointRemove={handlePathPointRemove}
             onPathPointUpdate={handlePathPointUpdate}
           />
-          {#if isGM}
-            <div class="scene-controls-overlay">
-              <SceneControls
-                {isGM}
-                {activeTool}
-                onToolChange={handleToolChange}
-              />
-            </div>
-          {/if}
         {:else}
           <div class="placeholder">
             <p>No Scene Available</p>
@@ -1060,18 +1061,19 @@
     background: rgba(59, 130, 246, 0.8);
   }
 
+  .toolbar-frame {
+    flex-shrink: 0;
+    height: 100%;
+    display: flex;
+    background-color: #111827;
+    border-right: 2px solid #374151;
+    padding: 0.75rem 0.5rem;
+  }
+
   .sidebar-frame {
     flex-shrink: 0;
     position: relative;
     height: 100%;
-  }
-
-  .scene-controls-overlay {
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
-    z-index: 10;
-    pointer-events: auto;
   }
 
   .placeholder {

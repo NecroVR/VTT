@@ -81,12 +81,10 @@
   .scene-controls {
     display: flex;
     flex-direction: column;
-    background-color: rgba(17, 24, 39, 0.9);
-    border: 1px solid #374151;
-    border-radius: 0.5rem;
-    padding: 0.5rem;
+    background-color: transparent;
+    padding: 0;
     gap: 0.5rem;
-    backdrop-filter: blur(8px);
+    height: 100%;
   }
 
   .scene-controls.horizontal {
