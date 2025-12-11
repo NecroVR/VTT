@@ -3943,6 +3943,69 @@
           }
         }
 
+        // Check for window control point dragging with Shift key (highest priority for windows)
+        if (e.shiftKey) {
+          const windowControlPointHit = findWindowControlPointAtPoint(worldPos.x, worldPos.y);
+          if (windowControlPointHit) {
+            const window = windows.find(w => w.id === windowControlPointHit.windowId);
+            if (window) {
+              draggedWindowControlPoint = windowControlPointHit;
+              draggedWindowControlPointRequiresGridSnap = window.snapToGrid === true;
+              isDraggingWindowControlPoint = true;
+
+              // Clear other selections
+              selectedTokenId = null;
+              selectedLightId = null;
+              selectedWallIds = new Set();
+              onTokenSelect?.(null);
+              onLightSelect?.(null);
+
+              renderWalls(); // renderWalls also renders windows
+              return;
+            }
+          }
+        }
+
+        // Check for window endpoint dragging (higher priority than window selection)
+        const windowEndpointHit = findWindowEndpointAtPoint(worldPos.x, worldPos.y);
+        if (windowEndpointHit) {
+          // Find the exact position of the clicked endpoint
+          const clickedWindow = windows.find(w => w.id === windowEndpointHit.windowId);
+          if (clickedWindow) {
+            const endpointX = windowEndpointHit.endpoint === 'start' ? clickedWindow.x1 : clickedWindow.x2;
+            const endpointY = windowEndpointHit.endpoint === 'start' ? clickedWindow.y1 : clickedWindow.y2;
+
+            // If the clicked window is not selected, select only that window
+            if (!selectedWindowIds.has(windowEndpointHit.windowId)) {
+              selectedWindowIds = new Set([windowEndpointHit.windowId]);
+            }
+
+            // Find all selected windows sharing this endpoint
+            draggedWindows = findSelectedWindowsAtEndpoint(endpointX, endpointY, selectedWindowIds);
+
+            // If no windows found (shouldn't happen), fall back to just the clicked window
+            if (draggedWindows.length === 0) {
+              draggedWindows = [{ windowId: windowEndpointHit.windowId, endpoint: windowEndpointHit.endpoint }];
+            }
+
+            // Determine if grid snapping should be applied (if ANY window has snapToGrid)
+            draggedWindowEndpointRequiresGridSnap = draggedWindows.some(dw => {
+              const window = windows.find(w => w.id === dw.windowId);
+              return window?.snapToGrid === true;
+            });
+
+            isDraggingWindowEndpoint = true;
+          }
+
+          selectedTokenId = null;
+          selectedLightId = null;
+          selectedWallIds = new Set();
+          onTokenSelect?.(null);
+          onLightSelect?.(null);
+          renderWalls(); // renderWalls also renders windows
+          return;
+        }
+
         // Check for wall/door selection
         const wallId = findWallAtPoint(worldPos.x, worldPos.y);
         if (wallId) {
@@ -3975,12 +4038,40 @@
           }
           selectedTokenId = null;
           selectedLightId = null;
+          selectedWindowIds = new Set();
           onTokenSelect?.(null);
           onLightSelect?.(null);
           renderWalls();
           return;
         } else {
           selectedWallIds = new Set();
+        }
+
+        // Check for window selection
+        const windowId = findWindowAtPoint(worldPos.x, worldPos.y);
+        if (windowId) {
+          // Regular window selection
+          if (e.ctrlKey) {
+            // Ctrl+Click: Toggle window in/out of selection
+            if (selectedWindowIds.has(windowId)) {
+              selectedWindowIds = new Set([...selectedWindowIds].filter(id => id !== windowId));
+            } else {
+              selectedWindowIds = new Set([...selectedWindowIds, windowId]);
+            }
+          } else {
+            // Regular click: Select only this window
+            selectedWindowIds = new Set([windowId]);
+          }
+          selectedTokenId = null;
+          selectedLightId = null;
+          selectedWallIds = new Set();
+          onTokenSelect?.(null);
+          onLightSelect?.(null);
+          onWindowSelect?.(windowId);
+          renderWalls(); // renderWalls also renders windows
+          return;
+        } else {
+          selectedWindowIds = new Set();
         }
 
         // Check for path selection (GM only)
@@ -4053,8 +4144,10 @@
             selectedTokenId = null;
             selectedLightId = null;
             selectedWallIds = new Set();
+            selectedWindowIds = new Set();
             onTokenSelect?.(null);
             onLightSelect?.(null);
+            onWindowSelect?.(null);
           }
 
           lastClickTime = 0;
@@ -4065,8 +4158,10 @@
           exitPossession();
           selectedTokenId = null;
           selectedLightId = null;
+          selectedWindowIds = new Set();
           onTokenSelect?.(null);
           onLightSelect?.(null);
+          onWindowSelect?.(null);
           isPanning = true;
           lastClickTime = 0;
           lastClickTokenId = null;
@@ -4077,8 +4172,10 @@
       // Non-select tool - clear selections and start panning if clicking empty space
       selectedTokenId = null;
       selectedLightId = null;
+      selectedWindowIds = new Set();
       onTokenSelect?.(null);
       onLightSelect?.(null);
+      onWindowSelect?.(null);
       isPanning = true;
       lastClickTime = 0;
       lastClickTokenId = null;
@@ -4255,11 +4352,20 @@
     }
 
     // Update wall hover
-    if (activeTool === 'select' && isGM && !isDraggingToken && !isDraggingLight && !isPanning && !isDraggingWallEndpoint) {
+    if (activeTool === 'select' && isGM && !isDraggingToken && !isDraggingLight && !isPanning && !isDraggingWallEndpoint && !isDraggingWindowEndpoint) {
       const wallId = findWallAtPoint(worldPos.x, worldPos.y);
       if (wallId !== hoveredWallId) {
         hoveredWallId = wallId;
         renderWalls();
+      }
+    }
+
+    // Update window hover
+    if (activeTool === 'select' && isGM && !isDraggingToken && !isDraggingLight && !isPanning && !isDraggingWallEndpoint && !isDraggingWindowEndpoint) {
+      const windowId = findWindowAtPoint(worldPos.x, worldPos.y);
+      if (windowId !== hoveredWindowId) {
+        hoveredWindowId = windowId;
+        renderWalls(); // renderWalls also renders windows
       }
     }
 
@@ -4309,6 +4415,51 @@
       // Invalidate visibility cache so walls update during drag
       invalidateVisibilityCache();
       renderWalls();
+      return;
+    }
+
+    // Handle window endpoint dragging
+    if (isDraggingWindowEndpoint && draggedWindows.length > 0) {
+      // Apply snapping based on whether any window requires grid snap
+      const targetPos = draggedWindowEndpointRequiresGridSnap ? snapToGrid(worldPos.x, worldPos.y) : worldPos;
+
+      // Update all dragged window endpoints locally for immediate feedback
+      for (const dw of draggedWindows) {
+        const window = windows.find(w => w.id === dw.windowId);
+        if (window) {
+          if (dw.endpoint === 'start') {
+            window.x1 = targetPos.x;
+            window.y1 = targetPos.y;
+          } else {
+            window.x2 = targetPos.x;
+            window.y2 = targetPos.y;
+          }
+        }
+      }
+
+      // Invalidate visibility cache so windows update during drag
+      invalidateVisibilityCache();
+      renderWalls(); // renderWalls also renders windows
+      return;
+    }
+
+    // Handle window control point dragging
+    if (isDraggingWindowControlPoint && draggedWindowControlPoint) {
+      // Apply snapping if needed
+      const targetPos = draggedWindowControlPointRequiresGridSnap ? snapToGrid(worldPos.x, worldPos.y) : worldPos;
+
+      // Update the control point position locally for immediate feedback
+      const window = windows.find(w => w.id === draggedWindowControlPoint.windowId);
+      if (window && window.controlPoints) {
+        window.controlPoints[draggedWindowControlPoint.controlPointIndex] = {
+          x: targetPos.x,
+          y: targetPos.y
+        };
+      }
+
+      // Invalidate visibility cache so windows update during drag
+      invalidateVisibilityCache();
+      renderWalls(); // renderWalls also renders windows
       return;
     }
 
@@ -4524,6 +4675,47 @@
       isDraggingControlPoint = false;
       draggedControlPoint = null;
       draggedControlPointRequiresGridSnap = false;
+    } else if (isDraggingWindowEndpoint && draggedWindows.length > 0) {
+      const worldPos = screenToWorld(e.clientX, e.clientY);
+      // Apply snapping based on whether any window requires grid snap
+      const finalPos = draggedWindowEndpointRequiresGridSnap ? snapToGrid(worldPos.x, worldPos.y) : worldPos;
+
+      // Send updates for ALL dragged windows
+      for (const dw of draggedWindows) {
+        const updates: Partial<Window> = dw.endpoint === 'start'
+          ? { x1: finalPos.x, y1: finalPos.y }
+          : { x2: finalPos.x, y2: finalPos.y };
+
+        onWindowUpdate?.(dw.windowId, updates);
+      }
+
+      // Reset drag state
+      isDraggingWindowEndpoint = false;
+      draggedWindows = [];
+      draggedWindowEndpointRequiresGridSnap = false;
+    } else if (isDraggingWindowControlPoint && draggedWindowControlPoint) {
+      const worldPos = screenToWorld(e.clientX, e.clientY);
+      // Apply snapping if needed
+      const finalPos = draggedWindowControlPointRequiresGridSnap
+        ? snapToGrid(worldPos.x, worldPos.y)
+        : worldPos;
+
+      // Find the window and update its control points
+      const window = windows.find(w => w.id === draggedWindowControlPoint.windowId);
+      if (window && window.controlPoints) {
+        const newControlPoints = [...window.controlPoints];
+        newControlPoints[draggedWindowControlPoint.controlPointIndex] = {
+          x: finalPos.x,
+          y: finalPos.y
+        };
+
+        onWindowUpdate?.(draggedWindowControlPoint.windowId, { controlPoints: newControlPoints });
+      }
+
+      // Reset drag state
+      isDraggingWindowControlPoint = false;
+      draggedWindowControlPoint = null;
+      draggedWindowControlPointRequiresGridSnap = false;
     }
 
     isPanning = false;
@@ -4953,7 +5145,7 @@
       return;
     }
 
-    // Escape - exit possession, or cancel wall drawing
+    // Escape - exit possession, cancel wall/window drawing, or clear selections
     if (e.key === 'Escape') {
       if (possessedTokenId) {
         exitPossession();
@@ -4961,17 +5153,41 @@
       } else if (isDrawingWall) {
         cancelWallDrawing();
         e.preventDefault();
+      } else if (isDrawingWindow) {
+        cancelWindowDrawing();
+        e.preventDefault();
+      } else if (selectedWindowIds.size > 0) {
+        selectedWindowIds = new Set();
+        onWindowSelect?.(null);
+        renderWalls(); // renderWalls also renders windows
+        e.preventDefault();
+      } else if (selectedWallIds.size > 0) {
+        selectedWallIds = new Set();
+        renderWalls();
+        e.preventDefault();
       }
     }
 
-    // Delete - remove selected wall(s)
-    if (e.key === 'Delete' && selectedWallIds.size > 0 && isGM) {
+    // Delete/Backspace - remove selected wall(s)
+    if ((e.key === 'Delete' || e.key === 'Backspace') && selectedWallIds.size > 0 && isGM) {
       // Delete all selected walls
       selectedWallIds.forEach(wallId => {
         onWallRemove?.(wallId);
       });
       selectedWallIds = new Set();
       renderWalls();
+      e.preventDefault();
+    }
+
+    // Delete/Backspace - remove selected window(s)
+    if ((e.key === 'Delete' || e.key === 'Backspace') && selectedWindowIds.size > 0 && isGM) {
+      // Delete all selected windows
+      selectedWindowIds.forEach(windowId => {
+        onWindowRemove?.(windowId);
+      });
+      selectedWindowIds = new Set();
+      onWindowSelect?.(null);
+      renderWalls(); // renderWalls also renders windows
       e.preventDefault();
     }
   }
@@ -5077,6 +5293,42 @@
         contextMenuElementVisible = true; // Walls don't have visibility toggle
         contextMenuElementSnapToGrid = wall?.snapToGrid !== false; // Default to true if undefined
         contextMenuWallShape = wall?.wallShape;
+        contextMenuClickWorldPos = { x: worldX, y: worldY };
+        contextMenuControlPointIndex = null; // Not clicking on a control point
+        return;
+      }
+
+      // Check for window control point at position (for curved windows)
+      const windowControlPointHit = findWindowControlPointAtPoint(worldX, worldY);
+      if (windowControlPointHit) {
+        const window = windows.find(w => w.id === windowControlPointHit.windowId);
+        if (window) {
+          showContextMenu = true;
+          contextMenuX = e.clientX;
+          contextMenuY = e.clientY;
+          contextMenuElementType = 'window';
+          contextMenuElementId = windowControlPointHit.windowId;
+          contextMenuElementVisible = true; // Windows don't have visibility toggle
+          contextMenuElementSnapToGrid = window.snapToGrid !== false; // Default to true if undefined
+          contextMenuWallShape = window.wallShape;
+          contextMenuClickWorldPos = { x: worldX, y: worldY };
+          contextMenuControlPointIndex = windowControlPointHit.controlPointIndex;
+          return;
+        }
+      }
+
+      // Check for window at position
+      const clickedWindowId = findWindowAtPoint(worldX, worldY);
+      if (clickedWindowId) {
+        const window = windows.find(w => w.id === clickedWindowId);
+        showContextMenu = true;
+        contextMenuX = e.clientX;
+        contextMenuY = e.clientY;
+        contextMenuElementType = 'window';
+        contextMenuElementId = clickedWindowId;
+        contextMenuElementVisible = true; // Windows don't have visibility toggle
+        contextMenuElementSnapToGrid = window?.snapToGrid !== false; // Default to true if undefined
+        contextMenuWallShape = window?.wallShape;
         contextMenuClickWorldPos = { x: worldX, y: worldY };
         contextMenuControlPointIndex = null; // Not clicking on a control point
         return;
@@ -5228,6 +5480,9 @@
     } else if (contextMenuElementType === 'wall') {
       deleteDialogTitle = 'Delete Wall';
       deleteDialogMessage = 'Are you sure you want to delete this wall? This action cannot be undone.';
+    } else if (contextMenuElementType === 'window') {
+      deleteDialogTitle = 'Delete Window';
+      deleteDialogMessage = 'Are you sure you want to delete this window? This action cannot be undone.';
     } else if (contextMenuElementType === 'pathpoint') {
       deleteDialogTitle = 'Delete Path Point';
       deleteDialogMessage = 'Are you sure you want to delete this path point? This action cannot be undone.';
@@ -5245,6 +5500,8 @@
       websocket.sendLightRemove({ lightId: contextMenuElementId });
     } else if (contextMenuElementType === 'wall' && contextMenuElementId) {
       websocket.sendWallRemove({ wallId: contextMenuElementId });
+    } else if (contextMenuElementType === 'window' && contextMenuElementId) {
+      onWindowRemove?.(contextMenuElementId);
     } else if (contextMenuElementType === 'pathpoint' && contextMenuElementId) {
       onPathPointRemove?.(contextMenuElementId);
     }
@@ -5260,6 +5517,10 @@
     }
     if (contextMenuElementType === 'wall') {
       selectedWallIds = new Set();
+    }
+    if (contextMenuElementType === 'window') {
+      selectedWindowIds = new Set();
+      onWindowSelect?.(null);
     }
     if (contextMenuElementType === 'pathpoint') {
       selectedPathPointId = null;
