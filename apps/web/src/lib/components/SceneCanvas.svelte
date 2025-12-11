@@ -527,6 +527,16 @@
     renderLights();
   }
 
+  // Watch for window changes - re-render walls layer (which includes windows)
+  $: if (windows && isGM) {
+    renderWalls();
+  }
+
+  // Watch for door changes - re-render walls layer (which includes doors)
+  $: if (doors && isGM) {
+    renderWalls();
+  }
+
   // Watch for light changes - render without full cache invalidation
   // (new lights get cache miss by ID, moved lights get cache miss by position)
   $: if (lights) {
