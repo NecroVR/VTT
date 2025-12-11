@@ -13,6 +13,8 @@
     { id: 'select', label: 'Select', icon: '⬆', gmOnly: false, shortcut: '1' },
     { id: 'wall', label: 'Wall', icon: '▬', gmOnly: true, shortcut: '2' },
     { id: 'curved-wall', label: 'Curved Wall', icon: '⌒', gmOnly: true, shortcut: 'c' },
+    { id: 'door', label: 'Door', icon: '🚪', gmOnly: true, shortcut: 'd' },
+    { id: 'curved-door', label: 'Curved Door', icon: '⌓', gmOnly: true, shortcut: 'shift+d' },
     { id: 'window', label: 'Window', icon: '🪟', gmOnly: true, shortcut: 'w' },
     { id: 'curved-window', label: 'Curved Window', icon: '⌓', gmOnly: true, shortcut: 'shift+w' },
     { id: 'path', label: 'Path', icon: '〰', gmOnly: true, shortcut: 'a' },
