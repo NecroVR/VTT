@@ -4,7 +4,7 @@
   // Props
   export let x: number;
   export let y: number;
-  export let elementType: 'token' | 'light' | 'wall' | 'pathpoint';
+  export let elementType: 'token' | 'light' | 'wall' | 'window' | 'door' | 'pathpoint';
   export let elementId: string;
   export let isGM: boolean = false;
   export let isVisible: boolean = true;
@@ -191,8 +191,8 @@
     <span>{isVisible ? 'Make Invisible' : 'Make Visible'}</span>
   </button>
 
-  <!-- Toggle Snap to Grid (walls only) -->
-  {#if elementType === 'wall'}
+  <!-- Toggle Snap to Grid (walls, windows, and doors) -->
+  {#if elementType === 'wall' || elementType === 'window' || elementType === 'door'}
     <button class="menu-item" on:click={handleToggleSnapToGrid}>
       <span class="icon">
         {#if snapToGrid}
@@ -217,8 +217,8 @@
     </button>
   {/if}
 
-  <!-- Add Spline Point (curved walls only) -->
-  {#if elementType === 'wall' && wallShape === 'curved' && controlPointIndex === null}
+  <!-- Add Spline Point (curved walls, windows, and doors) -->
+  {#if (elementType === 'wall' || elementType === 'window' || elementType === 'door') && wallShape === 'curved' && controlPointIndex === null}
     <button class="menu-item" on:click={handleAddSplinePoint}>
       <span class="icon">
         <!-- Plus icon for adding a point -->
@@ -232,8 +232,8 @@
     </button>
   {/if}
 
-  <!-- Delete Spline Point (curved walls only, when clicking on a control point) -->
-  {#if elementType === 'wall' && wallShape === 'curved' && controlPointIndex !== null}
+  <!-- Delete Spline Point (curved walls, windows, and doors, when clicking on a control point) -->
+  {#if (elementType === 'wall' || elementType === 'window' || elementType === 'door') && wallShape === 'curved' && controlPointIndex !== null}
     <button class="menu-item danger" on:click={handleDeleteSplinePoint}>
       <span class="icon">
         <!-- Trash icon for deleting a point -->
