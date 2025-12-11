@@ -1,137 +1,138 @@
-# Session Notes: Path Tool Implementation
+# Session 0029: Path Tool Implementation
 
-**Date**: 2025-12-10
-**Session ID**: 0029
-**Topic**: Path Tool - Animated Object Paths
+**Date:** 2025-12-10
+**Focus:** Implementing animated paths for tokens/lights to follow
 
----
+## Summary
 
-## Session Summary
+Completed the Path Tool feature allowing GMs to create spline-based paths that objects (tokens, lights) can follow. The path points system is fully functional with real-time editing, closed loop rendering, and path assignment UI in the light config modal.
 
-Implemented a new "Path Tool" that allows GMs to create animated paths for objects (tokens, lights) to follow. The design was refined during implementation to use individual PathPoints that are grouped by pathName and ordered by pathIndex.
+## What Was Implemented
 
----
+### Path Points System
+- **Database schema**: `path_points` table with `pathName`, `pathIndex`, x, y, color, visible fields
+- **API endpoints**: CRUD operations for path points at `/api/v1/scenes/:sceneId/path-points`
+- **WebSocket handlers**: Real-time sync for pathPoint:add/update/remove operations
+- **Stores**: `pathPointsStore` + `assembledPaths` derived store that groups points by pathName
 
-## Final Design (Simplified)
+### Path Tool UI
+- **Toolbar button**: Added path tool (icon: '〰', shortcut: 'a', GM-only)
+- **Point creation**: Click on canvas with path tool to add points
+- **Point selection**: Click on points with select tool to select them
+- **Point dragging**: Real-time visual feedback during drag (no grid snapping)
+- **Point deletion**: Right-click context menu with delete option
+- **Closed loop rendering**: Proper Catmull-Rom spline that connects last point back to first
 
-### Data Model
+### Spline Rendering Fixes
+- Fixed 3-point case to use Catmull-Rom with virtual endpoints (was using Bezier)
+- Implemented proper closed loop spline rendering with modular indexing
+- Eliminated duplicate connections at loop endpoints
 
-**PathPoints Table** - Individual path points:
-- `id` - UUID primary key
-- `sceneId` - Reference to scene
-- `pathName` - String, case-sensitive path identifier
-- `pathIndex` - Positive integer for ordering within path
-- `x`, `y` - Position coordinates
-- `color` - Path visualization color (default: yellow)
-- `visible` - GM-only visibility flag
-- `data` - Extensible metadata
-- `createdAt`, `updatedAt` - Timestamps
+### Light Config Integration
+- Added "Path Following" section to LightingConfig modal
+- Dropdown to select path by name (shows available paths for scene)
+- Speed slider (10-500 px/sec) with direct number input
+- Settings saved to `followPathName` and `pathSpeed` fields on lights
 
-**Token/Light Extensions**:
-- `followPathName` - String, path name to follow (case-sensitive)
-- `pathSpeed` - Number, speed in units per second
+## Key Files Modified/Created
 
-Paths are assembled at runtime by grouping points with the same `pathName` and ordering by `pathIndex`.
+### Created
+- `packages/database/src/schema/paths.ts` - PathPoints table schema
+- `packages/shared/src/types/path.ts` - TypeScript interfaces
+- `apps/server/src/routes/api/v1/paths.ts` - API routes
+- `apps/web/src/lib/stores/paths.ts` - Path stores
+- `apps/web/src/lib/utils/pathAnimation.ts` - Animation utilities (not yet integrated)
+- `apps/web/src/lib/components/PathConfigModal.svelte` - Config modal (exists but not yet used)
 
-### Context Menu
+### Modified
+- `apps/web/src/lib/components/SceneCanvas.svelte` - Path tool handling, rendering, drag support
+- `apps/web/src/lib/components/scene/SceneControls.svelte` - Added path tool button
+- `apps/web/src/lib/components/LightingConfig.svelte` - Added path following settings
+- `apps/web/src/lib/utils/spline.ts` - Fixed 3-point Catmull-Rom case
+- `apps/web/src/routes/campaign/[id]/+page.svelte` - Wired up path point handlers
+- `apps/web/src/lib/stores/websocket.ts` - Added pathPoint WebSocket methods
+- `apps/server/src/websocket/handlers/campaign.ts` - PathPoint WebSocket handlers
+- `packages/database/src/schema/tokens.ts` - Added followPathName, pathSpeed columns
+- `packages/database/src/schema/ambientLights.ts` - Added followPathName, pathSpeed columns
 
-Each path point has a context menu accessible via right-click with:
-- "Edit Path Name" - Change the pathName (groups the point with other points)
-- "Edit Path Index" - Change the pathIndex (ordering within path)
-- "Delete Point" - Remove the point
-
----
-
-## Implementation Completed
-
-### Phase 1: Database & Types
-- [x] Database schema for pathPoints table (`packages/database/src/schema/paths.ts`)
-- [x] Added followPathName and pathSpeed to tokens table
-- [x] Added followPathName and pathSpeed to ambientLights table
-- [x] Shared types for PathPoint interface (`packages/shared/src/types/path.ts`)
-- [x] WebSocket message types for path point operations
-
-### Phase 2: Backend
-- [x] API routes for PathPoint CRUD (`apps/server/src/routes/api/v1/paths.ts`)
-- [x] Assembled paths endpoint (groups points by pathName)
-- [x] WebSocket handlers for real-time sync
-
-### Phase 3: Frontend Store
-- [x] pathPointsStore for state management (`apps/web/src/lib/stores/paths.ts`)
-- [x] assembledPaths derived store
-- [x] WebSocket subscription for path updates
-
-### Phase 4: Path Tool UI
-- [x] Path tool handling in SceneCanvas
-- [x] Path rendering with spline interpolation
-- [x] Path node rendering as circles
-- [x] Path point selection and dragging
-- [x] Context menu for path point editing
-
-### Phase 5: Animation System
-- [x] Path animation utilities (`apps/web/src/lib/utils/pathAnimation.ts`)
-- [x] PathAnimationManager class
-- [x] Position calculation along spline curves
-
-### Remaining Work
-- [ ] Update token/light config modals with path fields
-- [ ] Integrate path animation with token/light rendering
-- [ ] Unit tests for path utilities
-- [ ] E2E tests for path tool
-
----
-
-## Files Created
-
-| File | Description |
-|------|-------------|
-| `packages/database/src/schema/paths.ts` | PathPoints database schema |
-| `packages/shared/src/types/path.ts` | PathPoint type definitions |
-| `apps/server/src/routes/api/v1/paths.ts` | API routes for path operations |
-| `apps/web/src/lib/stores/paths.ts` | Frontend path store |
-| `apps/web/src/lib/utils/pathAnimation.ts` | Animation utilities |
-| `apps/web/src/lib/components/PathConfigModal.svelte` | Configuration modal |
-
-## Files Modified
-
-| File | Changes |
-|------|---------|
-| `packages/database/src/schema/tokens.ts` | Added followPathName, pathSpeed |
-| `packages/database/src/schema/ambientLights.ts` | Added followPathName, pathSpeed |
-| `packages/shared/src/types/websocket.ts` | Added path message types |
-| `apps/server/src/websocket/handlers/campaign.ts` | Path WebSocket handlers |
-| `apps/web/src/lib/components/SceneCanvas.svelte` | Path tool UI & rendering |
-
----
-
-## Current Status
-
-- [x] Core implementation complete
-- [x] Build passing
-- [x] Deployed to Docker
-- [x] Server running without errors
-
----
-
-## Key Commits
+## Commits This Session
 
 ```
-37e4652 feat(paths): Add path tool rendering and interaction in SceneCanvas
-5f63cf5 fix(paths): Update API routes and WebSocket handlers for simplified path model
-22a1a73 refactor(paths): Replace Path model with PathPoint model
-694ef65 refactor(paths): Simplify path system by removing pathSettings table
-3938db0 feat(path): Add Path Tool UI components to SceneCanvas
-bb6ab95 feat(paths): Add backend API routes and WebSocket handlers
+b860dd7 feat(lights): Add path following settings to light config modal
+5e8b131 fix(paths): Render closed loop splines correctly without duplicate segments
+bb2fca3 feat(paths): Make paths render as closed loops
+030f6be fix(paths): Use local pathPoints array for real-time drag rendering
+6607313 fix(paths): Add real-time visual feedback during path point drag
+613c4a2 fix(paths): Fix spline interpolation, path point dragging, and selection order
+2fdca66 fix(paths): Ensure paths render consistently with walls on shared canvas
+3366fa1 fix(paths): Improve path reactivity by watching assembledPaths store
+28044eb fix(paths): Fix path point rendering and deletion
+8ea4d96 feat(paths): Wire up path point WebSocket handlers and campaign page integration
+eae0965 feat(toolbar): Add path tool button to scene controls
 ```
 
----
+## What's NOT Yet Implemented
+
+### Path Animation System
+The actual animation of objects following paths is not yet implemented. This requires:
+
+1. **PathAnimationManager integration** with rendering loop
+   - File exists at `apps/web/src/lib/utils/pathAnimation.ts` with:
+     - `calculatePathLength()` - Compute total path length
+     - `getPositionAtDistance()` - Get x,y at distance along path
+     - `getPositionAtTime()` - Get position based on elapsed time and speed
+     - `PathAnimationManager` class with precomputed spline for O(log n) lookup
+
+2. **Animation loop** in SceneCanvas
+   - Check which lights/tokens have `followPathName` set
+   - Update their positions based on elapsed time
+   - Re-render affected layers
+
+3. **Server-side position sync**
+   - Decide if animation runs client-side only or server-authoritative
+   - Handle multiplayer sync of animated object positions
+
+### Token Config Modal
+- TokenConfig.svelte needs the same "Path Following" section added (copy from LightingConfig)
+
+## Technical Notes
+
+### Closed Loop Spline Algorithm
+For proper closed Catmull-Rom splines:
+```javascript
+for (let i = 0; i < n; i++) {
+  const p0 = points[(i - 1 + n) % n];  // Previous (wraps)
+  const p1 = points[i];                 // Current (segment start)
+  const p2 = points[(i + 1) % n];       // Next (segment end)
+  const p3 = points[(i + 2) % n];       // After next (for tangent)
+  // Draw segment from p1 to p2 using Catmull-Rom matrix
+}
+```
+
+### Real-time Drag Rendering
+To get real-time visual updates during drag:
+1. Modify local `pathPoints` array with new object references
+2. Trigger Svelte reactivity with `pathPoints = pathPoints`
+3. Render function must use local array, not store-derived data
+4. On mouseUp, send update to server via WebSocket
+
+### Path Point Selection Order
+Path points are checked BEFORE walls in handleMouseDown to make them easier to click.
 
 ## Next Steps
 
-1. Add followPathName and pathSpeed fields to token/light configuration modals
-2. Integrate PathAnimationManager with SceneCanvas rendering loop
-3. Make tokens/lights move along their assigned paths
-4. Write unit tests for pathAnimation.ts utilities
-5. Write E2E tests for path tool functionality
+1. Implement animation loop in SceneCanvas that moves lights/tokens along paths
+2. Add path following settings to TokenConfig modal
+3. Decide on client-side vs server-authoritative animation
+4. Add path visibility toggle (show/hide paths for players)
+5. Add path color picker in context menu
+6. Consider adding "pause at point" feature for waypoint-style movement
+7. Clean up debug console.log statements
 
----
+## Testing Notes
+
+- Path tool works: Select path tool, click to add points, points form closed loop
+- Point dragging works: Select tool, click and drag points, real-time update
+- Point deletion works: Right-click point, click delete in context menu
+- Light config shows paths: Double-click light, scroll to "Path Following" section
+- Paths persist: Refresh page, paths still visible
