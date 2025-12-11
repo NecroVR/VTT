@@ -1422,13 +1422,21 @@
 
       const isSelected = selectedPathId === path.pathName;
 
-      // Render path line using spline
+      // Render path line using spline (closed loop)
       wallsCtx.beginPath();
       wallsCtx.strokeStyle = path.color || '#00ff00';
       wallsCtx.lineWidth = isSelected ? 3 / scale : 2 / scale;
 
       if (path.points.length >= 2) {
-        const splinePoints = catmullRomSpline(path.points);
+        // Create closed loop by duplicating points at start/end
+        // For Catmull-Rom, we need: [last, ...points, first, second] to close smoothly
+        const closedPoints = [
+          path.points[path.points.length - 1], // Last point wraps to start
+          ...path.points,
+          path.points[0], // First point wraps to end
+          path.points[1 % path.points.length]  // Second point for smooth end tangent
+        ];
+        const splinePoints = catmullRomSpline(closedPoints);
         renderSplinePath(wallsCtx, splinePoints);
       }
       wallsCtx.stroke();
