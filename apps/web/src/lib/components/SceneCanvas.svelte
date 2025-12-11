@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import { get } from 'svelte/store';
-  import type { Scene, Token, Wall, AmbientLight, FogGrid } from '@vtt/shared';
+  import type { Scene, Token, Wall, Window, AmbientLight, FogGrid } from '@vtt/shared';
   import { lightsStore } from '$lib/stores/lights';
   import { fogStore } from '$lib/stores/fog';
   import { pathPointsStore, assembledPaths } from '$lib/stores/paths';
@@ -15,6 +15,7 @@
     circleIntersectsRect,
     lineSegmentsIntersect,
     lineIntersectsRect,
+    lineIntersectsCircle,
   } from '$lib/utils/geometry';
   import {
     getSplinePoints,
@@ -30,6 +31,7 @@
   export let scene: Scene;
   export let tokens: Token[] = [];
   export let walls: Wall[] = [];
+  export let windows: Window[] = [];
   export let isGM: boolean = false;
   export let activeTool: string = 'select';
   export let gridSnap: boolean = false;
@@ -39,6 +41,10 @@
   export let onWallAdd: ((wall: { x1: number; y1: number; x2: number; y2: number; snapToGrid?: boolean; wallShape?: 'straight' | 'curved' }) => void) | undefined = undefined;
   export let onWallRemove: ((wallId: string) => void) | undefined = undefined;
   export let onWallUpdate: ((wallId: string, updates: Partial<Wall>) => void) | undefined = undefined;
+  export let onWindowAdd: ((window: { x1: number; y1: number; x2: number; y2: number; snapToGrid?: boolean; wallShape?: 'straight' | 'curved'; opacity?: number; tint?: string; tintIntensity?: number }) => void) | undefined = undefined;
+  export let onWindowRemove: ((windowId: string) => void) | undefined = undefined;
+  export let onWindowUpdate: ((windowId: string, updates: Partial<Window>) => void) | undefined = undefined;
+  export let onWindowSelect: ((windowId: string | null) => void) | undefined = undefined;
   export let onTokenAdd: ((tokenData: any) => void) | undefined = undefined;
   export let onLightAdd: ((lightData: { x: number; y: number }) => void) | undefined = undefined;
   export let onLightSelect: ((lightId: string | null) => void) | undefined = undefined;
@@ -63,6 +69,7 @@
   let lightingCanvas: HTMLCanvasElement;
   let fogCanvas: HTMLCanvasElement;
   let wallsCanvas: HTMLCanvasElement;
+  let windowsCanvas: HTMLCanvasElement;
   let controlsCanvas: HTMLCanvasElement;
 
   let backgroundCtx: CanvasRenderingContext2D | null = null;
@@ -71,6 +78,7 @@
   let lightingCtx: CanvasRenderingContext2D | null = null;
   let fogCtx: CanvasRenderingContext2D | null = null;
   let wallsCtx: CanvasRenderingContext2D | null = null;
+  let windowsCtx: CanvasRenderingContext2D | null = null;
   let controlsCtx: CanvasRenderingContext2D | null = null;
 
   // View state
@@ -109,6 +117,24 @@
   let draggedControlPoint: { wallId: string; controlPointIndex: number } | null = null;
   let draggedControlPointRequiresGridSnap = false;
   let isHoveringControlPoint = false;
+
+  // Window drawing state
+  let isDrawingWindow = false;
+  let windowStartPoint: { x: number; y: number } | null = null;
+  let windowPreview: { x1: number; y1: number; x2: number; y2: number } | null = null;
+  let selectedWindowIds: Set<string> = new Set();
+  let hoveredWindowId: string | null = null;
+
+  // Window endpoint dragging state
+  let isDraggingWindowEndpoint = false;
+  let draggedWindows: Array<{windowId: string, endpoint: 'start' | 'end'}> = [];
+  let draggedWindowEndpointRequiresGridSnap = false;
+
+  // Window control point dragging state
+  let isDraggingWindowControlPoint = false;
+  let draggedWindowControlPoint: { windowId: string; controlPointIndex: number } | null = null;
+  let draggedWindowControlPointRequiresGridSnap = false;
+  let isHoveringWindowControlPoint = false;
 
   // Path tool state
   let isDrawingPath = false;
@@ -615,6 +641,7 @@
     lightingCtx = lightingCanvas.getContext('2d');
     fogCtx = fogCanvas ? fogCanvas.getContext('2d') : null;
     wallsCtx = wallsCanvas ? wallsCanvas.getContext('2d') : null;
+    windowsCtx = windowsCanvas ? windowsCanvas.getContext('2d') : null;
     controlsCtx = controlsCanvas.getContext('2d');
 
     // Load fog data when canvas initializes
@@ -644,6 +671,11 @@
     if (wallsCanvas) {
       wallsCanvas.width = width;
       wallsCanvas.height = height;
+    }
+
+    if (windowsCanvas) {
+      windowsCanvas.width = width;
+      windowsCanvas.height = height;
     }
 
     // Invalidate caches on resize
@@ -750,7 +782,7 @@
       renderFog();
     }
     if (isGM) {
-      renderWalls();
+      renderWalls(); // Also renders windows and paths internally
       renderPaths();
     }
     renderControls();
@@ -1507,8 +1539,196 @@
 
     wallsCtx.restore();
 
-    // Also render paths on the same canvas (paths don't clear, just draw on top)
+    // Also render windows and paths on the same canvas (don't clear, just draw on top)
+    renderWindowsInternal();
     renderPathsInternal();
+  }
+
+  // Internal window rendering - doesn't clear canvas, called by renderWalls()
+  function renderWindowsInternal() {
+    if (!wallsCtx || !wallsCanvas) return;
+
+    wallsCtx.save();
+
+    // Apply transform (should already be applied, but ensure consistency)
+    wallsCtx.translate(-viewX * scale, -viewY * scale);
+    wallsCtx.scale(scale, scale);
+
+    // Render existing windows
+    windows.forEach(window => {
+      const isSelected = selectedWindowIds.has(window.id);
+      const isHovered = window.id === hoveredWindowId;
+
+      // Draw selection/hover glow
+      if (isSelected || isHovered) {
+        wallsCtx.strokeStyle = isSelected ? '#fbbf24' : '#60a5fa';
+        wallsCtx.lineWidth = 6 / scale;
+        wallsCtx.globalAlpha = 0.5;
+
+        wallsCtx.beginPath();
+        if (window.wallShape === 'curved') {
+          const points = getSplinePoints(window);
+          renderSplinePath(wallsCtx, points);
+        } else {
+          wallsCtx.moveTo(window.x1, window.y1);
+          wallsCtx.lineTo(window.x2, window.y2);
+        }
+        wallsCtx.stroke();
+
+        wallsCtx.globalAlpha = 1.0;
+      }
+
+      // Draw window with distinct style (cyan/light blue with dashed lines)
+      wallsCtx.strokeStyle = '#00FFFF'; // Cyan color
+      wallsCtx.lineWidth = 3 / scale;
+      wallsCtx.setLineDash([10 / scale, 5 / scale]); // Dashed line pattern
+
+      wallsCtx.beginPath();
+      if (window.wallShape === 'curved') {
+        const points = getSplinePoints(window);
+        renderSplinePath(wallsCtx, points);
+      } else {
+        wallsCtx.moveTo(window.x1, window.y1);
+        wallsCtx.lineTo(window.x2, window.y2);
+      }
+      wallsCtx.stroke();
+
+      // Reset line dash
+      wallsCtx.setLineDash([]);
+
+      // Draw tint overlay if tint intensity > 0
+      if (window.tintIntensity > 0 && window.tint) {
+        // Parse tint color and apply with intensity
+        const tintAlpha = window.tintIntensity * window.opacity;
+        wallsCtx.strokeStyle = hexToRgba(window.tint, tintAlpha);
+        wallsCtx.lineWidth = 5 / scale;
+        wallsCtx.globalAlpha = tintAlpha;
+
+        wallsCtx.beginPath();
+        if (window.wallShape === 'curved') {
+          const points = getSplinePoints(window);
+          renderSplinePath(wallsCtx, points);
+        } else {
+          wallsCtx.moveTo(window.x1, window.y1);
+          wallsCtx.lineTo(window.x2, window.y2);
+        }
+        wallsCtx.stroke();
+
+        wallsCtx.globalAlpha = 1.0;
+      }
+
+      // Draw endpoints for selected window
+      if (isSelected) {
+        wallsCtx.fillStyle = '#00FFFF';
+        const endpointRadius = 4 / scale;
+
+        wallsCtx.beginPath();
+        wallsCtx.arc(window.x1, window.y1, endpointRadius, 0, Math.PI * 2);
+        wallsCtx.fill();
+
+        wallsCtx.beginPath();
+        wallsCtx.arc(window.x2, window.y2, endpointRadius, 0, Math.PI * 2);
+        wallsCtx.fill();
+
+        // Draw control points for curved windows
+        if (window.wallShape === 'curved' && window.controlPoints && window.controlPoints.length > 0) {
+          const controlPointRadius = 8 / scale;
+
+          // Get all points including endpoints for direction calculation
+          const allPoints = [
+            { x: window.x1, y: window.y1 },
+            ...window.controlPoints,
+            { x: window.x2, y: window.y2 }
+          ];
+
+          window.controlPoints.forEach((cp, index) => {
+            // Check if this control point is being dragged
+            const isBeingDragged = isDraggingWindowControlPoint &&
+                                   draggedWindowControlPoint?.windowId === window.id &&
+                                   draggedWindowControlPoint?.controlPointIndex === index;
+
+            // Calculate direction arrow
+            const prevPoint = allPoints[index];
+            const nextPoint = allPoints[index + 2];
+
+            const midX = (prevPoint.x + nextPoint.x) / 2;
+            const midY = (prevPoint.y + nextPoint.y) / 2;
+
+            const dx = cp.x - midX;
+            const dy = cp.y - midY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (isBeingDragged) {
+              // Outer glow for dragged control point
+              wallsCtx.fillStyle = 'rgba(34, 197, 94, 0.3)';
+              wallsCtx.beginPath();
+              wallsCtx.arc(cp.x, cp.y, controlPointRadius * 1.8, 0, Math.PI * 2);
+              wallsCtx.fill();
+
+              // Main circle
+              wallsCtx.fillStyle = '#22c55e';
+              wallsCtx.strokeStyle = '#ffffff';
+              wallsCtx.lineWidth = 2 / scale;
+              wallsCtx.beginPath();
+              wallsCtx.arc(cp.x, cp.y, controlPointRadius, 0, Math.PI * 2);
+              wallsCtx.fill();
+              wallsCtx.stroke();
+            } else {
+              // Normal control point - cyan to match window
+              wallsCtx.fillStyle = '#00FFFF';
+              wallsCtx.strokeStyle = '#ffffff';
+              wallsCtx.lineWidth = 2 / scale;
+              wallsCtx.beginPath();
+              wallsCtx.arc(cp.x, cp.y, controlPointRadius, 0, Math.PI * 2);
+              wallsCtx.fill();
+              wallsCtx.stroke();
+            }
+
+            // Draw direction arrow if there's meaningful deformation
+            if (dist > 5) {
+              const arrowColor = '#ffffff';
+              const normalizedDx = dx / dist;
+              const normalizedDy = dy / dist;
+
+              const arrowLength = controlPointRadius * 0.7;
+              const arrowHeadSize = controlPointRadius * 0.4;
+
+              const arrowEndX = cp.x + normalizedDx * arrowLength * 0.3;
+              const arrowEndY = cp.y + normalizedDy * arrowLength * 0.3;
+              const arrowStartX = cp.x - normalizedDx * arrowLength * 0.5;
+              const arrowStartY = cp.y - normalizedDy * arrowLength * 0.5;
+
+              // Draw arrow line
+              wallsCtx.strokeStyle = arrowColor;
+              wallsCtx.lineWidth = 2 / scale;
+              wallsCtx.beginPath();
+              wallsCtx.moveTo(arrowStartX, arrowStartY);
+              wallsCtx.lineTo(arrowEndX, arrowEndY);
+              wallsCtx.stroke();
+
+              // Draw arrow head
+              const angle = Math.atan2(normalizedDy, normalizedDx);
+              const headAngle = Math.PI / 6;
+
+              wallsCtx.beginPath();
+              wallsCtx.moveTo(arrowEndX, arrowEndY);
+              wallsCtx.lineTo(
+                arrowEndX - arrowHeadSize * Math.cos(angle - headAngle),
+                arrowEndY - arrowHeadSize * Math.sin(angle - headAngle)
+              );
+              wallsCtx.moveTo(arrowEndX, arrowEndY);
+              wallsCtx.lineTo(
+                arrowEndX - arrowHeadSize * Math.cos(angle + headAngle),
+                arrowEndY - arrowHeadSize * Math.sin(angle + headAngle)
+              );
+              wallsCtx.stroke();
+            }
+          });
+        }
+      }
+    });
+
+    wallsCtx.restore();
   }
 
   // Internal path rendering - doesn't clear canvas, called by renderWalls()
@@ -2162,6 +2382,150 @@
 
     // Render light within clipped area
     renderCallback();
+
+    ctx.restore();
+  }
+
+
+  /**
+   * Find windows that intersect with a light's range
+   */
+  /**
+   * Blend two hex colors with a given intensity (0-1)
+   */
+  function blendColors(baseColor: string, tintColor: string, tintIntensity: number): string {
+    const base = hexToRgba(baseColor, 1);
+    const tint = hexToRgba(tintColor, 1);
+
+    // Parse RGB values from rgba strings
+    const baseMatch = base.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    const tintMatch = tint.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+
+    if (!baseMatch || !tintMatch) return baseColor;
+
+    const r = Math.round(parseInt(baseMatch[1]) * (1 - tintIntensity) + parseInt(tintMatch[1]) * tintIntensity);
+    const g = Math.round(parseInt(baseMatch[2]) * (1 - tintIntensity) + parseInt(tintMatch[2]) * tintIntensity);
+    const b = Math.round(parseInt(baseMatch[3]) * (1 - tintIntensity) + parseInt(tintMatch[3]) * tintIntensity);
+
+    return ;
+  }
+
+  function getWindowsInLightRange(lightSource: Point, lightRadius: number): Window[] {
+    const radiusSq = lightRadius * lightRadius;
+    const intersectingWindows: Window[] = [];
+
+    for (const window of windows) {
+      // Check if either endpoint is within radius
+      const d1Sq = (window.x1 - lightSource.x) ** 2 + (window.y1 - lightSource.y) ** 2;
+      const d2Sq = (window.x2 - lightSource.x) ** 2 + (window.y2 - lightSource.y) ** 2;
+
+      if (d1Sq <= radiusSq || d2Sq <= radiusSq) {
+        intersectingWindows.push(window);
+        continue;
+      }
+
+      // Check closest point on line segment to light source
+      const dx = window.x2 - window.x1;
+      const dy = window.y2 - window.y1;
+      const lenSq = dx * dx + dy * dy;
+
+      if (lenSq > 0) {
+        const t = Math.max(0, Math.min(1, ((lightSource.x - window.x1) * dx + (lightSource.y - window.y1) * dy) / lenSq));
+        const closestX = window.x1 + t * dx;
+        const closestY = window.y1 + t * dy;
+        const distSq = (lightSource.x - closestX) ** 2 + (lightSource.y - closestY) ** 2;
+
+        if (distSq <= radiusSq) {
+          intersectingWindows.push(window);
+        }
+      }
+    }
+
+    return intersectingWindows;
+  }
+
+  /**
+   * Render light transmission through a window
+   * Creates a secondary light on the far side of the window with reduced intensity and tint
+   */
+  function renderLightThroughWindow(
+    ctx: CanvasRenderingContext2D,
+    lightSource: Point,
+    lightRadius: number,
+    lightColor: string,
+    lightAlpha: number,
+    window: Window,
+    bright: number
+  ) {
+    // Calculate window properties
+    const windowOpacity = window.opacity ?? 1.0; // 1.0 = fully transparent
+    const windowTint = window.tint ?? '#ffffff';
+    const windowTintIntensity = window.tintIntensity ?? 0.0;
+
+    // If window is completely opaque (opacity = 0), don't render transmission
+    if (windowOpacity <= 0.01) return;
+
+    // Calculate window midpoint and normal vector
+    const windowMidX = (window.x1 + window.x2) / 2;
+    const windowMidY = (window.y1 + window.y2) / 2;
+
+    const windowDx = window.x2 - window.x1;
+    const windowDy = window.y2 - window.y1;
+    const windowLen = Math.sqrt(windowDx * windowDx + windowDy * windowDy);
+
+    if (windowLen === 0) return; // Degenerate window
+
+    // Normal vector (perpendicular to window)
+    const normalX = -windowDy / windowLen;
+    const normalY = windowDx / windowLen;
+
+    // Determine which side of the window the light is on
+    const toLight = {
+      x: lightSource.x - windowMidX,
+      y: lightSource.y - windowMidY
+    };
+    const dotProduct = toLight.x * normalX + toLight.y * normalY;
+
+    // Flip normal to point away from light (toward far side)
+    const finalNormalX = dotProduct > 0 ? -normalX : normalX;
+    const finalNormalY = dotProduct > 0 ? -normalY : normalY;
+
+    // Calculate transmission point (on the far side of the window)
+    const transmissionDistance = Math.max(20, lightRadius * 0.3); // Minimum 20 pixels from window
+    const transmissionX = windowMidX + finalNormalX * transmissionDistance;
+    const transmissionY = windowMidY + finalNormalY * transmissionDistance;
+
+    // Calculate transmitted light properties
+    const transmittedAlpha = lightAlpha * windowOpacity * 0.6; // Reduce alpha based on window opacity
+    const transmittedRadius = lightRadius * windowOpacity * 0.7; // Reduce radius
+
+    // Skip if transmitted light would be too dim
+    if (transmittedAlpha < 0.01 || transmittedRadius < 5) return;
+
+    // Apply tint to light color
+    const transmittedColor = blendColors(lightColor, windowTint, windowTintIntensity);
+
+    // Render transmitted light (simplified - no wall occlusion on far side for performance)
+    ctx.save();
+
+    // Create radial gradient for transmitted light
+    const gradient = ctx.createRadialGradient(
+      transmissionX, transmissionY, 0,
+      transmissionX, transmissionY, transmittedRadius
+    );
+
+    const baseColor = hexToRgba(transmittedColor, transmittedAlpha);
+    const dimColor = hexToRgba(transmittedColor, 0);
+
+    // Simple gradient (no bright/dim zones for transmitted light)
+    gradient.addColorStop(0, baseColor);
+    gradient.addColorStop(0.5, hexToRgba(transmittedColor, transmittedAlpha * 0.5));
+    gradient.addColorStop(1, dimColor);
+
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(transmissionX, transmissionY, transmittedRadius, 0, Math.PI * 2);
+    ctx.fill();
 
     ctx.restore();
   }
@@ -3216,6 +3580,113 @@
     };
   }
 
+
+  /**
+   * Check if token is incorporeal (can pass through windows and walls)
+   * Checks token.data.incorporeal flag
+   */
+  function isTokenIncorporeal(token: Token): boolean {
+    return token.data?.incorporeal === true;
+  }
+
+  /**
+   * Check if a token at the given position would collide with any blocking walls or windows
+   * Returns true if collision detected (movement should be blocked)
+   */
+  function checkTokenCollision(tokenX: number, tokenY: number, token: Token): boolean {
+    // Incorporeal tokens can pass through walls and windows
+    if (isTokenIncorporeal(token)) {
+      return false;
+    }
+
+    const gridSize = scene.gridSize ?? 100;
+    const tokenWidth = (token.width || 1) * (scene.gridWidth ?? gridSize);
+    const tokenHeight = (token.height || 1) * (scene.gridHeight ?? gridSize);
+    const tokenCenterX = tokenX + tokenWidth / 2;
+    const tokenCenterY = tokenY + tokenHeight / 2;
+    const tokenRadius = Math.min(tokenWidth, tokenHeight) / 2;
+
+    // Check collision with walls that block movement
+    for (const wall of walls) {
+      const effectiveProps = getEffectiveWallProperties(wall);
+      // Only check walls that block movement
+      if (effectiveProps.move !== 'block') continue;
+
+      if (wall.wallShape === 'curved') {
+        // For curved walls, convert to spline segments
+        const points = getSplinePoints(wall);
+        const splinePoints = catmullRomSpline(points);
+
+        // Check each segment of the spline
+        for (let i = 0; i < splinePoints.length - 1; i++) {
+          if (lineIntersectsCircle(
+            splinePoints[i].x,
+            splinePoints[i].y,
+            splinePoints[i + 1].x,
+            splinePoints[i + 1].y,
+            tokenCenterX,
+            tokenCenterY,
+            tokenRadius
+          )) {
+            return true;
+          }
+        }
+      } else {
+        // Straight wall - simple line segment check
+        if (lineIntersectsCircle(
+          wall.x1,
+          wall.y1,
+          wall.x2,
+          wall.y2,
+          tokenCenterX,
+          tokenCenterY,
+          tokenRadius
+        )) {
+          return true;
+        }
+      }
+    }
+
+    // Check collision with windows (windows always block non-incorporeal tokens)
+    for (const window of windows) {
+      if (window.wallShape === 'curved') {
+        // For curved windows, convert to spline segments
+        const points = getSplinePoints(window);
+        const splinePoints = catmullRomSpline(points);
+
+        // Check each segment of the spline
+        for (let i = 0; i < splinePoints.length - 1; i++) {
+          if (lineIntersectsCircle(
+            splinePoints[i].x,
+            splinePoints[i].y,
+            splinePoints[i + 1].x,
+            splinePoints[i + 1].y,
+            tokenCenterX,
+            tokenCenterY,
+            tokenRadius
+          )) {
+            return true;
+          }
+        }
+      } else {
+        // Straight window - simple line segment check
+        if (lineIntersectsCircle(
+          window.x1,
+          window.y1,
+          window.x2,
+          window.y2,
+          tokenCenterX,
+          tokenCenterY,
+          tokenRadius
+        )) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
   // Mouse event handlers
   function handleMouseDown(e: MouseEvent) {
     // Right-click cancels wall drawing
@@ -3252,6 +3723,24 @@
         // Complete wall
         console.log('Completing wall drawing');
         completeWallDrawing(snappedPos);
+      }
+      return;
+    }
+
+    // Handle window tool (both straight and curved)
+    if ((activeTool === 'window' || activeTool === 'curved-window') && isGM) {
+      console.log('Window tool clicked', { activeTool, isDrawingWindow, snappedPos });
+      if (!isDrawingWindow) {
+        // Start drawing window
+        console.log('Starting window drawing');
+        isDrawingWindow = true;
+        windowStartPoint = snappedPos;
+        windowPreview = { x1: snappedPos.x, y1: snappedPos.y, x2: snappedPos.x, y2: snappedPos.y };
+        renderWalls(); // renderWalls also renders windows
+      } else {
+        // Complete window
+        console.log('Completing window drawing');
+        completeWindowDrawing(snappedPos);
       }
       return;
     }
@@ -3600,6 +4089,53 @@
     renderWalls();
   }
 
+  function completeWindowDrawing(endPos: { x: number; y: number }) {
+    if (!windowStartPoint) {
+      return;
+    }
+
+    // Don't create zero-length windows
+    if (windowStartPoint.x === endPos.x && windowStartPoint.y === endPos.y) {
+      cancelWindowDrawing();
+      return;
+    }
+
+    // Determine window shape based on active tool
+    const wallShape = activeTool === 'curved-window' ? 'curved' : 'straight';
+    console.log('Window shape determined:', wallShape);
+
+    const windowData = {
+      x1: windowStartPoint.x,
+      y1: windowStartPoint.y,
+      x2: endPos.x,
+      y2: endPos.y,
+      snapToGrid: gridSnap,
+      wallShape,
+      opacity: 0.5,
+      tint: '#FFFFFF',
+      tintIntensity: 0.0,
+    };
+
+    console.log('Calling onWindowAdd with:', windowData);
+
+    // Create window via callback
+    onWindowAdd?.(windowData);
+
+    // Reset drawing state
+    isDrawingWindow = false;
+    windowStartPoint = null;
+    windowPreview = null;
+    renderWalls();
+    console.log('Window drawing complete');
+  }
+
+  function cancelWindowDrawing() {
+    isDrawingWindow = false;
+    windowStartPoint = null;
+    windowPreview = null;
+    renderWalls();
+  }
+
   function completePath() {
     if (currentPathNodes.length < 2) {
       cancelPath();
@@ -3757,9 +4293,12 @@
       // Update token position locally for immediate feedback
       const token = tokens.find(t => t.id === draggedTokenId);
       if (token) {
-        token.x = newX;
-        token.y = newY;
-        renderTokens();
+        // Check for collision at new position
+        if (!checkTokenCollision(newX, newY, token)) {
+          token.x = newX;
+          token.y = newY;
+          renderTokens();
+        }
       }
     } else if (isDrawingSelectionBox && selectionBoxStart) {
       // Update selection box end position
@@ -3863,6 +4402,13 @@
           const snappedPos = snapToGrid(newX, newY);
           newX = snappedPos.x;
           newY = snappedPos.y;
+        }
+
+        // Check for collision before finalizing position
+        if (checkTokenCollision(newX, newY, token)) {
+          // Collision detected - revert to original position
+          newX = token.x;
+          newY = token.y;
         }
 
         // Only send move event if position actually changed
@@ -4132,6 +4678,102 @@
 
     return result;
   }
+
+  // Window helper functions (similar to wall helpers)
+  function findWindowAtPoint(worldX: number, worldY: number): string | null {
+    const threshold = 10 / scale;
+
+    for (const window of windows) {
+      let distance: number;
+
+      if (window.wallShape === 'curved') {
+        const points = getSplinePoints(window);
+        const splinePoints = catmullRomSpline(points);
+        distance = distanceToSpline(worldX, worldY, splinePoints, threshold);
+      } else {
+        distance = distanceToLineSegment(worldX, worldY, window.x1, window.y1, window.x2, window.y2);
+      }
+
+      if (distance <= threshold) {
+        return window.id;
+      }
+    }
+
+    return null;
+  }
+
+  function findWindowEndpointAtPoint(worldX: number, worldY: number): { windowId: string; endpoint: 'start' | 'end' } | null {
+    const threshold = 8 / scale;
+
+    for (const window of windows) {
+      const dx1 = worldX - window.x1;
+      const dy1 = worldY - window.y1;
+      const dist1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
+      if (dist1 <= threshold) {
+        return { windowId: window.id, endpoint: 'start' };
+      }
+
+      const dx2 = worldX - window.x2;
+      const dy2 = worldY - window.y2;
+      const dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+      if (dist2 <= threshold) {
+        return { windowId: window.id, endpoint: 'end' };
+      }
+    }
+
+    return null;
+  }
+
+  function findWindowControlPointAtPoint(worldX: number, worldY: number): { windowId: string; controlPointIndex: number } | null {
+    const threshold = 8 / scale;
+
+    for (const window of windows) {
+      if (window.wallShape === 'curved' && window.controlPoints && window.controlPoints.length > 0) {
+        for (let i = 0; i < window.controlPoints.length; i++) {
+          const cp = window.controlPoints[i];
+          const dx = worldX - cp.x;
+          const dy = worldY - cp.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist <= threshold) {
+            return { windowId: window.id, controlPointIndex: i };
+          }
+        }
+      }
+    }
+
+    return null;
+  }
+
+  function findSelectedWindowsAtEndpoint(
+    worldX: number,
+    worldY: number,
+    selectedIds: Set<string>
+  ): Array<{windowId: string, endpoint: 'start' | 'end'}> {
+    const threshold = 8 / scale;
+    const result: Array<{windowId: string, endpoint: 'start' | 'end'}> = [];
+
+    for (const window of windows) {
+      if (!selectedIds.has(window.id)) continue;
+
+      const dx1 = worldX - window.x1;
+      const dy1 = worldY - window.y1;
+      const dist1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
+      if (dist1 <= threshold) {
+        result.push({ windowId: window.id, endpoint: 'start' });
+        continue;
+      }
+
+      const dx2 = worldX - window.x2;
+      const dy2 = worldY - window.y2;
+      const dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+      if (dist2 <= threshold) {
+        result.push({ windowId: window.id, endpoint: 'end' });
+      }
+    }
+
+    return result;
+  }
+
 
   /**
    * Find a path at the given point (checks both nodes and path lines)
@@ -4668,10 +5310,11 @@
   {/if}
   {#if isGM}
     <canvas class="canvas-layer" bind:this={wallsCanvas}></canvas>
+    <canvas class="canvas-layer" bind:this={windowsCanvas}></canvas>
   {/if}
   <canvas
     class="canvas-layer canvas-interactive"
-    class:cursor-crosshair={activeTool === 'wall' || activeTool === 'curved-wall' || activeTool === 'light' || activeTool === 'path'}
+    class:cursor-crosshair={activeTool === 'wall' || activeTool === 'curved-wall' || activeTool === 'window' || activeTool === 'curved-window' || activeTool === 'light' || activeTool === 'path'}
     class:cursor-grab={activeTool === 'select' && !isHoveringControlPoint && !isDraggingControlPoint}
     class:cursor-control-point-hover={isHoveringControlPoint && !isDraggingControlPoint}
     class:cursor-control-point-drag={isDraggingControlPoint}
