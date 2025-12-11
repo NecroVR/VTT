@@ -3953,8 +3953,8 @@
     const worldPos = screenToWorld(e.clientX, e.clientY);
     const snappedPos = snapToGrid(worldPos.x, worldPos.y);
 
-    // Handle wall tool
-    if (activeTool === 'wall' && isGM) {
+    // Handle wall tool - only on left-click
+    if (activeTool === 'wall' && isGM && e.button === 0) {
       console.log('Wall tool clicked', { activeTool, isDrawingWall, snappedPos });
       if (!isDrawingWall) {
         // Start drawing wall
@@ -3971,8 +3971,8 @@
       return;
     }
 
-    // Handle window tool
-    if (activeTool === 'window' && isGM) {
+    // Handle window tool - only on left-click
+    if (activeTool === 'window' && isGM && e.button === 0) {
       console.log('Window tool clicked', { activeTool, isDrawingWindow, snappedPos });
       if (!isDrawingWindow) {
         // Start drawing window
@@ -3989,8 +3989,8 @@
       return;
     }
 
-    // Handle door tool
-    if (activeTool === 'door' && isGM) {
+    // Handle door tool - only on left-click
+    if (activeTool === 'door' && isGM && e.button === 0) {
       console.log('Door tool clicked', { activeTool, isDrawingDoor, snappedPos });
       if (!isDrawingDoor) {
         // Start drawing door
@@ -4007,8 +4007,8 @@
       return;
     }
 
-    // Handle path tool
-    if (activeTool === 'path' && isGM) {
+    // Handle path tool - only on left-click
+    if (activeTool === 'path' && isGM && e.button === 0) {
       // Get the current highest pathIndex for this pathName
       const existingPoints = pathPoints.filter(p => p.pathName === currentPathName);
       const nextIndex = existingPoints.length > 0
@@ -4028,8 +4028,8 @@
       return;
     }
 
-    // Handle light tool
-    if (activeTool === 'light' && isGM) {
+    // Handle light tool - only on left-click
+    if (activeTool === 'light' && isGM && e.button === 0) {
       // Place light at clicked position (no snapping by default)
       onLightAdd?.({
         x: worldPos.x,
@@ -4770,17 +4770,19 @@
         }
       }
     } else {
-      // Non-select tool - clear selections and start panning if clicking empty space
-      selectedTokenIds = new Set();
-      selectedLightIds = new Set();
-      selectedWindowIds = new Set();
-      onTokenSelect?.(null);
-      onLightSelect?.(null);
-      onWindowSelect?.(null);
-      isPanning = true;
-      lastClickTime = 0;
-      lastClickTokenId = null;
-      lastClickLightId = null;
+      // Non-select tool - only pan on right-click
+      if (e.button === 2) {
+        selectedTokenIds = new Set();
+        selectedLightIds = new Set();
+        selectedWindowIds = new Set();
+        onTokenSelect?.(null);
+        onLightSelect?.(null);
+        onWindowSelect?.(null);
+        isPanning = true;
+        lastClickTime = 0;
+        lastClickTokenId = null;
+        lastClickLightId = null;
+      }
     }
   }
 
