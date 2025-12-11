@@ -2798,9 +2798,17 @@
       }
       renderLightGradient();
     }
+  
+    // Render light transmission through windows
+    if (windows && windows.length > 0) {
+      const affectedWindows = getWindowsInLightRange({ x, y }, animatedDim);
+      for (const window of affectedWindows) {
+        renderLightThroughWindow(ctx, { x, y }, animatedDim, color, alpha, window, animatedBright);
+      }
+    }
   }
 
-  function renderTokenLight(ctx: CanvasRenderingContext2D, token: Token, time: number) {
+    function renderTokenLight(ctx: CanvasRenderingContext2D, token: Token, time: number) {
     // Skip if token doesn't emit light
     if (token.lightBright <= 0 && token.lightDim <= 0) return;
 

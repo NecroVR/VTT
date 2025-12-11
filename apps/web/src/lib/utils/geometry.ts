@@ -128,3 +128,56 @@ export function lineIntersectsRect(
 
   return false;
 }
+
+/**
+ * Check if a line segment intersects with a circle
+ * Used for token collision detection with walls and windows
+ * @param x1 - Line segment start x
+ * @param y1 - Line segment start y
+ * @param x2 - Line segment end x
+ * @param y2 - Line segment end y
+ * @param cx - Circle center x
+ * @param cy - Circle center y
+ * @param r - Circle radius
+ * @returns true if line segment intersects circle
+ */
+export function lineIntersectsCircle(
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  cx: number,
+  cy: number,
+  r: number
+): boolean {
+  // Vector from line start to circle center
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const fx = x1 - cx;
+  const fy = y1 - cy;
+
+  // Quadratic equation coefficients: at^2 + bt + c = 0
+  const a = dx * dx + dy * dy;
+  const b = 2 * (fx * dx + fy * dy);
+  const c = fx * fx + fy * fy - r * r;
+
+  // Handle degenerate case (line is a point)
+  if (a === 0) {
+    return c <= 0;
+  }
+
+  const discriminant = b * b - 4 * a * c;
+
+  // No intersection if discriminant is negative
+  if (discriminant < 0) {
+    return false;
+  }
+
+  // Check if intersection points are within the line segment
+  const sqrtDiscriminant = Math.sqrt(discriminant);
+  const t1 = (-b - sqrtDiscriminant) / (2 * a);
+  const t2 = (-b + sqrtDiscriminant) / (2 * a);
+
+  // Intersection occurs if either t1 or t2 is in [0, 1]
+  return (t1 >= 0 && t1 <= 1) || (t2 >= 0 && t2 <= 1) || (t1 < 0 && t2 > 1);
+}
