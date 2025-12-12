@@ -1,0 +1,223 @@
+{
+  "compendiumId": "dnd5e-srd-spells-level-7",
+  "name": "7th Level Spells",
+  "templateId": "dnd5e-spell",
+  "source": "SRD 5.1",
+  "entries": [
+    {
+      "id": "delayed-blast-fireball",
+      "name": "Delayed Blast Fireball",
+      "img": "icons/magic/fire/explosion-fireball-medium-orange-red.webp",
+      "description": "A beam of yellow light flashes from your pointing finger, then condenses to linger at a chosen point within range as a glowing bead for the duration. When the spell ends, either because your concentration is broken or because you decide to end it, the bead blossoms with a low roar into an explosion of flame that spreads around corners. Each creature in a 20-foot-radius sphere centered on that point must make a Dexterity saving throw. A creature takes fire damage equal to the total accumulated damage on a failed save, or half as much damage on a successful one. The spell's base damage is 12d6. If at the end of your turn the bead has not yet detonated, the damage increases by 1d6.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 7,
+        "school": "evocation",
+        "castingTime": "1 action",
+        "range": "150 feet",
+        "components": ["V", "S", "M"],
+        "materials": "a tiny ball of bat guano and sulfur",
+        "duration": "Concentration, up to 1 minute",
+        "concentration": true,
+        "ritual": false,
+        "damage": "12d6",
+        "damageType": "fire",
+        "saveAbility": "dexterity",
+        "areaOfEffect": "20-foot radius",
+        "higherLevels": "When you cast this spell using a spell slot of 8th level or higher, the base damage increases by 1d6 for each slot level above 7th.",
+        "classes": ["sorcerer", "wizard"]
+      }
+    },
+    {
+      "id": "etherealness",
+      "name": "Etherealness",
+      "img": "icons/magic/movement/trail-streak-impact-blue.webp",
+      "description": "You step into the border regions of the Ethereal Plane, in the area where it overlaps with your current plane. You remain in the Border Ethereal for the duration or until you use your action to dismiss the spell. During this time, you can move in any direction. If you move up or down, every foot of movement costs an extra foot. You can see and hear the plane you originated from, but everything there looks gray, and you can't see anything more than 60 feet away.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 7,
+        "school": "transmutation",
+        "castingTime": "1 action",
+        "range": "Self",
+        "components": ["V", "S"],
+        "duration": "Up to 8 hours",
+        "concentration": false,
+        "ritual": false,
+        "higherLevels": "When you cast this spell using a spell slot of 8th level or higher, you can target up to three willing creatures (including you) for each slot level above 7th. The creatures must be within 10 feet of you when you cast the spell.",
+        "classes": ["bard", "cleric", "sorcerer", "warlock", "wizard"]
+      }
+    },
+    {
+      "id": "finger-of-death",
+      "name": "Finger of Death",
+      "img": "icons/magic/death/hand-finger-glow-pink.webp",
+      "description": "You send negative energy coursing through a creature that you can see within range, causing it searing pain. The target must make a Constitution saving throw. It takes 7d8 + 30 necrotic damage on a failed save, or half as much damage on a successful one. A humanoid killed by this spell rises at the start of your next turn as a zombie that is permanently under your command, following your verbal orders to the best of its ability.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 7,
+        "school": "necromancy",
+        "castingTime": "1 action",
+        "range": "60 feet",
+        "components": ["V", "S"],
+        "duration": "Instantaneous",
+        "concentration": false,
+        "ritual": false,
+        "damage": "7d8+30",
+        "damageType": "necrotic",
+        "saveAbility": "constitution",
+        "classes": ["sorcerer", "warlock", "wizard"]
+      }
+    },
+    {
+      "id": "fire-storm",
+      "name": "Fire Storm",
+      "img": "icons/magic/fire/explosion-fireball-large-orange.webp",
+      "description": "A storm made up of sheets of roaring flame appears in a location you choose within range. The area of the storm consists of up to ten 10-foot cubes, which you can arrange as you wish. Each cube must have at least one face adjacent to the face of another cube. Each creature in the area must make a Dexterity saving throw. It takes 7d10 fire damage on a failed save, or half as much damage on a successful one.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 7,
+        "school": "evocation",
+        "castingTime": "1 action",
+        "range": "150 feet",
+        "components": ["V", "S"],
+        "duration": "Instantaneous",
+        "concentration": false,
+        "ritual": false,
+        "damage": "7d10",
+        "damageType": "fire",
+        "saveAbility": "dexterity",
+        "areaOfEffect": "Ten 10-foot cubes",
+        "classes": ["cleric", "druid", "sorcerer"]
+      }
+    },
+    {
+      "id": "plane-shift",
+      "name": "Plane Shift",
+      "img": "icons/magic/movement/portal-vortex-purple.webp",
+      "description": "You and up to eight willing creatures who link hands in a circle are transported to a different plane of existence. You can specify a target destination in general terms, such as the City of Brass on the Elemental Plane of Fire or the palace of Dispater on the second level of the Nine Hells, and you appear in or near that destination. Alternatively, if you know the sigil sequence of a teleportation circle on another plane of existence, this spell can take you to that circle.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 7,
+        "school": "conjuration",
+        "castingTime": "1 action",
+        "range": "Touch",
+        "components": ["V", "S", "M"],
+        "materials": "a forked, metal rod worth at least 250 gp, attuned to a particular plane of existence",
+        "duration": "Instantaneous",
+        "concentration": false,
+        "ritual": false,
+        "classes": ["cleric", "druid", "sorcerer", "warlock", "wizard"]
+      }
+    },
+    {
+      "id": "prismatic-spray",
+      "name": "Prismatic Spray",
+      "img": "icons/magic/light/explosion-star-rainbow.webp",
+      "description": "Eight multicolored rays of light flash from your hand. Each ray is a different color and has a different power and purpose. Each creature in a 60-foot cone must make a Dexterity saving throw. For each target, roll a d8 to determine which color ray affects it.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 7,
+        "school": "evocation",
+        "castingTime": "1 action",
+        "range": "Self (60-foot cone)",
+        "components": ["V", "S"],
+        "duration": "Instantaneous",
+        "concentration": false,
+        "ritual": false,
+        "damage": "10d6",
+        "damageType": "varies",
+        "saveAbility": "dexterity",
+        "areaOfEffect": "60-foot cone",
+        "classes": ["sorcerer", "wizard"]
+      }
+    },
+    {
+      "id": "regenerate",
+      "name": "Regenerate",
+      "img": "icons/magic/life/heart-area-circle-green-purple.webp",
+      "description": "You touch a creature and stimulate its natural healing ability. The target regains 4d8 + 15 hit points. For the duration of the spell, the target regains 1 hit point at the start of each of its turns (10 hit points each minute). The target's severed body members (fingers, legs, tails, and so on), if any, are restored after 2 minutes. If you have the severed part and hold it to the stump, the spell instantaneously causes the limb to knit to the stump.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 7,
+        "school": "transmutation",
+        "castingTime": "1 minute",
+        "range": "Touch",
+        "components": ["V", "S", "M"],
+        "materials": "a prayer wheel and holy water",
+        "duration": "1 hour",
+        "concentration": false,
+        "ritual": false,
+        "healing": "4d8+15",
+        "classes": ["bard", "cleric", "druid"]
+      }
+    },
+    {
+      "id": "resurrection",
+      "name": "Resurrection",
+      "img": "icons/magic/life/cross-area-circle-green-white.webp",
+      "description": "You touch a dead creature that has been dead for no more than a century, that didn't die of old age, and that isn't undead. If its soul is free and willing, the target returns to life with all its hit points. This spell neutralizes any poisons and cures normal diseases afflicting the creature when it died. It doesn't, however, remove magical diseases, curses, and the like; if such effects aren't removed prior to casting the spell, they afflict the target on its return to life.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 7,
+        "school": "necromancy",
+        "castingTime": "1 hour",
+        "range": "Touch",
+        "components": ["V", "S", "M"],
+        "materials": "a diamond worth at least 1,000 gp, which the spell consumes",
+        "duration": "Instantaneous",
+        "concentration": false,
+        "ritual": false,
+        "classes": ["bard", "cleric"]
+      }
+    },
+    {
+      "id": "reverse-gravity",
+      "name": "Reverse Gravity",
+      "img": "icons/magic/movement/trail-streak-zigzag-blue-yellow.webp",
+      "description": "This spell reverses gravity in a 50-foot-radius, 100-foot high cylinder centered on a point within range. All creatures and objects that aren't somehow anchored to the ground in the area fall upward and reach the top of the area when you cast this spell. A creature can make a Dexterity saving throw to grab onto a fixed object it can reach, thus avoiding the fall.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 7,
+        "school": "transmutation",
+        "castingTime": "1 action",
+        "range": "100 feet",
+        "components": ["V", "S", "M"],
+        "materials": "a lodestone and iron filings",
+        "duration": "Concentration, up to 1 minute",
+        "concentration": true,
+        "ritual": false,
+        "saveAbility": "dexterity",
+        "areaOfEffect": "50-foot radius, 100-foot high cylinder",
+        "classes": ["druid", "sorcerer", "wizard"]
+      }
+    },
+    {
+      "id": "teleport",
+      "name": "Teleport",
+      "img": "icons/magic/movement/portal-doorway-blue.webp",
+      "description": "This spell instantly transports you and up to eight willing creatures of your choice that you can see within range, or a single object that you can see within range, to a destination you select. If you target an object, it must be able to fit entirely inside a 10-foot cube, and it can't be held or carried by an unwilling creature. The destination you choose must be known to you, and it must be on the same plane of existence as you.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 7,
+        "school": "conjuration",
+        "castingTime": "1 action",
+        "range": "10 feet",
+        "components": ["V"],
+        "duration": "Instantaneous",
+        "concentration": false,
+        "ritual": false,
+        "classes": ["bard", "sorcerer", "wizard"]
+      }
+    }
+  ]
+}

@@ -12,7 +12,7 @@
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
       "data": {
-        "weaponType": "simple-melee",
+        "weaponType": "simple_melee",
         "damage": "1d4",
         "damageType": "bludgeoning",
         "properties": ["light"],
@@ -28,7 +28,7 @@
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
       "data": {
-        "weaponType": "simple-melee",
+        "weaponType": "simple_melee",
         "damage": "1d4",
         "damageType": "piercing",
         "properties": ["finesse", "light", "thrown"],
@@ -45,12 +45,130 @@
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
       "data": {
-        "weaponType": "simple-melee",
+        "weaponType": "simple_melee",
         "damage": "1d8",
         "damageType": "bludgeoning",
-        "properties": ["two-handed"],
+        "properties": ["two_handed"],
         "weight": 10,
         "price": 0.2
+      }
+    },
+    {
+      "id": "handaxe",
+      "name": "Handaxe",
+      "img": "icons/weapons/axes/axe-hand-steel.webp",
+      "description": "A light, throwable axe.",
+      "templateId": "dnd5e-weapon",
+      "source": "SRD 5.1",
+      "data": {
+        "weaponType": "simple_melee",
+        "damage": "1d6",
+        "damageType": "slashing",
+        "properties": ["light", "thrown"],
+        "range": "20/60",
+        "weight": 2,
+        "price": 5
+      }
+    },
+    {
+      "id": "javelin",
+      "name": "Javelin",
+      "img": "icons/weapons/polearms/javelin-stone-tip.webp",
+      "description": "A light throwing spear.",
+      "templateId": "dnd5e-weapon",
+      "source": "SRD 5.1",
+      "data": {
+        "weaponType": "simple_melee",
+        "damage": "1d6",
+        "damageType": "piercing",
+        "properties": ["thrown"],
+        "range": "30/120",
+        "weight": 2,
+        "price": 0.5
+      }
+    },
+    {
+      "id": "light-hammer",
+      "name": "Light Hammer",
+      "img": "icons/weapons/hammers/hammer-light-steel.webp",
+      "description": "A small hammer that can be thrown.",
+      "templateId": "dnd5e-weapon",
+      "source": "SRD 5.1",
+      "data": {
+        "weaponType": "simple_melee",
+        "damage": "1d4",
+        "damageType": "bludgeoning",
+        "properties": ["light", "thrown"],
+        "range": "20/60",
+        "weight": 2,
+        "price": 2
+      }
+    },
+    {
+      "id": "mace",
+      "name": "Mace",
+      "img": "icons/weapons/maces/mace-flanged-steel.webp",
+      "description": "A heavy club with a metal head.",
+      "templateId": "dnd5e-weapon",
+      "source": "SRD 5.1",
+      "data": {
+        "weaponType": "simple_melee",
+        "damage": "1d6",
+        "damageType": "bludgeoning",
+        "properties": [],
+        "weight": 4,
+        "price": 5
+      }
+    },
+    {
+      "id": "quarterstaff",
+      "name": "Quarterstaff",
+      "img": "icons/weapons/staves/staff-wooden-plain.webp",
+      "description": "A sturdy wooden staff.",
+      "templateId": "dnd5e-weapon",
+      "source": "SRD 5.1",
+      "data": {
+        "weaponType": "simple_melee",
+        "damage": "1d6",
+        "damageType": "bludgeoning",
+        "properties": ["versatile"],
+        "versatileDamage": "1d8",
+        "weight": 4,
+        "price": 0.2
+      }
+    },
+    {
+      "id": "sickle",
+      "name": "Sickle",
+      "img": "icons/weapons/sickles/sickle-steel.webp",
+      "description": "A curved blade on a short handle.",
+      "templateId": "dnd5e-weapon",
+      "source": "SRD 5.1",
+      "data": {
+        "weaponType": "simple_melee",
+        "damage": "1d4",
+        "damageType": "slashing",
+        "properties": ["light"],
+        "weight": 2,
+        "price": 1
+      }
+    },
+    {
+      "id": "spear",
+      "name": "Spear",
+      "img": "icons/weapons/polearms/spear-steel-tip.webp",
+      "description": "A versatile weapon that can be thrown.",
+      "templateId": "dnd5e-weapon",
+      "source": "SRD 5.1",
+      "data": {
+        "weaponType": "simple_melee",
+        "damage": "1d6",
+        "damageType": "piercing",
+        "properties": ["thrown", "versatile"],
+        "range": "20/60",
+        "versatileDamage": "1d8",
+        "weight": 3,
+        "price": 1
       }
     }
   ]

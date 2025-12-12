@@ -1,0 +1,203 @@
+{
+  "compendiumId": "dnd5e-srd-spells-level-4",
+  "name": "4th Level Spells",
+  "templateId": "dnd5e-spell",
+  "source": "SRD 5.1",
+  "entries": [
+    {
+      "id": "banishment",
+      "name": "Banishment",
+      "img": "icons/magic/control/fear-fright-white.webp",
+      "description": "You attempt to send one creature that you can see within range to another plane of existence. The target must succeed on a Charisma saving throw or be banished. If the target is native to the plane of existence you're on, you banish the target to a harmless demiplane. While there, the target is incapacitated. The target remains there until the spell ends, at which point the target reappears in the space it left or in the nearest unoccupied space if that space is occupied.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 4,
+        "school": "abjuration",
+        "castingTime": "1 action",
+        "range": "60 feet",
+        "components": ["V", "S", "M"],
+        "materials": "an item distasteful to the target",
+        "duration": "Concentration, up to 1 minute",
+        "concentration": true,
+        "ritual": false,
+        "saveAbility": "charisma",
+        "higherLevels": "When you cast this spell using a spell slot of 5th level or higher, you can target one additional creature for each slot level above 4th.",
+        "classes": ["cleric", "paladin", "sorcerer", "warlock", "wizard"]
+      }
+    },
+    {
+      "id": "blight",
+      "name": "Blight",
+      "img": "icons/magic/death/skull-poison-green.webp",
+      "description": "Necromantic energy washes over a creature of your choice that you can see within range, draining moisture and vitality from it. The target must make a Constitution saving throw. The target takes 8d8 necrotic damage on a failed save, or half as much damage on a successful one. This spell has no effect on undead or constructs.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 4,
+        "school": "necromancy",
+        "castingTime": "1 action",
+        "range": "30 feet",
+        "components": ["V", "S"],
+        "duration": "Instantaneous",
+        "concentration": false,
+        "ritual": false,
+        "damage": "8d8",
+        "damageType": "necrotic",
+        "saveAbility": "constitution",
+        "higherLevels": "When you cast this spell using a spell slot of 5th level or higher, the damage increases by 1d8 for each slot level above 4th.",
+        "classes": ["druid", "sorcerer", "warlock", "wizard"]
+      }
+    },
+    {
+      "id": "confusion",
+      "name": "Confusion",
+      "img": "icons/magic/control/debuff-chains-blue.webp",
+      "description": "This spell assaults and twists creatures' minds, spawning delusions and provoking uncontrolled action. Each creature in a 10-foot-radius sphere centered on a point you choose within range must succeed on a Wisdom saving throw when you cast this spell or be affected by it.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 4,
+        "school": "enchantment",
+        "castingTime": "1 action",
+        "range": "90 feet",
+        "components": ["V", "S", "M"],
+        "materials": "three nut shells",
+        "duration": "Concentration, up to 1 minute",
+        "concentration": true,
+        "ritual": false,
+        "saveAbility": "wisdom",
+        "areaOfEffect": "10-foot radius",
+        "classes": ["bard", "druid", "sorcerer", "wizard"]
+      }
+    },
+    {
+      "id": "dimension-door",
+      "name": "Dimension Door",
+      "img": "icons/magic/movement/portal-vortex-blue.webp",
+      "description": "You teleport yourself from your current location to any other spot within range. You arrive at exactly the spot desired. It can be a place you can see, one you can visualize, or one you can describe by stating distance and direction. You can bring along objects as long as their weight doesn't exceed what you can carry. You can also bring one willing creature.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 4,
+        "school": "conjuration",
+        "castingTime": "1 action",
+        "range": "500 feet",
+        "components": ["V"],
+        "duration": "Instantaneous",
+        "concentration": false,
+        "ritual": false,
+        "classes": ["bard", "sorcerer", "warlock", "wizard"]
+      }
+    },
+    {
+      "id": "greater-invisibility",
+      "name": "Greater Invisibility",
+      "img": "icons/magic/perception/silhouette-stealth-purple.webp",
+      "description": "You or a creature you touch becomes invisible until the spell ends. Anything the target is wearing or carrying is invisible as long as it is on the target's person.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 4,
+        "school": "illusion",
+        "castingTime": "1 action",
+        "range": "Touch",
+        "components": ["V", "S"],
+        "duration": "Concentration, up to 1 minute",
+        "concentration": true,
+        "ritual": false,
+        "classes": ["bard", "sorcerer", "wizard"]
+      }
+    },
+    {
+      "id": "ice-storm",
+      "name": "Ice Storm",
+      "img": "icons/magic/water/ice-spikes-shards.webp",
+      "description": "A hail of rock-hard ice pounds to the ground in a 20-foot-radius, 40-foot-high cylinder centered on a point within range. Each creature in the cylinder must make a Dexterity saving throw. A creature takes 2d8 bludgeoning damage and 4d6 cold damage on a failed save, or half as much damage on a successful one.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 4,
+        "school": "evocation",
+        "castingTime": "1 action",
+        "range": "300 feet",
+        "components": ["V", "S", "M"],
+        "materials": "a pinch of dust and a few drops of water",
+        "duration": "Instantaneous",
+        "concentration": false,
+        "ritual": false,
+        "damage": "2d8 + 4d6",
+        "damageType": "bludgeoning and cold",
+        "saveAbility": "dexterity",
+        "areaOfEffect": "20-foot radius, 40-foot high cylinder",
+        "higherLevels": "When you cast this spell using a spell slot of 5th level or higher, the bludgeoning damage increases by 1d8 for each slot level above 4th.",
+        "classes": ["druid", "sorcerer", "wizard"]
+      }
+    },
+    {
+      "id": "polymorph",
+      "name": "Polymorph",
+      "img": "icons/magic/nature/wolf-paw-glow-large-green.webp",
+      "description": "This spell transforms a creature that you can see within range into a new form. An unwilling creature must make a Wisdom saving throw to avoid the effect. The spell has no effect on a shapechanger or a creature with 0 hit points. The transformation lasts for the duration, or until the target drops to 0 hit points or dies. The new form can be any beast whose challenge rating is equal to or less than the target's.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 4,
+        "school": "transmutation",
+        "castingTime": "1 action",
+        "range": "60 feet",
+        "components": ["V", "S", "M"],
+        "materials": "a caterpillar cocoon",
+        "duration": "Concentration, up to 1 hour",
+        "concentration": true,
+        "ritual": false,
+        "saveAbility": "wisdom",
+        "classes": ["bard", "druid", "sorcerer", "wizard"]
+      }
+    },
+    {
+      "id": "stoneskin",
+      "name": "Stoneskin",
+      "img": "icons/magic/defensive/shield-stone-brown.webp",
+      "description": "This spell turns the flesh of a willing creature you touch as hard as stone. Until the spell ends, the target has resistance to nonmagical bludgeoning, piercing, and slashing damage.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 4,
+        "school": "abjuration",
+        "castingTime": "1 action",
+        "range": "Touch",
+        "components": ["V", "S", "M"],
+        "materials": "diamond dust worth 100 gp, which the spell consumes",
+        "duration": "Concentration, up to 1 hour",
+        "concentration": true,
+        "ritual": false,
+        "classes": ["druid", "ranger", "sorcerer", "wizard"]
+      }
+    },
+    {
+      "id": "wall-of-fire",
+      "name": "Wall of Fire",
+      "img": "icons/magic/fire/barrier-wall-flame-ring-yellow.webp",
+      "description": "You create a wall of fire on a solid surface within range. You can make the wall up to 60 feet long, 20 feet high, and 1 foot thick, or a ringed wall up to 20 feet in diameter, 20 feet high, and 1 foot thick. The wall is opaque and lasts for the duration. When the wall appears, each creature within its area must make a Dexterity saving throw. On a failed save, a creature takes 5d8 fire damage, or half as much damage on a successful save.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 4,
+        "school": "evocation",
+        "castingTime": "1 action",
+        "range": "120 feet",
+        "components": ["V", "S", "M"],
+        "materials": "a small piece of phosphorus",
+        "duration": "Concentration, up to 1 minute",
+        "concentration": true,
+        "ritual": false,
+        "damage": "5d8",
+        "damageType": "fire",
+        "saveAbility": "dexterity",
+        "higherLevels": "When you cast this spell using a spell slot of 5th level or higher, the damage increases by 1d8 for each slot level above 4th.",
+        "classes": ["druid", "sorcerer", "wizard"]
+      }
+    }
+  ]
+}

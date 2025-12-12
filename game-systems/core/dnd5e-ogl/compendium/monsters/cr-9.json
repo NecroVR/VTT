@@ -1,0 +1,634 @@
+{
+  "compendiumId": "dnd5e-srd-monsters-cr-9",
+  "name": "CR 9 Monsters",
+  "templateId": "dnd5e-monster",
+  "source": "SRD 5.1",
+  "entries": [
+    {
+      "id": "abominable-yeti",
+      "name": "Abominable Yeti",
+      "img": "icons/creatures/magical/yeti-white-snow.webp",
+      "description": "A massive, fearsome creature of frozen mountains.",
+      "templateId": "dnd5e-monster",
+      "source": "SRD 5.1",
+      "data": {
+        "size": "huge",
+        "type": "monstrosity",
+        "alignment": "chaotic evil",
+        "ac": 15,
+        "acType": "natural armor",
+        "hp": "137 (11d12 + 66)",
+        "speed": "40 ft., climb 40 ft.",
+        "stats": {
+          "str": 24,
+          "dex": 10,
+          "con": 22,
+          "int": 9,
+          "wis": 13,
+          "cha": 9
+        },
+        "skills": "Perception +5, Stealth +4",
+        "damageImmunities": "cold",
+        "senses": "darkvision 60 ft., passive Perception 15",
+        "languages": "Yeti",
+        "cr": 9,
+        "traits": [
+          {
+            "name": "Fear of Fire",
+            "description": "If the yeti takes fire damage, it has disadvantage on attack rolls and ability checks until the end of its next turn."
+          },
+          {
+            "name": "Keen Smell",
+            "description": "The yeti has advantage on Wisdom (Perception) checks that rely on smell."
+          },
+          {
+            "name": "Snow Camouflage",
+            "description": "The yeti has advantage on Dexterity (Stealth) checks made to hide in snowy terrain."
+          }
+        ],
+        "actions": [
+          {
+            "name": "Multiattack",
+            "description": "The yeti can use its Chilling Gaze and makes two claw attacks."
+          },
+          {
+            "name": "Claw",
+            "description": "Melee Weapon Attack: +11 to hit, reach 5 ft., one target. Hit: 14 (2d6 + 7) slashing damage plus 7 (2d6) cold damage."
+          },
+          {
+            "name": "Chilling Gaze",
+            "description": "The yeti targets one creature it can see within 30 feet of it. If the target can see the yeti, the target must succeed on a DC 13 Constitution saving throw against this magic or take 10 (3d6) cold damage and then be paralyzed for 1 minute, unless it is immune to cold damage. The target can repeat the saving throw at the end of each of its turns, ending the effect on itself on a success. If the target's saving throw is successful, or if the effect ends on it, the target is immune to the Chilling Gaze of all yetis (but not abominable yetis) for 1 hour."
+          },
+          {
+            "name": "Cold Breath (Recharge 6)",
+            "description": "The yeti exhales a 30-foot cone of frigid air. Each creature in that area must make a DC 18 Constitution saving throw, taking 45 (10d8) cold damage on a failed save, or half as much damage on a successful one."
+          }
+        ]
+      }
+    },
+    {
+      "id": "bone-devil",
+      "name": "Bone Devil",
+      "img": "icons/creatures/unholy/devil-horned-skeleton-white.webp",
+      "description": "A skeletal fiend that serves as Hell's inquisitor.",
+      "templateId": "dnd5e-monster",
+      "source": "SRD 5.1",
+      "data": {
+        "size": "large",
+        "type": "fiend (devil)",
+        "alignment": "lawful evil",
+        "ac": 19,
+        "acType": "natural armor",
+        "hp": "142 (15d10 + 60)",
+        "speed": "40 ft., fly 40 ft.",
+        "stats": {
+          "str": 18,
+          "dex": 16,
+          "con": 18,
+          "int": 13,
+          "wis": 14,
+          "cha": 16
+        },
+        "savingThrows": "Int +6, Wis +7, Cha +8",
+        "skills": "Deception +8, Insight +7",
+        "damageResistances": "cold; bludgeoning, piercing, and slashing from nonmagical attacks that aren't silvered",
+        "damageImmunities": "fire, poison",
+        "conditionImmunities": "poisoned",
+        "senses": "darkvision 120 ft., passive Perception 12",
+        "languages": "Infernal, telepathy 120 ft.",
+        "cr": 9,
+        "traits": [
+          {
+            "name": "Devil's Sight",
+            "description": "Magical darkness doesn't impede the devil's darkvision."
+          },
+          {
+            "name": "Magic Resistance",
+            "description": "The devil has advantage on saving throws against spells and other magical effects."
+          }
+        ],
+        "actions": [
+          {
+            "name": "Multiattack",
+            "description": "The devil makes three attacks: two with its claws and one with its sting."
+          },
+          {
+            "name": "Claw",
+            "description": "Melee Weapon Attack: +8 to hit, reach 10 ft., one target. Hit: 8 (1d8 + 4) slashing damage."
+          },
+          {
+            "name": "Sting",
+            "description": "Melee Weapon Attack: +8 to hit, reach 10 ft., one target. Hit: 13 (2d8 + 4) piercing damage plus 17 (5d6) poison damage, and the target must succeed on a DC 14 Constitution saving throw or become poisoned for 1 minute. The target can repeat the saving throw at the end of each of its turns, ending the effect on itself on a success."
+          }
+        ]
+      }
+    },
+    {
+      "id": "clay-golem",
+      "name": "Clay Golem",
+      "img": "icons/creatures/magical/construct-clay-stone-brown.webp",
+      "description": "A humanoid construct molded from clay and animated by magic.",
+      "templateId": "dnd5e-monster",
+      "source": "SRD 5.1",
+      "data": {
+        "size": "large",
+        "type": "construct",
+        "alignment": "unaligned",
+        "ac": 14,
+        "acType": "natural armor",
+        "hp": "133 (14d10 + 56)",
+        "speed": "20 ft.",
+        "stats": {
+          "str": 20,
+          "dex": 9,
+          "con": 18,
+          "int": 3,
+          "wis": 8,
+          "cha": 1
+        },
+        "damageImmunities": "acid, poison, psychic; bludgeoning, piercing, and slashing from nonmagical attacks that aren't adamantine",
+        "conditionImmunities": "charmed, exhaustion, frightened, paralyzed, petrified, poisoned",
+        "senses": "darkvision 60 ft., passive Perception 9",
+        "languages": "understands the languages of its creator but can't speak",
+        "cr": 9,
+        "traits": [
+          {
+            "name": "Acid Absorption",
+            "description": "Whenever the golem is subjected to acid damage, it takes no damage and instead regains a number of hit points equal to the acid damage dealt."
+          },
+          {
+            "name": "Berserk",
+            "description": "Whenever the golem starts its turn with 60 hit points or fewer, roll a d6. On a 6, the golem goes berserk. On each of its turns while berserk, the golem attacks the nearest creature it can see. If no creature is near enough to move to and attack, the golem attacks an object, with preference for an object smaller than itself. Once the golem goes berserk, it continues to do so until it is destroyed or regains all its hit points."
+          },
+          {
+            "name": "Immutable Form",
+            "description": "The golem is immune to any spell or effect that would alter its form."
+          },
+          {
+            "name": "Magic Resistance",
+            "description": "The golem has advantage on saving throws against spells and other magical effects."
+          },
+          {
+            "name": "Magic Weapons",
+            "description": "The golem's weapon attacks are magical."
+          }
+        ],
+        "actions": [
+          {
+            "name": "Multiattack",
+            "description": "The golem makes two slam attacks."
+          },
+          {
+            "name": "Slam",
+            "description": "Melee Weapon Attack: +8 to hit, reach 5 ft., one target. Hit: 16 (2d10 + 5) bludgeoning damage. If the target is a creature, it must succeed on a DC 15 Constitution saving throw or have its hit point maximum reduced by an amount equal to the damage taken. The target dies if this attack reduces its hit point maximum to 0. The reduction lasts until removed by the greater restoration spell or other magic."
+          },
+          {
+            "name": "Haste (Recharge 5-6)",
+            "description": "Until the end of its next turn, the golem magically gains a +2 bonus to its AC, has advantage on Dexterity saving throws, and can use its slam attack as a bonus action."
+          }
+        ]
+      }
+    },
+    {
+      "id": "cloud-giant",
+      "name": "Cloud Giant",
+      "img": "icons/creatures/magical/humanoid-giant-cloud-white.webp",
+      "description": "A noble giant dwelling in castles atop clouds.",
+      "templateId": "dnd5e-monster",
+      "source": "SRD 5.1",
+      "data": {
+        "size": "huge",
+        "type": "giant",
+        "alignment": "neutral good (50%) or neutral evil (50%)",
+        "ac": 14,
+        "acType": "natural armor",
+        "hp": "200 (16d12 + 96)",
+        "speed": "40 ft.",
+        "stats": {
+          "str": 27,
+          "dex": 10,
+          "con": 22,
+          "int": 12,
+          "wis": 16,
+          "cha": 16
+        },
+        "savingThrows": "Con +10, Wis +7, Cha +7",
+        "skills": "Insight +7, Perception +7",
+        "senses": "passive Perception 17",
+        "languages": "Common, Giant",
+        "cr": 9,
+        "traits": [
+          {
+            "name": "Keen Smell",
+            "description": "The giant has advantage on Wisdom (Perception) checks that rely on smell."
+          },
+          {
+            "name": "Innate Spellcasting",
+            "description": "The giant's innate spellcasting ability is Charisma (spell save DC 15). It can innately cast the following spells, requiring no material components:\n\nAt will: detect magic, fog cloud, light\n3/day each: feather fall, fly, misty step, telekinesis\n1/day each: control weather, gaseous form"
+          }
+        ],
+        "actions": [
+          {
+            "name": "Multiattack",
+            "description": "The giant makes two morningstar attacks."
+          },
+          {
+            "name": "Morningstar",
+            "description": "Melee Weapon Attack: +12 to hit, reach 10 ft., one target. Hit: 21 (3d8 + 8) piercing damage."
+          },
+          {
+            "name": "Rock",
+            "description": "Ranged Weapon Attack: +12 to hit, range 60/240 ft., one target. Hit: 30 (4d10 + 8) bludgeoning damage."
+          }
+        ]
+      }
+    },
+    {
+      "id": "fire-giant",
+      "name": "Fire Giant",
+      "img": "icons/creatures/magical/humanoid-giant-fire-orange.webp",
+      "description": "A massive giant attuned to elemental fire.",
+      "templateId": "dnd5e-monster",
+      "source": "SRD 5.1",
+      "data": {
+        "size": "huge",
+        "type": "giant",
+        "alignment": "lawful evil",
+        "ac": 18,
+        "acType": "plate",
+        "hp": "162 (13d12 + 78)",
+        "speed": "30 ft.",
+        "stats": {
+          "str": 25,
+          "dex": 9,
+          "con": 23,
+          "int": 10,
+          "wis": 14,
+          "cha": 13
+        },
+        "savingThrows": "Dex +3, Con +10, Cha +5",
+        "skills": "Athletics +11, Perception +6",
+        "damageImmunities": "fire",
+        "senses": "passive Perception 16",
+        "languages": "Giant",
+        "cr": 9,
+        "actions": [
+          {
+            "name": "Multiattack",
+            "description": "The giant makes two greatsword attacks."
+          },
+          {
+            "name": "Greatsword",
+            "description": "Melee Weapon Attack: +11 to hit, reach 10 ft., one target. Hit: 28 (6d6 + 7) slashing damage."
+          },
+          {
+            "name": "Rock",
+            "description": "Ranged Weapon Attack: +11 to hit, range 60/240 ft., one target. Hit: 29 (4d10 + 7) bludgeoning damage."
+          }
+        ]
+      }
+    },
+    {
+      "id": "glabrezu",
+      "name": "Glabrezu",
+      "img": "icons/creatures/unholy/demon-horned-four-arms-red.webp",
+      "description": "A powerful demon with four arms and a talent for deception.",
+      "templateId": "dnd5e-monster",
+      "source": "SRD 5.1",
+      "data": {
+        "size": "large",
+        "type": "fiend (demon)",
+        "alignment": "chaotic evil",
+        "ac": 17,
+        "acType": "natural armor",
+        "hp": "157 (15d10 + 75)",
+        "speed": "40 ft.",
+        "stats": {
+          "str": 20,
+          "dex": 15,
+          "con": 21,
+          "int": 19,
+          "wis": 17,
+          "cha": 16
+        },
+        "savingThrows": "Str +9, Con +9, Wis +7, Cha +7",
+        "damageResistances": "cold, fire, lightning; bludgeoning, piercing, and slashing from nonmagical attacks",
+        "damageImmunities": "poison",
+        "conditionImmunities": "poisoned",
+        "senses": "truesight 120 ft., passive Perception 13",
+        "languages": "Abyssal, telepathy 120 ft.",
+        "cr": 9,
+        "traits": [
+          {
+            "name": "Innate Spellcasting",
+            "description": "The glabrezu's spellcasting ability is Intelligence (spell save DC 16). The glabrezu can innately cast the following spells, requiring no material components:\n\nAt will: darkness, detect magic, dispel magic\n1/day each: confusion, fly, power word stun"
+          },
+          {
+            "name": "Magic Resistance",
+            "description": "The glabrezu has advantage on saving throws against spells and other magical effects."
+          }
+        ],
+        "actions": [
+          {
+            "name": "Multiattack",
+            "description": "The glabrezu makes four attacks: two with its pincers and two with its fists. Alternatively, it makes two attacks with its pincers and casts one spell."
+          },
+          {
+            "name": "Pincer",
+            "description": "Melee Weapon Attack: +9 to hit, reach 10 ft., one target. Hit: 16 (2d10 + 5) bludgeoning damage. If the target is a Medium or smaller creature, it is grappled (escape DC 15). The glabrezu has two pincers, each of which can grapple only one target."
+          },
+          {
+            "name": "Fist",
+            "description": "Melee Weapon Attack: +9 to hit, reach 5 ft., one target. Hit: 7 (2d4 + 2) bludgeoning damage."
+          }
+        ]
+      }
+    },
+    {
+      "id": "gray-slaad",
+      "name": "Gray Slaad",
+      "img": "icons/creatures/amphibians/frog-slaad-gray.webp",
+      "description": "A powerful slaad capable of shapeshifting and magic.",
+      "templateId": "dnd5e-monster",
+      "source": "SRD 5.1",
+      "data": {
+        "size": "medium",
+        "type": "aberration (shapechanger)",
+        "alignment": "chaotic neutral",
+        "ac": 18,
+        "acType": "natural armor",
+        "hp": "127 (17d8 + 51)",
+        "speed": "30 ft.",
+        "stats": {
+          "str": 17,
+          "dex": 17,
+          "con": 16,
+          "int": 13,
+          "wis": 8,
+          "cha": 14
+        },
+        "skills": "Arcana +5, Perception +3",
+        "damageResistances": "acid, cold, fire, lightning, thunder",
+        "senses": "blindsight 60 ft., darkvision 60 ft., passive Perception 13",
+        "languages": "Slaad, telepathy 60 ft.",
+        "cr": 9,
+        "traits": [
+          {
+            "name": "Shapechanger",
+            "description": "The slaad can use its action to polymorph into a Small or Medium humanoid, or back into its true form. Its statistics, other than its size, are the same in each form. Any equipment it is wearing or carrying isn't transformed. It reverts to its true form if it dies."
+          },
+          {
+            "name": "Innate Spellcasting",
+            "description": "The slaad's innate spellcasting ability is Charisma (spell save DC 14). The slaad can innately cast the following spells, requiring no material components:\n\nAt will: detect magic, detect thoughts, invisibility (self only), mage hand, major image\n2/day each: fear, fly, fireball, tongues\n1/day: plane shift (self only)"
+          },
+          {
+            "name": "Magic Resistance",
+            "description": "The slaad has advantage on saving throws against spells and other magical effects."
+          },
+          {
+            "name": "Regeneration",
+            "description": "The slaad regains 10 hit points at the start of its turn if it has at least 1 hit point."
+          }
+        ],
+        "actions": [
+          {
+            "name": "Multiattack",
+            "description": "The slaad makes three attacks: one with its bite and two with its claws or greatsword."
+          },
+          {
+            "name": "Bite (Slaad Form Only)",
+            "description": "Melee Weapon Attack: +6 to hit, reach 5 ft., one target. Hit: 8 (2d4 + 3) piercing damage."
+          },
+          {
+            "name": "Claws (Slaad Form Only)",
+            "description": "Melee Weapon Attack: +6 to hit, reach 5 ft., one target. Hit: 10 (2d6 + 3) slashing damage."
+          },
+          {
+            "name": "Greatsword",
+            "description": "Melee Weapon Attack: +6 to hit, reach 5 ft., one target. Hit: 10 (2d6 + 3) slashing damage."
+          }
+        ]
+      }
+    },
+    {
+      "id": "nycaloth",
+      "name": "Nycaloth",
+      "img": "icons/creatures/unholy/demon-winged-green.webp",
+      "description": "A winged yugoloth mercenary from the Lower Planes.",
+      "templateId": "dnd5e-monster",
+      "source": "SRD 5.1",
+      "data": {
+        "size": "large",
+        "type": "fiend (yugoloth)",
+        "alignment": "neutral evil",
+        "ac": 18,
+        "acType": "natural armor",
+        "hp": "123 (13d10 + 52)",
+        "speed": "40 ft., fly 60 ft.",
+        "stats": {
+          "str": 20,
+          "dex": 11,
+          "con": 19,
+          "int": 12,
+          "wis": 10,
+          "cha": 15
+        },
+        "skills": "Intimidation +6, Perception +4, Stealth +4",
+        "damageResistances": "cold, fire, lightning; bludgeoning, piercing, and slashing from nonmagical attacks",
+        "damageImmunities": "acid, poison",
+        "conditionImmunities": "poisoned",
+        "senses": "blindsight 60 ft., darkvision 60 ft., passive Perception 14",
+        "languages": "Abyssal, Infernal, telepathy 60 ft.",
+        "cr": 9,
+        "traits": [
+          {
+            "name": "Innate Spellcasting",
+            "description": "The nycaloth's innate spellcasting ability is Charisma (spell save DC 14). The nycaloth can innately cast the following spells, requiring no material components:\n\nAt will: darkness, detect magic, dispel magic, invisibility (self only)\n2/day each: mirror image, plane shift (self only)"
+          },
+          {
+            "name": "Magic Resistance",
+            "description": "The nycaloth has advantage on saving throws against spells and other magical effects."
+          },
+          {
+            "name": "Magic Weapons",
+            "description": "The nycaloth's weapon attacks are magical."
+          }
+        ],
+        "actions": [
+          {
+            "name": "Multiattack",
+            "description": "The nycaloth makes two melee attacks, or it makes one melee attack and teleports before or after the attack."
+          },
+          {
+            "name": "Greataxe",
+            "description": "Melee Weapon Attack: +9 to hit, reach 5 ft., one target. Hit: 18 (2d12 + 5) slashing damage."
+          },
+          {
+            "name": "Claw",
+            "description": "Melee Weapon Attack: +9 to hit, reach 5 ft., one target. Hit: 12 (2d6 + 5) slashing damage."
+          },
+          {
+            "name": "Teleport",
+            "description": "The nycaloth magically teleports, along with any equipment it is wearing or carrying, up to 60 feet to an unoccupied space it can see."
+          }
+        ]
+      }
+    },
+    {
+      "id": "treant",
+      "name": "Treant",
+      "img": "icons/creatures/plants/treant-walking-tree-green.webp",
+      "description": "An ancient tree animated to serve as guardian of the forest.",
+      "templateId": "dnd5e-monster",
+      "source": "SRD 5.1",
+      "data": {
+        "size": "huge",
+        "type": "plant",
+        "alignment": "chaotic good",
+        "ac": 16,
+        "acType": "natural armor",
+        "hp": "138 (12d12 + 60)",
+        "speed": "30 ft.",
+        "stats": {
+          "str": 23,
+          "dex": 8,
+          "con": 21,
+          "int": 12,
+          "wis": 16,
+          "cha": 12
+        },
+        "damageResistances": "bludgeoning, piercing",
+        "damageVulnerabilities": "fire",
+        "senses": "passive Perception 13",
+        "languages": "Common, Druidic, Elvish, Sylvan",
+        "cr": 9,
+        "traits": [
+          {
+            "name": "False Appearance",
+            "description": "While the treant remains motionless, it is indistinguishable from a normal tree."
+          },
+          {
+            "name": "Siege Monster",
+            "description": "The treant deals double damage to objects and structures."
+          }
+        ],
+        "actions": [
+          {
+            "name": "Multiattack",
+            "description": "The treant makes two slam attacks."
+          },
+          {
+            "name": "Slam",
+            "description": "Melee Weapon Attack: +10 to hit, reach 5 ft., one target. Hit: 16 (3d6 + 6) bludgeoning damage."
+          },
+          {
+            "name": "Rock",
+            "description": "Ranged Weapon Attack: +10 to hit, range 60/180 ft., one target. Hit: 28 (4d10 + 6) bludgeoning damage."
+          },
+          {
+            "name": "Animate Trees (1/Day)",
+            "description": "The treant magically animates one or two trees it can see within 60 feet of it. These trees have the same statistics as a treant, except they have Intelligence and Charisma scores of 1, they can't speak, and they have only the Slam action option. An animated tree acts as an ally of the treant. The tree remains animate for 1 day or until it dies; until the treant dies or is more than 120 feet from the tree; or until the treant takes a bonus action to turn it back into an inanimate tree. The tree then takes root if possible."
+          }
+        ]
+      }
+    },
+    {
+      "id": "young-blue-dragon",
+      "name": "Young Blue Dragon",
+      "img": "icons/creatures/reptiles/dragon-young-blue.webp",
+      "description": "A young chromatic dragon dwelling in deserts.",
+      "templateId": "dnd5e-monster",
+      "source": "SRD 5.1",
+      "data": {
+        "size": "large",
+        "type": "dragon",
+        "alignment": "lawful evil",
+        "ac": 18,
+        "acType": "natural armor",
+        "hp": "152 (16d10 + 64)",
+        "speed": "40 ft., burrow 20 ft., fly 80 ft.",
+        "stats": {
+          "str": 21,
+          "dex": 10,
+          "con": 19,
+          "int": 14,
+          "wis": 13,
+          "cha": 17
+        },
+        "savingThrows": "Dex +4, Con +8, Wis +5, Cha +7",
+        "skills": "Perception +9, Stealth +4",
+        "damageImmunities": "lightning",
+        "senses": "blindsight 30 ft., darkvision 120 ft., passive Perception 19",
+        "languages": "Common, Draconic",
+        "cr": 9,
+        "actions": [
+          {
+            "name": "Multiattack",
+            "description": "The dragon makes three attacks: one with its bite and two with its claws."
+          },
+          {
+            "name": "Bite",
+            "description": "Melee Weapon Attack: +9 to hit, reach 10 ft., one target. Hit: 16 (2d10 + 5) piercing damage plus 5 (1d10) lightning damage."
+          },
+          {
+            "name": "Claw",
+            "description": "Melee Weapon Attack: +9 to hit, reach 5 ft., one target. Hit: 12 (2d6 + 5) slashing damage."
+          },
+          {
+            "name": "Lightning Breath (Recharge 5-6)",
+            "description": "The dragon exhales lightning in an 60-foot line that is 5 feet wide. Each creature in that line must make a DC 16 Dexterity saving throw, taking 55 (10d10) lightning damage on a failed save, or half as much damage on a successful one."
+          }
+        ]
+      }
+    },
+    {
+      "id": "young-silver-dragon",
+      "name": "Young Silver Dragon",
+      "img": "icons/creatures/reptiles/dragon-young-silver.webp",
+      "description": "A young metallic dragon known for its kindness.",
+      "templateId": "dnd5e-monster",
+      "source": "SRD 5.1",
+      "data": {
+        "size": "large",
+        "type": "dragon",
+        "alignment": "lawful good",
+        "ac": 18,
+        "acType": "natural armor",
+        "hp": "168 (16d10 + 80)",
+        "speed": "40 ft., fly 80 ft.",
+        "stats": {
+          "str": 23,
+          "dex": 10,
+          "con": 21,
+          "int": 14,
+          "wis": 11,
+          "cha": 19
+        },
+        "savingThrows": "Dex +4, Con +9, Wis +4, Cha +8",
+        "skills": "Arcana +6, History +6, Perception +8, Stealth +4",
+        "damageImmunities": "cold",
+        "senses": "blindsight 30 ft., darkvision 120 ft., passive Perception 18",
+        "languages": "Common, Draconic",
+        "cr": 9,
+        "actions": [
+          {
+            "name": "Multiattack",
+            "description": "The dragon makes three attacks: one with its bite and two with its claws."
+          },
+          {
+            "name": "Bite",
+            "description": "Melee Weapon Attack: +10 to hit, reach 10 ft., one target. Hit: 17 (2d10 + 6) piercing damage."
+          },
+          {
+            "name": "Claw",
+            "description": "Melee Weapon Attack: +10 to hit, reach 5 ft., one target. Hit: 13 (2d6 + 6) slashing damage."
+          },
+          {
+            "name": "Breath Weapons (Recharge 5-6)",
+            "description": "The dragon uses one of the following breath weapons:\n\nCold Breath: The dragon exhales an icy blast in a 30-foot cone. Each creature in that area must make a DC 17 Constitution saving throw, taking 54 (12d8) cold damage on a failed save, or half as much damage on a successful one.\n\nParalyzing Breath: The dragon exhales paralyzing gas in a 30-foot cone. Each creature in that area must succeed on a DC 17 Constitution saving throw or be paralyzed for 1 minute. A creature can repeat the saving throw at the end of each of its turns, ending the effect on itself on a success."
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "compendiumId": "dnd5e-srd-weapons-simple-ranged",
+  "name": "Simple Ranged Weapons",
+  "templateId": "dnd5e-weapon",
+  "source": "SRD 5.1",
+  "entries": [
+    {
+      "id": "crossbow-light",
+      "name": "Crossbow, Light",
+      "img": "icons/weapons/crossbows/crossbow-light-brown.webp",
+      "description": "A small mechanical crossbow.",
+      "templateId": "dnd5e-weapon",
+      "source": "SRD 5.1",
+      "data": {
+        "weaponType": "simple_ranged",
+        "damage": "1d8",
+        "damageType": "piercing",
+        "properties": ["ammunition", "loading", "two_handed"],
+        "range": "80/320",
+        "weight": 5,
+        "price": 25
+      }
+    },
+    {
+      "id": "dart",
+      "name": "Dart",
+      "img": "icons/weapons/thrown/dart-flight-metal.webp",
+      "description": "A small thrown projectile.",
+      "templateId": "dnd5e-weapon",
+      "source": "SRD 5.1",
+      "data": {
+        "weaponType": "simple_ranged",
+        "damage": "1d4",
+        "damageType": "piercing",
+        "properties": ["finesse", "thrown"],
+        "range": "20/60",
+        "weight": 0.25,
+        "price": 0.05
+      }
+    },
+    {
+      "id": "shortbow",
+      "name": "Shortbow",
+      "img": "icons/weapons/bows/bow-short-recurve-wood.webp",
+      "description": "A compact bow for ranged attacks.",
+      "templateId": "dnd5e-weapon",
+      "source": "SRD 5.1",
+      "data": {
+        "weaponType": "simple_ranged",
+        "damage": "1d6",
+        "damageType": "piercing",
+        "properties": ["ammunition", "two_handed"],
+        "range": "80/320",
+        "weight": 2,
+        "price": 25
+      }
+    },
+    {
+      "id": "sling",
+      "name": "Sling",
+      "img": "icons/weapons/thrown/sling-leather.webp",
+      "description": "A cord or leather strap for hurling stones.",
+      "templateId": "dnd5e-weapon",
+      "source": "SRD 5.1",
+      "data": {
+        "weaponType": "simple_ranged",
+        "damage": "1d4",
+        "damageType": "bludgeoning",
+        "properties": ["ammunition"],
+        "range": "30/120",
+        "weight": 0,
+        "price": 0.1
+      }
+    }
+  ]
+}

@@ -1,0 +1,255 @@
+{
+  "compendiumId": "dnd5e-srd-spells-level-2",
+  "name": "2nd Level Spells",
+  "templateId": "dnd5e-spell",
+  "source": "SRD 5.1",
+  "entries": [
+    {
+      "id": "aid",
+      "name": "Aid",
+      "img": "icons/magic/life/heart-cross-strong-green.webp",
+      "description": "Your spell bolsters your allies with toughness and resolve. Choose up to three creatures within range. Each target's hit point maximum and current hit points increase by 5 for the duration.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 2,
+        "school": "abjuration",
+        "castingTime": "1 action",
+        "range": "30 feet",
+        "components": ["V", "S", "M"],
+        "materials": "a tiny strip of white cloth",
+        "duration": "8 hours",
+        "concentration": false,
+        "ritual": false,
+        "higherLevels": "When you cast this spell using a spell slot of 3rd level or higher, a target's hit points increase by an additional 5 for each slot level above 2nd.",
+        "classes": ["cleric", "paladin"]
+      }
+    },
+    {
+      "id": "blur",
+      "name": "Blur",
+      "img": "icons/magic/perception/silhouette-stealth-blue.webp",
+      "description": "Your body becomes blurred, shifting and wavering to all who can see you. For the duration, any creature has disadvantage on attack rolls against you. An attacker is immune to this effect if it doesn't rely on sight, as with blindsight, or can see through illusions, as with truesight.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 2,
+        "school": "illusion",
+        "castingTime": "1 action",
+        "range": "Self",
+        "components": ["V"],
+        "duration": "Concentration, up to 1 minute",
+        "concentration": true,
+        "ritual": false,
+        "classes": ["sorcerer", "wizard"]
+      }
+    },
+    {
+      "id": "darkness",
+      "name": "Darkness",
+      "img": "icons/magic/unholy/orb-beam-purple.webp",
+      "description": "Magical darkness spreads from a point you choose within range to fill a 15-foot-radius sphere for the duration. The darkness spreads around corners. A creature with darkvision can't see through this darkness, and nonmagical light can't illuminate it.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 2,
+        "school": "evocation",
+        "castingTime": "1 action",
+        "range": "60 feet",
+        "components": ["V", "M"],
+        "materials": "bat fur and a drop of pitch or piece of coal",
+        "duration": "Concentration, up to 10 minutes",
+        "concentration": true,
+        "ritual": false,
+        "areaOfEffect": "15-foot radius",
+        "classes": ["sorcerer", "warlock", "wizard"]
+      }
+    },
+    {
+      "id": "hold-person",
+      "name": "Hold Person",
+      "img": "icons/magic/control/debuff-chains-blue.webp",
+      "description": "Choose a humanoid that you can see within range. The target must succeed on a Wisdom saving throw or be paralyzed for the duration. At the end of each of its turns, the target can make another Wisdom saving throw. On a success, the spell ends on the target.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 2,
+        "school": "enchantment",
+        "castingTime": "1 action",
+        "range": "60 feet",
+        "components": ["V", "S", "M"],
+        "materials": "a small, straight piece of iron",
+        "duration": "Concentration, up to 1 minute",
+        "concentration": true,
+        "ritual": false,
+        "saveAbility": "wisdom",
+        "higherLevels": "When you cast this spell using a spell slot of 3rd level or higher, you can target one additional humanoid for each slot level above 2nd. The humanoids must be within 30 feet of each other when you target them.",
+        "classes": ["bard", "cleric", "druid", "sorcerer", "warlock", "wizard"]
+      }
+    },
+    {
+      "id": "invisibility",
+      "name": "Invisibility",
+      "img": "icons/magic/perception/silhouette-stealth-blue.webp",
+      "description": "A creature you touch becomes invisible until the spell ends. Anything the target is wearing or carrying is invisible as long as it is on the target's person. The spell ends for a target that attacks or casts a spell.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 2,
+        "school": "illusion",
+        "castingTime": "1 action",
+        "range": "Touch",
+        "components": ["V", "S", "M"],
+        "materials": "an eyelash encased in gum arabic",
+        "duration": "Concentration, up to 1 hour",
+        "concentration": true,
+        "ritual": false,
+        "higherLevels": "When you cast this spell using a spell slot of 3rd level or higher, you can target one additional creature for each slot level above 2nd.",
+        "classes": ["bard", "sorcerer", "warlock", "wizard"]
+      }
+    },
+    {
+      "id": "knock",
+      "name": "Knock",
+      "img": "icons/sundries/misc/lock-keyhole-glow-yellow.webp",
+      "description": "Choose an object that you can see within range. The object can be a door, a box, a chest, a set of manacles, a padlock, or another object that contains a mundane or magical means that prevents access. A target that is held shut by a mundane lock or that is stuck or barred becomes unlocked, unstuck, or unbarred.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 2,
+        "school": "transmutation",
+        "castingTime": "1 action",
+        "range": "60 feet",
+        "components": ["V"],
+        "duration": "Instantaneous",
+        "concentration": false,
+        "ritual": false,
+        "classes": ["bard", "sorcerer", "wizard"]
+      }
+    },
+    {
+      "id": "lesser-restoration",
+      "name": "Lesser Restoration",
+      "img": "icons/magic/life/ankh-gold-blue.webp",
+      "description": "You touch a creature and can end either one disease or one condition afflicting it. The condition can be blinded, deafened, paralyzed, or poisoned.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 2,
+        "school": "abjuration",
+        "castingTime": "1 action",
+        "range": "Touch",
+        "components": ["V", "S"],
+        "duration": "Instantaneous",
+        "concentration": false,
+        "ritual": false,
+        "classes": ["bard", "cleric", "druid", "paladin", "ranger"]
+      }
+    },
+    {
+      "id": "misty-step",
+      "name": "Misty Step",
+      "img": "icons/magic/movement/trail-streak-zigzag-blue.webp",
+      "description": "Briefly surrounded by silvery mist, you teleport up to 30 feet to an unoccupied space that you can see.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 2,
+        "school": "conjuration",
+        "castingTime": "1 bonus action",
+        "range": "Self",
+        "components": ["V"],
+        "duration": "Instantaneous",
+        "concentration": false,
+        "ritual": false,
+        "classes": ["sorcerer", "warlock", "wizard"]
+      }
+    },
+    {
+      "id": "scorching-ray",
+      "name": "Scorching Ray",
+      "img": "icons/magic/fire/projectile-bolt-zigzag-orange.webp",
+      "description": "You create three rays of fire and hurl them at targets within range. You can hurl them at one target or several. Make a ranged spell attack for each ray. On a hit, the target takes 2d6 fire damage.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 2,
+        "school": "evocation",
+        "castingTime": "1 action",
+        "range": "120 feet",
+        "components": ["V", "S"],
+        "duration": "Instantaneous",
+        "concentration": false,
+        "ritual": false,
+        "damage": "2d6",
+        "damageType": "fire",
+        "attackType": "ranged",
+        "higherLevels": "When you cast this spell using a spell slot of 3rd level or higher, you create one additional ray for each slot level above 2nd.",
+        "classes": ["sorcerer", "wizard"]
+      }
+    },
+    {
+      "id": "see-invisibility",
+      "name": "See Invisibility",
+      "img": "icons/magic/perception/eye-ringed-glow-angry-purple.webp",
+      "description": "For the duration, you see invisible creatures and objects as if they were visible, and you can see into the Ethereal Plane. Ethereal creatures and objects appear ghostly and translucent.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 2,
+        "school": "divination",
+        "castingTime": "1 action",
+        "range": "Self",
+        "components": ["V", "S", "M"],
+        "materials": "a pinch of talc and a small sprinkling of powdered silver",
+        "duration": "1 hour",
+        "concentration": false,
+        "ritual": false,
+        "classes": ["bard", "sorcerer", "wizard"]
+      }
+    },
+    {
+      "id": "silence",
+      "name": "Silence",
+      "img": "icons/magic/sonic/scream-wail-shout-purple.webp",
+      "description": "For the duration, no sound can be created within or pass through a 20-foot-radius sphere centered on a point you choose within range. Any creature or object entirely inside the sphere is immune to thunder damage, and creatures are deafened while entirely inside it. Casting a spell that includes a verbal component is impossible there.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 2,
+        "school": "illusion",
+        "castingTime": "1 action",
+        "range": "120 feet",
+        "components": ["V", "S"],
+        "duration": "Concentration, up to 10 minutes",
+        "concentration": true,
+        "ritual": true,
+        "areaOfEffect": "20-foot radius",
+        "classes": ["bard", "cleric", "ranger"]
+      }
+    },
+    {
+      "id": "spiritual-weapon",
+      "name": "Spiritual Weapon",
+      "img": "icons/magic/holy/weapon-sword-gold.webp",
+      "description": "You create a floating, spectral weapon within range that lasts for the duration or until you cast this spell again. When you cast the spell, you can make a melee spell attack against a creature within 5 feet of the weapon. On a hit, the target takes force damage equal to 1d8 + your spellcasting ability modifier.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 2,
+        "school": "evocation",
+        "castingTime": "1 bonus action",
+        "range": "60 feet",
+        "components": ["V", "S"],
+        "duration": "1 minute",
+        "concentration": false,
+        "ritual": false,
+        "damage": "1d8",
+        "damageType": "force",
+        "attackType": "melee",
+        "higherLevels": "When you cast this spell using a spell slot of 3rd level or higher, the damage increases by 1d8 for every two slot levels above 2nd.",
+        "classes": ["cleric"]
+      }
+    }
+  ]
+}

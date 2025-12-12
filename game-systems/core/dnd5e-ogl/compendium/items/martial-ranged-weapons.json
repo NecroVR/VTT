@@ -1,0 +1,108 @@
+{
+  "compendiumId": "dnd5e-srd-weapons-martial-ranged",
+  "name": "Martial Ranged Weapons",
+  "templateId": "dnd5e-weapon",
+  "source": "SRD 5.1",
+  "entries": [
+    {
+      "id": "blowgun",
+      "name": "Blowgun",
+      "img": "icons/weapons/ammunition/blowgun-simple.webp",
+      "description": "A hollow tube for firing darts by breath.",
+      "templateId": "dnd5e-weapon",
+      "source": "SRD 5.1",
+      "data": {
+        "weaponType": "martial_ranged",
+        "damage": "1",
+        "damageType": "piercing",
+        "properties": ["ammunition", "loading"],
+        "range": {
+          "normal": 25,
+          "long": 100
+        },
+        "weight": 1,
+        "price": 10
+      }
+    },
+    {
+      "id": "crossbow-hand",
+      "name": "Crossbow, hand",
+      "img": "icons/weapons/crossbows/crossbow-hand.webp",
+      "description": "A small crossbow that can be wielded in one hand.",
+      "templateId": "dnd5e-weapon",
+      "source": "SRD 5.1",
+      "data": {
+        "weaponType": "martial_ranged",
+        "damage": "1d6",
+        "damageType": "piercing",
+        "properties": ["ammunition", "light", "loading"],
+        "range": {
+          "normal": 30,
+          "long": 120
+        },
+        "weight": 3,
+        "price": 75
+      }
+    },
+    {
+      "id": "crossbow-heavy",
+      "name": "Crossbow, heavy",
+      "img": "icons/weapons/crossbows/crossbow-heavy.webp",
+      "description": "A powerful crossbow that requires two hands to use.",
+      "templateId": "dnd5e-weapon",
+      "source": "SRD 5.1",
+      "data": {
+        "weaponType": "martial_ranged",
+        "damage": "1d10",
+        "damageType": "piercing",
+        "properties": ["ammunition", "heavy", "loading", "two_handed"],
+        "range": {
+          "normal": 100,
+          "long": 400
+        },
+        "weight": 18,
+        "price": 50
+      }
+    },
+    {
+      "id": "longbow",
+      "name": "Longbow",
+      "img": "icons/weapons/bows/bow-longbow-leather.webp",
+      "description": "A tall bow that fires arrows with great power.",
+      "templateId": "dnd5e-weapon",
+      "source": "SRD 5.1",
+      "data": {
+        "weaponType": "martial_ranged",
+        "damage": "1d8",
+        "damageType": "piercing",
+        "properties": ["ammunition", "heavy", "two_handed"],
+        "range": {
+          "normal": 150,
+          "long": 600
+        },
+        "weight": 2,
+        "price": 50
+      }
+    },
+    {
+      "id": "net",
+      "name": "Net",
+      "img": "icons/weapons/thrown/net-weighted.webp",
+      "description": "A Large or smaller creature hit by a net is restrained until it is freed. A net has no effect on creatures that are formless, or creatures that are Huge or larger. A creature can use its action to make a DC 10 Strength check, freeing itself or another creature within its reach on a success. Dealing 5 slashing damage to the net (AC 10) also frees the creature without harming it, ending the effect and destroying the net.",
+      "templateId": "dnd5e-weapon",
+      "source": "SRD 5.1",
+      "data": {
+        "weaponType": "martial_ranged",
+        "damage": "0",
+        "damageType": "special",
+        "properties": ["special", "thrown"],
+        "range": {
+          "normal": 5,
+          "long": 15
+        },
+        "weight": 3,
+        "price": 1
+      }
+    }
+  ]
+}

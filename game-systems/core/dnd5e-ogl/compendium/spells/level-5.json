@@ -1,0 +1,206 @@
+{
+  "compendiumId": "dnd5e-srd-spells-level-5",
+  "name": "5th Level Spells",
+  "templateId": "dnd5e-spell",
+  "source": "SRD 5.1",
+  "entries": [
+    {
+      "id": "cloudkill",
+      "name": "Cloudkill",
+      "img": "icons/magic/death/skull-poison-green-yellow.webp",
+      "description": "You create a 20-foot-radius sphere of poisonous, yellow-green fog centered on a point you choose within range. The fog spreads around corners. It lasts for the duration or until strong wind disperses the fog, ending the spell. Its area is heavily obscured. When a creature enters the spell's area for the first time on a turn or starts its turn there, that creature must make a Constitution saving throw. The creature takes 5d8 poison damage on a failed save, or half as much damage on a successful one.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 5,
+        "school": "conjuration",
+        "castingTime": "1 action",
+        "range": "120 feet",
+        "components": ["V", "S"],
+        "duration": "Concentration, up to 10 minutes",
+        "concentration": true,
+        "ritual": false,
+        "damage": "5d8",
+        "damageType": "poison",
+        "saveAbility": "constitution",
+        "areaOfEffect": "20-foot radius",
+        "higherLevels": "When you cast this spell using a spell slot of 6th level or higher, the damage increases by 1d8 for each slot level above 5th.",
+        "classes": ["sorcerer", "wizard"]
+      }
+    },
+    {
+      "id": "cone-of-cold",
+      "name": "Cone of Cold",
+      "img": "icons/magic/water/ice-snowflake-light-blue.webp",
+      "description": "A blast of cold air erupts from your hands. Each creature in a 60-foot cone must make a Constitution saving throw. A creature takes 8d8 cold damage on a failed save, or half as much damage on a successful one. A creature killed by this spell becomes a frozen statue until it thaws.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 5,
+        "school": "evocation",
+        "castingTime": "1 action",
+        "range": "Self (60-foot cone)",
+        "components": ["V", "S", "M"],
+        "materials": "a small crystal or glass cone",
+        "duration": "Instantaneous",
+        "concentration": false,
+        "ritual": false,
+        "damage": "8d8",
+        "damageType": "cold",
+        "saveAbility": "constitution",
+        "areaOfEffect": "60-foot cone",
+        "higherLevels": "When you cast this spell using a spell slot of 6th level or higher, the damage increases by 1d8 for each slot level above 5th.",
+        "classes": ["sorcerer", "wizard"]
+      }
+    },
+    {
+      "id": "dominate-person",
+      "name": "Dominate Person",
+      "img": "icons/magic/control/debuff-chains-red.webp",
+      "description": "You attempt to beguile a humanoid that you can see within range. It must succeed on a Wisdom saving throw or be charmed by you for the duration. If you or creatures that are friendly to you are fighting it, it has advantage on the saving throw. While the target is charmed, you have a telepathic link with it as long as the two of you are on the same plane of existence.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 5,
+        "school": "enchantment",
+        "castingTime": "1 action",
+        "range": "60 feet",
+        "components": ["V", "S"],
+        "duration": "Concentration, up to 1 minute",
+        "concentration": true,
+        "ritual": false,
+        "saveAbility": "wisdom",
+        "higherLevels": "When you cast this spell using a 6th-level spell slot, the duration is concentration, up to 10 minutes. When you use a 7th-level spell slot, the duration is concentration, up to 1 hour. When you use a spell slot of 8th level or higher, the duration is concentration, up to 8 hours.",
+        "classes": ["bard", "sorcerer", "wizard"]
+      }
+    },
+    {
+      "id": "flame-strike",
+      "name": "Flame Strike",
+      "img": "icons/magic/fire/beam-jet-stream-yellow.webp",
+      "description": "A vertical column of divine fire roars down from the heavens in a location you specify. Each creature in a 10-foot-radius, 40-foot-high cylinder centered on a point within range must make a Dexterity saving throw. A creature takes 4d6 fire damage and 4d6 radiant damage on a failed save, or half as much damage on a successful one.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 5,
+        "school": "evocation",
+        "castingTime": "1 action",
+        "range": "60 feet",
+        "components": ["V", "S", "M"],
+        "materials": "pinch of sulfur",
+        "duration": "Instantaneous",
+        "concentration": false,
+        "ritual": false,
+        "damage": "4d6 + 4d6",
+        "damageType": "fire and radiant",
+        "saveAbility": "dexterity",
+        "areaOfEffect": "10-foot radius, 40-foot high cylinder",
+        "higherLevels": "When you cast this spell using a spell slot of 6th level or higher, the fire damage or the radiant damage (your choice) increases by 1d6 for each slot level above 5th.",
+        "classes": ["cleric"]
+      }
+    },
+    {
+      "id": "greater-restoration",
+      "name": "Greater Restoration",
+      "img": "icons/magic/life/ankh-gold-blue.webp",
+      "description": "You imbue a creature you touch with positive energy to undo a debilitating effect. You can reduce the target's exhaustion level by one, or end one of the following effects on the target: one effect that charmed or petrified the target, one curse, including the target's attunement to a cursed magic item, any reduction to one of the target's ability scores, or one effect reducing the target's hit point maximum.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 5,
+        "school": "abjuration",
+        "castingTime": "1 action",
+        "range": "Touch",
+        "components": ["V", "S", "M"],
+        "materials": "diamond dust worth at least 100 gp, which the spell consumes",
+        "duration": "Instantaneous",
+        "concentration": false,
+        "ritual": false,
+        "classes": ["bard", "cleric", "druid"]
+      }
+    },
+    {
+      "id": "hold-monster",
+      "name": "Hold Monster",
+      "img": "icons/magic/control/debuff-chains-orange.webp",
+      "description": "Choose a creature that you can see within range. The target must succeed on a Wisdom saving throw or be paralyzed for the duration. This spell has no effect on undead. At the end of each of its turns, the target can make another Wisdom saving throw. On a success, the spell ends on the target.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 5,
+        "school": "enchantment",
+        "castingTime": "1 action",
+        "range": "90 feet",
+        "components": ["V", "S", "M"],
+        "materials": "a small, straight piece of iron",
+        "duration": "Concentration, up to 1 minute",
+        "concentration": true,
+        "ritual": false,
+        "saveAbility": "wisdom",
+        "higherLevels": "When you cast this spell using a spell slot of 6th level or higher, you can target one additional creature for each slot level above 5th. The creatures must be within 30 feet of each other when you target them.",
+        "classes": ["bard", "sorcerer", "warlock", "wizard"]
+      }
+    },
+    {
+      "id": "scrying",
+      "name": "Scrying",
+      "img": "icons/magic/perception/eye-ringed-glow-angry-blue.webp",
+      "description": "You can see and hear a particular creature you choose that is on the same plane of existence as you. The target must make a Wisdom saving throw, which is modified by how well you know the target and the sort of physical connection you have to it. If a target knows you're casting this spell, it can fail the saving throw voluntarily if it wants to be observed.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 5,
+        "school": "divination",
+        "castingTime": "10 minutes",
+        "range": "Self",
+        "components": ["V", "S", "M"],
+        "materials": "a focus worth at least 1,000 gp, such as a crystal ball, a silver mirror, or a font filled with holy water",
+        "duration": "Concentration, up to 10 minutes",
+        "concentration": true,
+        "ritual": false,
+        "saveAbility": "wisdom",
+        "classes": ["bard", "cleric", "druid", "warlock", "wizard"]
+      }
+    },
+    {
+      "id": "teleportation-circle",
+      "name": "Teleportation Circle",
+      "img": "icons/magic/symbols/runes-star-pentagon-blue.webp",
+      "description": "As you cast the spell, you draw a 10-foot-diameter circle on the ground inscribed with sigils that link your location to a permanent teleportation circle of your choice whose sigil sequence you know and that is on the same plane of existence as you. A shimmering portal opens within the circle you drew and remains open until the end of your next turn. Any creature that enters the portal instantly appears within 5 feet of the destination circle or in the nearest unoccupied space if that space is occupied.",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 5,
+        "school": "conjuration",
+        "castingTime": "1 minute",
+        "range": "10 feet",
+        "components": ["V", "M"],
+        "materials": "rare chalks and inks infused with precious gems worth 50 gp, which the spell consumes",
+        "duration": "1 round",
+        "concentration": false,
+        "ritual": false,
+        "classes": ["bard", "sorcerer", "wizard"]
+      }
+    },
+    {
+      "id": "wall-of-stone",
+      "name": "Wall of Stone",
+      "img": "icons/magic/earth/barrier-stone-pillar-grey.webp",
+      "description": "A nonmagical wall of solid stone springs into existence at a point you choose within range. The wall is 6 inches thick and is composed of ten 10-foot-by-10-foot panels. Each panel must be contiguous with at least one other panel. Alternatively, you can create 10-foot-by-20-foot panels that are only 3 inches thick. If the wall cuts through a creature's space when it appears, the creature is pushed to one side of the wall (your choice).",
+      "templateId": "dnd5e-spell",
+      "source": "SRD 5.1",
+      "data": {
+        "level": 5,
+        "school": "evocation",
+        "castingTime": "1 action",
+        "range": "120 feet",
+        "components": ["V", "S", "M"],
+        "materials": "a small block of granite",
+        "duration": "Concentration, up to 10 minutes",
+        "concentration": true,
+        "ritual": false,
+        "classes": ["druid", "sorcerer", "wizard"]
+      }
+    }
+  ]
+}
