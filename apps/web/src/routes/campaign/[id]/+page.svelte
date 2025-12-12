@@ -30,6 +30,8 @@
   import LightingConfig from '$lib/components/LightingConfig.svelte';
   import OverlaySidebar from '$lib/components/sidebar/OverlaySidebar.svelte';
   import WindowManager from '$lib/components/sidebar/WindowManager.svelte';
+  import EntityFormManager from '$lib/components/EntityFormManager.svelte';
+  import MinimizedDock from '$lib/components/MinimizedDock.svelte';
   import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
   import type { ComponentType, SvelteComponent } from 'svelte';
   import type { Scene, Token, Wall, Door } from '@vtt/shared';
@@ -1085,6 +1087,8 @@
     on:select-token={handleSelectToken}
   />
 
+  <EntityFormManager {campaignId} />
+
   {#if showActorSheet && selectedActorId}
     <div class="actor-sheet-overlay">
       <div class="actor-sheet-modal">
@@ -1144,6 +1148,8 @@
       on:cancel={cancelDeleteScene}
     />
   {/if}
+
+  <MinimizedDock />
 </div>
 
 <style>

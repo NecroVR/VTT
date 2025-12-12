@@ -3,6 +3,7 @@
   import { browser } from '$app/environment';
   import type { ModuleEntity, EntityGroup } from '@vtt/shared';
   import { modulesStore } from '$lib/stores/modules';
+  import { openForm } from '$lib/stores/entityForms';
   import { API_BASE_URL } from '$lib/config/api';
   import CollapsibleGroup from './CollapsibleGroup.svelte';
 
@@ -209,6 +210,11 @@
     }
     collapsedGroups = collapsedGroups; // Trigger reactivity
   }
+
+  function handleEntityClick(entity: ModuleEntity) {
+    if (!selectedModuleId) return;
+    openForm(entity, selectedModuleId);
+  }
 </script>
 
 <svelte:window on:click={closeDropdown} />
@@ -324,7 +330,7 @@
               on:toggle={handleGroupToggle}
             >
               {#each getEntitiesForGroup(group.groupKey) as entity (entity.id)}
-                <div class="entity-card">
+                <div class="entity-card" on:click={() => handleEntityClick(entity)} role="button" tabindex="0">
                   <div class="entity-info">
                     <div class="entity-header">
                       <div class="entity-name">{entity.name}</div>
@@ -340,7 +346,7 @@
                     <div class="dropdown-wrapper">
                       <button
                         class="button-secondary"
-                        on:click={(e) => toggleDropdown(entity.id, e)}
+                        on:click={(e) => { e.stopPropagation(); toggleDropdown(entity.id, e); }}
                       >
                         Actions
                         <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
@@ -370,7 +376,7 @@
       {:else}
         <div class="entities-list">
           {#each entities as entity (entity.id)}
-            <div class="entity-card">
+            <div class="entity-card" on:click={() => handleEntityClick(entity)} role="button" tabindex="0">
               <div class="entity-info">
                 <div class="entity-header">
                   <div class="entity-name">{entity.name}</div>
@@ -386,7 +392,7 @@
                 <div class="dropdown-wrapper">
                   <button
                     class="button-secondary"
-                    on:click={(e) => toggleDropdown(entity.id, e)}
+                    on:click={(e) => { e.stopPropagation(); toggleDropdown(entity.id, e); }}
                   >
                     Actions
                     <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
@@ -630,11 +636,17 @@
     border-radius: 0.375rem;
     background-color: #111827;
     transition: all 0.2s;
+    cursor: pointer;
   }
 
   .entity-card:hover {
     border-color: #60a5fa;
     background-color: #1f2937;
+  }
+
+  .entity-card:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
   }
 
   .entity-info {
