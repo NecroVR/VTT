@@ -47,6 +47,7 @@ services:
       CORS_ORIGIN: https://localhost
     volumes:
       - uploads_data:/app/apps/server/uploads
+      - ./game-systems:/app/game-systems:ro
     networks:
       - vtt-network
     depends_on:
