@@ -1,4 +1,4 @@
-import type { GameSystem, GameSystemManifest, GameSystemModule, ItemTemplate } from '@vtt/shared';
+import type { GameSystem, GameSystemManifest, GameSystemModule, ItemTemplate, FileCompendiumType, FileCompendiumEntry, FileCompendiumFile } from '@vtt/shared';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -18,6 +18,16 @@ export interface LoadedGameSystem {
   system: GameSystem;
   path: string;
   type: 'core' | 'community';
+  compendium: {
+    items: Map<string, FileCompendiumEntry>;
+    spells: Map<string, FileCompendiumEntry>;
+    monsters: Map<string, FileCompendiumEntry>;
+    races: Map<string, FileCompendiumEntry>;
+    classes: Map<string, FileCompendiumEntry>;
+    backgrounds: Map<string, FileCompendiumEntry>;
+    features: Map<string, FileCompendiumEntry>;
+    conditions: Map<string, FileCompendiumEntry>;
+  };
 }
 
 export interface GameSystemError {
@@ -170,6 +180,32 @@ class GameSystemLoaderService {
   }
 
   /**
+   * Validate a compendium file structure
+   */
+  private validateCompendiumFile(file: any, filePath: string): file is FileCompendiumFile {
+    const required = ['compendiumId', 'name', 'templateId', 'source', 'entries'];
+
+    for (const field of required) {
+      if (!file[field]) {
+        throw new Error(`Missing required field '${field}' in compendium file at ${filePath}`);
+      }
+    }
+
+    if (!Array.isArray(file.entries)) {
+      throw new Error(`Entries must be an array in compendium file at ${filePath}`);
+    }
+
+    // Validate each entry
+    for (const entry of file.entries) {
+      if (!entry.id || !entry.name || !entry.templateId || !entry.source || !entry.data) {
+        throw new Error(`Invalid entry in compendium file at ${filePath}: missing required fields`);
+      }
+    }
+
+    return true;
+  }
+
+  /**
    * Validate an item template structure
    */
   private validateItemTemplate(template: any, filePath: string): template is ItemTemplate {
@@ -211,6 +247,136 @@ class GameSystemLoaderService {
     }
 
     return true;
+  }
+
+  /**
+   * Load compendium entries from the compendium/ directory
+   */
+  private async loadCompendiumEntries(systemDir: string): Promise<LoadedGameSystem['compendium']> {
+    const compendium: LoadedGameSystem['compendium'] = {
+      items: new Map(),
+      spells: new Map(),
+      monsters: new Map(),
+      races: new Map(),
+      classes: new Map(),
+      backgrounds: new Map(),
+      features: new Map(),
+      conditions: new Map(),
+    };
+
+    const compendiumDir = path.join(systemDir, 'compendium');
+
+    try {
+      // Check if compendium directory exists
+      const exists = await this.directoryExists(compendiumDir);
+      if (!exists) {
+        console.log(`No compendium directory found at ${compendiumDir}`);
+        return compendium;
+      }
+
+      // Read all subdirectories (items, spells, monsters, etc.)
+      const entries = await fs.readdir(compendiumDir, { withFileTypes: true });
+      const subdirs = entries.filter(e => e.isDirectory() && !e.name.startsWith('.'));
+
+      for (const subdir of subdirs) {
+        const type = subdir.name as FileCompendiumType;
+
+        // Validate that this is a recognized compendium type
+        if (!Object.keys(compendium).includes(type)) {
+          console.warn(`Unknown compendium type '${type}' in ${compendiumDir}, skipping`);
+          continue;
+        }
+
+        const typeDir = path.join(compendiumDir, type);
+        await this.loadCompendiumType(typeDir, type, compendium[type]);
+      }
+
+      // Log summary
+      const totalEntries = Object.values(compendium).reduce((sum, map) => sum + map.size, 0);
+      console.log(`Loaded ${totalEntries} total compendium entries`);
+
+    } catch (error) {
+      console.error(`Error loading compendium from ${compendiumDir}:`, error);
+    }
+
+    return compendium;
+  }
+
+  /**
+   * Load all compendium files from a specific type directory
+   */
+  private async loadCompendiumType(
+    typeDir: string,
+    type: FileCompendiumType,
+    entryMap: Map<string, FileCompendiumEntry>
+  ): Promise<void> {
+    try {
+      // Recursively find all .json files in this directory and subdirectories
+      const jsonFiles = await this.findJsonFiles(typeDir);
+
+      if (jsonFiles.length === 0) {
+        console.log(`No compendium files found for type '${type}'`);
+        return;
+      }
+
+      console.log(`Loading ${jsonFiles.length} compendium file(s) for type '${type}'`);
+
+      let entriesLoaded = 0;
+
+      // Load and validate each file
+      for (const filePath of jsonFiles) {
+        try {
+          const file = await this.readJsonFile<FileCompendiumFile>(filePath);
+
+          // Validate the file structure
+          this.validateCompendiumFile(file, filePath);
+
+          // Add all entries to the map
+          for (const entry of file.entries) {
+            if (entryMap.has(entry.id)) {
+              console.warn(`Duplicate entry ID '${entry.id}' in ${filePath}, overwriting previous entry`);
+            }
+            entryMap.set(entry.id, entry);
+            entriesLoaded++;
+          }
+
+          console.log(`  Loaded ${file.entries.length} entries from ${path.basename(filePath)}`);
+        } catch (error) {
+          console.error(`Failed to load compendium file ${filePath}:`, error instanceof Error ? error.message : String(error));
+        }
+      }
+
+      console.log(`Successfully loaded ${entriesLoaded} entries for type '${type}'`);
+    } catch (error) {
+      console.error(`Error loading compendium type '${type}' from ${typeDir}:`, error);
+    }
+  }
+
+  /**
+   * Recursively find all .json files in a directory
+   */
+  private async findJsonFiles(dir: string): Promise<string[]> {
+    const files: string[] = [];
+
+    try {
+      const entries = await fs.readdir(dir, { withFileTypes: true });
+
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+
+        if (entry.isDirectory() && !entry.name.startsWith('.')) {
+          // Recursively search subdirectories
+          const subFiles = await this.findJsonFiles(fullPath);
+          files.push(...subFiles);
+        } else if (entry.isFile() && entry.name.endsWith('.json')) {
+          files.push(fullPath);
+        }
+      }
+    } catch (error) {
+      console.error(`Error reading directory ${dir}:`, error);
+    }
+
+    return files;
   }
 
   /**
@@ -296,11 +462,15 @@ class GameSystemLoaderService {
       const itemTemplates = await this.loadItemTemplates(systemDir);
       system.itemTemplates = itemTemplates;
 
+      // Load compendium entries
+      const compendium = await this.loadCompendiumEntries(systemDir);
+
       return {
         manifest,
         system,
         path: systemDir,
         type,
+        compendium,
       };
     } catch (error) {
       const systemId = path.basename(systemDir);
@@ -467,6 +637,106 @@ class GameSystemLoaderService {
     this.systems.clear();
     this.errors = [];
     this.initialized = false;
+  }
+
+  /**
+   * Get compendium entries for a specific system and type
+   * Optionally filter by search parameters
+   */
+  getCompendiumEntries(
+    systemId: string,
+    type: FileCompendiumType,
+    searchParams?: {
+      search?: string;
+      filters?: Record<string, string | string[]>;
+      page?: number;
+      limit?: number;
+    }
+  ): { entries: FileCompendiumEntry[]; total: number; page: number; limit: number; hasMore: boolean } {
+    const system = this.getSystem(systemId);
+
+    if (!system) {
+      throw new Error(`Game system '${systemId}' not found`);
+    }
+
+    const entryMap = system.compendium[type];
+    if (!entryMap) {
+      throw new Error(`Invalid compendium type '${type}'`);
+    }
+
+    // Get all entries as an array
+    let entries = Array.from(entryMap.values());
+
+    // Apply search filter
+    if (searchParams?.search) {
+      const searchLower = searchParams.search.toLowerCase();
+      entries = entries.filter(entry =>
+        entry.name.toLowerCase().includes(searchLower) ||
+        entry.description?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Apply custom filters
+    if (searchParams?.filters) {
+      entries = entries.filter(entry => {
+        for (const [key, value] of Object.entries(searchParams.filters!)) {
+          const entryValue = entry.data[key];
+
+          if (Array.isArray(value)) {
+            // For array filters, check if entry value is in the array
+            if (!value.includes(String(entryValue))) {
+              return false;
+            }
+          } else {
+            // For single value filters, check exact match
+            if (String(entryValue) !== value) {
+              return false;
+            }
+          }
+        }
+        return true;
+      });
+    }
+
+    // Calculate pagination
+    const total = entries.length;
+    const page = searchParams?.page ?? 1;
+    const limit = searchParams?.limit ?? 20;
+    const offset = (page - 1) * limit;
+
+    // Apply pagination
+    const paginatedEntries = entries.slice(offset, offset + limit);
+    const hasMore = offset + limit < total;
+
+    return {
+      entries: paginatedEntries,
+      total,
+      page,
+      limit,
+      hasMore,
+    };
+  }
+
+  /**
+   * Get a single compendium entry by ID
+   */
+  getCompendiumEntry(
+    systemId: string,
+    type: FileCompendiumType,
+    entryId: string
+  ): FileCompendiumEntry | undefined {
+    const system = this.getSystem(systemId);
+
+    if (!system) {
+      throw new Error(`Game system '${systemId}' not found`);
+    }
+
+    const entryMap = system.compendium[type];
+    if (!entryMap) {
+      throw new Error(`Invalid compendium type '${type}'`);
+    }
+
+    return entryMap.get(entryId);
   }
 }
 

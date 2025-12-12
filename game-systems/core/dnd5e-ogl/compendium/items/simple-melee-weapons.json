@@ -1,0 +1,57 @@
+{
+  "compendiumId": "dnd5e-srd-weapons-simple-melee",
+  "name": "Simple Melee Weapons",
+  "templateId": "dnd5e-weapon",
+  "source": "SRD 5.1",
+  "entries": [
+    {
+      "id": "club",
+      "name": "Club",
+      "img": "icons/weapons/clubs/club-wood.webp",
+      "description": "A simple wooden club.",
+      "templateId": "dnd5e-weapon",
+      "source": "SRD 5.1",
+      "data": {
+        "weaponType": "simple-melee",
+        "damage": "1d4",
+        "damageType": "bludgeoning",
+        "properties": ["light"],
+        "weight": 2,
+        "price": 0.1
+      }
+    },
+    {
+      "id": "dagger",
+      "name": "Dagger",
+      "img": "icons/weapons/daggers/dagger-steel.webp",
+      "description": "A small, easily concealed blade.",
+      "templateId": "dnd5e-weapon",
+      "source": "SRD 5.1",
+      "data": {
+        "weaponType": "simple-melee",
+        "damage": "1d4",
+        "damageType": "piercing",
+        "properties": ["finesse", "light", "thrown"],
+        "range": "20/60",
+        "weight": 1,
+        "price": 2
+      }
+    },
+    {
+      "id": "greatclub",
+      "name": "Greatclub",
+      "img": "icons/weapons/clubs/club-heavy-wood.webp",
+      "description": "A large, two-handed club.",
+      "templateId": "dnd5e-weapon",
+      "source": "SRD 5.1",
+      "data": {
+        "weaponType": "simple-melee",
+        "damage": "1d8",
+        "damageType": "bludgeoning",
+        "properties": ["two-handed"],
+        "weight": 10,
+        "price": 0.2
+      }
+    }
+  ]
+}
