@@ -3,14 +3,30 @@
   import { goto } from '$app/navigation';
   import { campaignsStore } from '$lib/stores/campaigns';
   import { authStore } from '$lib/stores/auth';
+  import { API_BASE_URL } from '$lib/config/api';
   import type { CampaignSettings } from '@vtt/shared';
+
+  interface GameSystem {
+    systemId: string;
+    name: string;
+    version: string;
+    publisher: string;
+    description: string;
+    type: string;
+  }
 
   let user: any = null;
   let loading = false;
   let error: string | null = null;
 
+  // Game Systems
+  let gameSystems: GameSystem[] = [];
+  let gameSystemsLoading = false;
+  let gameSystemsError: string | null = null;
+
   // Form fields
   let campaignName = '';
+  let selectedGameSystemId = '';
   let gridType: 'square' | 'hex' | 'none' = 'square';
   let gridSize = 50;
   let snapToGrid = true;
@@ -35,6 +51,9 @@
       }
     }
 
+    // Fetch available game systems
+    await fetchGameSystems();
+
     // Return cleanup function
     return () => {
       unsubscribeCampaigns();
@@ -42,9 +61,44 @@
     };
   });
 
+  async function fetchGameSystems() {
+    gameSystemsLoading = true;
+    gameSystemsError = null;
+
+    try {
+      const sessionId = localStorage.getItem('vtt_session_id');
+      if (!sessionId) {
+        throw new Error('Not authenticated');
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/v1/game-systems`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${sessionId}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch game systems');
+      }
+
+      gameSystems = await response.json();
+      gameSystemsLoading = false;
+    } catch (err) {
+      gameSystemsError = err instanceof Error ? err.message : 'Failed to load game systems';
+      gameSystemsLoading = false;
+    }
+  }
+
   async function handleSubmit() {
     if (!campaignName.trim()) {
       error = 'Campaign name is required';
+      return;
+    }
+
+    if (!selectedGameSystemId) {
+      error = 'Game system is required';
       return;
     }
 
@@ -56,6 +110,7 @@
 
     const campaign = await campaignsStore.createCampaign({
       name: campaignName.trim(),
+      gameSystemId: selectedGameSystemId,
       settings,
     });
 
@@ -86,9 +141,16 @@
     </div>
   {/if}
 
+  {#if gameSystemsError}
+    <div class="error-message">
+      <p>{gameSystemsError}</p>
+      <button class="btn-text" on:click={fetchGameSystems}>Retry</button>
+    </div>
+  {/if}
+
   <form on:submit|preventDefault={handleSubmit} class="form">
     <div class="form-group">
-      <label for="campaignName">Campaign Name</label>
+      <label for="campaignName">Campaign Name <span class="required">*</span></label>
       <input
         id="campaignName"
         type="text"
@@ -97,6 +159,41 @@
         required
         disabled={loading}
       />
+    </div>
+
+    <div class="form-group">
+      <label for="gameSystem">Game System <span class="required">*</span></label>
+      {#if gameSystemsLoading}
+        <div class="loading-inline">Loading game systems...</div>
+      {:else if gameSystems.length === 0}
+        <div class="warning-message">
+          No game systems available. Please contact your administrator.
+        </div>
+      {:else}
+        <select
+          id="gameSystem"
+          bind:value={selectedGameSystemId}
+          required
+          disabled={loading}
+        >
+          <option value="">Select a game system</option>
+          {#each gameSystems as system (system.systemId)}
+            <option value={system.systemId}>
+              {system.name} ({system.publisher})
+            </option>
+          {/each}
+        </select>
+        {#if selectedGameSystemId}
+          {@const selectedSystem = gameSystems.find(s => s.systemId === selectedGameSystemId)}
+          {#if selectedSystem}
+            <div class="system-description">
+              <p><strong>{selectedSystem.name}</strong> v{selectedSystem.version}</p>
+              <p>{selectedSystem.description}</p>
+            </div>
+          {/if}
+        {/if}
+      {/if}
+      <small>The game system cannot be changed after campaign creation.</small>
     </div>
 
     <div class="form-section">
@@ -150,7 +247,7 @@
       <button
         type="submit"
         class="btn btn-primary"
-        disabled={loading || !campaignName.trim()}
+        disabled={loading || !campaignName.trim() || !selectedGameSystemId || gameSystemsLoading}
       >
         {loading ? 'Creating...' : 'Create Campaign'}
       </button>
@@ -298,5 +395,51 @@
 
   .btn-secondary:hover:not(:disabled) {
     background-color: var(--color-bg-secondary);
+  }
+
+  .required {
+    color: #f87171;
+    margin-left: var(--spacing-xs);
+  }
+
+  .loading-inline {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-md);
+    font-style: italic;
+  }
+
+  .warning-message {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: rgba(251, 191, 36, 0.1);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    border-radius: var(--border-radius-sm);
+    color: #f59e0b;
+    font-size: var(--font-size-sm);
+  }
+
+  .system-description {
+    margin-top: var(--spacing-sm);
+    padding: var(--spacing-md);
+    background-color: rgba(59, 130, 246, 0.05);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: var(--border-radius-sm);
+  }
+
+  .system-description p {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+  }
+
+  .system-description p:first-child {
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .system-description p:last-child {
+    color: var(--color-text-secondary);
   }
 </style>

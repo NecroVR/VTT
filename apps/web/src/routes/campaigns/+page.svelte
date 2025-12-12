@@ -3,8 +3,18 @@
   import { goto } from '$app/navigation';
   import { campaignsStore } from '$lib/stores/campaigns';
   import { authStore } from '$lib/stores/auth';
+  import { API_BASE_URL } from '$lib/config/api';
   import GMManagement from '$lib/components/campaign/GMManagement.svelte';
   import type { Campaign } from '@vtt/shared';
+
+  interface GameSystem {
+    systemId: string;
+    name: string;
+    version: string;
+    publisher: string;
+    description: string;
+    type: string;
+  }
 
   let campaigns: Campaign[] = [];
   let loading = false;
@@ -13,6 +23,7 @@
   let gmManagementOpen = false;
   let selectedCampaign: Campaign | null = null;
   let token = '';
+  let gameSystems: Map<string, GameSystem> = new Map();
 
   const unsubscribeCampaigns = campaignsStore.subscribe(state => {
     campaigns = state.campaigns;
@@ -37,9 +48,41 @@
     // Get session token for GM management
     token = localStorage.getItem('vtt_session_id') || '';
 
-    // Fetch campaigns
-    await campaignsStore.fetchCampaigns();
+    // Fetch campaigns and game systems
+    await Promise.all([
+      campaignsStore.fetchCampaigns(),
+      fetchGameSystems()
+    ]);
   });
+
+  async function fetchGameSystems() {
+    try {
+      const sessionId = localStorage.getItem('vtt_session_id');
+      if (!sessionId) {
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/v1/game-systems`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${sessionId}`,
+        },
+      });
+
+      if (response.ok) {
+        const systems: GameSystem[] = await response.json();
+        gameSystems = new Map(systems.map(s => [s.systemId, s]));
+      }
+    } catch (err) {
+      console.error('Failed to fetch game systems:', err);
+    }
+  }
+
+  function getGameSystemName(gameSystemId?: string | null): string {
+    if (!gameSystemId) return 'Not specified';
+    const system = gameSystems.get(gameSystemId);
+    return system ? system.name : 'Unknown System';
+  }
 
   function createNewCampaign() {
     goto('/campaigns/new');
@@ -167,6 +210,10 @@
             </div>
           </div>
           <div class="campaign-card-body">
+            <div class="campaign-info">
+              <span class="label">Game System:</span>
+              <span class="value">{getGameSystemName(campaign.gameSystemId)}</span>
+            </div>
             <div class="campaign-info">
               <span class="label">Grid:</span>
               <span class="value">{campaign.settings.gridType}</span>
