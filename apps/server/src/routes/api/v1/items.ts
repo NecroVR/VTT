@@ -6,6 +6,7 @@ import { authenticate } from '../../../middleware/auth.js';
 import { ItemTemplateValidator } from '../../../services/itemTemplateValidator.js';
 import { createItemEffectsService } from '../../../services/itemEffects.js';
 import { gameSystemLoader } from '../../../services/gameSystemLoader.js';
+import { roomManager } from '../../../websocket/rooms.js';
 
 /**
  * Item API routes
@@ -433,7 +434,7 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
                   const template = foundTemplate as import('@vtt/shared').ItemTemplate | undefined;
 
                   if (template?.effects && template.effects.length > 0) {
-                    await itemEffectsService.generateEffects(
+                    const createdEffects = await itemEffectsService.generateEffects(
                       updatedItem.id,
                       existingItem.actorId,
                       updatedItem.campaignId,
@@ -441,13 +442,34 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
                       'equipped'
                     );
                     fastify.log.info(`Generated effects for equipped item ${updatedItem.id}`);
+
+                    // Broadcast each created effect to campaign room
+                    for (const effect of createdEffects) {
+                      roomManager.broadcast(updatedItem.campaignId, {
+                        type: 'activeEffect:created',
+                        payload: { effect },
+                        timestamp: Date.now(),
+                      });
+                    }
                   }
                 }
               }
             } else if (updates.equipped === false) {
-              // Item was unequipped - remove effects
+              // Item was unequipped - get effects before removing
+              const effectsToRemove = await itemEffectsService.getItemEffects(updatedItem.id);
+
+              // Remove effects
               await itemEffectsService.removeEffects(updatedItem.id, 'equipped');
               fastify.log.info(`Removed equipped effects for item ${updatedItem.id}`);
+
+              // Broadcast effect deletions to campaign room
+              for (const effect of effectsToRemove) {
+                roomManager.broadcast(updatedItem.campaignId, {
+                  type: 'activeEffect:deleted',
+                  payload: { effectId: effect.id },
+                  timestamp: Date.now(),
+                });
+              }
             }
           }
 
@@ -473,7 +495,7 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
                   const template = foundTemplate as import('@vtt/shared').ItemTemplate | undefined;
 
                   if (template?.effects && template.effects.length > 0) {
-                    await itemEffectsService.generateEffects(
+                    const createdEffects = await itemEffectsService.generateEffects(
                       updatedItem.id,
                       existingItem.actorId,
                       updatedItem.campaignId,
@@ -481,13 +503,34 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
                       'attuned'
                     );
                     fastify.log.info(`Generated effects for attuned item ${updatedItem.id}`);
+
+                    // Broadcast each created effect to campaign room
+                    for (const effect of createdEffects) {
+                      roomManager.broadcast(updatedItem.campaignId, {
+                        type: 'activeEffect:created',
+                        payload: { effect },
+                        timestamp: Date.now(),
+                      });
+                    }
                   }
                 }
               }
             } else if (existingItem.attunement === 'attuned' && updates.attunement !== 'attuned') {
-              // Item attunement was removed - remove effects
+              // Item attunement was removed - get effects before removing
+              const effectsToRemove = await itemEffectsService.getItemEffects(updatedItem.id);
+
+              // Remove effects
               await itemEffectsService.removeEffects(updatedItem.id, 'attuned');
               fastify.log.info(`Removed attunement effects for item ${updatedItem.id}`);
+
+              // Broadcast effect deletions to campaign room
+              for (const effect of effectsToRemove) {
+                roomManager.broadcast(updatedItem.campaignId, {
+                  type: 'activeEffect:deleted',
+                  payload: { effectId: effect.id },
+                  timestamp: Date.now(),
+                });
+              }
             }
           }
         } catch (error) {
@@ -559,9 +602,23 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
         // Remove all effects from this item before deletion
         try {
           const itemEffectsService = createItemEffectsService(fastify.db);
+
+          // Get all effects before removing them
+          const effectsToRemove = await itemEffectsService.getItemEffects(itemId);
+
+          // Remove effects from database
           await itemEffectsService.removeEffects(itemId, 'equipped');
           await itemEffectsService.removeEffects(itemId, 'attuned');
           fastify.log.info(`Removed all effects for deleted item ${itemId}`);
+
+          // Broadcast effect deletions to campaign room
+          for (const effect of effectsToRemove) {
+            roomManager.broadcast(existingItem.campaignId, {
+              type: 'activeEffect:deleted',
+              payload: { effectId: effect.id },
+              timestamp: Date.now(),
+            });
+          }
         } catch (error) {
           fastify.log.error(error, 'Failed to remove item effects before deletion');
           // Continue with deletion even if effect cleanup fails
