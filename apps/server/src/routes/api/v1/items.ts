@@ -1,7 +1,7 @@
 import type { FastifyPluginAsync } from 'fastify';
 import { items, actors, campaigns } from '@vtt/database';
 import { eq, and } from 'drizzle-orm';
-import type { Item, CreateItemRequest, UpdateItemRequest } from '@vtt/shared';
+import type { Item, CreateItemRequest, UpdateItemRequest, AttunementState, ItemRarity } from '@vtt/shared';
 import { authenticate } from '../../../middleware/auth.js';
 
 /**
@@ -57,6 +57,11 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
           weight: item.weight,
           price: item.price,
           equipped: item.equipped,
+          templateId: item.templateId,
+          identified: item.identified,
+          attunement: item.attunement as AttunementState | null,
+          rarity: item.rarity as ItemRarity | null,
+          containerId: item.containerId,
           data: item.data as Record<string, unknown>,
           sort: item.sort,
           createdAt: item.createdAt,
@@ -112,6 +117,11 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
           weight: item.weight,
           price: item.price,
           equipped: item.equipped,
+          templateId: item.templateId,
+          identified: item.identified,
+          attunement: item.attunement as AttunementState | null,
+          rarity: item.rarity as ItemRarity | null,
+          containerId: item.containerId,
           data: item.data as Record<string, unknown>,
           sort: item.sort,
           createdAt: item.createdAt,
@@ -193,6 +203,11 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
             weight: itemData.weight ?? 0,
             price: itemData.price ?? 0,
             equipped: itemData.equipped ?? false,
+            templateId: itemData.templateId ?? null,
+            identified: itemData.identified ?? true,
+            attunement: itemData.attunement ?? null,
+            rarity: itemData.rarity ?? null,
+            containerId: itemData.containerId ?? null,
             data: itemData.data ?? {},
             sort: itemData.sort ?? 0,
           })
@@ -213,6 +228,11 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
           weight: newItem.weight,
           price: newItem.price,
           equipped: newItem.equipped,
+          templateId: newItem.templateId,
+          identified: newItem.identified,
+          attunement: newItem.attunement as AttunementState | null,
+          rarity: newItem.rarity as ItemRarity | null,
+          containerId: newItem.containerId,
           data: newItem.data as Record<string, unknown>,
           sort: newItem.sort,
           createdAt: newItem.createdAt,
@@ -298,6 +318,21 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
         if (updates.actorId !== undefined) {
           updateData.actorId = updates.actorId;
         }
+        if (updates.templateId !== undefined) {
+          updateData.templateId = updates.templateId;
+        }
+        if (updates.identified !== undefined) {
+          updateData.identified = updates.identified;
+        }
+        if (updates.attunement !== undefined) {
+          updateData.attunement = updates.attunement;
+        }
+        if (updates.rarity !== undefined) {
+          updateData.rarity = updates.rarity;
+        }
+        if (updates.containerId !== undefined) {
+          updateData.containerId = updates.containerId;
+        }
         if (updates.data !== undefined) {
           updateData.data = updates.data;
         }
@@ -327,6 +362,11 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
           weight: updatedItem.weight,
           price: updatedItem.price,
           equipped: updatedItem.equipped,
+          templateId: updatedItem.templateId,
+          identified: updatedItem.identified,
+          attunement: updatedItem.attunement as AttunementState | null,
+          rarity: updatedItem.rarity as ItemRarity | null,
+          containerId: updatedItem.containerId,
           data: updatedItem.data as Record<string, unknown>,
           sort: updatedItem.sort,
           createdAt: updatedItem.createdAt,

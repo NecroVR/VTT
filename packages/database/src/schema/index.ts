@@ -24,3 +24,4 @@ export * from './scenePins.js';
 export * from './compendiums.js';
 export * from './paths.js';
 export * from './pathPoints.js';
+export * from './itemTemplates.js';

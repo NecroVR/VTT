@@ -154,6 +154,7 @@ describe('Index Exports', () => {
         weight: 1,
         price: 10,
         equipped: false,
+        identified: true,
         data: {},
         sort: 0,
         createdAt: new Date(),

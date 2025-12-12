@@ -22,6 +22,7 @@ describe('Item Types', () => {
         weight: 3,
         price: 15,
         equipped: false,
+        identified: true,
         data: {},
         sort: 0,
         createdAt: new Date(),
@@ -47,6 +48,7 @@ describe('Item Types', () => {
         weight: 0.5,
         price: 50,
         equipped: false,
+        identified: true,
         data: {},
         sort: 0,
         createdAt: new Date(),
@@ -70,6 +72,7 @@ describe('Item Types', () => {
         weight: 4,
         price: 1000,
         equipped: true,
+        identified: true,
         data: {},
         sort: 0,
         createdAt: new Date(),
@@ -93,6 +96,7 @@ describe('Item Types', () => {
         weight: 0,
         price: 500,
         equipped: true,
+        identified: true,
         data: {},
         sort: 0,
         createdAt: new Date(),
@@ -115,6 +119,7 @@ describe('Item Types', () => {
         weight: 65,
         price: 1500,
         equipped: true,
+        identified: true,
         data: { ac: 18 },
         sort: 0,
         createdAt: new Date(),
@@ -138,6 +143,7 @@ describe('Item Types', () => {
         weight: 2,
         price: 5,
         equipped: false,
+        identified: true,
         data: {},
         sort: 0,
         createdAt: new Date(),
@@ -161,6 +167,7 @@ describe('Item Types', () => {
         weight: 6,
         price: 10,
         equipped: true,
+        identified: true,
         data: { acBonus: 2 },
         sort: 0,
         createdAt: new Date(),
@@ -184,6 +191,7 @@ describe('Item Types', () => {
         weight: 0,
         price: 1,
         equipped: false,
+        identified: true,
         data: {},
         sort: 0,
         createdAt: new Date(),
@@ -207,6 +215,7 @@ describe('Item Types', () => {
         weight: 1,
         price: 1,
         equipped: false,
+        identified: true,
         data: {},
         sort: 5,
         createdAt: new Date(),
@@ -229,6 +238,7 @@ describe('Item Types', () => {
         weight: 3,
         price: 5000,
         equipped: true,
+        identified: true,
         data: {
           damage: '1d8+2',
           properties: ['finesse', 'versatile'],
@@ -269,6 +279,7 @@ describe('Item Types', () => {
         weight: 5,
         price: 100,
         equipped: true,
+        identified: true,
         data: { damage: '2d6' },
         sort: 10,
       };
@@ -384,6 +395,7 @@ describe('Item Types', () => {
     it('should allow updating equipped state', () => {
       const request: UpdateItemRequest = {
         equipped: true,
+        identified: true,
       };
 
       expect(request.equipped).toBe(true);
@@ -410,6 +422,7 @@ describe('Item Types', () => {
         name: 'Updated Item',
         quantity: 5,
         equipped: false,
+        identified: true,
         price: 100,
       };
 
@@ -435,6 +448,7 @@ describe('Item Types', () => {
           weight: 1,
           price: 10,
           equipped: false,
+        identified: true,
           data: {},
           sort: 0,
           createdAt: new Date(),
@@ -471,6 +485,7 @@ describe('Item Types', () => {
             weight: 3,
             price: 15,
             equipped: true,
+        identified: true,
             data: {},
             sort: 0,
             createdAt: new Date(),
@@ -488,6 +503,7 @@ describe('Item Types', () => {
             weight: 0.5,
             price: 50,
             equipped: false,
+        identified: true,
             data: {},
             sort: 1,
             createdAt: new Date(),

@@ -15,6 +15,12 @@ export const items = pgTable('items', {
   weight: real('weight').notNull().default(0),
   price: real('price').notNull().default(0),
   equipped: boolean('equipped').notNull().default(false),
+  // Item template system
+  templateId: text('template_id'),
+  identified: boolean('identified').notNull().default(true),
+  attunement: text('attunement'),
+  rarity: text('rarity'),
+  containerId: uuid('container_id').references((): any => items.id, { onDelete: 'set null' }),
   // Metadata
   data: jsonb('data').notNull().default({}),
   sort: integer('sort').notNull().default(0),

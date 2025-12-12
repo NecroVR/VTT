@@ -25,10 +25,10 @@ COPY packages/shared ./packages/shared
 COPY docs ./docs
 COPY turbo.json ./
 
-# Build the application
-RUN pnpm --filter @vtt/server build
-RUN pnpm --filter @vtt/database build
+# Build the application (dependencies first, then dependents)
 RUN pnpm --filter @vtt/shared build
+RUN pnpm --filter @vtt/database build
+RUN pnpm --filter @vtt/server build
 
 # Stage 2: Production
 FROM node:20-alpine

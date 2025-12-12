@@ -23,3 +23,4 @@ export * from './compendium.js';
 export * from './sceneViewport.js';
 export * from './path.js';
 export * from './game-systems.js';
+export * from './item-templates.js';
