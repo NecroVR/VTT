@@ -4,6 +4,7 @@
   import { scenesStore } from '$lib/stores/scenes';
   import { assetsStore } from '$lib/stores/assets';
   import { AssetPicker } from '$lib/components/assets';
+  import ItemTemplateList from '$lib/components/admin/ItemTemplateList.svelte';
   import type { Asset } from '@vtt/shared';
 
   export let campaignId: string;
@@ -16,6 +17,7 @@
   $: snapToGrid = currentCampaign?.settings?.snapToGrid ?? false;
   $: wallEndpointSnapRange = currentCampaign?.settings?.wallEndpointSnapRange ?? 4;
   $: loading = $campaignsStore.loading;
+  $: gameSystemId = currentCampaign?.gameSystemId ?? null;
 
   // Read active scene from scenes store (reactive)
   $: activeScene = $scenesStore.activeSceneId
@@ -850,6 +852,20 @@
           </div>
         {/if}
       </section>
+
+      <section class="settings-section">
+        <h3>Item Templates</h3>
+
+        {#if !gameSystemId}
+          <div class="no-system-message">
+            <p>No game system assigned to this campaign. Please assign a game system to manage item templates.</p>
+          </div>
+        {:else}
+          <div class="item-templates-container">
+            <ItemTemplateList campaignId={campaignId} systemId={gameSystemId} />
+          </div>
+        {/if}
+      </section>
     {/if}
   </div>
 </div>
@@ -1354,5 +1370,29 @@
 
   input:checked + .slider-small:hover {
     background-color: #2563eb;
+  }
+
+  /* Item Templates Section */
+  .no-system-message {
+    padding: 2rem 1rem;
+    text-align: center;
+    color: #9ca3af;
+    font-size: 0.875rem;
+    font-style: italic;
+    background-color: #111827;
+    border: 1px dashed #374151;
+    border-radius: 6px;
+  }
+
+  .no-system-message p {
+    margin: 0;
+  }
+
+  .item-templates-container {
+    background-color: #111827;
+    border: 1px solid #374151;
+    border-radius: 6px;
+    overflow: hidden;
+    max-height: 600px;
   }
 </style>
