@@ -813,10 +813,9 @@
       const delta = resizeStartX - e.clientX;
       let newWidth = resizeStartWidth + delta;
 
-      // Constrain to min/max bounds
+      // Constrain to min width only - no max limit so users can drag as wide as they want
       const MIN_WIDTH = 280;
-      const MAX_WIDTH = 600;
-      newWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, newWidth));
+      newWidth = Math.max(MIN_WIDTH, newWidth);
 
       sidebarStore.updateDockedWidth(newWidth);
     }
