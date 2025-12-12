@@ -186,7 +186,10 @@
         // Update existing item
         response = await fetch(`/api/v1/items/${item.id}`, {
           method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({
             name: formData.name.trim(),
             itemType: formData.itemType,
@@ -204,7 +207,10 @@
         // Create new item
         response = await fetch(`/api/v1/actors/${actorId}/items`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({
             campaignId,
             actorId,
