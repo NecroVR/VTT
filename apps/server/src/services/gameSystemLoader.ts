@@ -1,4 +1,4 @@
-import type { GameSystem, GameSystemManifest, GameSystemModule } from '@vtt/shared';
+import type { GameSystem, GameSystemManifest, GameSystemModule, ItemTemplate } from '@vtt/shared';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -170,6 +170,100 @@ class GameSystemLoaderService {
   }
 
   /**
+   * Validate an item template structure
+   */
+  private validateItemTemplate(template: any, filePath: string): template is ItemTemplate {
+    // Required fields
+    const required = ['id', 'systemId', 'entityType', 'name', 'category'];
+
+    for (const field of required) {
+      if (!template[field]) {
+        throw new Error(`Missing required field '${field}' in item template at ${filePath}`);
+      }
+    }
+
+    // Validate entityType
+    if (template.entityType !== 'item') {
+      throw new Error(`Invalid entityType '${template.entityType}' - must be 'item' in ${filePath}`);
+    }
+
+    // Validate category
+    const validCategories = [
+      'weapon', 'armor', 'spell', 'consumable', 'feature', 'tool',
+      'loot', 'container', 'class', 'race', 'background', 'custom'
+    ];
+    if (!validCategories.includes(template.category)) {
+      console.warn(`Unknown category '${template.category}' in item template ${filePath}`);
+    }
+
+    // Validate fields array if present
+    if (template.fields && !Array.isArray(template.fields)) {
+      throw new Error(`Fields must be an array in item template at ${filePath}`);
+    }
+
+    // Log warnings for missing optional fields
+    if (!template.fields || template.fields.length === 0) {
+      console.warn(`Item template ${template.id} has no fields defined at ${filePath}`);
+    }
+
+    if (!template.sections || template.sections.length === 0) {
+      console.warn(`Item template ${template.id} has no sections defined at ${filePath}`);
+    }
+
+    return true;
+  }
+
+  /**
+   * Load item templates from the templates/items/ directory
+   */
+  private async loadItemTemplates(systemDir: string): Promise<ItemTemplate[]> {
+    const itemTemplates: ItemTemplate[] = [];
+    const itemsDir = path.join(systemDir, 'templates', 'items');
+
+    try {
+      // Check if templates/items directory exists
+      const exists = await this.directoryExists(itemsDir);
+      if (!exists) {
+        console.log(`No item templates directory found at ${itemsDir}`);
+        return itemTemplates;
+      }
+
+      // Read all .json files in the directory
+      const files = await fs.readdir(itemsDir);
+      const jsonFiles = files.filter(f => f.endsWith('.json'));
+
+      if (jsonFiles.length === 0) {
+        console.log(`No item template files found in ${itemsDir}`);
+        return itemTemplates;
+      }
+
+      console.log(`Loading ${jsonFiles.length} item template(s) from ${itemsDir}`);
+
+      // Load and validate each template
+      for (const file of jsonFiles) {
+        try {
+          const filePath = path.join(itemsDir, file);
+          const template = await this.readJsonFile<ItemTemplate>(filePath);
+
+          // Validate the template
+          this.validateItemTemplate(template, filePath);
+
+          itemTemplates.push(template);
+          console.log(`  Loaded item template: ${template.id} (${template.category})`);
+        } catch (error) {
+          console.error(`Failed to load item template from ${file}:`, error instanceof Error ? error.message : String(error));
+        }
+      }
+
+      console.log(`Successfully loaded ${itemTemplates.length} item template(s)`);
+    } catch (error) {
+      console.error(`Error loading item templates from ${itemsDir}:`, error);
+    }
+
+    return itemTemplates;
+  }
+
+  /**
    * Load a single game system from a directory
    */
   private async loadSystemFromDirectory(systemDir: string, type: 'core' | 'community'): Promise<LoadedGameSystem | null> {
@@ -197,6 +291,10 @@ class GameSystemLoaderService {
       if (manifest.id !== system.id) {
         throw new Error(`Manifest ID (${manifest.id}) does not match system ID (${system.id}) in ${systemDir}`);
       }
+
+      // Load item templates
+      const itemTemplates = await this.loadItemTemplates(systemDir);
+      system.itemTemplates = itemTemplates;
 
       return {
         manifest,

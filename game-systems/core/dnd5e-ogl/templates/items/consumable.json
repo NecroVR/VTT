@@ -1,0 +1,220 @@
+{
+  "id": "dnd5e-consumable",
+  "systemId": "dnd5e-ogl",
+  "entityType": "item",
+  "category": "consumable",
+  "name": "D&D 5e Consumable",
+
+  "fields": [
+    {
+      "id": "name",
+      "name": "Item Name",
+      "fieldType": "text",
+      "required": true,
+      "placeholder": "Enter item name",
+      "width": "half"
+    },
+    {
+      "id": "consumableType",
+      "name": "Consumable Type",
+      "fieldType": "select",
+      "required": true,
+      "options": [
+        {"value": "potion", "label": "Potion"},
+        {"value": "scroll", "label": "Scroll"},
+        {"value": "wand", "label": "Wand"},
+        {"value": "rod", "label": "Rod"},
+        {"value": "ammunition", "label": "Ammunition"},
+        {"value": "food", "label": "Food/Drink"},
+        {"value": "trinket", "label": "Trinket"},
+        {"value": "other", "label": "Other"}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "uses",
+      "name": "Current Uses/Charges",
+      "fieldType": "number",
+      "defaultValue": 1,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "helpText": "Current number of uses remaining",
+      "width": "quarter"
+    },
+    {
+      "id": "maxUses",
+      "name": "Maximum Uses/Charges",
+      "fieldType": "number",
+      "defaultValue": 1,
+      "validation": [
+        {"rule": "min", "value": 1}
+      ],
+      "helpText": "Maximum number of uses",
+      "width": "quarter"
+    },
+    {
+      "id": "recovery",
+      "name": "Charge Recovery",
+      "fieldType": "select",
+      "options": [
+        {"value": "none", "label": "None (Single Use)"},
+        {"value": "dawn", "label": "Recharges at Dawn"},
+        {"value": "dusk", "label": "Recharges at Dusk"},
+        {"value": "short_rest", "label": "Recharges on Short Rest"},
+        {"value": "long_rest", "label": "Recharges on Long Rest"},
+        {"value": "formula", "label": "Custom Formula"}
+      ],
+      "defaultValue": "none",
+      "width": "quarter"
+    },
+    {
+      "id": "rechargeFormula",
+      "name": "Recharge Formula",
+      "fieldType": "text",
+      "placeholder": "e.g., 1d6+1",
+      "helpText": "Dice formula for recharging (if recovery is 'formula')",
+      "width": "quarter"
+    },
+    {
+      "id": "destroyOnEmpty",
+      "name": "Destroy When Empty",
+      "fieldType": "checkbox",
+      "defaultValue": true,
+      "helpText": "Is the item destroyed when all uses are consumed?",
+      "width": "quarter"
+    },
+    {
+      "id": "effect",
+      "name": "Effect",
+      "fieldType": "text",
+      "placeholder": "e.g., Heals 2d4+2 hit points, grants advantage on saves",
+      "helpText": "Primary effect of using this item",
+      "width": "full"
+    },
+    {
+      "id": "healing",
+      "name": "Healing Dice",
+      "fieldType": "text",
+      "placeholder": "e.g., 2d4+2",
+      "helpText": "Healing dice for potions of healing",
+      "width": "quarter"
+    },
+    {
+      "id": "spellLevel",
+      "name": "Spell Level (Scrolls)",
+      "fieldType": "select",
+      "options": [
+        {"value": "0", "label": "Cantrip"},
+        {"value": "1", "label": "1st Level"},
+        {"value": "2", "label": "2nd Level"},
+        {"value": "3", "label": "3rd Level"},
+        {"value": "4", "label": "4th Level"},
+        {"value": "5", "label": "5th Level"},
+        {"value": "6", "label": "6th Level"},
+        {"value": "7", "label": "7th Level"},
+        {"value": "8", "label": "8th Level"},
+        {"value": "9", "label": "9th Level"}
+      ],
+      "helpText": "Level of spell on scroll",
+      "width": "quarter"
+    },
+    {
+      "id": "weight",
+      "name": "Weight (lbs)",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "price",
+      "name": "Price (gp)",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "quantity",
+      "name": "Quantity",
+      "fieldType": "number",
+      "defaultValue": 1,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "description",
+      "name": "Description",
+      "fieldType": "textarea",
+      "placeholder": "Item description, effects, usage instructions, etc.",
+      "width": "full"
+    }
+  ],
+
+  "rolls": [
+    {
+      "id": "healing",
+      "name": "Healing Roll",
+      "formula": "{healing}",
+      "description": "Roll healing from potion"
+    }
+  ],
+
+  "actions": [
+    {
+      "id": "use",
+      "name": "Use Item",
+      "actionType": "action",
+      "description": "Consume or activate this item",
+      "consumesCharge": true
+    }
+  ],
+
+  "consumes": {
+    "resourceType": "charges",
+    "amount": 1,
+    "perUse": true
+  },
+
+  "physical": {
+    "hasWeight": true,
+    "hasPrice": true,
+    "hasQuantity": true,
+    "stackable": true
+  },
+
+  "sections": [
+    {
+      "id": "basic",
+      "name": "Basic Information",
+      "fields": ["name", "consumableType"]
+    },
+    {
+      "id": "charges",
+      "name": "Uses & Charges",
+      "fields": ["uses", "maxUses", "recovery", "rechargeFormula", "destroyOnEmpty"]
+    },
+    {
+      "id": "effects",
+      "name": "Effects",
+      "fields": ["effect", "healing", "spellLevel"]
+    },
+    {
+      "id": "physical",
+      "name": "Physical Properties",
+      "fields": ["weight", "price", "quantity"]
+    },
+    {
+      "id": "details",
+      "name": "Description",
+      "fields": ["description"]
+    }
+  ]
+}

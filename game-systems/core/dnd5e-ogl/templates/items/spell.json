@@ -1,0 +1,297 @@
+{
+  "id": "dnd5e-spell",
+  "systemId": "dnd5e-ogl",
+  "entityType": "item",
+  "category": "spell",
+  "name": "D&D 5e Spell",
+
+  "fields": [
+    {
+      "id": "name",
+      "name": "Spell Name",
+      "fieldType": "text",
+      "required": true,
+      "placeholder": "Enter spell name",
+      "width": "half"
+    },
+    {
+      "id": "level",
+      "name": "Spell Level",
+      "fieldType": "select",
+      "required": true,
+      "options": [
+        {"value": "0", "label": "Cantrip"},
+        {"value": "1", "label": "1st Level"},
+        {"value": "2", "label": "2nd Level"},
+        {"value": "3", "label": "3rd Level"},
+        {"value": "4", "label": "4th Level"},
+        {"value": "5", "label": "5th Level"},
+        {"value": "6", "label": "6th Level"},
+        {"value": "7", "label": "7th Level"},
+        {"value": "8", "label": "8th Level"},
+        {"value": "9", "label": "9th Level"}
+      ],
+      "defaultValue": "0",
+      "width": "quarter"
+    },
+    {
+      "id": "school",
+      "name": "School of Magic",
+      "fieldType": "select",
+      "required": true,
+      "options": [
+        {"value": "abjuration", "label": "Abjuration"},
+        {"value": "conjuration", "label": "Conjuration"},
+        {"value": "divination", "label": "Divination"},
+        {"value": "enchantment", "label": "Enchantment"},
+        {"value": "evocation", "label": "Evocation"},
+        {"value": "illusion", "label": "Illusion"},
+        {"value": "necromancy", "label": "Necromancy"},
+        {"value": "transmutation", "label": "Transmutation"}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "castingTime",
+      "name": "Casting Time",
+      "fieldType": "text",
+      "required": true,
+      "placeholder": "e.g., 1 action, 1 bonus action, 1 minute",
+      "width": "quarter"
+    },
+    {
+      "id": "range",
+      "name": "Range",
+      "fieldType": "text",
+      "required": true,
+      "placeholder": "e.g., Self, Touch, 60 feet, 1 mile",
+      "width": "quarter"
+    },
+    {
+      "id": "components",
+      "name": "Components",
+      "fieldType": "multiselect",
+      "required": true,
+      "options": [
+        {"value": "V", "label": "Verbal (V)"},
+        {"value": "S", "label": "Somatic (S)"},
+        {"value": "M", "label": "Material (M)"}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "materials",
+      "name": "Material Components",
+      "fieldType": "text",
+      "placeholder": "Description of material components",
+      "helpText": "Required if spell has Material component",
+      "width": "half"
+    },
+    {
+      "id": "materialCost",
+      "name": "Material Cost (gp)",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "helpText": "Gold piece cost of material components",
+      "width": "quarter"
+    },
+    {
+      "id": "materialConsumed",
+      "name": "Materials Consumed",
+      "fieldType": "checkbox",
+      "defaultValue": false,
+      "helpText": "Are materials consumed by the spell?",
+      "width": "quarter"
+    },
+    {
+      "id": "duration",
+      "name": "Duration",
+      "fieldType": "text",
+      "required": true,
+      "placeholder": "e.g., Instantaneous, 1 minute, 1 hour, Until dispelled",
+      "width": "quarter"
+    },
+    {
+      "id": "concentration",
+      "name": "Concentration",
+      "fieldType": "checkbox",
+      "defaultValue": false,
+      "helpText": "Does this spell require concentration?",
+      "width": "quarter"
+    },
+    {
+      "id": "ritual",
+      "name": "Ritual",
+      "fieldType": "checkbox",
+      "defaultValue": false,
+      "helpText": "Can this spell be cast as a ritual?",
+      "width": "quarter"
+    },
+    {
+      "id": "prepared",
+      "name": "Prepared",
+      "fieldType": "checkbox",
+      "defaultValue": false,
+      "helpText": "Is this spell currently prepared?",
+      "width": "quarter"
+    },
+    {
+      "id": "damage",
+      "name": "Damage Dice",
+      "fieldType": "text",
+      "placeholder": "e.g., 1d8, 3d6, 8d6",
+      "helpText": "Damage dice for damaging spells",
+      "width": "quarter"
+    },
+    {
+      "id": "damageType",
+      "name": "Damage Type",
+      "fieldType": "select",
+      "options": [
+        {"value": "none", "label": "None"},
+        {"value": "acid", "label": "Acid"},
+        {"value": "bludgeoning", "label": "Bludgeoning"},
+        {"value": "cold", "label": "Cold"},
+        {"value": "fire", "label": "Fire"},
+        {"value": "force", "label": "Force"},
+        {"value": "lightning", "label": "Lightning"},
+        {"value": "necrotic", "label": "Necrotic"},
+        {"value": "piercing", "label": "Piercing"},
+        {"value": "poison", "label": "Poison"},
+        {"value": "psychic", "label": "Psychic"},
+        {"value": "radiant", "label": "Radiant"},
+        {"value": "slashing", "label": "Slashing"},
+        {"value": "thunder", "label": "Thunder"}
+      ],
+      "defaultValue": "none",
+      "width": "quarter"
+    },
+    {
+      "id": "saveAbility",
+      "name": "Saving Throw",
+      "fieldType": "select",
+      "options": [
+        {"value": "none", "label": "None"},
+        {"value": "strength", "label": "Strength"},
+        {"value": "dexterity", "label": "Dexterity"},
+        {"value": "constitution", "label": "Constitution"},
+        {"value": "intelligence", "label": "Intelligence"},
+        {"value": "wisdom", "label": "Wisdom"},
+        {"value": "charisma", "label": "Charisma"}
+      ],
+      "defaultValue": "none",
+      "helpText": "Ability save required by targets",
+      "width": "quarter"
+    },
+    {
+      "id": "attackType",
+      "name": "Attack Type",
+      "fieldType": "select",
+      "options": [
+        {"value": "none", "label": "None"},
+        {"value": "melee", "label": "Melee Spell Attack"},
+        {"value": "ranged", "label": "Ranged Spell Attack"}
+      ],
+      "defaultValue": "none",
+      "width": "quarter"
+    },
+    {
+      "id": "areaType",
+      "name": "Area of Effect Type",
+      "fieldType": "select",
+      "options": [
+        {"value": "none", "label": "None"},
+        {"value": "cone", "label": "Cone"},
+        {"value": "cube", "label": "Cube"},
+        {"value": "cylinder", "label": "Cylinder"},
+        {"value": "line", "label": "Line"},
+        {"value": "sphere", "label": "Sphere"}
+      ],
+      "defaultValue": "none",
+      "width": "quarter"
+    },
+    {
+      "id": "areaSize",
+      "name": "Area Size",
+      "fieldType": "text",
+      "placeholder": "e.g., 20-foot radius, 30-foot cone",
+      "helpText": "Size of area of effect",
+      "width": "quarter"
+    },
+    {
+      "id": "upcastDamage",
+      "name": "Upcast Damage Increase",
+      "fieldType": "text",
+      "placeholder": "e.g., +1d8 per slot level",
+      "helpText": "Additional damage when cast at higher levels",
+      "width": "half"
+    },
+    {
+      "id": "description",
+      "name": "Description",
+      "fieldType": "textarea",
+      "required": true,
+      "placeholder": "Full spell description and effects",
+      "width": "full"
+    },
+    {
+      "id": "atHigherLevels",
+      "name": "At Higher Levels",
+      "fieldType": "textarea",
+      "placeholder": "Effects when cast using a spell slot of higher level",
+      "width": "full"
+    }
+  ],
+
+  "rolls": [
+    {
+      "id": "spellAttack",
+      "name": "Spell Attack Roll",
+      "formula": "d20 + {spell_attack_bonus}",
+      "description": "Roll to hit with a spell attack"
+    },
+    {
+      "id": "damage",
+      "name": "Damage Roll",
+      "formula": "{damage}",
+      "description": "Roll spell damage"
+    }
+  ],
+
+  "consumes": {
+    "resourceType": "spell_slot",
+    "amount": "{level}",
+    "perUse": true
+  },
+
+  "sections": [
+    {
+      "id": "basic",
+      "name": "Basic Information",
+      "fields": ["name", "level", "school", "castingTime", "range", "duration"]
+    },
+    {
+      "id": "components",
+      "name": "Components",
+      "fields": ["components", "materials", "materialCost", "materialConsumed"]
+    },
+    {
+      "id": "properties",
+      "name": "Properties",
+      "fields": ["concentration", "ritual", "prepared"]
+    },
+    {
+      "id": "mechanics",
+      "name": "Spell Mechanics",
+      "fields": ["damage", "damageType", "saveAbility", "attackType", "areaType", "areaSize", "upcastDamage"]
+    },
+    {
+      "id": "description",
+      "name": "Description",
+      "fields": ["description", "atHigherLevels"]
+    }
+  ]
+}

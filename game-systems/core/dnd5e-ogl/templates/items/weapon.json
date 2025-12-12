@@ -1,0 +1,246 @@
+{
+  "id": "dnd5e-weapon",
+  "systemId": "dnd5e-ogl",
+  "entityType": "item",
+  "category": "weapon",
+  "name": "D&D 5e Weapon",
+
+  "fields": [
+    {
+      "id": "name",
+      "name": "Weapon Name",
+      "fieldType": "text",
+      "required": true,
+      "placeholder": "Enter weapon name",
+      "width": "half"
+    },
+    {
+      "id": "weaponType",
+      "name": "Weapon Type",
+      "fieldType": "select",
+      "required": true,
+      "options": [
+        {"value": "simple_melee", "label": "Simple Melee"},
+        {"value": "simple_ranged", "label": "Simple Ranged"},
+        {"value": "martial_melee", "label": "Martial Melee"},
+        {"value": "martial_ranged", "label": "Martial Ranged"}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "damage",
+      "name": "Damage Dice",
+      "fieldType": "text",
+      "required": true,
+      "placeholder": "e.g., 1d8, 2d6",
+      "helpText": "Weapon damage dice",
+      "width": "quarter"
+    },
+    {
+      "id": "damageType",
+      "name": "Damage Type",
+      "fieldType": "select",
+      "required": true,
+      "options": [
+        {"value": "slashing", "label": "Slashing"},
+        {"value": "piercing", "label": "Piercing"},
+        {"value": "bludgeoning", "label": "Bludgeoning"},
+        {"value": "acid", "label": "Acid"},
+        {"value": "cold", "label": "Cold"},
+        {"value": "fire", "label": "Fire"},
+        {"value": "force", "label": "Force"},
+        {"value": "lightning", "label": "Lightning"},
+        {"value": "necrotic", "label": "Necrotic"},
+        {"value": "poison", "label": "Poison"},
+        {"value": "psychic", "label": "Psychic"},
+        {"value": "radiant", "label": "Radiant"},
+        {"value": "thunder", "label": "Thunder"}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "properties",
+      "name": "Properties",
+      "fieldType": "multiselect",
+      "options": [
+        {"value": "ammunition", "label": "Ammunition"},
+        {"value": "finesse", "label": "Finesse"},
+        {"value": "heavy", "label": "Heavy"},
+        {"value": "light", "label": "Light"},
+        {"value": "loading", "label": "Loading"},
+        {"value": "reach", "label": "Reach"},
+        {"value": "special", "label": "Special"},
+        {"value": "thrown", "label": "Thrown"},
+        {"value": "two_handed", "label": "Two-Handed"},
+        {"value": "versatile", "label": "Versatile"}
+      ],
+      "width": "half"
+    },
+    {
+      "id": "range",
+      "name": "Range",
+      "fieldType": "text",
+      "placeholder": "e.g., 5 ft., 80/320 ft.",
+      "helpText": "Weapon range (melee reach or ranged normal/long)",
+      "width": "quarter"
+    },
+    {
+      "id": "versatileDamage",
+      "name": "Versatile Damage",
+      "fieldType": "text",
+      "placeholder": "e.g., 1d10",
+      "helpText": "Damage when wielded two-handed (versatile weapons only)",
+      "width": "quarter"
+    },
+    {
+      "id": "magicBonus",
+      "name": "Magic Bonus",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0},
+        {"rule": "max", "value": 3}
+      ],
+      "helpText": "Magic weapon bonus (+1, +2, +3)",
+      "width": "quarter"
+    },
+    {
+      "id": "attackBonus",
+      "name": "Additional Attack Bonus",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "helpText": "Additional bonus to attack rolls (beyond magic bonus)",
+      "width": "quarter"
+    },
+    {
+      "id": "bonusDamage",
+      "name": "Bonus Damage",
+      "fieldType": "text",
+      "placeholder": "e.g., 1d6",
+      "helpText": "Additional damage dice (e.g., flaming sword)",
+      "width": "quarter"
+    },
+    {
+      "id": "bonusDamageType",
+      "name": "Bonus Damage Type",
+      "fieldType": "select",
+      "options": [
+        {"value": "none", "label": "None"},
+        {"value": "acid", "label": "Acid"},
+        {"value": "cold", "label": "Cold"},
+        {"value": "fire", "label": "Fire"},
+        {"value": "force", "label": "Force"},
+        {"value": "lightning", "label": "Lightning"},
+        {"value": "necrotic", "label": "Necrotic"},
+        {"value": "poison", "label": "Poison"},
+        {"value": "psychic", "label": "Psychic"},
+        {"value": "radiant", "label": "Radiant"},
+        {"value": "thunder", "label": "Thunder"}
+      ],
+      "defaultValue": "none",
+      "width": "quarter"
+    },
+    {
+      "id": "weight",
+      "name": "Weight (lbs)",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "price",
+      "name": "Price (gp)",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "quantity",
+      "name": "Quantity",
+      "fieldType": "number",
+      "defaultValue": 1,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "description",
+      "name": "Description",
+      "fieldType": "textarea",
+      "placeholder": "Weapon description, special properties, etc.",
+      "width": "full"
+    }
+  ],
+
+  "rolls": [
+    {
+      "id": "attack",
+      "name": "Attack Roll",
+      "formula": "d20 + {strength_modifier} + {proficiency_bonus} + {magicBonus} + {attackBonus}",
+      "description": "Roll to hit with this weapon"
+    },
+    {
+      "id": "damage",
+      "name": "Damage Roll",
+      "formula": "{damage} + {strength_modifier} + {magicBonus}",
+      "description": "Roll weapon damage"
+    },
+    {
+      "id": "versatile_damage",
+      "name": "Versatile Damage Roll",
+      "formula": "{versatileDamage} + {strength_modifier} + {magicBonus}",
+      "description": "Roll two-handed versatile damage"
+    }
+  ],
+
+  "actions": [
+    {
+      "id": "attack",
+      "name": "Attack",
+      "actionType": "action",
+      "description": "Make a melee or ranged weapon attack",
+      "rolls": ["attack", "damage"]
+    }
+  ],
+
+  "physical": {
+    "hasWeight": true,
+    "hasPrice": true,
+    "hasQuantity": true,
+    "stackable": false
+  },
+
+  "equippable": {
+    "slots": ["mainHand", "offHand", "twoHand"]
+  },
+
+  "sections": [
+    {
+      "id": "basic",
+      "name": "Basic Information",
+      "fields": ["name", "weaponType", "damage", "damageType", "range"]
+    },
+    {
+      "id": "properties",
+      "name": "Properties & Bonuses",
+      "fields": ["properties", "versatileDamage", "magicBonus", "attackBonus", "bonusDamage", "bonusDamageType"]
+    },
+    {
+      "id": "physical",
+      "name": "Physical Properties",
+      "fields": ["weight", "price", "quantity"]
+    },
+    {
+      "id": "details",
+      "name": "Description",
+      "fields": ["description"]
+    }
+  ]
+}

@@ -1,0 +1,203 @@
+{
+  "id": "dnd5e-loot",
+  "systemId": "dnd5e-ogl",
+  "entityType": "item",
+  "category": "loot",
+  "name": "D&D 5e Loot/Treasure",
+
+  "fields": [
+    {
+      "id": "name",
+      "name": "Item Name",
+      "fieldType": "text",
+      "required": true,
+      "placeholder": "Enter item name",
+      "width": "half"
+    },
+    {
+      "id": "lootType",
+      "name": "Loot Type",
+      "fieldType": "select",
+      "required": true,
+      "options": [
+        {"value": "art", "label": "Art Object"},
+        {"value": "gem", "label": "Gemstone"},
+        {"value": "trade_good", "label": "Trade Good"},
+        {"value": "treasure", "label": "Treasure"},
+        {"value": "currency", "label": "Currency"},
+        {"value": "other", "label": "Other"}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "gemValue",
+      "name": "Gem Value (gp)",
+      "fieldType": "select",
+      "options": [
+        {"value": "10", "label": "10 gp"},
+        {"value": "50", "label": "50 gp"},
+        {"value": "100", "label": "100 gp"},
+        {"value": "500", "label": "500 gp"},
+        {"value": "1000", "label": "1,000 gp"},
+        {"value": "5000", "label": "5,000 gp"}
+      ],
+      "helpText": "Standard value for gemstones",
+      "width": "quarter"
+    },
+    {
+      "id": "artDescription",
+      "name": "Art Description",
+      "fieldType": "text",
+      "placeholder": "e.g., Gold ring with bloodstones, Silver chalice",
+      "helpText": "Description of art object",
+      "width": "half"
+    },
+    {
+      "id": "rarity",
+      "name": "Rarity",
+      "fieldType": "select",
+      "options": [
+        {"value": "common", "label": "Common"},
+        {"value": "uncommon", "label": "Uncommon"},
+        {"value": "rare", "label": "Rare"},
+        {"value": "very_rare", "label": "Very Rare"},
+        {"value": "legendary", "label": "Legendary"}
+      ],
+      "defaultValue": "common",
+      "helpText": "Rarity of this item",
+      "width": "quarter"
+    },
+    {
+      "id": "weight",
+      "name": "Weight (lbs)",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "price",
+      "name": "Price (gp)",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "helpText": "Market value in gold pieces",
+      "width": "quarter"
+    },
+    {
+      "id": "quantity",
+      "name": "Quantity",
+      "fieldType": "number",
+      "defaultValue": 1,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "copperPieces",
+      "name": "Copper Pieces",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "silverPieces",
+      "name": "Silver Pieces",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "electrumPieces",
+      "name": "Electrum Pieces",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "goldPieces",
+      "name": "Gold Pieces",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "platinumPieces",
+      "name": "Platinum Pieces",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "description",
+      "name": "Description",
+      "fieldType": "textarea",
+      "placeholder": "Detailed description of the item, its appearance, history, etc.",
+      "width": "full"
+    }
+  ],
+
+  "computedFields": [
+    {
+      "id": "totalValue",
+      "name": "Total Value (gp)",
+      "formula": "(copperPieces * 0.01) + (silverPieces * 0.1) + (electrumPieces * 0.5) + goldPieces + (platinumPieces * 10) + price",
+      "dependencies": ["copperPieces", "silverPieces", "electrumPieces", "goldPieces", "platinumPieces", "price"]
+    }
+  ],
+
+  "physical": {
+    "hasWeight": true,
+    "hasPrice": true,
+    "hasQuantity": true,
+    "stackable": true
+  },
+
+  "sections": [
+    {
+      "id": "basic",
+      "name": "Basic Information",
+      "fields": ["name", "lootType", "rarity"]
+    },
+    {
+      "id": "treasure_details",
+      "name": "Treasure Details",
+      "fields": ["gemValue", "artDescription"]
+    },
+    {
+      "id": "currency",
+      "name": "Currency",
+      "fields": ["copperPieces", "silverPieces", "electrumPieces", "goldPieces", "platinumPieces"]
+    },
+    {
+      "id": "physical",
+      "name": "Physical Properties",
+      "fields": ["weight", "price", "quantity"]
+    },
+    {
+      "id": "details",
+      "name": "Description",
+      "fields": ["description"]
+    }
+  ]
+}

@@ -1,0 +1,228 @@
+{
+  "id": "dnd5e-container",
+  "systemId": "dnd5e-ogl",
+  "entityType": "item",
+  "category": "container",
+  "name": "D&D 5e Container",
+
+  "fields": [
+    {
+      "id": "name",
+      "name": "Container Name",
+      "fieldType": "text",
+      "required": true,
+      "placeholder": "Enter container name",
+      "width": "half"
+    },
+    {
+      "id": "containerType",
+      "name": "Container Type",
+      "fieldType": "select",
+      "required": true,
+      "options": [
+        {"value": "backpack", "label": "Backpack"},
+        {"value": "bag", "label": "Bag"},
+        {"value": "pouch", "label": "Pouch"},
+        {"value": "sack", "label": "Sack"},
+        {"value": "chest", "label": "Chest"},
+        {"value": "barrel", "label": "Barrel"},
+        {"value": "basket", "label": "Basket"},
+        {"value": "case", "label": "Case"},
+        {"value": "quiver", "label": "Quiver"},
+        {"value": "other", "label": "Other"}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "weightCapacity",
+      "name": "Weight Capacity (lbs)",
+      "fieldType": "number",
+      "required": true,
+      "defaultValue": 30,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "helpText": "Maximum weight the container can hold",
+      "width": "quarter"
+    },
+    {
+      "id": "itemCapacity",
+      "name": "Item Capacity",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "helpText": "Maximum number of items (0 for unlimited)",
+      "width": "quarter"
+    },
+    {
+      "id": "weightMultiplier",
+      "name": "Weight Multiplier",
+      "fieldType": "number",
+      "defaultValue": 1.0,
+      "validation": [
+        {"rule": "min", "value": 0},
+        {"rule": "max", "value": 1}
+      ],
+      "helpText": "Multiplier for contents weight (e.g., 0.5 for Bag of Holding, 1.0 for normal)",
+      "width": "quarter"
+    },
+    {
+      "id": "locked",
+      "name": "Locked",
+      "fieldType": "checkbox",
+      "defaultValue": false,
+      "helpText": "Is this container locked?",
+      "width": "quarter"
+    },
+    {
+      "id": "lockDC",
+      "name": "Lock DC",
+      "fieldType": "number",
+      "defaultValue": 15,
+      "validation": [
+        {"rule": "min", "value": 5},
+        {"rule": "max", "value": 30}
+      ],
+      "helpText": "DC to pick the lock",
+      "width": "quarter"
+    },
+    {
+      "id": "hasKey",
+      "name": "Has Key",
+      "fieldType": "checkbox",
+      "defaultValue": false,
+      "helpText": "Do you possess the key?",
+      "width": "quarter"
+    },
+    {
+      "id": "magical",
+      "name": "Magical Container",
+      "fieldType": "checkbox",
+      "defaultValue": false,
+      "helpText": "Is this a magical container (e.g., Bag of Holding)?",
+      "width": "quarter"
+    },
+    {
+      "id": "allowNesting",
+      "name": "Allow Nesting",
+      "fieldType": "checkbox",
+      "defaultValue": true,
+      "helpText": "Can this container hold other containers?",
+      "width": "quarter"
+    },
+    {
+      "id": "waterproof",
+      "name": "Waterproof",
+      "fieldType": "checkbox",
+      "defaultValue": false,
+      "helpText": "Does this container protect contents from water?",
+      "width": "quarter"
+    },
+    {
+      "id": "weight",
+      "name": "Empty Weight (lbs)",
+      "fieldType": "number",
+      "defaultValue": 5,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "helpText": "Weight of the empty container",
+      "width": "quarter"
+    },
+    {
+      "id": "price",
+      "name": "Price (gp)",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "quantity",
+      "name": "Quantity",
+      "fieldType": "number",
+      "defaultValue": 1,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "description",
+      "name": "Description",
+      "fieldType": "textarea",
+      "placeholder": "Container description, appearance, special properties, etc.",
+      "width": "full"
+    },
+    {
+      "id": "specialProperties",
+      "name": "Special Properties",
+      "fieldType": "textarea",
+      "placeholder": "Any magical or unusual properties",
+      "helpText": "e.g., Extradimensional space, items weigh less, etc.",
+      "width": "full"
+    }
+  ],
+
+  "computedFields": [
+    {
+      "id": "currentWeight",
+      "name": "Current Weight",
+      "formula": "weight + (contentsWeight * weightMultiplier)",
+      "dependencies": ["weight", "contentsWeight", "weightMultiplier"]
+    },
+    {
+      "id": "remainingCapacity",
+      "name": "Remaining Capacity",
+      "formula": "weightCapacity - contentsWeight",
+      "dependencies": ["weightCapacity", "contentsWeight"]
+    }
+  ],
+
+  "physical": {
+    "hasWeight": true,
+    "hasPrice": true,
+    "hasQuantity": true,
+    "stackable": false
+  },
+
+  "container": {
+    "canContainItems": true,
+    "weightCapacity": "{weightCapacity}",
+    "itemCapacity": "{itemCapacity}",
+    "allowNesting": "{allowNesting}",
+    "weightMultiplier": "{weightMultiplier}"
+  },
+
+  "sections": [
+    {
+      "id": "basic",
+      "name": "Basic Information",
+      "fields": ["name", "containerType", "magical"]
+    },
+    {
+      "id": "capacity",
+      "name": "Capacity & Properties",
+      "fields": ["weightCapacity", "itemCapacity", "weightMultiplier", "allowNesting", "waterproof"]
+    },
+    {
+      "id": "security",
+      "name": "Security",
+      "fields": ["locked", "lockDC", "hasKey"]
+    },
+    {
+      "id": "physical",
+      "name": "Physical Properties",
+      "fields": ["weight", "price", "quantity"]
+    },
+    {
+      "id": "details",
+      "name": "Description",
+      "fields": ["description", "specialProperties"]
+    }
+  ]
+}

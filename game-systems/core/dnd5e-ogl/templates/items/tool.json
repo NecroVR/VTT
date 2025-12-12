@@ -1,0 +1,187 @@
+{
+  "id": "dnd5e-tool",
+  "systemId": "dnd5e-ogl",
+  "entityType": "item",
+  "category": "tool",
+  "name": "D&D 5e Tool",
+
+  "fields": [
+    {
+      "id": "name",
+      "name": "Tool Name",
+      "fieldType": "text",
+      "required": true,
+      "placeholder": "Enter tool name",
+      "width": "half"
+    },
+    {
+      "id": "toolType",
+      "name": "Tool Type",
+      "fieldType": "select",
+      "required": true,
+      "options": [
+        {"value": "artisan", "label": "Artisan's Tools"},
+        {"value": "gaming", "label": "Gaming Set"},
+        {"value": "musical", "label": "Musical Instrument"},
+        {"value": "navigation", "label": "Navigation Tools"},
+        {"value": "thieves", "label": "Thieves' Tools"},
+        {"value": "vehicle", "label": "Vehicle"},
+        {"value": "other", "label": "Other"}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "proficiencyType",
+      "name": "Proficiency Type",
+      "fieldType": "select",
+      "options": [
+        {"value": "none", "label": "No Proficiency Required"},
+        {"value": "tool", "label": "Tool Proficiency"},
+        {"value": "skill", "label": "Skill Proficiency"}
+      ],
+      "defaultValue": "tool",
+      "helpText": "What kind of proficiency is needed to use this tool",
+      "width": "quarter"
+    },
+    {
+      "id": "isProficient",
+      "name": "Proficient",
+      "fieldType": "checkbox",
+      "defaultValue": false,
+      "helpText": "Are you proficient with this tool?",
+      "width": "quarter"
+    },
+    {
+      "id": "relatedAbility",
+      "name": "Related Ability",
+      "fieldType": "select",
+      "options": [
+        {"value": "strength", "label": "Strength"},
+        {"value": "dexterity", "label": "Dexterity"},
+        {"value": "constitution", "label": "Constitution"},
+        {"value": "intelligence", "label": "Intelligence"},
+        {"value": "wisdom", "label": "Wisdom"},
+        {"value": "charisma", "label": "Charisma"}
+      ],
+      "defaultValue": "dexterity",
+      "helpText": "Primary ability used with this tool",
+      "width": "quarter"
+    },
+    {
+      "id": "uses",
+      "name": "Uses (if limited)",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "helpText": "Number of uses (0 for unlimited)",
+      "width": "quarter"
+    },
+    {
+      "id": "maxUses",
+      "name": "Maximum Uses",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "helpText": "Maximum uses (0 for unlimited)",
+      "width": "quarter"
+    },
+    {
+      "id": "weight",
+      "name": "Weight (lbs)",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "price",
+      "name": "Price (gp)",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "quantity",
+      "name": "Quantity",
+      "fieldType": "number",
+      "defaultValue": 1,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "description",
+      "name": "Description",
+      "fieldType": "textarea",
+      "placeholder": "Tool description, what it can be used for, special properties, etc.",
+      "width": "full"
+    },
+    {
+      "id": "activities",
+      "name": "Activities",
+      "fieldType": "textarea",
+      "placeholder": "List of activities this tool can be used for",
+      "helpText": "e.g., Crafting items, picking locks, playing music",
+      "width": "full"
+    }
+  ],
+
+  "rolls": [
+    {
+      "id": "tool_check",
+      "name": "Tool Check",
+      "formula": "d20 + {relatedAbility}_modifier + {proficiency_bonus:isProficient}",
+      "description": "Make a tool check"
+    }
+  ],
+
+  "actions": [
+    {
+      "id": "use_tool",
+      "name": "Use Tool",
+      "actionType": "action",
+      "description": "Use this tool for its intended purpose",
+      "consumesCharge": false
+    }
+  ],
+
+  "physical": {
+    "hasWeight": true,
+    "hasPrice": true,
+    "hasQuantity": true,
+    "stackable": false
+  },
+
+  "sections": [
+    {
+      "id": "basic",
+      "name": "Basic Information",
+      "fields": ["name", "toolType", "proficiencyType", "isProficient", "relatedAbility"]
+    },
+    {
+      "id": "usage",
+      "name": "Uses",
+      "fields": ["uses", "maxUses"]
+    },
+    {
+      "id": "physical",
+      "name": "Physical Properties",
+      "fields": ["weight", "price", "quantity"]
+    },
+    {
+      "id": "details",
+      "name": "Description & Activities",
+      "fields": ["description", "activities"]
+    }
+  ]
+}

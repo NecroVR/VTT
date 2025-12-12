@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { buildApp } from './app.js';
 import { loadEnvConfig } from './config/env.js';
+import { gameSystemLoader } from './services/gameSystemLoader.js';
 
 /**
  * Application entry point
@@ -13,6 +14,12 @@ async function main() {
 
     // Build Fastify app
     const app = await buildApp(config);
+
+    // Load game systems
+    app.log.info('Loading game systems...');
+    await gameSystemLoader.loadAllSystems();
+    const systems = gameSystemLoader.getAllSystems();
+    app.log.info(`Loaded ${systems.length} game system(s)`);
 
     // Start server
     await app.listen({

@@ -1,0 +1,188 @@
+{
+  "id": "dnd5e-armor",
+  "systemId": "dnd5e-ogl",
+  "entityType": "item",
+  "category": "armor",
+  "name": "D&D 5e Armor",
+
+  "fields": [
+    {
+      "id": "name",
+      "name": "Armor Name",
+      "fieldType": "text",
+      "required": true,
+      "placeholder": "Enter armor name",
+      "width": "half"
+    },
+    {
+      "id": "armorType",
+      "name": "Armor Type",
+      "fieldType": "select",
+      "required": true,
+      "options": [
+        {"value": "light", "label": "Light Armor"},
+        {"value": "medium", "label": "Medium Armor"},
+        {"value": "heavy", "label": "Heavy Armor"},
+        {"value": "shield", "label": "Shield"}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "baseAC",
+      "name": "Base AC",
+      "fieldType": "number",
+      "required": true,
+      "defaultValue": 10,
+      "validation": [
+        {"rule": "min", "value": 10},
+        {"rule": "max", "value": 20}
+      ],
+      "helpText": "Base armor class value",
+      "width": "quarter"
+    },
+    {
+      "id": "dexBonus",
+      "name": "Dexterity Bonus",
+      "fieldType": "select",
+      "required": true,
+      "options": [
+        {"value": "full", "label": "Full (Light Armor)"},
+        {"value": "max2", "label": "Max +2 (Medium Armor)"},
+        {"value": "none", "label": "None (Heavy Armor)"}
+      ],
+      "defaultValue": "full",
+      "helpText": "How Dexterity modifier applies to AC",
+      "width": "quarter"
+    },
+    {
+      "id": "strengthRequirement",
+      "name": "Strength Requirement",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0},
+        {"rule": "max", "value": 20}
+      ],
+      "helpText": "Minimum Strength needed to wear without penalty",
+      "width": "quarter"
+    },
+    {
+      "id": "stealthDisadvantage",
+      "name": "Stealth Disadvantage",
+      "fieldType": "checkbox",
+      "defaultValue": false,
+      "helpText": "Does this armor impose disadvantage on Stealth checks?",
+      "width": "quarter"
+    },
+    {
+      "id": "magicBonus",
+      "name": "Magic Bonus",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0},
+        {"rule": "max", "value": 3}
+      ],
+      "helpText": "Magic armor bonus to AC (+1, +2, +3)",
+      "width": "quarter"
+    },
+    {
+      "id": "weight",
+      "name": "Weight (lbs)",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "price",
+      "name": "Price (gp)",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "quantity",
+      "name": "Quantity",
+      "fieldType": "number",
+      "defaultValue": 1,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "description",
+      "name": "Description",
+      "fieldType": "textarea",
+      "placeholder": "Armor description, special properties, etc.",
+      "width": "full"
+    }
+  ],
+
+  "computedFields": [
+    {
+      "id": "calculatedAC",
+      "name": "Total AC",
+      "formula": "baseAC + magicBonus + (dexBonus === 'full' ? dexterity_modifier : dexBonus === 'max2' ? min(dexterity_modifier, 2) : 0)",
+      "dependencies": ["baseAC", "magicBonus", "dexBonus", "dexterity_modifier"]
+    }
+  ],
+
+  "effects": [
+    {
+      "id": "ac_bonus",
+      "name": "AC Bonus",
+      "effectType": "stat_modifier",
+      "target": "armor_class",
+      "value": "{calculatedAC}",
+      "condition": "equipped"
+    },
+    {
+      "id": "stealth_disadvantage",
+      "name": "Stealth Disadvantage",
+      "effectType": "skill_disadvantage",
+      "target": "stealth",
+      "condition": "equipped && stealthDisadvantage"
+    }
+  ],
+
+  "physical": {
+    "hasWeight": true,
+    "hasPrice": true,
+    "hasQuantity": true,
+    "stackable": false
+  },
+
+  "equippable": {
+    "slots": ["armor"]
+  },
+
+  "sections": [
+    {
+      "id": "basic",
+      "name": "Basic Information",
+      "fields": ["name", "armorType", "baseAC", "dexBonus"]
+    },
+    {
+      "id": "properties",
+      "name": "Properties & Requirements",
+      "fields": ["strengthRequirement", "stealthDisadvantage", "magicBonus"]
+    },
+    {
+      "id": "physical",
+      "name": "Physical Properties",
+      "fields": ["weight", "price", "quantity"]
+    },
+    {
+      "id": "details",
+      "name": "Description",
+      "fields": ["description"]
+    }
+  ]
+}

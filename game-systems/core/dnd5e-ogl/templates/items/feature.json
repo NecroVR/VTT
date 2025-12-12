@@ -1,0 +1,236 @@
+{
+  "id": "dnd5e-feature",
+  "systemId": "dnd5e-ogl",
+  "entityType": "item",
+  "category": "feature",
+  "name": "D&D 5e Feature/Feat",
+
+  "fields": [
+    {
+      "id": "name",
+      "name": "Feature Name",
+      "fieldType": "text",
+      "required": true,
+      "placeholder": "Enter feature or feat name",
+      "width": "half"
+    },
+    {
+      "id": "featureType",
+      "name": "Feature Type",
+      "fieldType": "select",
+      "required": true,
+      "options": [
+        {"value": "class", "label": "Class Feature"},
+        {"value": "feat", "label": "Feat"},
+        {"value": "racial", "label": "Racial Trait"},
+        {"value": "background", "label": "Background Feature"}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "sourceClass",
+      "name": "Source Class",
+      "fieldType": "text",
+      "placeholder": "e.g., Wizard, Rogue, Fighter",
+      "helpText": "Class that grants this feature (if applicable)",
+      "width": "quarter"
+    },
+    {
+      "id": "sourceLevel",
+      "name": "Source Level",
+      "fieldType": "number",
+      "defaultValue": 1,
+      "validation": [
+        {"rule": "min", "value": 1},
+        {"rule": "max", "value": 20}
+      ],
+      "helpText": "Character level when this feature is gained",
+      "width": "quarter"
+    },
+    {
+      "id": "prerequisite",
+      "name": "Prerequisite",
+      "fieldType": "text",
+      "placeholder": "e.g., Dexterity 13 or higher, Spellcasting ability",
+      "helpText": "Requirements to gain this feature or feat",
+      "width": "half"
+    },
+    {
+      "id": "uses",
+      "name": "Current Uses",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "helpText": "Current number of uses remaining (if limited use)",
+      "width": "quarter"
+    },
+    {
+      "id": "maxUses",
+      "name": "Maximum Uses",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0}
+      ],
+      "helpText": "Maximum uses per rest (0 for unlimited)",
+      "width": "quarter"
+    },
+    {
+      "id": "recovery",
+      "name": "Use Recovery",
+      "fieldType": "select",
+      "options": [
+        {"value": "none", "label": "Not Applicable"},
+        {"value": "short_rest", "label": "Short Rest"},
+        {"value": "long_rest", "label": "Long Rest"},
+        {"value": "dawn", "label": "Dawn"}
+      ],
+      "defaultValue": "none",
+      "width": "quarter"
+    },
+    {
+      "id": "activationType",
+      "name": "Activation Type",
+      "fieldType": "select",
+      "options": [
+        {"value": "none", "label": "Passive"},
+        {"value": "action", "label": "Action"},
+        {"value": "bonus_action", "label": "Bonus Action"},
+        {"value": "reaction", "label": "Reaction"},
+        {"value": "special", "label": "Special"}
+      ],
+      "defaultValue": "none",
+      "helpText": "How this feature is activated",
+      "width": "quarter"
+    },
+    {
+      "id": "reactionTrigger",
+      "name": "Reaction Trigger",
+      "fieldType": "text",
+      "placeholder": "e.g., When you are hit by an attack",
+      "helpText": "What triggers this reaction (if applicable)",
+      "width": "half"
+    },
+    {
+      "id": "damage",
+      "name": "Damage Dice",
+      "fieldType": "text",
+      "placeholder": "e.g., 1d6, 2d8",
+      "helpText": "Damage dice if this feature deals damage",
+      "width": "quarter"
+    },
+    {
+      "id": "damageType",
+      "name": "Damage Type",
+      "fieldType": "select",
+      "options": [
+        {"value": "none", "label": "None"},
+        {"value": "acid", "label": "Acid"},
+        {"value": "bludgeoning", "label": "Bludgeoning"},
+        {"value": "cold", "label": "Cold"},
+        {"value": "fire", "label": "Fire"},
+        {"value": "force", "label": "Force"},
+        {"value": "lightning", "label": "Lightning"},
+        {"value": "necrotic", "label": "Necrotic"},
+        {"value": "piercing", "label": "Piercing"},
+        {"value": "poison", "label": "Poison"},
+        {"value": "psychic", "label": "Psychic"},
+        {"value": "radiant", "label": "Radiant"},
+        {"value": "slashing", "label": "Slashing"},
+        {"value": "thunder", "label": "Thunder"}
+      ],
+      "defaultValue": "none",
+      "width": "quarter"
+    },
+    {
+      "id": "saveAbility",
+      "name": "Saving Throw",
+      "fieldType": "select",
+      "options": [
+        {"value": "none", "label": "None"},
+        {"value": "strength", "label": "Strength"},
+        {"value": "dexterity", "label": "Dexterity"},
+        {"value": "constitution", "label": "Constitution"},
+        {"value": "intelligence", "label": "Intelligence"},
+        {"value": "wisdom", "label": "Wisdom"},
+        {"value": "charisma", "label": "Charisma"}
+      ],
+      "defaultValue": "none",
+      "helpText": "Ability save required by targets",
+      "width": "quarter"
+    },
+    {
+      "id": "description",
+      "name": "Description",
+      "fieldType": "textarea",
+      "required": true,
+      "placeholder": "Full description of the feature or feat",
+      "width": "full"
+    },
+    {
+      "id": "mechanicalBenefits",
+      "name": "Mechanical Benefits",
+      "fieldType": "textarea",
+      "placeholder": "e.g., +2 to Strength, advantage on saves vs. poison, gain expertise in two skills",
+      "helpText": "Specific mechanical benefits granted",
+      "width": "full"
+    }
+  ],
+
+  "rolls": [
+    {
+      "id": "damage",
+      "name": "Damage Roll",
+      "formula": "{damage}",
+      "description": "Roll damage for this feature"
+    }
+  ],
+
+  "actions": [
+    {
+      "id": "activate",
+      "name": "Activate Feature",
+      "actionType": "{activationType}",
+      "description": "Use this feature",
+      "consumesCharge": true
+    }
+  ],
+
+  "consumes": {
+    "resourceType": "uses",
+    "amount": 1,
+    "perUse": true
+  },
+
+  "physical": {
+    "hasWeight": false,
+    "hasPrice": false,
+    "hasQuantity": false,
+    "stackable": false
+  },
+
+  "sections": [
+    {
+      "id": "basic",
+      "name": "Basic Information",
+      "fields": ["name", "featureType", "sourceClass", "sourceLevel", "prerequisite"]
+    },
+    {
+      "id": "usage",
+      "name": "Usage & Activation",
+      "fields": ["uses", "maxUses", "recovery", "activationType", "reactionTrigger"]
+    },
+    {
+      "id": "mechanics",
+      "name": "Mechanical Effects",
+      "fields": ["damage", "damageType", "saveAbility"]
+    },
+    {
+      "id": "details",
+      "name": "Description",
+      "fields": ["description", "mechanicalBenefits"]
+    }
+  ]
+}
