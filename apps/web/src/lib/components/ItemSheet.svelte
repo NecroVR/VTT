@@ -350,7 +350,7 @@
                   {/each}
                 </div>
               {/if}
-            </section}
+            </section>
           {/if}
 
           <!-- Basic Properties -->
