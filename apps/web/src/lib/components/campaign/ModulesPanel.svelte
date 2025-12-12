@@ -17,10 +17,7 @@
   let error: string | null = null;
   let searchQuery = '';
   let selectedEntityType: string = 'all';
-  let page = 1;
-  let pageSize = 20;
   let total = 0;
-  let hasMore = false;
   let openDropdownId: string | null = null;
   let availableEntityTypes: string[] = [];
   let selectedModuleId: string | null = null;
@@ -37,7 +34,6 @@
 
   // Reactive search/filter
   $: if (browser && selectedModuleId) {
-    page = 1;
     loadEntities();
   }
 
@@ -91,8 +87,9 @@
         params.append('groupBy', groupBy);
       }
 
-      params.append('page', page.toString());
-      params.append('pageSize', pageSize.toString());
+      // Load all entities at once
+      params.append('page', '1');
+      params.append('pageSize', '10000');
 
       const url = `${API_BASE_URL}/api/v1/modules/${selectedModuleId}/entities/search?${params}`;
       const token = localStorage.getItem('vtt_session_id') || sessionStorage.getItem('vtt_session_id');
@@ -109,29 +106,25 @@
 
       const data = await response.json();
 
-      if (page === 1) {
-        entities = data.entities || [];
-        // Use available types from API if provided (always complete list)
-        if (data.availableTypes) {
-          availableEntityTypes = data.availableTypes;
-        }
-        // Store groups and entityGroupKeys from response
-        if (data.groups) {
-          groups = data.groups;
-        } else {
-          groups = [];
-        }
-        if (data.entityGroupKeys) {
-          entityGroupKeys = data.entityGroupKeys;
-        } else {
-          entityGroupKeys = {};
-        }
+      // Always replace entities (loading all at once)
+      entities = data.entities || [];
+      // Use available types from API if provided (always complete list)
+      if (data.availableTypes) {
+        availableEntityTypes = data.availableTypes;
+      }
+      // Store groups and entityGroupKeys from response
+      if (data.groups) {
+        groups = data.groups;
       } else {
-        entities = [...entities, ...(data.entities || [])];
+        groups = [];
+      }
+      if (data.entityGroupKeys) {
+        entityGroupKeys = data.entityGroupKeys;
+      } else {
+        entityGroupKeys = {};
       }
 
       total = data.total || 0;
-      hasMore = (page * pageSize) < total;
 
     } catch (err) {
       error = err instanceof Error ? err.message : 'Failed to load module entities';
@@ -139,12 +132,6 @@
     } finally {
       loading = false;
     }
-  }
-
-  async function loadMore() {
-    if (!hasMore || loading) return;
-    page += 1;
-    await loadEntities();
   }
 
   function toggleDropdown(entityId: string, event: Event) {
@@ -161,7 +148,6 @@
     selectedModuleId = target.value;
     selectedEntityType = 'all';
     groupBy = 'none';
-    page = 1;
     entities = [];
   }
 
@@ -253,7 +239,7 @@
           id="type-select"
           class="type-select"
           bind:value={selectedEntityType}
-          on:change={() => { page = 1; loadEntities(); }}
+          on:change={() => loadEntities()}
         >
           <option value="all">All Types</option>
           {#each availableEntityTypes as type}
@@ -270,7 +256,7 @@
           id="group-select"
           class="group-select"
           bind:value={groupBy}
-          on:change={() => { page = 1; loadEntities(); }}
+          on:change={() => loadEntities()}
         >
           {#each getGroupingOptions(selectedEntityType) as option}
             <option value={option.value}>{option.label}</option>
@@ -285,7 +271,7 @@
         class="search-input"
         placeholder="Search entities..."
         bind:value={searchQuery}
-        on:input={() => { page = 1; loadEntities(); }}
+        on:input={() => loadEntities()}
       />
     {/if}
   </div>
@@ -419,20 +405,7 @@
         </div>
       {/if}
 
-      {#if hasMore}
-        <div class="load-more-container">
-          <button
-            class="button-secondary load-more"
-            on:click={loadMore}
-            disabled={loading}
-          >
-            {loading ? 'Loading...' : 'Load More'}
-          </button>
-          <span class="result-count">
-            Showing {entities.length} of {total}
-          </span>
-        </div>
-      {:else if total > 0}
+      {#if total > 0}
         <div class="end-message">
           Showing all {total} {selectedEntityType === 'all' ? 'entities' : getEntityTypeLabel(selectedEntityType).toLowerCase()}
         </div>
@@ -770,25 +743,6 @@
   .dropdown-item:disabled {
     color: #6b7280;
     cursor: not-allowed;
-  }
-
-  .load-more-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 1.5rem;
-    padding-top: 1rem;
-    border-top: 1px solid #374151;
-  }
-
-  .load-more {
-    min-width: 120px;
-  }
-
-  .result-count {
-    font-size: 0.75rem;
-    color: #6b7280;
   }
 
   .end-message {
