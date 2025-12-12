@@ -46,10 +46,33 @@ function getSpellLevelLabel(level: number): string {
 }
 
 /**
- * Helper function to capitalize strings (for item types)
+ * Helper function to get readable item type labels
  */
-function capitalize(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1);
+function getItemTypeLabel(type: string): string {
+  const labels: Record<string, string> = {
+    // Weapon types
+    'simple_melee': 'Simple Melee',
+    'simple_ranged': 'Simple Ranged',
+    'martial_melee': 'Martial Melee',
+    'martial_ranged': 'Martial Ranged',
+    // Armor types
+    'light': 'Light Armor',
+    'medium': 'Medium Armor',
+    'heavy': 'Heavy Armor',
+    'shield': 'Shields',
+    // Tool types
+    'artisan': 'Artisan Tools',
+    'gaming': 'Gaming Sets',
+    'musical': 'Musical Instruments',
+    // Consumable types
+    'potion': 'Potions',
+    'scroll': 'Scrolls',
+    'wand': 'Wands',
+    'rod': 'Rods',
+    'staff': 'Staves',
+    'other': 'Other',
+  };
+  return labels[type] || type.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 }
 
 /**
@@ -732,93 +755,126 @@ const modulesRoute: FastifyPluginAsync = async (fastify) => {
 
         // Handle grouping if requested
         if (groupBy && groupBy !== 'none') {
-          // Determine property key based on groupBy parameter
-          let propertyKey: string;
-          let groupKeyExpression: any;
+          // For items, we need to check multiple property keys since items use
+          // weaponType, armorType, toolType, consumableType instead of a unified itemType
+          const isItemGrouping = groupBy === 'itemType';
 
-          if (groupBy === 'level') {
-            propertyKey = 'level';
-            // For spell level: try value_integer first, then cast value_string to integer
-            groupKeyExpression = sql<number>`COALESCE(
-              ${entityProperties.valueInteger},
-              CAST(${entityProperties.valueString} AS INTEGER),
-              -1
-            )`.as('group_key');
-          } else if (groupBy === 'cr') {
-            propertyKey = 'challenge_rating';
-            // For CR: use value_string (CRs are stored as strings like "0", "1/8", "1/4", etc.)
-            groupKeyExpression = sql<string>`COALESCE(${entityProperties.valueString}, 'unknown')`.as('group_key');
+          let entitiesWithGroup: any[];
+          let groupCounts: any[];
+
+          if (isItemGrouping) {
+            // Items use different type properties - use a subquery to find the first match
+            // Get entities with item type from any of the type properties
+            entitiesWithGroup = await fastify.db.execute(sql`
+              SELECT me.*, COALESCE(
+                (SELECT ep.value_string FROM entity_properties ep
+                 WHERE ep.entity_id = me.id AND ep.property_key IN ('weaponType', 'armorType', 'toolType', 'consumableType')
+                 LIMIT 1),
+                'other'
+              ) as group_key
+              FROM module_entities me
+              WHERE me.module_id = ${moduleId}
+              ${entityType ? sql`AND me.entity_type = ${entityType}` : sql``}
+              ${query ? sql`AND to_tsvector('english', me.search_text) @@ plainto_tsquery('english', ${query})` : sql``}
+              ORDER BY group_key, me.name
+              LIMIT ${pageSizeNum} OFFSET ${offset}
+            `) as any[];
+
+            // Get group counts for items
+            groupCounts = await fastify.db.execute(sql`
+              SELECT
+                COALESCE(
+                  (SELECT ep.value_string FROM entity_properties ep
+                   WHERE ep.entity_id = me.id AND ep.property_key IN ('weaponType', 'armorType', 'toolType', 'consumableType')
+                   LIMIT 1),
+                  'other'
+                ) as group_key,
+                COUNT(*)::int as count
+              FROM module_entities me
+              WHERE me.module_id = ${moduleId}
+              ${entityType ? sql`AND me.entity_type = ${entityType}` : sql``}
+              ${query ? sql`AND to_tsvector('english', me.search_text) @@ plainto_tsquery('english', ${query})` : sql``}
+              GROUP BY group_key
+              ORDER BY group_key
+            `) as any[];
           } else {
-            // itemType grouping
-            propertyKey = 'itemType';
-            groupKeyExpression = sql<string>`COALESCE(${entityProperties.valueString}, 'other')`.as('group_key');
-          }
-
-          // Get entities with group keys
-          const entitiesWithGroup = await fastify.db
-            .select({
-              ...getTableColumns(moduleEntities),
-              groupKey: groupKeyExpression,
-            })
-            .from(moduleEntities)
-            .leftJoin(
-              entityProperties,
-              and(
-                eq(entityProperties.entityId, moduleEntities.id),
-                eq(entityProperties.propertyKey, propertyKey)
-              )
-            )
-            .where(and(...whereConditions))
-            .orderBy(sql`group_key`, moduleEntities.name)
-            .limit(pageSizeNum)
-            .offset(offset);
-
-          // Get group counts with same expression
-          let groupCountExpression: any;
-
-          if (groupBy === 'level') {
-            groupCountExpression = sql<number>`COALESCE(
-              ${entityProperties.valueInteger},
-              CAST(${entityProperties.valueString} AS INTEGER),
-              -1
-            )`;
-          } else if (groupBy === 'cr') {
-            groupCountExpression = sql<string>`COALESCE(${entityProperties.valueString}, 'unknown')`;
-          } else {
-            groupCountExpression = sql<string>`COALESCE(${entityProperties.valueString}, 'other')`;
-          }
-
-          const groupCounts = await fastify.db
-            .select({
-              groupKey: groupCountExpression,
-              count: sql<number>`count(*)::int`,
-            })
-            .from(moduleEntities)
-            .leftJoin(
-              entityProperties,
-              and(
-                eq(entityProperties.entityId, moduleEntities.id),
-                eq(entityProperties.propertyKey, propertyKey)
-              )
-            )
-            .where(and(...whereConditions))
-            .groupBy(sql`1`)
-            .orderBy(sql`1`);
-
-          // Build groups with labels
-          const groups: EntityGroup[] = groupCounts.map(gc => {
-            const key = gc.groupKey;
-            let label: string;
+            // Level or CR grouping - use single property key
+            let propertyKey: string;
+            let groupKeyExpression: any;
 
             if (groupBy === 'level') {
+              propertyKey = 'level';
+              // For spell level: try value_integer first, then cast value_string to integer
+              groupKeyExpression = sql<number>`COALESCE(
+                ${entityProperties.valueInteger},
+                CAST(${entityProperties.valueString} AS INTEGER),
+                -1
+              )`.as('group_key');
+            } else {
+              // CR grouping
+              propertyKey = 'challenge_rating';
+              // For CR: use value_string (CRs are stored as strings like "0", "1/8", "1/4", etc.)
+              groupKeyExpression = sql<string>`COALESCE(${entityProperties.valueString}, 'unknown')`.as('group_key');
+            }
+
+            // Get entities with group keys
+            entitiesWithGroup = await fastify.db
+              .select({
+                ...getTableColumns(moduleEntities),
+                groupKey: groupKeyExpression,
+              })
+              .from(moduleEntities)
+              .leftJoin(
+                entityProperties,
+                and(
+                  eq(entityProperties.entityId, moduleEntities.id),
+                  eq(entityProperties.propertyKey, propertyKey)
+                )
+              )
+              .where(and(...whereConditions))
+              .orderBy(sql`group_key`, moduleEntities.name)
+              .limit(pageSizeNum)
+              .offset(offset);
+
+            // Get group counts
+            let groupCountExpression = groupBy === 'level'
+              ? sql<number>`COALESCE(${entityProperties.valueInteger}, CAST(${entityProperties.valueString} AS INTEGER), -1)`
+              : sql<string>`COALESCE(${entityProperties.valueString}, 'unknown')`;
+
+            groupCounts = await fastify.db
+              .select({
+                groupKey: groupCountExpression,
+                count: sql<number>`count(*)::int`,
+              })
+              .from(moduleEntities)
+              .leftJoin(
+                entityProperties,
+                and(
+                  eq(entityProperties.entityId, moduleEntities.id),
+                  eq(entityProperties.propertyKey, propertyKey)
+                )
+              )
+              .where(and(...whereConditions))
+              .groupBy(sql`1`)
+              .orderBy(sql`1`);
+          }
+
+          // Build groups with labels
+          // Handle both camelCase (drizzle ORM) and snake_case (raw SQL) column names
+          const groupByStr = groupBy as string; // Avoid TypeScript narrowing issues
+          const groups: EntityGroup[] = groupCounts.map(gc => {
+            const key = gc.groupKey ?? gc.group_key;
+            let label: string;
+
+            if (groupByStr === 'level') {
               const levelNum = typeof key === 'number' ? key : -1;
               label = levelNum === -1 ? 'Other' : getSpellLevelLabel(levelNum);
-            } else if (groupBy === 'cr') {
+            } else if (groupByStr === 'cr') {
               const crStr = typeof key === 'string' ? key : 'unknown';
               label = crStr === 'unknown' ? 'Unknown CR' : getCRLabel(crStr);
             } else {
               const typeStr = typeof key === 'string' ? key : 'other';
-              label = typeStr === 'other' ? 'Other' : capitalize(typeStr);
+              label = typeStr === 'other' ? 'Other' : getItemTypeLabel(typeStr);
             }
 
             return {
@@ -829,13 +885,14 @@ const modulesRoute: FastifyPluginAsync = async (fastify) => {
           });
 
           // Build entityGroupKeys map
+          // Handle both camelCase (drizzle ORM) and snake_case (raw SQL) column names
           const entityGroupKeys: Record<string, string | number> = {};
           for (const entity of entitiesWithGroup) {
-            entityGroupKeys[entity.id] = entity.groupKey;
+            entityGroupKeys[entity.id] = entity.groupKey ?? entity.group_key;
           }
 
-          // Remove groupKey from entities (it's not part of ModuleEntity type)
-          const entities = entitiesWithGroup.map(({ groupKey, ...entity }) => entity);
+          // Remove groupKey/group_key from entities (it's not part of ModuleEntity type)
+          const entities = entitiesWithGroup.map(({ groupKey, group_key, ...entity }) => entity);
 
           const response: ModuleEntitiesListResponse = {
             entities: entities as ModuleEntity[],
