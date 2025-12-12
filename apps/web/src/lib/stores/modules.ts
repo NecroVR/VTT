@@ -101,9 +101,10 @@ function createModulesStore() {
 
     /**
      * Load modules for a specific campaign
+     * Returns the loaded campaign modules array for immediate use
      */
-    async loadCampaignModules(campaignId: string): Promise<void> {
-      if (!browser) return;
+    async loadCampaignModules(campaignId: string): Promise<CampaignModule[]> {
+      if (!browser) return [];
 
       update(state => ({ ...state, loading: true, error: null }));
 
@@ -143,6 +144,8 @@ function createModulesStore() {
             loading: false,
           };
         });
+
+        return campaignModules;
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to load campaign modules';
         update(state => ({
@@ -151,6 +154,7 @@ function createModulesStore() {
           error: errorMessage,
         }));
         console.error('Error loading campaign modules:', error);
+        return [];
       }
     },
 

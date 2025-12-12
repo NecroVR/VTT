@@ -45,11 +45,13 @@
     if (!browser) return;
 
     try {
-      await modulesStore.loadCampaignModules(campaignId);
+      const loadedModules = await modulesStore.loadCampaignModules(campaignId);
 
-      // Select first active module by default
-      if (activeModules.length > 0) {
-        selectedModuleId = activeModules[0].moduleId;
+      // Select first active module by default using returned data directly
+      // (avoids race condition with reactive statements)
+      const active = loadedModules.filter(cm => cm.isActive);
+      if (active.length > 0) {
+        selectedModuleId = active[0].moduleId;
       }
     } catch (err) {
       error = err instanceof Error ? err.message : 'Failed to load campaign modules';
