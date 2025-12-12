@@ -254,14 +254,18 @@ export interface ConditionalNode extends BaseLayoutNode {
 }
 
 /**
- * Static content node (text, HTML, markdown)
+ * Static content node (text, HTML, markdown, image, icon)
  */
 export interface StaticNode extends BaseLayoutNode {
   type: 'static';
   content: string;                      // Content (may contain {{binding}} interpolation)
   contentKey?: string;                  // i18n key
-  contentType?: 'text' | 'html' | 'markdown';
+  contentType?: 'text' | 'html' | 'markdown' | 'image' | 'icon';
   tag?: string;                         // HTML tag to use (default 'div')
+  alt?: string;                         // Alt text for images
+  width?: string;                       // Width for images
+  height?: string;                      // Height for images
+  size?: string;                        // Size for icons
 }
 
 /**

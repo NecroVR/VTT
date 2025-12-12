@@ -123,6 +123,48 @@
     return obj;
   }
 
+  // Interpolate {{path}} patterns in content strings
+  function interpolateContent(content: string): string {
+    // First handle {{index}} if in repeater context
+    if (repeaterContext) {
+      content = content.replace(/\{\{index\}\}/g, String(repeaterContext.index));
+    }
+
+    // Handle {{path}} patterns
+    return content.replace(/\{\{([^}]+)\}\}/g, (match, path) => {
+      const value = getValueByPath(entity, path.trim());
+      return value != null ? String(value) : '';
+    });
+  }
+
+  // Icon mapping for simple emoji-based icons
+  const iconMap: Record<string, string> = {
+    sword: '⚔️',
+    shield: '🛡️',
+    heart: '❤️',
+    star: '⭐',
+    fire: '🔥',
+    water: '💧',
+    lightning: '⚡',
+    skull: '💀',
+    book: '📖',
+    scroll: '📜',
+    potion: '🧪',
+    coin: '🪙',
+    bag: '🎒',
+    gem: '💎',
+    key: '🔑',
+    lock: '🔒',
+    crown: '👑',
+    dice: '🎲',
+    map: '🗺️',
+    compass: '🧭'
+  };
+
+  function getIcon(iconName: string): string {
+    return iconMap[iconName.toLowerCase()] || iconName;
+  }
+
   let isVisible = $derived(evaluateCondition(node.visibility));
 </script>
 
@@ -293,11 +335,32 @@
       </div>
     </div>
   {:else if node.type === 'static'}
-    <div class="layout-static" class:static-{node.contentType || 'text'}>
+    {@const interpolated = interpolateContent(node.content)}
+    <div
+      class="layout-static"
+      class:static-{node.contentType || 'text'}
+      style={node.style ? Object.entries(node.style).map(([k, v]) => `${k}: ${v}`).join(';') : ''}
+    >
       {#if node.contentType === 'html'}
-        {@html node.content}
+        {@html interpolated}
+      {:else if node.contentType === 'image'}
+        <img
+          src={interpolated}
+          alt={node.alt || ''}
+          style="
+            {node.width ? `width: ${node.width};` : ''}
+            {node.height ? `height: ${node.height};` : ''}
+          "
+        />
+      {:else if node.contentType === 'icon'}
+        <span
+          class="static-icon-content"
+          style={node.size ? `font-size: ${node.size};` : ''}
+        >
+          {getIcon(interpolated)}
+        </span>
       {:else}
-        {node.content}
+        {interpolated}
       {/if}
     </div>
   {:else if node.type === 'spacer'}
@@ -405,6 +468,24 @@
           {repeaterContext}
         />
       {/each}
+    {/if}
+  {:else if node.type === 'fragmentRef'}
+    {@const fragment = fragments.find(f => f.id === node.fragmentId)}
+    {#if fragment}
+      {@const substitutedContent = substituteFragmentParameters(fragment.content, node.parameters || {})}
+      {#each substitutedContent as fragmentNode}
+        <svelte:self
+          node={fragmentNode}
+          {entity}
+          {mode}
+          {fragments}
+          {computedFields}
+          {onChange}
+          {repeaterContext}
+        />
+      {/each}
+    {:else}
+      <div class="fragment-error">Fragment not found: {node.fragmentId}</div>
     {/if}
   {:else}
     <!-- Unknown node type -->
@@ -527,7 +608,29 @@
     cursor: not-allowed;
   }
 
-  /* Static and spacing */
+  /* Static content styles */
+  .layout-static {
+    display: block;
+  }
+
+  .static-image img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .static-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .static-icon-content {
+    line-height: 1;
+    display: inline-block;
+  }
+
+  /* Spacing */
   .layout-spacer { display: block; }
   .layout-divider {
     border: none;
@@ -541,7 +644,7 @@
     margin: 0 0.5rem;
   }
 
-  .unknown-node {
+  .unknown-node, .fragment-error {
     background: #fee;
     color: #c00;
     padding: 0.5rem;
