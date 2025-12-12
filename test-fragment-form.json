@@ -1,0 +1,164 @@
+{
+  "id": "test-fragment-form",
+  "name": "Fragment Test Form",
+  "description": "Test form for fragment system",
+  "gameSystemId": "dnd5e",
+  "entityType": "actor",
+  "version": 1,
+  "isDefault": false,
+  "isLocked": false,
+  "visibility": "private",
+  "ownerId": "test-user",
+  "fragments": [
+    {
+      "id": "ability-score",
+      "name": "Ability Score Block",
+      "description": "Reusable ability score display",
+      "parameters": [
+        {
+          "name": "abilityName",
+          "type": "binding",
+          "description": "Name of the ability (e.g., 'strength', 'dexterity')"
+        },
+        {
+          "name": "abilityLabel",
+          "type": "literal",
+          "description": "Display label for the ability"
+        }
+      ],
+      "content": [
+        {
+          "id": "ability-container",
+          "type": "flex",
+          "direction": "column",
+          "align": "center",
+          "gap": "0.25rem",
+          "children": [
+            {
+              "id": "ability-label",
+              "type": "static",
+              "content": "{{abilityLabel}}",
+              "contentType": "text",
+              "style": {
+                "font-weight": "bold",
+                "text-transform": "uppercase",
+                "font-size": "0.875rem"
+              }
+            },
+            {
+              "id": "ability-score",
+              "type": "field",
+              "fieldType": "number",
+              "binding": "abilities.{{abilityName}}.score",
+              "label": "Score",
+              "options": {
+                "min": 1,
+                "max": 30
+              }
+            },
+            {
+              "id": "ability-modifier",
+              "type": "field",
+              "fieldType": "text",
+              "binding": "abilities.{{abilityName}}.modifier",
+              "label": "Modifier",
+              "readonly": true
+            }
+          ]
+        }
+      ],
+      "createdAt": "2025-12-12T00:00:00.000Z",
+      "updatedAt": "2025-12-12T00:00:00.000Z"
+    }
+  ],
+  "layout": [
+    {
+      "id": "main-section",
+      "type": "section",
+      "title": "Ability Scores",
+      "children": [
+        {
+          "id": "abilities-grid",
+          "type": "grid",
+          "columns": 3,
+          "gap": "1rem",
+          "children": [
+            {
+              "id": "str-fragment",
+              "type": "fragmentRef",
+              "fragmentId": "ability-score",
+              "parameters": {
+                "abilityName": "strength",
+                "abilityLabel": "STR"
+              }
+            },
+            {
+              "id": "dex-fragment",
+              "type": "fragmentRef",
+              "fragmentId": "ability-score",
+              "parameters": {
+                "abilityName": "dexterity",
+                "abilityLabel": "DEX"
+              }
+            },
+            {
+              "id": "con-fragment",
+              "type": "fragmentRef",
+              "fragmentId": "ability-score",
+              "parameters": {
+                "abilityName": "constitution",
+                "abilityLabel": "CON"
+              }
+            },
+            {
+              "id": "int-fragment",
+              "type": "fragmentRef",
+              "fragmentId": "ability-score",
+              "parameters": {
+                "abilityName": "intelligence",
+                "abilityLabel": "INT"
+              }
+            },
+            {
+              "id": "wis-fragment",
+              "type": "fragmentRef",
+              "fragmentId": "ability-score",
+              "parameters": {
+                "abilityName": "wisdom",
+                "abilityLabel": "WIS"
+              }
+            },
+            {
+              "id": "cha-fragment",
+              "type": "fragmentRef",
+              "fragmentId": "ability-score",
+              "parameters": {
+                "abilityName": "charisma",
+                "abilityLabel": "CHA"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "missing-fragment-test",
+      "type": "section",
+      "title": "Missing Fragment Test",
+      "children": [
+        {
+          "id": "missing-fragment",
+          "type": "fragmentRef",
+          "fragmentId": "non-existent-fragment",
+          "parameters": {}
+        }
+      ]
+    }
+  ],
+  "styles": {
+    "theme": "default"
+  },
+  "computedFields": [],
+  "createdAt": "2025-12-12T00:00:00.000Z",
+  "updatedAt": "2025-12-12T00:00:00.000Z"
+}
