@@ -219,6 +219,8 @@ export interface ModuleEntitiesListResponse {
   total: number;
   page?: number;
   pageSize?: number;
+  /** All available entity types for this module (for filter dropdown) */
+  availableTypes?: string[];
 }
 
 /**

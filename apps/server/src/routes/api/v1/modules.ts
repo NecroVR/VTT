@@ -716,11 +716,21 @@ const modulesRoute: FastifyPluginAsync = async (fastify) => {
           .limit(pageSizeNum)
           .offset(offset);
 
+        // Get all available entity types for this module (regardless of current filter)
+        const typesResult = await fastify.db
+          .selectDistinct({ entityType: moduleEntities.entityType })
+          .from(moduleEntities)
+          .where(eq(moduleEntities.moduleId, moduleId))
+          .orderBy(moduleEntities.entityType);
+
+        const availableTypes = typesResult.map(r => r.entityType);
+
         const response: ModuleEntitiesListResponse = {
           entities: entities as ModuleEntity[],
           total,
           page: pageNum,
           pageSize: pageSizeNum,
+          availableTypes,
         };
 
         return reply.status(200).send(response);

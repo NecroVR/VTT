@@ -94,10 +94,10 @@
 
       if (page === 1) {
         entities = data.entities || [];
-        // Extract unique entity types
-        const types = new Set<string>();
-        entities.forEach(e => types.add(e.entityType));
-        availableEntityTypes = Array.from(types).sort();
+        // Use available types from API if provided (always complete list)
+        if (data.availableTypes) {
+          availableEntityTypes = data.availableTypes;
+        }
       } else {
         entities = [...entities, ...(data.entities || [])];
       }
