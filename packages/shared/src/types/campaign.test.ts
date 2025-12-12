@@ -544,14 +544,17 @@ describe('Campaign Types', () => {
     it('should have correct structure with minimal fields', () => {
       const request: CreateCampaignRequest = {
         name: 'New Campaign',
+        gameSystemId: 'dnd5e',
       };
 
       expect(request.name).toBe('New Campaign');
+      expect(request.gameSystemId).toBe('dnd5e');
     });
 
     it('should handle optional settings', () => {
       const request: CreateCampaignRequest = {
         name: 'Campaign with Settings',
+        gameSystemId: 'dnd5e',
         settings: {
           gridType: 'hex',
           gridSize: 60,
@@ -566,6 +569,7 @@ describe('Campaign Types', () => {
     it('should handle partial settings', () => {
       const request: CreateCampaignRequest = {
         name: 'Campaign',
+        gameSystemId: 'pf2e',
         settings: {
           gridSize: 40,
         },
