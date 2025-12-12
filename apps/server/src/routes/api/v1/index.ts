@@ -27,6 +27,7 @@ import storageRoute from './storage.js';
 import viewportsRoute from './viewports.js';
 import pathsRoute from './paths.js';
 import docsRoute from './docs.js';
+import itemTemplatesRoute from './itemTemplates.js';
 
 /**
  * API v1 routes
@@ -71,6 +72,7 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
         viewports: '/api/v1/scenes/:sceneId/viewport',
         paths: '/api/v1/scenes/:sceneId/paths',
         docs: '/api/v1/docs',
+        itemTemplates: '/api/v1/campaigns/:campaignId/item-templates',
       },
     };
   });
@@ -104,6 +106,7 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
   await fastify.register(viewportsRoute);
   await fastify.register(pathsRoute);
   await fastify.register(docsRoute);
+  await fastify.register(itemTemplatesRoute);
 };
 
 export default apiV1Routes;
