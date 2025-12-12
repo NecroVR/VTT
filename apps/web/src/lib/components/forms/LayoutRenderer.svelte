@@ -63,6 +63,66 @@
     }, obj as unknown);
   }
 
+  // Repeater array manipulation helpers
+  function addItem(path: string): void {
+    const currentArray = (getValueByPath(entity, path) as unknown[]) || [];
+    const newArray = [...currentArray, {}]; // Add empty object
+    onChange(path, newArray);
+  }
+
+  function removeItem(path: string, index: number): void {
+    const currentArray = (getValueByPath(entity, path) as unknown[]) || [];
+    const newArray = currentArray.filter((_, i) => i !== index);
+    onChange(path, newArray);
+  }
+
+  function moveItem(path: string, fromIndex: number, toIndex: number): void {
+    const currentArray = (getValueByPath(entity, path) as unknown[]) || [];
+    if (fromIndex < 0 || fromIndex >= currentArray.length || toIndex < 0 || toIndex >= currentArray.length) {
+      return; // Invalid indices
+    }
+    const newArray = [...currentArray];
+    const [movedItem] = newArray.splice(fromIndex, 1);
+    newArray.splice(toIndex, 0, movedItem);
+    onChange(path, newArray);
+  }
+
+  // Substitute fragment parameters in node tree
+  function substituteFragmentParameters(nodes: LayoutNode[], parameters: Record<string, string>): LayoutNode[] {
+    return nodes.map(node => substituteNodeParameters(node, parameters));
+  }
+
+  function substituteNodeParameters(node: LayoutNode, parameters: Record<string, string>): LayoutNode {
+    // Deep clone and substitute parameters in all string properties
+    const substituted = JSON.parse(JSON.stringify(node));
+    return substituteInObject(substituted, parameters) as LayoutNode;
+  }
+
+  function substituteInObject(obj: unknown, parameters: Record<string, string>): unknown {
+    if (typeof obj === 'string') {
+      // Replace all {{paramName}} with parameter values
+      let result = obj;
+      for (const [paramName, paramValue] of Object.entries(parameters)) {
+        result = result.replace(new RegExp(`\\{\\{${paramName}\\}\\}`, 'g'), paramValue);
+      }
+      return result;
+    }
+
+    if (Array.isArray(obj)) {
+      return obj.map(item => substituteInObject(item, parameters));
+    }
+
+    if (obj && typeof obj === 'object') {
+      const result: Record<string, unknown> = {};
+      for (const [key, value] of Object.entries(obj)) {
+        result[key] = substituteInObject(value, parameters);
+      }
+      return result;
+    }
+
+    return obj;
+  }
+
   let isVisible = $derived(evaluateCondition(node.visibility));
 </script>
 
@@ -129,6 +189,28 @@
         align-items: {node.align || 'stretch'};
         flex-wrap: {node.wrap ? 'wrap' : 'nowrap'};
         gap: {node.gap || '0.5rem'};
+      "
+    >
+      {#each node.children as child}
+        <svelte:self
+          node={child}
+          {entity}
+          {mode}
+          {fragments}
+          {computedFields}
+          {onChange}
+          {repeaterContext}
+        />
+      {/each}
+    </div>
+  {:else if node.type === 'columns'}
+    <div
+      class="layout-columns"
+      style="
+        display: grid;
+        grid-template-columns: {node.widths.join(' ')};
+        gap: {node.gap || '1rem'};
+        {node.style ? Object.entries(node.style).map(([k, v]) => `${k}: ${v}`).join(';') : ''}
       "
     >
       {#each node.children as child}
@@ -238,22 +320,62 @@
       {:else}
         {#each items as item, index}
           <div class="repeater-item">
-            {#each node.itemTemplate as templateNode}
-              <svelte:self
-                node={templateNode}
-                {entity}
-                {mode}
-                {fragments}
-                {computedFields}
-                {onChange}
-                repeaterContext={{ index, item }}
-              />
-            {/each}
+            <div class="repeater-item-content">
+              {#each node.itemTemplate as templateNode}
+                <svelte:self
+                  node={templateNode}
+                  {entity}
+                  {mode}
+                  {fragments}
+                  {computedFields}
+                  {onChange}
+                  repeaterContext={{ index, item }}
+                />
+              {/each}
+            </div>
+            {#if mode === 'edit' && node.allowDelete !== false}
+              <div class="repeater-item-controls">
+                {#if node.allowReorder !== false && items.length > 1}
+                  <button
+                    class="repeater-control-btn move-up"
+                    type="button"
+                    disabled={index === 0}
+                    onclick={() => moveItem(node.binding, index, index - 1)}
+                    title="Move up"
+                  >
+                    ▲
+                  </button>
+                  <button
+                    class="repeater-control-btn move-down"
+                    type="button"
+                    disabled={index === items.length - 1}
+                    onclick={() => moveItem(node.binding, index, index + 1)}
+                    title="Move down"
+                  >
+                    ▼
+                  </button>
+                {/if}
+                <button
+                  class="repeater-control-btn remove"
+                  type="button"
+                  disabled={node.minItems !== undefined && items.length <= node.minItems}
+                  onclick={() => removeItem(node.binding, index)}
+                  title="Remove item"
+                >
+                  ✕
+                </button>
+              </div>
+            {/if}
           </div>
         {/each}
       {/if}
       {#if mode === 'edit'}
-        <button class="add-item-btn" type="button">
+        <button
+          class="add-item-btn"
+          type="button"
+          disabled={node.maxItems !== undefined && items.length >= node.maxItems}
+          onclick={() => addItem(node.binding)}
+        >
           {node.addLabel || 'Add Item'}
         </button>
       {/if}
@@ -307,6 +429,11 @@
     margin-bottom: 0.5rem;
   }
 
+  /* Columns layout */
+  .layout-columns {
+    width: 100%;
+  }
+
   /* Section styles */
   .layout-section {
     margin: 0.5rem 0;
@@ -343,9 +470,45 @@
   /* Repeater styles */
   .layout-repeater { display: flex; flex-direction: column; gap: 0.5rem; }
   .repeater-item {
+    display: flex;
+    gap: 0.5rem;
     padding: 0.5rem;
     border: 1px solid var(--border-color, #ccc);
     border-radius: 4px;
+    align-items: start;
+  }
+  .repeater-item-content {
+    flex: 1;
+  }
+  .repeater-item-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .repeater-control-btn {
+    padding: 0.25rem 0.5rem;
+    background: var(--bg-hover, #f0f0f0);
+    border: 1px solid var(--border-color, #ccc);
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    line-height: 1;
+    min-width: 24px;
+    text-align: center;
+  }
+  .repeater-control-btn:hover:not(:disabled) {
+    background: var(--bg-active, #e0e0e0);
+  }
+  .repeater-control-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .repeater-control-btn.remove {
+    color: var(--danger-color, #d00);
+  }
+  .repeater-control-btn.remove:hover:not(:disabled) {
+    background: var(--danger-bg, #fee);
+    border-color: var(--danger-color, #d00);
   }
   .repeater-empty { color: var(--muted-color, #666); font-style: italic; }
   .add-item-btn {
@@ -354,6 +517,14 @@
     border: 1px dashed var(--border-color, #ccc);
     border-radius: 4px;
     cursor: pointer;
+  }
+  .add-item-btn:hover:not(:disabled) {
+    background: var(--bg-active, #e0e0e0);
+    border-color: var(--primary-color, #007bff);
+  }
+  .add-item-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   /* Static and spacing */
