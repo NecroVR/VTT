@@ -16,10 +16,7 @@
   let error: string | null = null;
   let searchQuery = '';
   let selectedCategory = 'all';
-  let page = 1;
-  let limit = 20;
   let total = 0;
-  let hasMore = false;
   let openDropdownId: string | null = null;
   let addingToActor: string | null = null;
   let addSuccess: string | null = null;
@@ -30,7 +27,6 @@
 
   // Reactive search/filter
   $: if (browser) {
-    page = 1;
     loadEntries();
   }
 
@@ -55,8 +51,8 @@
         params.append(`filter[category]`, selectedCategory);
       }
 
-      params.append('page', page.toString());
-      params.append('limit', limit.toString());
+      // Load all items at once by setting a very high limit
+      params.append('limit', '10000');
 
       const url = `${API_BASE_URL}/api/v1/compendium/${systemId}/${type}?${params}`;
       const response = await fetch(url);
@@ -68,50 +64,10 @@
       const data = await response.json();
       entries = data.entries || [];
       total = data.total || 0;
-      hasMore = data.hasMore || false;
 
     } catch (err) {
       error = err instanceof Error ? err.message : 'Failed to load compendium entries';
       console.error('Error loading compendium:', err);
-    } finally {
-      loading = false;
-    }
-  }
-
-  async function loadMore() {
-    if (!hasMore || loading) return;
-    page += 1;
-
-    loading = true;
-    try {
-      const params = new URLSearchParams();
-
-      if (searchQuery) {
-        params.append('search', searchQuery);
-      }
-
-      if (selectedCategory && selectedCategory !== 'all') {
-        params.append(`filter[category]`, selectedCategory);
-      }
-
-      params.append('page', page.toString());
-      params.append('limit', limit.toString());
-
-      const url = `${API_BASE_URL}/api/v1/compendium/${systemId}/${type}?${params}`;
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch more entries: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      entries = [...entries, ...(data.entries || [])];
-      total = data.total || 0;
-      hasMore = data.hasMore || false;
-
-    } catch (err) {
-      error = err instanceof Error ? err.message : 'Failed to load more entries';
-      console.error('Error loading more entries:', err);
     } finally {
       loading = false;
     }
@@ -233,12 +189,12 @@
 
   <!-- Content -->
   <div class="browser-content">
-    {#if loading && entries.length === 0}
+    {#if loading}
       <div class="loading-state">
         <div class="spinner"></div>
         <p>Loading {type}...</p>
       </div>
-    {:else if error && entries.length === 0}
+    {:else if error}
       <div class="empty-state">
         <p>Error: {error}</p>
         <button class="button-secondary" on:click={loadEntries}>
@@ -306,20 +262,7 @@
         {/each}
       </div>
 
-      {#if hasMore}
-        <div class="load-more-container">
-          <button
-            class="button-secondary load-more"
-            on:click={loadMore}
-            disabled={loading}
-          >
-            {loading ? 'Loading...' : 'Load More'}
-          </button>
-          <span class="result-count">
-            Showing {entries.length} of {total}
-          </span>
-        </div>
-      {:else if total > 0}
+      {#if total > 0}
         <div class="end-message">
           Showing all {total} {type}
         </div>
@@ -590,25 +533,6 @@
     font-size: 0.75rem;
     color: #6b7280;
     padding: 0.5rem;
-  }
-
-  .load-more-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 1.5rem;
-    padding-top: 1rem;
-    border-top: 1px solid #374151;
-  }
-
-  .load-more {
-    min-width: 120px;
-  }
-
-  .result-count {
-    font-size: 0.75rem;
-    color: #6b7280;
   }
 
   .end-message {
