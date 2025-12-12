@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@vtt/shared": "workspace:*",
+    "marked": "^17.0.1",
     "visibility-polygon": "^1.1.0"
   },
   "devDependencies": {

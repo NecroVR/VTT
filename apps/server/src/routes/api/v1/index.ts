@@ -25,6 +25,7 @@ import compendiumsRoute from './compendiums.js';
 import storageRoute from './storage.js';
 import viewportsRoute from './viewports.js';
 import pathsRoute from './paths.js';
+import docsRoute from './docs.js';
 
 /**
  * API v1 routes
@@ -67,6 +68,7 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
         storage: '/api/v1/storage/quota',
         viewports: '/api/v1/scenes/:sceneId/viewport',
         paths: '/api/v1/scenes/:sceneId/paths',
+        docs: '/api/v1/docs',
       },
     };
   });
@@ -98,6 +100,7 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
   await fastify.register(storageRoute);
   await fastify.register(viewportsRoute);
   await fastify.register(pathsRoute);
+  await fastify.register(docsRoute);
 };
 
 export default apiV1Routes;

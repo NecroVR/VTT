@@ -88,7 +88,18 @@
 
 <main class="container">
   <div class="header">
-    <h1>My Campaigns</h1>
+    <div class="header-left">
+      <h1>My Campaigns</h1>
+      <a href="/docs" class="docs-link" title="View Documentation">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          <line x1="12" y1="6" x2="12" y2="10"/>
+          <line x1="12" y1="14" x2="12.01" y2="14"/>
+        </svg>
+        Documentation
+      </a>
+    </div>
     <button class="btn btn-primary" on:click={createNewCampaign}>
       Create New Campaign
     </button>
@@ -205,9 +216,37 @@
     margin-bottom: var(--spacing-xl);
   }
 
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+  }
+
   .header h1 {
     font-size: var(--font-size-2xl);
     font-weight: 700;
+    margin: 0;
+  }
+
+  .docs-link {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    transition: background-color 0.2s, color 0.2s;
+  }
+
+  .docs-link:hover {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-primary);
+  }
+
+  .docs-link svg {
+    flex-shrink: 0;
   }
 
   .error-message {

@@ -22,6 +22,7 @@ ENV PATH="/app/node_modules/.bin:$PATH"
 COPY apps/server ./apps/server
 COPY packages/database ./packages/database
 COPY packages/shared ./packages/shared
+COPY docs ./docs
 COPY turbo.json ./
 
 # Build the application
@@ -53,6 +54,9 @@ COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
 
 # Copy database migrations
 COPY --from=builder /app/packages/database/drizzle ./packages/database/drizzle
+
+# Copy documentation for API serving
+COPY --from=builder /app/docs ./docs
 
 # Expose port
 EXPOSE 3000
