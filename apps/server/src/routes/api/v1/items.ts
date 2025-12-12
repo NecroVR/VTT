@@ -3,6 +3,9 @@ import { items, actors, campaigns } from '@vtt/database';
 import { eq, and } from 'drizzle-orm';
 import type { Item, CreateItemRequest, UpdateItemRequest, AttunementState, ItemRarity } from '@vtt/shared';
 import { authenticate } from '../../../middleware/auth.js';
+import { ItemTemplateValidator } from '../../../services/itemTemplateValidator.js';
+import { createItemEffectsService } from '../../../services/itemEffects.js';
+import { gameSystemLoader } from '../../../services/gameSystemLoader.js';
 
 /**
  * Item API routes
@@ -189,6 +192,61 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
 
         // TODO: Check if user has permission to create items for this actor
 
+        // Validate item data against template if templateId is provided
+        if (itemData.templateId && campaign.gameSystemId) {
+          try {
+            const gameSystem = gameSystemLoader.getSystem(campaign.gameSystemId);
+
+            if (!gameSystem) {
+              return reply.status(400).send({
+                error: `Game system '${campaign.gameSystemId}' not found`
+              });
+            }
+
+            // Find the item template
+            const foundTemplate = gameSystem.system.itemTemplates?.find(
+              t => t.id === itemData.templateId
+            );
+
+            if (!foundTemplate) {
+              return reply.status(400).send({
+                error: `Item template '${itemData.templateId}' not found in game system '${campaign.gameSystemId}'`
+              });
+            }
+
+            // Type assertion - we know itemTemplates are ItemTemplates
+            const template = foundTemplate as import('@vtt/shared').ItemTemplate;
+
+            // Validate item data against template
+            const validator = new ItemTemplateValidator();
+            const validationResult = validator.validateItem(
+              itemData.data ?? {},
+              template
+            );
+
+            if (!validationResult.valid) {
+              return reply.status(400).send({
+                error: 'Item validation failed',
+                validationErrors: validationResult.errors,
+                validationWarnings: validationResult.warnings,
+              });
+            }
+
+            // Apply template defaults and compute fields
+            const dataWithDefaults = validator.applyDefaults(itemData.data ?? {}, template);
+            const computedFields = validator.computeFields(dataWithDefaults, template);
+
+            // Merge computed fields into data
+            itemData.data = { ...dataWithDefaults, ...computedFields };
+
+          } catch (error) {
+            fastify.log.error(error, 'Failed to validate item against template');
+            return reply.status(500).send({
+              error: 'Failed to validate item template'
+            });
+          }
+        }
+
         // Create item in database
         const newItems = await fastify.db
           .insert(items)
@@ -349,6 +407,95 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
 
         const updatedItem = updatedItems[0];
 
+        // Handle effect generation/removal when equipped or attunement status changes
+        const itemEffectsService = createItemEffectsService(fastify.db);
+
+        try {
+          // Check if equipped status changed
+          if (updates.equipped !== undefined && existingItem.actorId) {
+            if (updates.equipped === true && existingItem.templateId) {
+              // Item was equipped - try to generate effects
+              const campaign = await fastify.db
+                .select()
+                .from(campaigns)
+                .where(eq(campaigns.id, existingItem.campaignId))
+                .limit(1);
+
+              if (campaign[0]?.gameSystemId) {
+                const gameSystem = gameSystemLoader.getSystem(campaign[0].gameSystemId);
+
+                if (gameSystem) {
+                  const foundTemplate = gameSystem.system.itemTemplates?.find(
+                    t => t.id === existingItem.templateId
+                  );
+
+                  // Type assertion - we know itemTemplates are ItemTemplates
+                  const template = foundTemplate as import('@vtt/shared').ItemTemplate | undefined;
+
+                  if (template?.effects && template.effects.length > 0) {
+                    await itemEffectsService.generateEffects(
+                      updatedItem.id,
+                      existingItem.actorId,
+                      updatedItem.campaignId,
+                      template.effects,
+                      'equipped'
+                    );
+                    fastify.log.info(`Generated effects for equipped item ${updatedItem.id}`);
+                  }
+                }
+              }
+            } else if (updates.equipped === false) {
+              // Item was unequipped - remove effects
+              await itemEffectsService.removeEffects(updatedItem.id, 'equipped');
+              fastify.log.info(`Removed equipped effects for item ${updatedItem.id}`);
+            }
+          }
+
+          // Check if attunement status changed
+          if (updates.attunement !== undefined && existingItem.actorId) {
+            if (updates.attunement === 'attuned' && existingItem.templateId) {
+              // Item was attuned - try to generate effects
+              const campaign = await fastify.db
+                .select()
+                .from(campaigns)
+                .where(eq(campaigns.id, existingItem.campaignId))
+                .limit(1);
+
+              if (campaign[0]?.gameSystemId) {
+                const gameSystem = gameSystemLoader.getSystem(campaign[0].gameSystemId);
+
+                if (gameSystem) {
+                  const foundTemplate = gameSystem.system.itemTemplates?.find(
+                    t => t.id === existingItem.templateId
+                  );
+
+                  // Type assertion - we know itemTemplates are ItemTemplates
+                  const template = foundTemplate as import('@vtt/shared').ItemTemplate | undefined;
+
+                  if (template?.effects && template.effects.length > 0) {
+                    await itemEffectsService.generateEffects(
+                      updatedItem.id,
+                      existingItem.actorId,
+                      updatedItem.campaignId,
+                      template.effects,
+                      'attuned'
+                    );
+                    fastify.log.info(`Generated effects for attuned item ${updatedItem.id}`);
+                  }
+                }
+              }
+            } else if (existingItem.attunement === 'attuned' && updates.attunement !== 'attuned') {
+              // Item attunement was removed - remove effects
+              await itemEffectsService.removeEffects(updatedItem.id, 'attuned');
+              fastify.log.info(`Removed attunement effects for item ${updatedItem.id}`);
+            }
+          }
+        } catch (error) {
+          fastify.log.error(error, 'Failed to manage item effects');
+          // Continue with the response even if effect management fails
+          // This prevents item updates from being blocked by effect errors
+        }
+
         // Convert to Item interface
         const formattedItem: Item = {
           id: updatedItem.id,
@@ -408,6 +555,17 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
         }
 
         // TODO: Check if user has permission to delete this item
+
+        // Remove all effects from this item before deletion
+        try {
+          const itemEffectsService = createItemEffectsService(fastify.db);
+          await itemEffectsService.removeEffects(itemId, 'equipped');
+          await itemEffectsService.removeEffects(itemId, 'attuned');
+          fastify.log.info(`Removed all effects for deleted item ${itemId}`);
+        } catch (error) {
+          fastify.log.error(error, 'Failed to remove item effects before deletion');
+          // Continue with deletion even if effect cleanup fails
+        }
 
         // Delete item from database
         await fastify.db
