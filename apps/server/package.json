@@ -10,7 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
-    "clean": "rm -rf dist node_modules"
+    "clean": "rm -rf dist node_modules",
+    "seed:dnd5e": "tsx src/scripts/seedDnd5eModule.ts"
   },
   "dependencies": {
     "@fastify/cors": "^10.0.1",

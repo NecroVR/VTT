@@ -472,13 +472,36 @@ class ModuleLoaderService {
   }
 
   /**
-   * Load entity file (may contain single entity or array)
+   * Load entity file (may contain single entity, array, or compendium batch format)
    */
   private async loadEntityFile(filePath: string, defaultType?: string): Promise<EntityFile[]> {
     try {
       const content = await fs.readFile(filePath, 'utf-8');
       const parsed = JSON.parse(content);
 
+      // Handle compendium batch format: {compendiumId, name, entries: [...]}
+      if (parsed.entries && Array.isArray(parsed.entries)) {
+        const compendiumMetadata = {
+          compendiumId: parsed.compendiumId,
+          compendiumName: parsed.name,
+          templateId: parsed.templateId,
+          source: parsed.source,
+        };
+
+        return parsed.entries.map((entity: any) => ({
+          entityId: entity.id || entity.entityId,
+          entityType: entity.type || entity.entityType || defaultType || 'item',
+          name: entity.name,
+          description: entity.description,
+          img: entity.img,
+          templateId: entity.templateId || compendiumMetadata.templateId,
+          tags: entity.tags || [compendiumMetadata.compendiumId],
+          data: entity.data || entity,
+          sourcePath: filePath,
+        }));
+      }
+
+      // Handle array format: [{...}, {...}]
       const entities = Array.isArray(parsed) ? parsed : [parsed];
 
       return entities.map((entity) => ({
