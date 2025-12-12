@@ -25,9 +25,8 @@
   import ActorManager from '$lib/components/campaign/ActorManager.svelte';
   import ActorCreateModal from '$lib/components/actor/ActorCreateModal.svelte';
   import TokenConfig from '$lib/components/TokenConfig.svelte';
-  import AssetBrowser from '$lib/components/assets/AssetBrowser.svelte';
+  import CampaignTab from '$lib/components/campaign/CampaignTab.svelte';
   import AdminPanel from '$lib/components/campaign/AdminPanel.svelte';
-  import ItemTemplateList from '$lib/components/admin/ItemTemplateList.svelte';
   import LightingConfig from '$lib/components/LightingConfig.svelte';
   import OverlaySidebar from '$lib/components/sidebar/OverlaySidebar.svelte';
   import WindowManager from '$lib/components/sidebar/WindowManager.svelte';
@@ -126,6 +125,9 @@
     ? currentCampaign.ownerId === currentUser.id || (currentCampaign.gmUserIds || []).includes(currentUser.id)
     : false;
 
+  // Get actors for campaign tab
+  $: actors = Array.from($actorsStore.actors.values());
+
   // Define sidebar tabs
   $: tabs = [
     {
@@ -150,20 +152,17 @@
       props: { campaignId: campaignId, isGM, currentSceneId: activeScene?.id || null }
     },
     {
-      id: 'assets',
-      label: 'Assets',
-      icon: 'image',
-      component: AssetBrowser,
-      props: { campaignId: campaignId }
+      id: 'campaign',
+      label: 'Campaign',
+      icon: 'folder',
+      component: CampaignTab,
+      props: {
+        campaignId: campaignId,
+        gameSystemId: currentCampaign?.gameSystemId || null,
+        isGM: isGM,
+        actors: actors
+      }
     },
-    // Templates tab - only visible to GMs
-    ...(isGM && currentCampaign?.gameSystemId ? [{
-      id: 'templates',
-      label: 'Templates',
-      icon: 'template',
-      component: ItemTemplateList,
-      props: { campaignId: campaignId, systemId: currentCampaign.gameSystemId }
-    }] : []),
     // Admin tab - only visible to GMs
     ...(isGM ? [{
       id: 'admin',
