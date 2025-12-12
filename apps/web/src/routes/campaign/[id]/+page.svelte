@@ -27,6 +27,7 @@
   import TokenConfig from '$lib/components/TokenConfig.svelte';
   import AssetBrowser from '$lib/components/assets/AssetBrowser.svelte';
   import AdminPanel from '$lib/components/campaign/AdminPanel.svelte';
+  import ItemTemplateList from '$lib/components/admin/ItemTemplateList.svelte';
   import LightingConfig from '$lib/components/LightingConfig.svelte';
   import OverlaySidebar from '$lib/components/sidebar/OverlaySidebar.svelte';
   import WindowManager from '$lib/components/sidebar/WindowManager.svelte';
@@ -155,6 +156,14 @@
       component: AssetBrowser,
       props: { campaignId: campaignId }
     },
+    // Templates tab - only visible to GMs
+    ...(isGM && currentCampaign?.gameSystemId ? [{
+      id: 'templates',
+      label: 'Templates',
+      icon: 'template',
+      component: ItemTemplateList,
+      props: { campaignId: campaignId, systemId: currentCampaign.gameSystemId }
+    }] : []),
     // Admin tab - only visible to GMs
     ...(isGM ? [{
       id: 'admin',
