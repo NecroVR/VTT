@@ -22,7 +22,7 @@
   let addGmError: string | null = null;
 
   // Check if current user is GM or owner
-  $: isCurrentUserGM = campaign.ownerId === currentUserId || campaign.gmUserIds.includes(currentUserId);
+  $: isCurrentUserGM = campaign.ownerId === currentUserId || (campaign.gmUserIds || []).includes(currentUserId);
 
   // Load GM details when modal opens
   $: if (isOpen && campaign) {
@@ -35,7 +35,7 @@
 
     try {
       // Get all user IDs (owner + GM list)
-      const allGmUserIds = [campaign.ownerId, ...campaign.gmUserIds];
+      const allGmUserIds = [campaign.ownerId, ...(campaign.gmUserIds || [])];
       const uniqueGmUserIds = [...new Set(allGmUserIds)];
 
       // Fetch user details for each GM
@@ -113,7 +113,7 @@
         return;
       }
 
-      if (campaign.gmUserIds.includes(targetUser.id)) {
+      if ((campaign.gmUserIds || []).includes(targetUser.id)) {
         addGmError = 'User is already a GM';
         return;
       }

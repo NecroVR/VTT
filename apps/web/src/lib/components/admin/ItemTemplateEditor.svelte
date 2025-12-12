@@ -147,6 +147,12 @@
       equipSlots: ['none'],
       requiresAttunement: false,
     };
+  } else if (hasEquippable && formData.equippable && !formData.equippable.equipSlots) {
+    // Handle case where equippable exists but equipSlots is missing (e.g., from old templates)
+    formData.equippable = {
+      ...formData.equippable,
+      equipSlots: formData.equippable.slots || ['none'], // Fall back to 'slots' field if it exists
+    };
   } else if (!hasEquippable) {
     formData.equippable = null;
   }
@@ -584,18 +590,19 @@
                               <input
                                 type="checkbox"
                                 value={slot.value}
-                                checked={formData.equippable.equipSlots.includes(slot.value)}
+                                checked={(formData.equippable?.equipSlots || []).includes(slot.value)}
                                 on:change={(e) => {
+                                  const currentSlots = formData.equippable?.equipSlots || [];
                                   if (e.currentTarget.checked) {
-                                    formData.equippable.equipSlots = [
-                                      ...formData.equippable.equipSlots,
-                                      slot.value,
-                                    ];
+                                    formData.equippable = {
+                                      ...formData.equippable,
+                                      equipSlots: [...currentSlots, slot.value],
+                                    };
                                   } else {
-                                    formData.equippable.equipSlots =
-                                      formData.equippable.equipSlots.filter(
-                                        (s) => s !== slot.value
-                                      );
+                                    formData.equippable = {
+                                      ...formData.equippable,
+                                      equipSlots: currentSlots.filter((s) => s !== slot.value),
+                                    };
                                   }
                                 }}
                                 disabled={readOnly}

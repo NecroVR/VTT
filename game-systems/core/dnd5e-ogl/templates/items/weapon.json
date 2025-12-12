@@ -218,7 +218,7 @@
   },
 
   "equippable": {
-    "slots": ["mainHand", "offHand", "twoHand"]
+    "equipSlots": ["mainHand", "offHand", "twoHand"]
   },
 
   "sections": [
