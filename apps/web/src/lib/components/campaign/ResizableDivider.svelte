@@ -4,7 +4,7 @@
   // Props
   export let initialWidth = 350;
   export let minWidth = 250;
-  export let maxWidth = 600;
+  export let maxWidth = Infinity; // Allow unlimited width - user can drag as wide as they want
   export let storageKey = 'vtt-sidebar-width';
 
   // Dispatch width change event
