@@ -312,7 +312,10 @@ const modulesRoute: FastifyPluginAsync = async (fastify) => {
    * POST /api/v1/modules/:moduleId/validate - Validate module
    * Runs validation on a module and returns results
    */
-  fastify.post<{ Params: { moduleId: string } }>(
+  fastify.post<{
+    Params: { moduleId: string };
+    Body: { force?: boolean; async?: boolean };
+  }>(
     '/modules/:moduleId/validate',
     { preHandler: authenticate },
     async (request, reply) => {
@@ -321,9 +324,10 @@ const modulesRoute: FastifyPluginAsync = async (fastify) => {
       }
 
       const { moduleId } = request.params;
+      const { force = false, async = false } = request.body || {};
 
       try {
-        // Get module status (includes validation info)
+        // Get module
         const [module] = await fastify.db
           .select()
           .from(modules)
@@ -334,20 +338,138 @@ const modulesRoute: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: 'Module not found' });
         }
 
-        // Get validation status
-        const status = await moduleLoader.getModuleStatus(fastify.db, module.moduleId);
+        // Check if already validated recently
+        if (!force && module.validatedAt) {
+          const hoursSinceValidation =
+            (Date.now() - new Date(module.validatedAt).getTime()) / (1000 * 60 * 60);
+
+          if (hoursSinceValidation < 1) {
+            // Return cached validation status
+            const status = await moduleValidatorService.getValidationSummary(
+              fastify.db,
+              moduleId
+            );
+
+            return reply.status(200).send({
+              moduleId: module.moduleId,
+              status: status.status,
+              errors: status.moduleIssues,
+              validatedAt: module.validatedAt,
+              cached: true,
+            });
+          }
+        }
+
+        // Run async validation if requested
+        if (async) {
+          try {
+            const scheduler = getScheduler();
+            const jobId = await scheduler.scheduleValidation(moduleId, true);
+
+            return reply.status(202).send({
+              message: 'Validation scheduled',
+              jobId,
+            });
+          } catch (error) {
+            // Scheduler not available, fall back to sync validation
+            fastify.log.warn('Validation scheduler not available, running sync validation');
+          }
+        }
+
+        // Run synchronous validation
+        const result = await moduleValidatorService.revalidateModuleFromDb(
+          fastify.db,
+          moduleId
+        );
 
         const response: ModuleValidationResponse = {
           moduleId: module.moduleId,
-          status: status.status,
-          errors: status.errors,
-          validatedAt: module.validatedAt || new Date(),
+          status: result.valid ? 'valid' : 'invalid',
+          errors: result.errors.map((err) => ({
+            errorType: err.type,
+            severity: err.severity,
+            message: err.message,
+            entityId: err.entityId,
+            propertyKey: err.propertyKey,
+            details: err.details,
+          })),
+          validatedAt: result.validatedAt,
         };
 
         return reply.status(200).send(response);
       } catch (error) {
         fastify.log.error(error, 'Failed to validate module');
-        return reply.status(500).send({ error: 'Failed to validate module' });
+        return reply.status(500).send({
+          error: 'Failed to validate module',
+          details: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
+  );
+
+  /**
+   * GET /api/v1/modules/:moduleId/validation-status - Get validation status
+   * Returns detailed validation status and summary for a module
+   */
+  fastify.get<{ Params: { moduleId: string } }>(
+    '/modules/:moduleId/validation-status',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      if (!request.user) {
+        return reply.status(401).send({ error: 'Not authenticated' });
+      }
+
+      const { moduleId } = request.params;
+
+      try {
+        const [module] = await fastify.db
+          .select()
+          .from(modules)
+          .where(eq(modules.id, moduleId))
+          .limit(1);
+
+        if (!module) {
+          return reply.status(404).send({ error: 'Module not found' });
+        }
+
+        const status = await moduleValidatorService.getValidationSummary(
+          fastify.db,
+          moduleId
+        );
+
+        return reply.status(200).send(status);
+      } catch (error) {
+        fastify.log.error(error, 'Failed to get validation status');
+        return reply.status(500).send({ error: 'Failed to get validation status' });
+      }
+    }
+  );
+
+  /**
+   * GET /api/v1/modules/:moduleId/compatibility/:campaignId - Check campaign compatibility
+   * Checks if a module is compatible with a specific campaign
+   */
+  fastify.get<{ Params: { moduleId: string; campaignId: string } }>(
+    '/modules/:moduleId/compatibility/:campaignId',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      if (!request.user) {
+        return reply.status(401).send({ error: 'Not authenticated' });
+      }
+
+      const { moduleId, campaignId } = request.params;
+
+      try {
+        const compatible = await moduleValidatorService.checkCampaignCompatibility(
+          fastify.db,
+          moduleId,
+          campaignId
+        );
+
+        return reply.status(200).send({ compatible });
+      } catch (error) {
+        fastify.log.error(error, 'Failed to check compatibility');
+        return reply.status(500).send({ error: 'Failed to check compatibility' });
       }
     }
   );
@@ -1073,29 +1195,19 @@ const modulesRoute: FastifyPluginAsync = async (fastify) => {
       const { note } = request.body;
 
       try {
-        // Verify error exists
-        const [error] = await fastify.db
+        await moduleValidatorService.resolveError(
+          fastify.db,
+          errorId,
+          request.user.id,
+          note
+        );
+
+        // Fetch updated error
+        const [updatedError] = await fastify.db
           .select()
           .from(validationErrors)
           .where(eq(validationErrors.id, errorId))
           .limit(1);
-
-        if (!error) {
-          return reply.status(404).send({ error: 'Validation error not found' });
-        }
-
-        // Update error
-        const [updatedError] = await fastify.db
-          .update(validationErrors)
-          .set({
-            isResolved: true,
-            resolvedAt: new Date(),
-            resolvedBy: request.user.id,
-            resolutionNote: note || null,
-            updatedAt: new Date(),
-          })
-          .where(eq(validationErrors.id, errorId))
-          .returning();
 
         return reply.status(200).send({
           error: updatedError as ValidationError,
@@ -1103,6 +1215,129 @@ const modulesRoute: FastifyPluginAsync = async (fastify) => {
       } catch (error) {
         fastify.log.error(error, 'Failed to resolve validation error');
         return reply.status(500).send({ error: 'Failed to resolve validation error' });
+      }
+    }
+  );
+
+  // =====================================================
+  // VALIDATION JOB ROUTES
+  // =====================================================
+
+  /**
+   * GET /api/v1/validation/jobs/:jobId - Get validation job status
+   * Returns the current status of a validation job
+   */
+  fastify.get<{ Params: { jobId: string } }>(
+    '/validation/jobs/:jobId',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      if (!request.user) {
+        return reply.status(401).send({ error: 'Not authenticated' });
+      }
+
+      const { jobId } = request.params;
+
+      try {
+        const scheduler = getScheduler();
+        const job = scheduler.getJobStatus(jobId);
+
+        if (!job) {
+          return reply.status(404).send({ error: 'Job not found' });
+        }
+
+        return reply.status(200).send({ job });
+      } catch (error) {
+        // Scheduler not initialized
+        return reply.status(503).send({ error: 'Validation scheduler not available' });
+      }
+    }
+  );
+
+  /**
+   * GET /api/v1/validation/jobs - Get all active validation jobs
+   * Returns all currently running validation jobs
+   */
+  fastify.get(
+    '/validation/jobs',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      if (!request.user) {
+        return reply.status(401).send({ error: 'Not authenticated' });
+      }
+
+      try {
+        const scheduler = getScheduler();
+        const jobs = scheduler.getActiveJobs();
+
+        return reply.status(200).send({ jobs });
+      } catch (error) {
+        // Scheduler not initialized
+        return reply.status(503).send({ error: 'Validation scheduler not available' });
+      }
+    }
+  );
+
+  /**
+   * POST /api/v1/validation/jobs/:jobId/cancel - Cancel a validation job
+   * Cancels a pending or running validation job
+   */
+  fastify.post<{ Params: { jobId: string } }>(
+    '/validation/jobs/:jobId/cancel',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      if (!request.user) {
+        return reply.status(401).send({ error: 'Not authenticated' });
+      }
+
+      const { jobId } = request.params;
+
+      try {
+        const scheduler = getScheduler();
+        const cancelled = scheduler.cancelValidation(jobId);
+
+        if (!cancelled) {
+          return reply.status(400).send({ error: 'Job cannot be cancelled' });
+        }
+
+        return reply.status(200).send({ message: 'Job cancelled successfully' });
+      } catch (error) {
+        // Scheduler not initialized
+        return reply.status(503).send({ error: 'Validation scheduler not available' });
+      }
+    }
+  );
+
+  /**
+   * POST /api/v1/validation/batch - Batch validate multiple modules
+   * Schedules validation for multiple modules
+   */
+  fastify.post<{
+    Body: { moduleIds: string[] };
+  }>(
+    '/validation/batch',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      if (!request.user) {
+        return reply.status(401).send({ error: 'Not authenticated' });
+      }
+
+      const { moduleIds } = request.body;
+
+      if (!moduleIds || !Array.isArray(moduleIds) || moduleIds.length === 0) {
+        return reply.status(400).send({ error: 'Module IDs array is required' });
+      }
+
+      try {
+        const scheduler = getScheduler();
+        const jobIds = await scheduler.batchValidate(moduleIds);
+
+        return reply.status(202).send({
+          message: 'Batch validation scheduled',
+          jobIds,
+        });
+      } catch (error) {
+        fastify.log.error(error, 'Failed to schedule batch validation');
+        return reply.status(500).send({ error: 'Failed to schedule batch validation' });
       }
     }
   );

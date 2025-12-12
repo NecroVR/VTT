@@ -7,13 +7,16 @@
   import CompendiumEntrySheet from './CompendiumEntrySheet.svelte';
   import CompendiumConfig from './CompendiumConfig.svelte';
   import CompendiumImport from './CompendiumImport.svelte';
+  import ModuleBrowser from '../modules/ModuleBrowser.svelte';
 
   export let campaignId: string;
+  export let gameSystemId: string = '';
   export let isGM: boolean = false;
   export let isOpen: boolean = false;
   export let fullPage: boolean = false;
 
   // State
+  let activeTab: 'compendiums' | 'modules' = 'compendiums';
   let searchQuery = '';
   let viewMode: 'grid' | 'list' = 'grid';
   let filterEntityType: CompendiumEntityType | 'all' = 'all';
@@ -170,6 +173,33 @@
         </header>
       {/if}
 
+      <!-- Tab Switcher -->
+      <div class="tab-switcher">
+        <button
+          class="tab-button"
+          class:active={activeTab === 'compendiums'}
+          on:click={() => (activeTab = 'compendiums')}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+          </svg>
+          Compendiums
+        </button>
+        <button
+          class="tab-button"
+          class:active={activeTab === 'modules'}
+          on:click={() => (activeTab = 'modules')}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+          </svg>
+          Modules
+        </button>
+      </div>
+
+      {#if activeTab === 'compendiums'}
       <div class="browser-toolbar">
         <div class="toolbar-left">
           <input
@@ -308,6 +338,14 @@
           {/if}
         </div>
       </div>
+      {:else}
+      <!-- Modules Tab -->
+      <ModuleBrowser
+        {campaignId}
+        {gameSystemId}
+        {isGM}
+      />
+      {/if}
     </div>
   </div>
 {/if}
@@ -414,6 +452,42 @@
   .close-button:hover {
     background-color: rgba(255, 255, 255, 0.1);
     color: var(--color-text-primary, #ffffff);
+  }
+
+  .tab-switcher {
+    display: flex;
+    gap: 0.5rem;
+    padding: 1rem 1rem 0 1rem;
+    border-bottom: 1px solid var(--color-border, #333);
+  }
+
+  .tab-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--color-text-secondary, #aaa);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .tab-button svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .tab-button:hover {
+    color: var(--color-text-primary, #ffffff);
+  }
+
+  .tab-button.active {
+    color: #4a90e2;
+    border-bottom-color: #4a90e2;
   }
 
   .browser-toolbar {
