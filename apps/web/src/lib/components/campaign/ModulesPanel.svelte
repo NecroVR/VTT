@@ -25,7 +25,7 @@
   let selectedModuleId: string | null = null;
 
   // Grouping state
-  let groupBy: 'none' | 'level' | 'itemType' = 'none';
+  let groupBy: 'none' | 'level' | 'itemType' | 'cr' = 'none';
   let groups: EntityGroup[] = [];
   let entityGroupKeys: Record<string, string | number> = {};
   let collapsedGroups: Set<string> = new Set();
@@ -187,6 +187,12 @@
         { value: 'itemType', label: 'By Category' }
       ];
     }
+    if (entityType === 'monster') {
+      return [
+        { value: 'none', label: 'No Grouping' },
+        { value: 'cr', label: 'By Challenge Rating' }
+      ];
+    }
     return [];
   }
 
@@ -251,7 +257,7 @@
       </div>
     {/if}
 
-    {#if selectedModuleId && (selectedEntityType === 'spell' || selectedEntityType === 'item')}
+    {#if selectedModuleId && (selectedEntityType === 'spell' || selectedEntityType === 'item' || selectedEntityType === 'monster')}
       <div class="group-selector">
         <label for="group-select">Group:</label>
         <select

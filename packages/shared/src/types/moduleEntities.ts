@@ -292,8 +292,9 @@ export interface EntitySearchParams {
    * Group results by a property key
    * 'level' for spells (groups by 0-9)
    * 'itemType' for items (groups by category)
+   * 'cr' for monsters (groups by challenge rating)
    */
-  groupBy?: 'level' | 'itemType' | 'none';
+  groupBy?: 'level' | 'itemType' | 'cr' | 'none';
 }
 
 // ============================================================================

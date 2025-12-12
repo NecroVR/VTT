@@ -53,6 +53,17 @@ function capitalize(str: string): string {
 }
 
 /**
+ * Helper function to generate challenge rating labels
+ */
+function getCRLabel(cr: string): string {
+  if (cr === '0') return 'CR 0';
+  if (cr === '0.125' || cr === '1/8') return 'CR 1/8';
+  if (cr === '0.25' || cr === '1/4') return 'CR 1/4';
+  if (cr === '0.5' || cr === '1/2') return 'CR 1/2';
+  return `CR ${cr}`;
+}
+
+/**
  * Module API routes
  * Handles module management, entity browsing, and campaign-module relationships
  */
@@ -722,15 +733,32 @@ const modulesRoute: FastifyPluginAsync = async (fastify) => {
         // Handle grouping if requested
         if (groupBy && groupBy !== 'none') {
           // Determine property key based on groupBy parameter
-          const propertyKey = groupBy === 'level' ? 'level' : 'itemType';
+          let propertyKey: string;
+          let groupKeyExpression: any;
+
+          if (groupBy === 'level') {
+            propertyKey = 'level';
+            // For spell level: try value_integer first, then cast value_string to integer
+            groupKeyExpression = sql<number>`COALESCE(
+              ${entityProperties.valueInteger},
+              CAST(${entityProperties.valueString} AS INTEGER),
+              -1
+            )`.as('group_key');
+          } else if (groupBy === 'cr') {
+            propertyKey = 'challenge_rating';
+            // For CR: use value_string (CRs are stored as strings like "0", "1/8", "1/4", etc.)
+            groupKeyExpression = sql<string>`COALESCE(${entityProperties.valueString}, 'unknown')`.as('group_key');
+          } else {
+            // itemType grouping
+            propertyKey = 'itemType';
+            groupKeyExpression = sql<string>`COALESCE(${entityProperties.valueString}, 'other')`.as('group_key');
+          }
 
           // Get entities with group keys
           const entitiesWithGroup = await fastify.db
             .select({
               ...getTableColumns(moduleEntities),
-              groupKey: groupBy === 'level'
-                ? sql<number>`COALESCE(${entityProperties.valueInteger}, -1)`.as('group_key')
-                : sql<string>`COALESCE(${entityProperties.valueString}, 'other')`.as('group_key'),
+              groupKey: groupKeyExpression,
             })
             .from(moduleEntities)
             .leftJoin(
@@ -745,12 +773,24 @@ const modulesRoute: FastifyPluginAsync = async (fastify) => {
             .limit(pageSizeNum)
             .offset(offset);
 
-          // Get group counts
+          // Get group counts with same expression
+          let groupCountExpression: any;
+
+          if (groupBy === 'level') {
+            groupCountExpression = sql<number>`COALESCE(
+              ${entityProperties.valueInteger},
+              CAST(${entityProperties.valueString} AS INTEGER),
+              -1
+            )`;
+          } else if (groupBy === 'cr') {
+            groupCountExpression = sql<string>`COALESCE(${entityProperties.valueString}, 'unknown')`;
+          } else {
+            groupCountExpression = sql<string>`COALESCE(${entityProperties.valueString}, 'other')`;
+          }
+
           const groupCounts = await fastify.db
             .select({
-              groupKey: groupBy === 'level'
-                ? sql<number>`COALESCE(${entityProperties.valueInteger}, -1)`
-                : sql<string>`COALESCE(${entityProperties.valueString}, 'other')`,
+              groupKey: groupCountExpression,
               count: sql<number>`count(*)::int`,
             })
             .from(moduleEntities)
@@ -773,6 +813,9 @@ const modulesRoute: FastifyPluginAsync = async (fastify) => {
             if (groupBy === 'level') {
               const levelNum = typeof key === 'number' ? key : -1;
               label = levelNum === -1 ? 'Other' : getSpellLevelLabel(levelNum);
+            } else if (groupBy === 'cr') {
+              const crStr = typeof key === 'string' ? key : 'unknown';
+              label = crStr === 'unknown' ? 'Unknown CR' : getCRLabel(crStr);
             } else {
               const typeStr = typeof key === 'string' ? key : 'other';
               label = typeStr === 'other' ? 'Other' : capitalize(typeStr);
