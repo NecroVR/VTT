@@ -1,0 +1,9 @@
+{
+  "id": "daggerheart",
+  "name": "Daggerheart",
+  "version": "1.0.0",
+  "authors": ["VTT Core"],
+  "description": "Daggerheart game system",
+  "license": "MIT",
+  "minPlatformVersion": "1.0.0"
+}

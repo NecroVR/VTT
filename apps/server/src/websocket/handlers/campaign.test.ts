@@ -95,7 +95,7 @@ describe('Campaign WebSocket Handler', () => {
       .values({
         ownerId: testUserId,
         name: 'Test Campaign',
-        settings: {},
+        gameSystemId: 'dnd5e-ogl', settings: {},
       })
       .returning();
 

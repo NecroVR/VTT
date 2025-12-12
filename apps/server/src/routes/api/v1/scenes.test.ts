@@ -59,9 +59,7 @@ describe('Scenes Routes', () => {
       headers: {
         authorization: `Bearer ${sessionId}`,
       },
-      payload: {
-        name: 'Test Campaign',
-      },
+      payload: { name: 'Test Campaign', gameSystemId: 'dnd5e-ogl' },
     });
 
     const campaignBody = JSON.parse(campaignResponse.body);

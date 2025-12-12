@@ -1,0 +1,9 @@
+{
+  "id": "dnd5e-ogl",
+  "name": "Dungeons & Dragons 5th Edition (OGL)",
+  "version": "1.0.0",
+  "publisher": "VTT Core",
+  "description": "D&D 5e implementation using Open Game License content",
+  "license": "OGL 1.0a",
+  "minPlatformVersion": "1.0.0"
+}

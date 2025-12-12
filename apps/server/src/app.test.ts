@@ -23,6 +23,14 @@ vi.mock("./plugins/websocket.js", () => ({
   default: vi.fn(),
 }));
 
+vi.mock("./plugins/multipart.js", () => ({
+  default: vi.fn(),
+}));
+
+vi.mock("./plugins/static.js", () => ({
+  default: vi.fn(),
+}));
+
 vi.mock("./routes/index.js", () => ({
   default: vi.fn(),
 }));
@@ -37,6 +45,8 @@ describe("Application Builder", () => {
   let mockFastifyInstance: any;
   let corsPluginMock: any;
   let databasePluginMock: any;
+  let multipartPluginMock: any;
+  let staticPluginMock: any;
   let redisPluginMock: any;
   let websocketPluginMock: any;
   let routesMock: any;
@@ -70,6 +80,12 @@ describe("Application Builder", () => {
 
     const dbModule = await import("./plugins/database.js");
     databasePluginMock = dbModule.default;
+
+    const multipartModule = await import("./plugins/multipart.js");
+    multipartPluginMock = multipartModule.default;
+
+    const staticModule = await import("./plugins/static.js");
+    staticPluginMock = staticModule.default;
 
     const redisModule = await import("./plugins/redis.js");
     redisPluginMock = redisModule.default;
@@ -204,6 +220,22 @@ describe("Application Builder", () => {
       );
     });
 
+    it("should register multipart plugin", async () => {
+      await buildApp(testConfig);
+
+      expect(mockFastifyInstance.register).toHaveBeenCalledWith(
+        multipartPluginMock,
+      );
+    });
+
+    it("should register static plugin", async () => {
+      await buildApp(testConfig);
+
+      expect(mockFastifyInstance.register).toHaveBeenCalledWith(
+        staticPluginMock,
+      );
+    });
+
     it("should register WebSocket plugin", async () => {
       await buildApp(testConfig);
 
@@ -241,16 +273,18 @@ describe("Application Builder", () => {
 
       expect(registerCalls[0][0]).toBe(corsPluginMock);
       expect(registerCalls[1][0]).toBe(databasePluginMock);
-      expect(registerCalls[2][0]).toBe(websocketPluginMock);
-      expect(registerCalls[3][0]).toBe(redisPluginMock);
-      expect(registerCalls[4][0]).toBe(routesMock);
-      expect(registerCalls[5][0]).toBe(websocketHandlersMock);
+      expect(registerCalls[2][0]).toBe(multipartPluginMock);
+      expect(registerCalls[3][0]).toBe(staticPluginMock);
+      expect(registerCalls[4][0]).toBe(websocketPluginMock);
+      expect(registerCalls[5][0]).toBe(redisPluginMock);
+      expect(registerCalls[6][0]).toBe(routesMock);
+      expect(registerCalls[7][0]).toBe(websocketHandlersMock);
     });
 
-    it("should register exactly 6 items", async () => {
+    it("should register exactly 8 items", async () => {
       await buildApp(testConfig);
 
-      expect(mockFastifyInstance.register).toHaveBeenCalledTimes(6);
+      expect(mockFastifyInstance.register).toHaveBeenCalledTimes(8);
     });
 
     it("should log success message", async () => {

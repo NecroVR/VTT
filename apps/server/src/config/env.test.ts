@@ -22,17 +22,18 @@ describe("Environment Configuration", () => {
       process.env.HOST = "127.0.0.1";
       process.env.NODE_ENV = "production";
       process.env.CORS_ORIGIN = "https://example.com";
+      process.env.HTTPS_ENABLED = "false";
 
       const config = loadEnvConfig();
 
-      expect(config).toEqual({
-        DATABASE_URL: "postgresql://user:pass@localhost:5432/testdb",
-        REDIS_URL: "redis://localhost:6379",
-        PORT: 4000,
-        HOST: "127.0.0.1",
-        NODE_ENV: "production",
-        CORS_ORIGIN: "https://example.com",
-      });
+      expect(config.DATABASE_URL).toBe("postgresql://user:pass@localhost:5432/testdb");
+      expect(config.REDIS_URL).toBe("redis://localhost:6379");
+      expect(config.PORT).toBe(4000);
+      expect(config.HOST).toBe("127.0.0.1");
+      expect(config.NODE_ENV).toBe("production");
+      expect(config.CORS_ORIGIN).toBe("https://example.com");
+      expect(config.HTTPS_ENABLED).toBe(false);
+      // HTTPS_CERT_PATH and HTTPS_KEY_PATH may be set if certs exist, even when HTTPS is disabled
     });
 
     it("should use default DATABASE_URL if not provided", () => {
@@ -76,7 +77,7 @@ describe("Environment Configuration", () => {
 
       const config = loadEnvConfig();
 
-      expect(config.CORS_ORIGIN).toBe("http://localhost:5173");
+      expect(config.CORS_ORIGIN).toBe("https://localhost:5173");
     });
 
     it("should parse PORT as integer", () => {

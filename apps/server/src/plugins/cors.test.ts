@@ -60,19 +60,21 @@ describe('CORS Plugin', () => {
   it('should register @fastify/cors with correct configuration', async () => {
     await corsPlugin(mockFastify);
 
-    expect(mockFastify.register).toHaveBeenCalledWith(corsMock, {
-      origin: 'http://localhost:5173',
-      credentials: true,
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
-    });
+    expect(mockFastify.register).toHaveBeenCalledWith(corsMock,
+      expect.objectContaining({
+        origin: expect.any(Function),
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+      })
+    );
   });
 
   it('should log CORS enablement with origin', async () => {
     await corsPlugin(mockFastify);
 
     expect(mockFastify.log.info).toHaveBeenCalledWith(
-      'CORS enabled for origin: http://localhost:5173'
+      'CORS enabled for localhost, private networks, and http://localhost:5173'
     );
   });
 
@@ -83,8 +85,12 @@ describe('CORS Plugin', () => {
 
     expect(mockFastify.register).toHaveBeenCalledWith(corsMock,
       expect.objectContaining({
-        origin: 'https://example.com',
+        origin: expect.any(Function),
       })
+    );
+
+    expect(mockFastify.log.info).toHaveBeenCalledWith(
+      'CORS enabled for localhost, private networks, and https://example.com'
     );
   });
 

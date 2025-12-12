@@ -1,0 +1,222 @@
+{
+  "system": {
+    "name": "Dungeons & Dragons 5th Edition (OGL)",
+    "shortName": "D&D 5e"
+  },
+
+  "abilities": {
+    "strength": "Strength",
+    "dexterity": "Dexterity",
+    "constitution": "Constitution",
+    "intelligence": "Intelligence",
+    "wisdom": "Wisdom",
+    "charisma": "Charisma",
+    "str": "STR",
+    "dex": "DEX",
+    "con": "CON",
+    "int": "INT",
+    "wis": "WIS",
+    "cha": "CHA"
+  },
+
+  "skills": {
+    "acrobatics": "Acrobatics",
+    "animal_handling": "Animal Handling",
+    "arcana": "Arcana",
+    "athletics": "Athletics",
+    "deception": "Deception",
+    "history": "History",
+    "insight": "Insight",
+    "intimidation": "Intimidation",
+    "investigation": "Investigation",
+    "medicine": "Medicine",
+    "nature": "Nature",
+    "perception": "Perception",
+    "performance": "Performance",
+    "persuasion": "Persuasion",
+    "religion": "Religion",
+    "sleight_of_hand": "Sleight of Hand",
+    "stealth": "Stealth",
+    "survival": "Survival"
+  },
+
+  "actions": {
+    "action": "Action",
+    "bonus_action": "Bonus Action",
+    "reaction": "Reaction",
+    "movement": "Movement",
+    "free": "Free Action"
+  },
+
+  "conditions": {
+    "blinded": "Blinded",
+    "charmed": "Charmed",
+    "deafened": "Deafened",
+    "frightened": "Frightened",
+    "grappled": "Grappled",
+    "incapacitated": "Incapacitated",
+    "invisible": "Invisible",
+    "paralyzed": "Paralyzed",
+    "petrified": "Petrified",
+    "poisoned": "Poisoned",
+    "prone": "Prone",
+    "restrained": "Restrained",
+    "stunned": "Stunned",
+    "unconscious": "Unconscious",
+    "exhaustion": "Exhaustion"
+  },
+
+  "combat": {
+    "armor_class": "Armor Class",
+    "hit_points": "Hit Points",
+    "current_hp": "Current HP",
+    "max_hp": "Maximum HP",
+    "temp_hp": "Temporary HP",
+    "initiative": "Initiative",
+    "speed": "Speed",
+    "proficiency_bonus": "Proficiency Bonus",
+    "hit_dice": "Hit Dice",
+    "death_saves": "Death Saves",
+    "successes": "Successes",
+    "failures": "Failures"
+  },
+
+  "character": {
+    "name": "Character Name",
+    "class": "Class",
+    "level": "Level",
+    "race": "Race",
+    "background": "Background",
+    "alignment": "Alignment",
+    "experience": "Experience Points",
+    "personality_traits": "Personality Traits",
+    "ideals": "Ideals",
+    "bonds": "Bonds",
+    "flaws": "Flaws",
+    "features": "Features & Traits",
+    "equipment": "Equipment",
+    "treasure": "Treasure",
+    "backstory": "Backstory",
+    "notes": "Notes"
+  },
+
+  "spellcasting": {
+    "spell_slots": "Spell Slots",
+    "spell_level": "Level",
+    "spell_save_dc": "Spell Save DC",
+    "spell_attack": "Spell Attack Bonus",
+    "spellcasting_ability": "Spellcasting Ability",
+    "cantrips": "Cantrips",
+    "spells_known": "Spells Known",
+    "spells_prepared": "Spells Prepared"
+  },
+
+  "rolls": {
+    "ability_check": "Ability Check",
+    "saving_throw": "Saving Throw",
+    "skill_check": "Skill Check",
+    "attack_roll": "Attack Roll",
+    "damage_roll": "Damage Roll",
+    "advantage": "Advantage",
+    "disadvantage": "Disadvantage",
+    "normal": "Normal Roll",
+    "critical_hit": "Critical Hit!",
+    "critical_miss": "Critical Miss!"
+  },
+
+  "rest": {
+    "short_rest": "Short Rest",
+    "long_rest": "Long Rest",
+    "spend_hit_dice": "Spend Hit Dice",
+    "recover_hp": "Recover Hit Points",
+    "regain_abilities": "Regain Abilities"
+  },
+
+  "creature": {
+    "size": {
+      "tiny": "Tiny",
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large",
+      "huge": "Huge",
+      "gargantuan": "Gargantuan"
+    },
+    "type": "Type",
+    "challenge_rating": "Challenge Rating",
+    "experience_points": "XP",
+    "traits": "Traits",
+    "actions": "Actions",
+    "legendary_actions": "Legendary Actions",
+    "lair_actions": "Lair Actions",
+    "regional_effects": "Regional Effects"
+  },
+
+  "alignments": {
+    "lg": "Lawful Good",
+    "ng": "Neutral Good",
+    "cg": "Chaotic Good",
+    "ln": "Lawful Neutral",
+    "n": "True Neutral",
+    "cn": "Chaotic Neutral",
+    "le": "Lawful Evil",
+    "ne": "Neutral Evil",
+    "ce": "Chaotic Evil",
+    "unaligned": "Unaligned"
+  },
+
+  "damage_types": {
+    "acid": "Acid",
+    "bludgeoning": "Bludgeoning",
+    "cold": "Cold",
+    "fire": "Fire",
+    "force": "Force",
+    "lightning": "Lightning",
+    "necrotic": "Necrotic",
+    "piercing": "Piercing",
+    "poison": "Poison",
+    "psychic": "Psychic",
+    "radiant": "Radiant",
+    "slashing": "Slashing",
+    "thunder": "Thunder"
+  },
+
+  "senses": {
+    "blindsight": "Blindsight",
+    "darkvision": "Darkvision",
+    "tremorsense": "Tremorsense",
+    "truesight": "Truesight",
+    "passive_perception": "Passive Perception"
+  },
+
+  "ui": {
+    "create_character": "Create Character",
+    "create_npc": "Create NPC",
+    "create_monster": "Create Monster",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "roll": "Roll",
+    "add": "Add",
+    "remove": "Remove",
+    "reset": "Reset",
+    "close": "Close"
+  },
+
+  "help": {
+    "advantage_help": "Roll twice and use the higher result",
+    "disadvantage_help": "Roll twice and use the lower result",
+    "proficiency_help": "Add your proficiency bonus if you're proficient",
+    "expertise_help": "Double your proficiency bonus for this skill",
+    "spell_slots_help": "Mark off spell slots as you cast spells. They recover on a long rest.",
+    "death_saves_help": "When you drop to 0 HP, roll d20. 10+ is a success, below 10 is a failure. 3 successes = stable, 3 failures = death.",
+    "hit_dice_help": "Spend hit dice during short rests to recover HP. You regain half your hit dice on a long rest.",
+    "temp_hp_help": "Temporary hit points absorb damage but don't stack. Take the higher value if you gain more."
+  },
+
+  "ogl": {
+    "notice": "This content is released under the Open Game License v1.0a",
+    "product_identity": "Product Identity: None",
+    "open_content": "Open Game Content: All game mechanics, character creation rules, and system elements"
+  }
+}

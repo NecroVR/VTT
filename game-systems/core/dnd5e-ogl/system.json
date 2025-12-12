@@ -1,0 +1,473 @@
+{
+  "id": "dnd5e-ogl",
+  "name": "Dungeons & Dragons 5th Edition (OGL)",
+  "version": "1.0.0",
+  "publisher": "VTT Core",
+  "description": "D&D 5e implementation using Open Game License content",
+
+  "dice": {
+    "standardDice": ["d4", "d6", "d8", "d10", "d12", "d20", "d100"],
+    "fudgeDice": false,
+    "defaultRoll": "d20",
+    "supportsAdvantage": true,
+    "supportsExploding": false,
+    "supportsPushing": false
+  },
+
+  "attributes": [
+    {
+      "id": "strength",
+      "name": "Strength",
+      "abbreviation": "STR",
+      "valueType": "number",
+      "minValue": 1,
+      "maxValue": 30,
+      "defaultValue": 10,
+      "modifierFormula": "floor((value - 10) / 2)",
+      "category": "physical"
+    },
+    {
+      "id": "dexterity",
+      "name": "Dexterity",
+      "abbreviation": "DEX",
+      "valueType": "number",
+      "minValue": 1,
+      "maxValue": 30,
+      "defaultValue": 10,
+      "modifierFormula": "floor((value - 10) / 2)",
+      "category": "physical"
+    },
+    {
+      "id": "constitution",
+      "name": "Constitution",
+      "abbreviation": "CON",
+      "valueType": "number",
+      "minValue": 1,
+      "maxValue": 30,
+      "defaultValue": 10,
+      "modifierFormula": "floor((value - 10) / 2)",
+      "category": "physical"
+    },
+    {
+      "id": "intelligence",
+      "name": "Intelligence",
+      "abbreviation": "INT",
+      "valueType": "number",
+      "minValue": 1,
+      "maxValue": 30,
+      "defaultValue": 10,
+      "modifierFormula": "floor((value - 10) / 2)",
+      "category": "mental"
+    },
+    {
+      "id": "wisdom",
+      "name": "Wisdom",
+      "abbreviation": "WIS",
+      "valueType": "number",
+      "minValue": 1,
+      "maxValue": 30,
+      "defaultValue": 10,
+      "modifierFormula": "floor((value - 10) / 2)",
+      "category": "mental"
+    },
+    {
+      "id": "charisma",
+      "name": "Charisma",
+      "abbreviation": "CHA",
+      "valueType": "number",
+      "minValue": 1,
+      "maxValue": 30,
+      "defaultValue": 10,
+      "modifierFormula": "floor((value - 10) / 2)",
+      "category": "mental"
+    }
+  ],
+
+  "skills": [
+    {
+      "id": "acrobatics",
+      "name": "Acrobatics",
+      "linkedAttribute": "dexterity",
+      "proficiencyType": "boolean",
+      "rollFormula": "d20 + {dexterity_modifier} + {proficiency_bonus:proficient}",
+      "category": "physical"
+    },
+    {
+      "id": "animal_handling",
+      "name": "Animal Handling",
+      "linkedAttribute": "wisdom",
+      "proficiencyType": "boolean",
+      "rollFormula": "d20 + {wisdom_modifier} + {proficiency_bonus:proficient}",
+      "category": "social"
+    },
+    {
+      "id": "arcana",
+      "name": "Arcana",
+      "linkedAttribute": "intelligence",
+      "proficiencyType": "boolean",
+      "rollFormula": "d20 + {intelligence_modifier} + {proficiency_bonus:proficient}",
+      "category": "knowledge"
+    },
+    {
+      "id": "athletics",
+      "name": "Athletics",
+      "linkedAttribute": "strength",
+      "proficiencyType": "boolean",
+      "rollFormula": "d20 + {strength_modifier} + {proficiency_bonus:proficient}",
+      "category": "physical"
+    },
+    {
+      "id": "deception",
+      "name": "Deception",
+      "linkedAttribute": "charisma",
+      "proficiencyType": "boolean",
+      "rollFormula": "d20 + {charisma_modifier} + {proficiency_bonus:proficient}",
+      "category": "social"
+    },
+    {
+      "id": "history",
+      "name": "History",
+      "linkedAttribute": "intelligence",
+      "proficiencyType": "boolean",
+      "rollFormula": "d20 + {intelligence_modifier} + {proficiency_bonus:proficient}",
+      "category": "knowledge"
+    },
+    {
+      "id": "insight",
+      "name": "Insight",
+      "linkedAttribute": "wisdom",
+      "proficiencyType": "boolean",
+      "rollFormula": "d20 + {wisdom_modifier} + {proficiency_bonus:proficient}",
+      "category": "social"
+    },
+    {
+      "id": "intimidation",
+      "name": "Intimidation",
+      "linkedAttribute": "charisma",
+      "proficiencyType": "boolean",
+      "rollFormula": "d20 + {charisma_modifier} + {proficiency_bonus:proficient}",
+      "category": "social"
+    },
+    {
+      "id": "investigation",
+      "name": "Investigation",
+      "linkedAttribute": "intelligence",
+      "proficiencyType": "boolean",
+      "rollFormula": "d20 + {intelligence_modifier} + {proficiency_bonus:proficient}",
+      "category": "exploration"
+    },
+    {
+      "id": "medicine",
+      "name": "Medicine",
+      "linkedAttribute": "wisdom",
+      "proficiencyType": "boolean",
+      "rollFormula": "d20 + {wisdom_modifier} + {proficiency_bonus:proficient}",
+      "category": "knowledge"
+    },
+    {
+      "id": "nature",
+      "name": "Nature",
+      "linkedAttribute": "intelligence",
+      "proficiencyType": "boolean",
+      "rollFormula": "d20 + {intelligence_modifier} + {proficiency_bonus:proficient}",
+      "category": "knowledge"
+    },
+    {
+      "id": "perception",
+      "name": "Perception",
+      "linkedAttribute": "wisdom",
+      "proficiencyType": "boolean",
+      "rollFormula": "d20 + {wisdom_modifier} + {proficiency_bonus:proficient}",
+      "category": "exploration"
+    },
+    {
+      "id": "performance",
+      "name": "Performance",
+      "linkedAttribute": "charisma",
+      "proficiencyType": "boolean",
+      "rollFormula": "d20 + {charisma_modifier} + {proficiency_bonus:proficient}",
+      "category": "social"
+    },
+    {
+      "id": "persuasion",
+      "name": "Persuasion",
+      "linkedAttribute": "charisma",
+      "proficiencyType": "boolean",
+      "rollFormula": "d20 + {charisma_modifier} + {proficiency_bonus:proficient}",
+      "category": "social"
+    },
+    {
+      "id": "religion",
+      "name": "Religion",
+      "linkedAttribute": "intelligence",
+      "proficiencyType": "boolean",
+      "rollFormula": "d20 + {intelligence_modifier} + {proficiency_bonus:proficient}",
+      "category": "knowledge"
+    },
+    {
+      "id": "sleight_of_hand",
+      "name": "Sleight of Hand",
+      "linkedAttribute": "dexterity",
+      "proficiencyType": "boolean",
+      "rollFormula": "d20 + {dexterity_modifier} + {proficiency_bonus:proficient}",
+      "category": "physical"
+    },
+    {
+      "id": "stealth",
+      "name": "Stealth",
+      "linkedAttribute": "dexterity",
+      "proficiencyType": "boolean",
+      "rollFormula": "d20 + {dexterity_modifier} + {proficiency_bonus:proficient}",
+      "category": "exploration"
+    },
+    {
+      "id": "survival",
+      "name": "Survival",
+      "linkedAttribute": "wisdom",
+      "proficiencyType": "boolean",
+      "rollFormula": "d20 + {wisdom_modifier} + {proficiency_bonus:proficient}",
+      "category": "exploration"
+    }
+  ],
+
+  "resources": [
+    {
+      "id": "hp",
+      "name": "Hit Points",
+      "category": "health",
+      "valueType": "current_max",
+      "maxFormula": "max_hp",
+      "recoveryTrigger": "long_rest",
+      "displayStyle": "bar"
+    },
+    {
+      "id": "temp_hp",
+      "name": "Temporary Hit Points",
+      "category": "health",
+      "valueType": "current_max",
+      "recoveryTrigger": "manual",
+      "displayStyle": "number"
+    },
+    {
+      "id": "hit_dice",
+      "name": "Hit Dice",
+      "category": "slot",
+      "valueType": "slots",
+      "recoveryTrigger": "long_rest",
+      "recoveryFormula": "floor(max_hit_dice / 2)",
+      "displayStyle": "boxes"
+    },
+    {
+      "id": "spell_slots_1",
+      "name": "1st Level Spell Slots",
+      "category": "slot",
+      "valueType": "slots",
+      "recoveryTrigger": "long_rest",
+      "displayStyle": "boxes"
+    },
+    {
+      "id": "spell_slots_2",
+      "name": "2nd Level Spell Slots",
+      "category": "slot",
+      "valueType": "slots",
+      "recoveryTrigger": "long_rest",
+      "displayStyle": "boxes"
+    },
+    {
+      "id": "spell_slots_3",
+      "name": "3rd Level Spell Slots",
+      "category": "slot",
+      "valueType": "slots",
+      "recoveryTrigger": "long_rest",
+      "displayStyle": "boxes"
+    },
+    {
+      "id": "spell_slots_4",
+      "name": "4th Level Spell Slots",
+      "category": "slot",
+      "valueType": "slots",
+      "recoveryTrigger": "long_rest",
+      "displayStyle": "boxes"
+    },
+    {
+      "id": "spell_slots_5",
+      "name": "5th Level Spell Slots",
+      "category": "slot",
+      "valueType": "slots",
+      "recoveryTrigger": "long_rest",
+      "displayStyle": "boxes"
+    },
+    {
+      "id": "spell_slots_6",
+      "name": "6th Level Spell Slots",
+      "category": "slot",
+      "valueType": "slots",
+      "recoveryTrigger": "long_rest",
+      "displayStyle": "boxes"
+    },
+    {
+      "id": "spell_slots_7",
+      "name": "7th Level Spell Slots",
+      "category": "slot",
+      "valueType": "slots",
+      "recoveryTrigger": "long_rest",
+      "displayStyle": "boxes"
+    },
+    {
+      "id": "spell_slots_8",
+      "name": "8th Level Spell Slots",
+      "category": "slot",
+      "valueType": "slots",
+      "recoveryTrigger": "long_rest",
+      "displayStyle": "boxes"
+    },
+    {
+      "id": "spell_slots_9",
+      "name": "9th Level Spell Slots",
+      "category": "slot",
+      "valueType": "slots",
+      "recoveryTrigger": "long_rest",
+      "displayStyle": "boxes"
+    }
+  ],
+
+  "actionEconomy": {
+    "type": "action_types",
+    "actionTypes": [
+      {
+        "id": "action",
+        "name": "Action",
+        "countPerTurn": 1,
+        "examples": ["Attack", "Cast a Spell", "Dash", "Disengage", "Dodge", "Help", "Hide", "Ready", "Search", "Use an Object"]
+      },
+      {
+        "id": "bonus_action",
+        "name": "Bonus Action",
+        "countPerTurn": 1,
+        "examples": ["Offhand Attack", "Cunning Action", "Bonus Action Spells"]
+      },
+      {
+        "id": "reaction",
+        "name": "Reaction",
+        "countPerTurn": 1,
+        "examples": ["Opportunity Attack", "Shield", "Counterspell", "Feather Fall"]
+      },
+      {
+        "id": "movement",
+        "name": "Movement",
+        "countPerTurn": 1,
+        "examples": ["Move up to your speed"]
+      },
+      {
+        "id": "free",
+        "name": "Free Action",
+        "countPerTurn": -1,
+        "examples": ["Drop an item", "Speak briefly", "Environmental interaction"]
+      }
+    ],
+    "resetOn": "turn_start"
+  },
+
+  "conditions": [
+    {
+      "id": "blinded",
+      "name": "Blinded",
+      "description": "A blinded creature can't see and automatically fails any ability check that requires sight. Attack rolls against the creature have advantage, and the creature's attack rolls have disadvantage."
+    },
+    {
+      "id": "charmed",
+      "name": "Charmed",
+      "description": "A charmed creature can't attack the charmer or target the charmer with harmful abilities or magical effects. The charmer has advantage on any ability check to interact socially with the creature."
+    },
+    {
+      "id": "deafened",
+      "name": "Deafened",
+      "description": "A deafened creature can't hear and automatically fails any ability check that requires hearing."
+    },
+    {
+      "id": "frightened",
+      "name": "Frightened",
+      "description": "A frightened creature has disadvantage on ability checks and attack rolls while the source of its fear is within line of sight. The creature can't willingly move closer to the source of its fear."
+    },
+    {
+      "id": "grappled",
+      "name": "Grappled",
+      "description": "A grappled creature's speed becomes 0, and it can't benefit from any bonus to its speed. The condition ends if the grappler is incapacitated or if an effect removes the grappled creature from the reach of the grappler."
+    },
+    {
+      "id": "incapacitated",
+      "name": "Incapacitated",
+      "description": "An incapacitated creature can't take actions or reactions."
+    },
+    {
+      "id": "invisible",
+      "name": "Invisible",
+      "description": "An invisible creature is impossible to see without the aid of magic or a special sense. For the purpose of hiding, the creature is heavily obscured. The creature's location can be detected by any noise it makes or any tracks it leaves. Attack rolls against the creature have disadvantage, and the creature's attack rolls have advantage."
+    },
+    {
+      "id": "paralyzed",
+      "name": "Paralyzed",
+      "description": "A paralyzed creature is incapacitated and can't move or speak. The creature automatically fails Strength and Dexterity saving throws. Attack rolls against the creature have advantage. Any attack that hits the creature is a critical hit if the attacker is within 5 feet of the creature."
+    },
+    {
+      "id": "petrified",
+      "name": "Petrified",
+      "description": "A petrified creature is transformed, along with any nonmagical object it is wearing or carrying, into a solid inanimate substance (usually stone). Its weight increases by a factor of ten, and it ceases aging. The creature is incapacitated, can't move or speak, and is unaware of its surroundings. Attack rolls against the creature have advantage. The creature automatically fails Strength and Dexterity saving throws. The creature has resistance to all damage. The creature is immune to poison and disease, although a poison or disease already in its system is suspended, not neutralized."
+    },
+    {
+      "id": "poisoned",
+      "name": "Poisoned",
+      "description": "A poisoned creature has disadvantage on attack rolls and ability checks."
+    },
+    {
+      "id": "prone",
+      "name": "Prone",
+      "description": "A prone creature's only movement option is to crawl, unless it stands up and thereby ends the condition. The creature has disadvantage on attack rolls. An attack roll against the creature has advantage if the attacker is within 5 feet of the creature. Otherwise, the attack roll has disadvantage."
+    },
+    {
+      "id": "restrained",
+      "name": "Restrained",
+      "description": "A restrained creature's speed becomes 0, and it can't benefit from any bonus to its speed. Attack rolls against the creature have advantage, and the creature's attack rolls have disadvantage. The creature has disadvantage on Dexterity saving throws."
+    },
+    {
+      "id": "stunned",
+      "name": "Stunned",
+      "description": "A stunned creature is incapacitated, can't move, and can speak only falteringly. The creature automatically fails Strength and Dexterity saving throws. Attack rolls against the creature have advantage."
+    },
+    {
+      "id": "unconscious",
+      "name": "Unconscious",
+      "description": "An unconscious creature is incapacitated, can't move or speak, and is unaware of its surroundings. The creature drops whatever it's holding and falls prone. The creature automatically fails Strength and Dexterity saving throws. Attack rolls against the creature have advantage. Any attack that hits the creature is a critical hit if the attacker is within 5 feet of the creature."
+    },
+    {
+      "id": "exhaustion_1",
+      "name": "Exhaustion (Level 1)",
+      "description": "Disadvantage on ability checks"
+    },
+    {
+      "id": "exhaustion_2",
+      "name": "Exhaustion (Level 2)",
+      "description": "Speed halved"
+    },
+    {
+      "id": "exhaustion_3",
+      "name": "Exhaustion (Level 3)",
+      "description": "Disadvantage on attack rolls and saving throws"
+    },
+    {
+      "id": "exhaustion_4",
+      "name": "Exhaustion (Level 4)",
+      "description": "Hit point maximum halved"
+    },
+    {
+      "id": "exhaustion_5",
+      "name": "Exhaustion (Level 5)",
+      "description": "Speed reduced to 0"
+    },
+    {
+      "id": "exhaustion_6",
+      "name": "Exhaustion (Level 6)",
+      "description": "Death"
+    }
+  ]
+}

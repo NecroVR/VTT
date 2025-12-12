@@ -1,0 +1,751 @@
+{
+  "id": "dnd5e-character",
+  "systemId": "dnd5e-ogl",
+  "entityType": "character",
+  "name": "D&D 5e Character",
+
+  "fields": [
+    {
+      "id": "name",
+      "name": "Character Name",
+      "fieldType": "text",
+      "required": true,
+      "placeholder": "Enter character name",
+      "width": "full"
+    },
+    {
+      "id": "class",
+      "name": "Class",
+      "fieldType": "text",
+      "required": true,
+      "placeholder": "Barbarian, Bard, Cleric, etc.",
+      "width": "third"
+    },
+    {
+      "id": "level",
+      "name": "Level",
+      "fieldType": "number",
+      "required": true,
+      "defaultValue": 1,
+      "validation": [
+        {"rule": "min", "value": 1},
+        {"rule": "max", "value": 20}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "race",
+      "name": "Race",
+      "fieldType": "text",
+      "required": false,
+      "placeholder": "Dwarf, Elf, Human, etc.",
+      "width": "third"
+    },
+    {
+      "id": "background",
+      "name": "Background",
+      "fieldType": "text",
+      "required": false,
+      "placeholder": "Acolyte, Criminal, Folk Hero, etc.",
+      "width": "third"
+    },
+    {
+      "id": "alignment",
+      "name": "Alignment",
+      "fieldType": "select",
+      "options": [
+        {"value": "lg", "label": "Lawful Good"},
+        {"value": "ng", "label": "Neutral Good"},
+        {"value": "cg", "label": "Chaotic Good"},
+        {"value": "ln", "label": "Lawful Neutral"},
+        {"value": "n", "label": "True Neutral"},
+        {"value": "cn", "label": "Chaotic Neutral"},
+        {"value": "le", "label": "Lawful Evil"},
+        {"value": "ne", "label": "Neutral Evil"},
+        {"value": "ce", "label": "Chaotic Evil"}
+      ],
+      "defaultValue": "n",
+      "width": "quarter"
+    },
+    {
+      "id": "experience_points",
+      "name": "Experience Points",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "width": "quarter"
+    },
+
+    {
+      "id": "strength",
+      "name": "Strength",
+      "fieldType": "number",
+      "required": true,
+      "defaultValue": 10,
+      "validation": [
+        {"rule": "min", "value": 1},
+        {"rule": "max", "value": 30}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "dexterity",
+      "name": "Dexterity",
+      "fieldType": "number",
+      "required": true,
+      "defaultValue": 10,
+      "validation": [
+        {"rule": "min", "value": 1},
+        {"rule": "max", "value": 30}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "constitution",
+      "name": "Constitution",
+      "fieldType": "number",
+      "required": true,
+      "defaultValue": 10,
+      "validation": [
+        {"rule": "min", "value": 1},
+        {"rule": "max", "value": 30}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "intelligence",
+      "name": "Intelligence",
+      "fieldType": "number",
+      "required": true,
+      "defaultValue": 10,
+      "validation": [
+        {"rule": "min", "value": 1},
+        {"rule": "max", "value": 30}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "wisdom",
+      "name": "Wisdom",
+      "fieldType": "number",
+      "required": true,
+      "defaultValue": 10,
+      "validation": [
+        {"rule": "min", "value": 1},
+        {"rule": "max", "value": 30}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "charisma",
+      "name": "Charisma",
+      "fieldType": "number",
+      "required": true,
+      "defaultValue": 10,
+      "validation": [
+        {"rule": "min", "value": 1},
+        {"rule": "max", "value": 30}
+      ],
+      "width": "quarter"
+    },
+
+    {
+      "id": "hp_current",
+      "name": "Current Hit Points",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "width": "quarter"
+    },
+    {
+      "id": "hp_max",
+      "name": "Maximum Hit Points",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "width": "quarter"
+    },
+    {
+      "id": "temp_hp",
+      "name": "Temporary Hit Points",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "width": "quarter"
+    },
+    {
+      "id": "hit_dice_total",
+      "name": "Total Hit Dice",
+      "fieldType": "text",
+      "placeholder": "e.g., 5d8",
+      "helpText": "Your class hit die times your level",
+      "width": "quarter"
+    },
+    {
+      "id": "hit_dice_current",
+      "name": "Current Hit Dice",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "width": "quarter"
+    },
+    {
+      "id": "death_saves_successes",
+      "name": "Death Save Successes",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0},
+        {"rule": "max", "value": 3}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "death_saves_failures",
+      "name": "Death Save Failures",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "validation": [
+        {"rule": "min", "value": 0},
+        {"rule": "max", "value": 3}
+      ],
+      "width": "quarter"
+    },
+
+    {
+      "id": "armor_class",
+      "name": "Armor Class",
+      "fieldType": "number",
+      "defaultValue": 10,
+      "width": "quarter"
+    },
+    {
+      "id": "speed",
+      "name": "Speed",
+      "fieldType": "number",
+      "defaultValue": 30,
+      "helpText": "Movement speed in feet",
+      "width": "quarter"
+    },
+
+    {
+      "id": "saving_throw_proficiencies",
+      "name": "Saving Throw Proficiencies",
+      "fieldType": "multiselect",
+      "options": [
+        {"value": "strength", "label": "Strength"},
+        {"value": "dexterity", "label": "Dexterity"},
+        {"value": "constitution", "label": "Constitution"},
+        {"value": "intelligence", "label": "Intelligence"},
+        {"value": "wisdom", "label": "Wisdom"},
+        {"value": "charisma", "label": "Charisma"}
+      ],
+      "width": "half"
+    },
+
+    {
+      "id": "skill_proficiencies",
+      "name": "Skill Proficiencies",
+      "fieldType": "multiselect",
+      "options": [
+        {"value": "acrobatics", "label": "Acrobatics (DEX)"},
+        {"value": "animal_handling", "label": "Animal Handling (WIS)"},
+        {"value": "arcana", "label": "Arcana (INT)"},
+        {"value": "athletics", "label": "Athletics (STR)"},
+        {"value": "deception", "label": "Deception (CHA)"},
+        {"value": "history", "label": "History (INT)"},
+        {"value": "insight", "label": "Insight (WIS)"},
+        {"value": "intimidation", "label": "Intimidation (CHA)"},
+        {"value": "investigation", "label": "Investigation (INT)"},
+        {"value": "medicine", "label": "Medicine (WIS)"},
+        {"value": "nature", "label": "Nature (INT)"},
+        {"value": "perception", "label": "Perception (WIS)"},
+        {"value": "performance", "label": "Performance (CHA)"},
+        {"value": "persuasion", "label": "Persuasion (CHA)"},
+        {"value": "religion", "label": "Religion (INT)"},
+        {"value": "sleight_of_hand", "label": "Sleight of Hand (DEX)"},
+        {"value": "stealth", "label": "Stealth (DEX)"},
+        {"value": "survival", "label": "Survival (WIS)"}
+      ],
+      "width": "half"
+    },
+
+    {
+      "id": "skill_expertise",
+      "name": "Skill Expertise",
+      "fieldType": "multiselect",
+      "options": [
+        {"value": "acrobatics", "label": "Acrobatics"},
+        {"value": "animal_handling", "label": "Animal Handling"},
+        {"value": "arcana", "label": "Arcana"},
+        {"value": "athletics", "label": "Athletics"},
+        {"value": "deception", "label": "Deception"},
+        {"value": "history", "label": "History"},
+        {"value": "insight", "label": "Insight"},
+        {"value": "intimidation", "label": "Intimidation"},
+        {"value": "investigation", "label": "Investigation"},
+        {"value": "medicine", "label": "Medicine"},
+        {"value": "nature", "label": "Nature"},
+        {"value": "perception", "label": "Perception"},
+        {"value": "performance", "label": "Performance"},
+        {"value": "persuasion", "label": "Persuasion"},
+        {"value": "religion", "label": "Religion"},
+        {"value": "sleight_of_hand", "label": "Sleight of Hand"},
+        {"value": "stealth", "label": "Stealth"},
+        {"value": "survival", "label": "Survival"}
+      ],
+      "helpText": "Double proficiency bonus for these skills",
+      "width": "half"
+    },
+
+    {
+      "id": "passive_perception",
+      "name": "Passive Perception",
+      "fieldType": "calculated",
+      "width": "quarter"
+    },
+
+    {
+      "id": "spell_slots_1_total",
+      "name": "1st Level Slots",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "width": "quarter"
+    },
+    {
+      "id": "spell_slots_1_used",
+      "name": "1st Level Used",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "width": "quarter"
+    },
+    {
+      "id": "spell_slots_2_total",
+      "name": "2nd Level Slots",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "width": "quarter"
+    },
+    {
+      "id": "spell_slots_2_used",
+      "name": "2nd Level Used",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "width": "quarter"
+    },
+    {
+      "id": "spell_slots_3_total",
+      "name": "3rd Level Slots",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "width": "quarter"
+    },
+    {
+      "id": "spell_slots_3_used",
+      "name": "3rd Level Used",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "width": "quarter"
+    },
+    {
+      "id": "spell_slots_4_total",
+      "name": "4th Level Slots",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "width": "quarter"
+    },
+    {
+      "id": "spell_slots_4_used",
+      "name": "4th Level Used",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "width": "quarter"
+    },
+    {
+      "id": "spell_slots_5_total",
+      "name": "5th Level Slots",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "width": "quarter"
+    },
+    {
+      "id": "spell_slots_5_used",
+      "name": "5th Level Used",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "width": "quarter"
+    },
+    {
+      "id": "spell_slots_6_total",
+      "name": "6th Level Slots",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "width": "quarter"
+    },
+    {
+      "id": "spell_slots_6_used",
+      "name": "6th Level Used",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "width": "quarter"
+    },
+    {
+      "id": "spell_slots_7_total",
+      "name": "7th Level Slots",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "width": "quarter"
+    },
+    {
+      "id": "spell_slots_7_used",
+      "name": "7th Level Used",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "width": "quarter"
+    },
+    {
+      "id": "spell_slots_8_total",
+      "name": "8th Level Slots",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "width": "quarter"
+    },
+    {
+      "id": "spell_slots_8_used",
+      "name": "8th Level Used",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "width": "quarter"
+    },
+    {
+      "id": "spell_slots_9_total",
+      "name": "9th Level Slots",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "width": "quarter"
+    },
+    {
+      "id": "spell_slots_9_used",
+      "name": "9th Level Used",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "width": "quarter"
+    },
+
+    {
+      "id": "spellcasting_ability",
+      "name": "Spellcasting Ability",
+      "fieldType": "select",
+      "options": [
+        {"value": "intelligence", "label": "Intelligence"},
+        {"value": "wisdom", "label": "Wisdom"},
+        {"value": "charisma", "label": "Charisma"}
+      ],
+      "width": "quarter"
+    },
+    {
+      "id": "spell_save_dc",
+      "name": "Spell Save DC",
+      "fieldType": "calculated",
+      "width": "quarter"
+    },
+    {
+      "id": "spell_attack_bonus",
+      "name": "Spell Attack Bonus",
+      "fieldType": "calculated",
+      "width": "quarter"
+    },
+
+    {
+      "id": "weapons",
+      "name": "Weapons",
+      "fieldType": "textarea",
+      "placeholder": "List your weapons and their stats",
+      "width": "full"
+    },
+    {
+      "id": "armor_and_equipment",
+      "name": "Armor & Equipment",
+      "fieldType": "textarea",
+      "placeholder": "Armor, gear, and other equipment",
+      "width": "full"
+    },
+    {
+      "id": "treasure",
+      "name": "Treasure",
+      "fieldType": "textarea",
+      "placeholder": "Money, gems, magic items, etc.",
+      "width": "full"
+    },
+
+    {
+      "id": "features_and_traits",
+      "name": "Features & Traits",
+      "fieldType": "textarea",
+      "placeholder": "Racial traits, class features, feats, etc.",
+      "width": "full"
+    },
+
+    {
+      "id": "personality_traits",
+      "name": "Personality Traits",
+      "fieldType": "textarea",
+      "placeholder": "Describe your character's personality",
+      "width": "half"
+    },
+    {
+      "id": "ideals",
+      "name": "Ideals",
+      "fieldType": "textarea",
+      "placeholder": "What does your character believe in?",
+      "width": "half"
+    },
+    {
+      "id": "bonds",
+      "name": "Bonds",
+      "fieldType": "textarea",
+      "placeholder": "What ties your character to the world?",
+      "width": "half"
+    },
+    {
+      "id": "flaws",
+      "name": "Flaws",
+      "fieldType": "textarea",
+      "placeholder": "What are your character's weaknesses?",
+      "width": "half"
+    },
+
+    {
+      "id": "backstory",
+      "name": "Backstory",
+      "fieldType": "textarea",
+      "placeholder": "Your character's history and background",
+      "width": "full"
+    },
+
+    {
+      "id": "notes",
+      "name": "Notes",
+      "fieldType": "textarea",
+      "placeholder": "Additional notes and information",
+      "width": "full"
+    }
+  ],
+
+  "computedFields": [
+    {
+      "id": "proficiency_bonus",
+      "name": "Proficiency Bonus",
+      "formula": "ceil(level / 4) + 1",
+      "dependencies": ["level"]
+    },
+    {
+      "id": "strength_modifier",
+      "name": "Strength Modifier",
+      "formula": "floor((strength - 10) / 2)",
+      "dependencies": ["strength"]
+    },
+    {
+      "id": "dexterity_modifier",
+      "name": "Dexterity Modifier",
+      "formula": "floor((dexterity - 10) / 2)",
+      "dependencies": ["dexterity"]
+    },
+    {
+      "id": "constitution_modifier",
+      "name": "Constitution Modifier",
+      "formula": "floor((constitution - 10) / 2)",
+      "dependencies": ["constitution"]
+    },
+    {
+      "id": "intelligence_modifier",
+      "name": "Intelligence Modifier",
+      "formula": "floor((intelligence - 10) / 2)",
+      "dependencies": ["intelligence"]
+    },
+    {
+      "id": "wisdom_modifier",
+      "name": "Wisdom Modifier",
+      "formula": "floor((wisdom - 10) / 2)",
+      "dependencies": ["wisdom"]
+    },
+    {
+      "id": "charisma_modifier",
+      "name": "Charisma Modifier",
+      "formula": "floor((charisma - 10) / 2)",
+      "dependencies": ["charisma"]
+    },
+    {
+      "id": "initiative",
+      "name": "Initiative",
+      "formula": "dexterity_modifier",
+      "dependencies": ["dexterity_modifier"]
+    },
+    {
+      "id": "passive_perception",
+      "name": "Passive Perception",
+      "formula": "10 + wisdom_modifier + (skill_proficiencies.includes('perception') ? proficiency_bonus : 0)",
+      "dependencies": ["wisdom_modifier", "skill_proficiencies", "proficiency_bonus"]
+    },
+    {
+      "id": "spell_save_dc",
+      "name": "Spell Save DC",
+      "formula": "8 + proficiency_bonus + spellcasting_ability_modifier",
+      "dependencies": ["proficiency_bonus", "spellcasting_ability"]
+    },
+    {
+      "id": "spell_attack_bonus",
+      "name": "Spell Attack Bonus",
+      "formula": "proficiency_bonus + spellcasting_ability_modifier",
+      "dependencies": ["proficiency_bonus", "spellcasting_ability"]
+    }
+  ],
+
+  "rolls": [
+    {
+      "id": "initiative",
+      "name": "Initiative",
+      "formula": "d20 + {initiative}"
+    },
+    {
+      "id": "strength_check",
+      "name": "Strength Check",
+      "formula": "d20 + {strength_modifier}"
+    },
+    {
+      "id": "dexterity_check",
+      "name": "Dexterity Check",
+      "formula": "d20 + {dexterity_modifier}"
+    },
+    {
+      "id": "constitution_check",
+      "name": "Constitution Check",
+      "formula": "d20 + {constitution_modifier}"
+    },
+    {
+      "id": "intelligence_check",
+      "name": "Intelligence Check",
+      "formula": "d20 + {intelligence_modifier}"
+    },
+    {
+      "id": "wisdom_check",
+      "name": "Wisdom Check",
+      "formula": "d20 + {wisdom_modifier}"
+    },
+    {
+      "id": "charisma_check",
+      "name": "Charisma Check",
+      "formula": "d20 + {charisma_modifier}"
+    },
+    {
+      "id": "strength_save",
+      "name": "Strength Save",
+      "formula": "d20 + {strength_modifier} + {proficiency_bonus:saving_throw_proficiencies.includes('strength')}"
+    },
+    {
+      "id": "dexterity_save",
+      "name": "Dexterity Save",
+      "formula": "d20 + {dexterity_modifier} + {proficiency_bonus:saving_throw_proficiencies.includes('dexterity')}"
+    },
+    {
+      "id": "constitution_save",
+      "name": "Constitution Save",
+      "formula": "d20 + {constitution_modifier} + {proficiency_bonus:saving_throw_proficiencies.includes('constitution')}"
+    },
+    {
+      "id": "intelligence_save",
+      "name": "Intelligence Save",
+      "formula": "d20 + {intelligence_modifier} + {proficiency_bonus:saving_throw_proficiencies.includes('intelligence')}"
+    },
+    {
+      "id": "wisdom_save",
+      "name": "Wisdom Save",
+      "formula": "d20 + {wisdom_modifier} + {proficiency_bonus:saving_throw_proficiencies.includes('wisdom')}"
+    },
+    {
+      "id": "charisma_save",
+      "name": "Charisma Save",
+      "formula": "d20 + {charisma_modifier} + {proficiency_bonus:saving_throw_proficiencies.includes('charisma')}"
+    },
+    {
+      "id": "death_save",
+      "name": "Death Saving Throw",
+      "formula": "d20"
+    }
+  ],
+
+  "sections": [
+    {
+      "id": "header",
+      "name": "Character Information",
+      "fields": ["name", "class", "level", "race", "background", "alignment", "experience_points"]
+    },
+    {
+      "id": "abilities",
+      "name": "Ability Scores",
+      "fields": ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"]
+    },
+    {
+      "id": "combat",
+      "name": "Combat Stats",
+      "fields": ["armor_class", "initiative", "speed", "hp_current", "hp_max", "temp_hp", "hit_dice_total", "hit_dice_current"]
+    },
+    {
+      "id": "death_saves",
+      "name": "Death Saves",
+      "fields": ["death_saves_successes", "death_saves_failures"]
+    },
+    {
+      "id": "saving_throws",
+      "name": "Saving Throws",
+      "fields": ["saving_throw_proficiencies"]
+    },
+    {
+      "id": "skills",
+      "name": "Skills",
+      "fields": ["skill_proficiencies", "skill_expertise", "passive_perception"]
+    },
+    {
+      "id": "spellcasting",
+      "name": "Spellcasting",
+      "fields": [
+        "spellcasting_ability",
+        "spell_save_dc",
+        "spell_attack_bonus",
+        "spell_slots_1_total",
+        "spell_slots_1_used",
+        "spell_slots_2_total",
+        "spell_slots_2_used",
+        "spell_slots_3_total",
+        "spell_slots_3_used",
+        "spell_slots_4_total",
+        "spell_slots_4_used",
+        "spell_slots_5_total",
+        "spell_slots_5_used",
+        "spell_slots_6_total",
+        "spell_slots_6_used",
+        "spell_slots_7_total",
+        "spell_slots_7_used",
+        "spell_slots_8_total",
+        "spell_slots_8_used",
+        "spell_slots_9_total",
+        "spell_slots_9_used"
+      ]
+    },
+    {
+      "id": "equipment",
+      "name": "Equipment",
+      "fields": ["weapons", "armor_and_equipment", "treasure"]
+    },
+    {
+      "id": "features",
+      "name": "Features & Traits",
+      "fields": ["features_and_traits"]
+    },
+    {
+      "id": "personality",
+      "name": "Personality",
+      "fields": ["personality_traits", "ideals", "bonds", "flaws"]
+    },
+    {
+      "id": "background",
+      "name": "Background & Notes",
+      "fields": ["backstory", "notes"]
+    }
+  ]
+}

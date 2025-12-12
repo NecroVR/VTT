@@ -1,0 +1,9 @@
+{
+  "id": "pf2e",
+  "name": "Pathfinder 2nd Edition",
+  "version": "1.0.0",
+  "authors": ["VTT Core"],
+  "description": "Pathfinder 2e game system",
+  "license": "OGL 1.0a",
+  "minPlatformVersion": "1.0.0"
+}

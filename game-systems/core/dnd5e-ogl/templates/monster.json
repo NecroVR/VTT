@@ -1,0 +1,489 @@
+{
+  "id": "dnd5e-monster",
+  "systemId": "dnd5e-ogl",
+  "entityType": "creature",
+  "name": "D&D 5e Monster",
+
+  "fields": [
+    {
+      "id": "name",
+      "name": "Monster Name",
+      "fieldType": "text",
+      "required": true,
+      "placeholder": "Enter monster name",
+      "width": "half"
+    },
+    {
+      "id": "size",
+      "name": "Size",
+      "fieldType": "select",
+      "required": true,
+      "options": [
+        {"value": "tiny", "label": "Tiny"},
+        {"value": "small", "label": "Small"},
+        {"value": "medium", "label": "Medium"},
+        {"value": "large", "label": "Large"},
+        {"value": "huge", "label": "Huge"},
+        {"value": "gargantuan", "label": "Gargantuan"}
+      ],
+      "defaultValue": "medium",
+      "width": "quarter"
+    },
+    {
+      "id": "type",
+      "name": "Type",
+      "fieldType": "text",
+      "required": true,
+      "placeholder": "e.g., humanoid (goblinoid), dragon, undead",
+      "width": "half"
+    },
+    {
+      "id": "alignment",
+      "name": "Alignment",
+      "fieldType": "select",
+      "options": [
+        {"value": "lg", "label": "Lawful Good"},
+        {"value": "ng", "label": "Neutral Good"},
+        {"value": "cg", "label": "Chaotic Good"},
+        {"value": "ln", "label": "Lawful Neutral"},
+        {"value": "n", "label": "True Neutral"},
+        {"value": "cn", "label": "Chaotic Neutral"},
+        {"value": "le", "label": "Lawful Evil"},
+        {"value": "ne", "label": "Neutral Evil"},
+        {"value": "ce", "label": "Chaotic Evil"},
+        {"value": "unaligned", "label": "Unaligned"}
+      ],
+      "defaultValue": "unaligned",
+      "width": "quarter"
+    },
+
+    {
+      "id": "armor_class",
+      "name": "Armor Class",
+      "fieldType": "text",
+      "required": true,
+      "placeholder": "e.g., 13 (natural armor)",
+      "width": "quarter"
+    },
+    {
+      "id": "hp_formula",
+      "name": "Hit Points",
+      "fieldType": "text",
+      "required": true,
+      "placeholder": "e.g., 22 (4d8 + 4)",
+      "helpText": "Average (dice formula)",
+      "width": "quarter"
+    },
+    {
+      "id": "hp_current",
+      "name": "Current HP",
+      "fieldType": "number",
+      "defaultValue": 0,
+      "width": "quarter"
+    },
+    {
+      "id": "speed",
+      "name": "Speed",
+      "fieldType": "text",
+      "required": true,
+      "placeholder": "e.g., 30 ft., fly 60 ft., swim 40 ft.",
+      "defaultValue": "30 ft.",
+      "width": "quarter"
+    },
+
+    {
+      "id": "strength",
+      "name": "Strength",
+      "fieldType": "number",
+      "required": true,
+      "defaultValue": 10,
+      "width": "quarter"
+    },
+    {
+      "id": "dexterity",
+      "name": "Dexterity",
+      "fieldType": "number",
+      "required": true,
+      "defaultValue": 10,
+      "width": "quarter"
+    },
+    {
+      "id": "constitution",
+      "name": "Constitution",
+      "fieldType": "number",
+      "required": true,
+      "defaultValue": 10,
+      "width": "quarter"
+    },
+    {
+      "id": "intelligence",
+      "name": "Intelligence",
+      "fieldType": "number",
+      "required": true,
+      "defaultValue": 10,
+      "width": "quarter"
+    },
+    {
+      "id": "wisdom",
+      "name": "Wisdom",
+      "fieldType": "number",
+      "required": true,
+      "defaultValue": 10,
+      "width": "quarter"
+    },
+    {
+      "id": "charisma",
+      "name": "Charisma",
+      "fieldType": "number",
+      "required": true,
+      "defaultValue": 10,
+      "width": "quarter"
+    },
+
+    {
+      "id": "saving_throws",
+      "name": "Saving Throws",
+      "fieldType": "text",
+      "placeholder": "e.g., Dex +4, Con +3, Wis +5",
+      "width": "half"
+    },
+    {
+      "id": "skills",
+      "name": "Skills",
+      "fieldType": "text",
+      "placeholder": "e.g., Perception +5, Stealth +4",
+      "width": "half"
+    },
+    {
+      "id": "damage_vulnerabilities",
+      "name": "Damage Vulnerabilities",
+      "fieldType": "text",
+      "placeholder": "e.g., fire",
+      "width": "third"
+    },
+    {
+      "id": "damage_resistances",
+      "name": "Damage Resistances",
+      "fieldType": "text",
+      "placeholder": "e.g., bludgeoning, piercing, and slashing from nonmagical attacks",
+      "width": "third"
+    },
+    {
+      "id": "damage_immunities",
+      "name": "Damage Immunities",
+      "fieldType": "text",
+      "placeholder": "e.g., poison, psychic",
+      "width": "third"
+    },
+    {
+      "id": "condition_immunities",
+      "name": "Condition Immunities",
+      "fieldType": "text",
+      "placeholder": "e.g., charmed, frightened, poisoned",
+      "width": "half"
+    },
+    {
+      "id": "senses",
+      "name": "Senses",
+      "fieldType": "text",
+      "placeholder": "e.g., darkvision 60 ft., passive Perception 12",
+      "defaultValue": "passive Perception 10",
+      "width": "half"
+    },
+    {
+      "id": "languages",
+      "name": "Languages",
+      "fieldType": "text",
+      "placeholder": "e.g., Common, Draconic",
+      "width": "half"
+    },
+
+    {
+      "id": "challenge_rating",
+      "name": "Challenge Rating",
+      "fieldType": "text",
+      "required": true,
+      "placeholder": "e.g., 1/4, 1/2, 1, 2, etc.",
+      "defaultValue": "0",
+      "width": "quarter"
+    },
+    {
+      "id": "experience_points",
+      "name": "Experience Points",
+      "fieldType": "number",
+      "required": true,
+      "defaultValue": 0,
+      "helpText": "XP reward for defeating this creature",
+      "width": "quarter"
+    },
+    {
+      "id": "proficiency_bonus",
+      "name": "Proficiency Bonus",
+      "fieldType": "number",
+      "defaultValue": 2,
+      "width": "quarter"
+    },
+
+    {
+      "id": "traits",
+      "name": "Traits",
+      "fieldType": "textarea",
+      "placeholder": "Special traits (e.g., Pack Tactics, Keen Smell, Magic Resistance)",
+      "helpText": "Passive abilities that are always active",
+      "width": "full"
+    },
+    {
+      "id": "actions",
+      "name": "Actions",
+      "fieldType": "textarea",
+      "required": true,
+      "placeholder": "Actions the creature can take (e.g., Multiattack, Bite, Claw)",
+      "helpText": "Standard actions available in combat",
+      "width": "full"
+    },
+    {
+      "id": "bonus_actions",
+      "name": "Bonus Actions",
+      "fieldType": "textarea",
+      "placeholder": "Bonus actions available to the creature",
+      "width": "full"
+    },
+    {
+      "id": "reactions",
+      "name": "Reactions",
+      "fieldType": "textarea",
+      "placeholder": "Reactions the creature can use",
+      "width": "full"
+    },
+    {
+      "id": "legendary_actions",
+      "name": "Legendary Actions",
+      "fieldType": "textarea",
+      "placeholder": "Legendary actions (if any)",
+      "helpText": "Legendary creatures can take 3 legendary actions per round",
+      "width": "full"
+    },
+    {
+      "id": "legendary_actions_per_round",
+      "name": "Legendary Actions Per Round",
+      "fieldType": "number",
+      "defaultValue": 3,
+      "width": "quarter"
+    },
+    {
+      "id": "lair_actions",
+      "name": "Lair Actions",
+      "fieldType": "textarea",
+      "placeholder": "Actions the creature can take while in its lair",
+      "width": "full"
+    },
+    {
+      "id": "regional_effects",
+      "name": "Regional Effects",
+      "fieldType": "textarea",
+      "placeholder": "Effects on the region around the creature's lair",
+      "width": "full"
+    },
+
+    {
+      "id": "description",
+      "name": "Description",
+      "fieldType": "textarea",
+      "placeholder": "Physical description and behavior",
+      "width": "full"
+    },
+    {
+      "id": "lore",
+      "name": "Lore",
+      "fieldType": "textarea",
+      "placeholder": "Background and lore information",
+      "width": "full"
+    },
+    {
+      "id": "tactics",
+      "name": "Combat Tactics",
+      "fieldType": "textarea",
+      "placeholder": "How this creature fights",
+      "width": "full"
+    },
+
+    {
+      "id": "notes",
+      "name": "GM Notes",
+      "fieldType": "textarea",
+      "placeholder": "Additional notes for the GM",
+      "width": "full"
+    }
+  ],
+
+  "computedFields": [
+    {
+      "id": "strength_modifier",
+      "name": "Strength Modifier",
+      "formula": "floor((strength - 10) / 2)",
+      "dependencies": ["strength"]
+    },
+    {
+      "id": "dexterity_modifier",
+      "name": "Dexterity Modifier",
+      "formula": "floor((dexterity - 10) / 2)",
+      "dependencies": ["dexterity"]
+    },
+    {
+      "id": "constitution_modifier",
+      "name": "Constitution Modifier",
+      "formula": "floor((constitution - 10) / 2)",
+      "dependencies": ["constitution"]
+    },
+    {
+      "id": "intelligence_modifier",
+      "name": "Intelligence Modifier",
+      "formula": "floor((intelligence - 10) / 2)",
+      "dependencies": ["intelligence"]
+    },
+    {
+      "id": "wisdom_modifier",
+      "name": "Wisdom Modifier",
+      "formula": "floor((wisdom - 10) / 2)",
+      "dependencies": ["wisdom"]
+    },
+    {
+      "id": "charisma_modifier",
+      "name": "Charisma Modifier",
+      "formula": "floor((charisma - 10) / 2)",
+      "dependencies": ["charisma"]
+    },
+    {
+      "id": "initiative",
+      "name": "Initiative",
+      "formula": "dexterity_modifier",
+      "dependencies": ["dexterity_modifier"]
+    }
+  ],
+
+  "rolls": [
+    {
+      "id": "initiative",
+      "name": "Initiative",
+      "formula": "d20 + {initiative}"
+    },
+    {
+      "id": "strength_check",
+      "name": "Strength Check",
+      "formula": "d20 + {strength_modifier}"
+    },
+    {
+      "id": "dexterity_check",
+      "name": "Dexterity Check",
+      "formula": "d20 + {dexterity_modifier}"
+    },
+    {
+      "id": "constitution_check",
+      "name": "Constitution Check",
+      "formula": "d20 + {constitution_modifier}"
+    },
+    {
+      "id": "intelligence_check",
+      "name": "Intelligence Check",
+      "formula": "d20 + {intelligence_modifier}"
+    },
+    {
+      "id": "wisdom_check",
+      "name": "Wisdom Check",
+      "formula": "d20 + {wisdom_modifier}"
+    },
+    {
+      "id": "charisma_check",
+      "name": "Charisma Check",
+      "formula": "d20 + {charisma_modifier}"
+    },
+    {
+      "id": "strength_save",
+      "name": "Strength Save",
+      "formula": "d20 + {strength_modifier}"
+    },
+    {
+      "id": "dexterity_save",
+      "name": "Dexterity Save",
+      "formula": "d20 + {dexterity_modifier}"
+    },
+    {
+      "id": "constitution_save",
+      "name": "Constitution Save",
+      "formula": "d20 + {constitution_modifier}"
+    },
+    {
+      "id": "intelligence_save",
+      "name": "Intelligence Save",
+      "formula": "d20 + {intelligence_modifier}"
+    },
+    {
+      "id": "wisdom_save",
+      "name": "Wisdom Save",
+      "formula": "d20 + {wisdom_modifier}"
+    },
+    {
+      "id": "charisma_save",
+      "name": "Charisma Save",
+      "formula": "d20 + {charisma_modifier}"
+    }
+  ],
+
+  "sections": [
+    {
+      "id": "header",
+      "name": "Basic Information",
+      "fields": ["name", "size", "type", "alignment"]
+    },
+    {
+      "id": "combat_stats",
+      "name": "Combat Statistics",
+      "fields": ["armor_class", "hp_formula", "hp_current", "speed"]
+    },
+    {
+      "id": "ability_scores",
+      "name": "Ability Scores",
+      "fields": ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"]
+    },
+    {
+      "id": "defenses",
+      "name": "Defenses",
+      "fields": ["saving_throws", "damage_vulnerabilities", "damage_resistances", "damage_immunities", "condition_immunities"]
+    },
+    {
+      "id": "skills_senses",
+      "name": "Skills & Senses",
+      "fields": ["skills", "senses", "languages"]
+    },
+    {
+      "id": "challenge",
+      "name": "Challenge",
+      "fields": ["challenge_rating", "experience_points", "proficiency_bonus"]
+    },
+    {
+      "id": "abilities",
+      "name": "Traits & Abilities",
+      "fields": ["traits"]
+    },
+    {
+      "id": "combat_actions",
+      "name": "Combat Actions",
+      "fields": ["actions", "bonus_actions", "reactions"]
+    },
+    {
+      "id": "legendary",
+      "name": "Legendary Abilities",
+      "fields": ["legendary_actions_per_round", "legendary_actions", "lair_actions", "regional_effects"]
+    },
+    {
+      "id": "lore_tactics",
+      "name": "Description & Lore",
+      "fields": ["description", "lore", "tactics"]
+    },
+    {
+      "id": "notes",
+      "name": "GM Notes",
+      "fields": ["notes"]
+    }
+  ]
+}

@@ -196,9 +196,7 @@ describe('Campaigns Routes', () => {
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
-        payload: {
-          name: 'Test Campaign',
-        },
+        payload: { name: 'Test Campaign' },
       });
 
       expect(response.statusCode).toBe(400);

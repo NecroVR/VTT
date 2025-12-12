@@ -1,0 +1,58 @@
+{
+  "id": "pf2e",
+  "name": "Pathfinder 2nd Edition",
+  "version": "1.0.0",
+  "publisher": "VTT Core",
+  "description": "Pathfinder 2e game system",
+  "dice": {
+    "standardDice": ["d4", "d6", "d8", "d10", "d12", "d20"],
+    "fudgeDice": false,
+    "defaultRoll": "d20",
+    "supportsAdvantage": false,
+    "supportsExploding": false,
+    "supportsPushing": false
+  },
+  "attributes": [
+    {
+      "id": "strength",
+      "name": "Strength",
+      "abbreviation": "STR",
+      "valueType": "number",
+      "defaultValue": 10
+    }
+  ],
+  "resources": [
+    {
+      "id": "hp",
+      "name": "Hit Points",
+      "category": "health",
+      "valueType": "current_max",
+      "displayStyle": "bar"
+    }
+  ],
+  "skills": [
+    {
+      "id": "athletics",
+      "name": "Athletics",
+      "linkedAttribute": "strength",
+      "proficiencyType": "boolean",
+      "rollFormula": "1d20 + {strength_mod}"
+    }
+  ],
+  "characterTemplate": {
+    "id": "character",
+    "systemId": "pf2e",
+    "entityType": "character",
+    "name": "Character",
+    "fields": [],
+    "computedFields": [],
+    "sections": [],
+    "rolls": []
+  },
+  "npcTemplates": [],
+  "itemTemplates": [],
+  "rollResolver": {
+    "type": "threshold"
+  },
+  "sheetLayouts": []
+}
