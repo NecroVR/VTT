@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Item } from '@vtt/shared';
   import { onMount } from 'svelte';
+  import { browser } from '$app/environment';
   import ItemSheet from '../ItemSheet.svelte';
 
   // Props
@@ -16,6 +17,12 @@
   let showItemSheet = false;
   let selectedItem: Item | null = null;
 
+  // Get auth token
+  function getToken(): string {
+    if (!browser) return '';
+    return localStorage.getItem('vtt_session_id') || sessionStorage.getItem('vtt_session_id') || '';
+  }
+
   onMount(async () => {
     await loadItems();
   });
@@ -25,7 +32,12 @@
     error = null;
 
     try {
-      const response = await fetch(`/api/v1/actors/${actorId}/items`);
+      const token = getToken();
+      const response = await fetch(`/api/v1/actors/${actorId}/items`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (response.ok) {
         const data = await response.json();
         items = data.items || [];
@@ -70,9 +82,13 @@
 
   async function updateItem(itemId: string, updates: Partial<Item>) {
     try {
+      const token = getToken();
       const response = await fetch(`/api/v1/items/${itemId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(updates)
       });
 
