@@ -1,8 +1,12 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import type { Asset, AssetType } from '@vtt/shared';
+  import type { Asset, AssetType, FileCompendiumType } from '@vtt/shared';
   import { assetsStore } from '$lib/stores/assets';
+  import { campaignsStore } from '$lib/stores/campaigns';
+  import { browser } from '$app/environment';
+  import { API_BASE_URL } from '$lib/config/api';
   import AssetUploader from './AssetUploader.svelte';
+  import CompendiumBrowser from './CompendiumBrowser.svelte';
 
   // Props
   export let campaignId: string | undefined = undefined;
@@ -15,6 +19,13 @@
   let searchQuery = '';
   let selectedAssetId: string | null = null;
   let showUploader = false;
+  let activeSection: 'files' | FileCompendiumType = 'files';
+  let availableTypes: FileCompendiumType[] = [];
+  let loadingTypes = false;
+
+  // Get current campaign to access gameSystemId
+  $: currentCampaign = $campaignsStore.currentCampaign;
+  $: gameSystemId = currentCampaign?.gameSystemId;
 
   // Reactive assets list
   $: assets = Array.from($assetsStore.assets.values())
@@ -54,7 +65,35 @@
     // Load all user assets (not filtered by campaign)
     // Assets are tied to user accounts, not campaigns
     await assetsStore.loadAssets();
+
+    // Load available compendium types if game system is available
+    if (gameSystemId) {
+      loadCompendiumTypes();
+    }
   });
+
+  // Reactive: reload compendium types when game system changes
+  $: if (browser && gameSystemId) {
+    loadCompendiumTypes();
+  }
+
+  async function loadCompendiumTypes() {
+    if (!browser || !gameSystemId) return;
+
+    loadingTypes = true;
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/compendium/${gameSystemId}/types`);
+
+      if (response.ok) {
+        const data = await response.json();
+        availableTypes = data.types || [];
+      }
+    } catch (error) {
+      console.error('Error loading compendium types:', error);
+    } finally {
+      loadingTypes = false;
+    }
+  }
 
   function handleUpload(event: CustomEvent<Asset>) {
     showUploader = false;
@@ -107,36 +146,56 @@
 </script>
 
 <div class="asset-browser">
-  <!-- Header -->
+  <!-- Header with Tabs -->
   <div class="browser-header">
-    <div class="header-left">
-      <h3>Assets</h3>
-      <span class="asset-count">{assets.length} items</span>
-    </div>
-    <div class="header-right">
+    <div class="header-tabs">
       <button
-        class="button-primary"
-        on:click={() => (showUploader = !showUploader)}
+        class="tab-button"
+        class:active={activeSection === 'files'}
+        on:click={() => (activeSection = 'files')}
       >
-        {showUploader ? 'Hide Uploader' : 'Upload New'}
+        Files
       </button>
+      {#if gameSystemId && !loadingTypes}
+        {#each availableTypes as type}
+          <button
+            class="tab-button"
+            class:active={activeSection === type}
+            on:click={() => (activeSection = type)}
+          >
+            {type.charAt(0).toUpperCase() + type.slice(1)}
+          </button>
+        {/each}
+      {/if}
     </div>
+    {#if activeSection === 'files'}
+      <div class="header-right">
+        <button
+          class="button-primary"
+          on:click={() => (showUploader = !showUploader)}
+        >
+          {showUploader ? 'Hide Uploader' : 'Upload New'}
+        </button>
+      </div>
+    {/if}
   </div>
 
-  <!-- Uploader -->
-  {#if showUploader}
-    <div class="uploader-container">
-      <AssetUploader
-        assetType={filterType === 'all' ? 'other' : filterType}
-        {campaignId}
-        on:upload={handleUpload}
-        on:error={handleUploadError}
-      />
-    </div>
-  {/if}
+  <!-- Content Section -->
+  {#if activeSection === 'files'}
+    <!-- Uploader -->
+    {#if showUploader}
+      <div class="uploader-container">
+        <AssetUploader
+          assetType={filterType === 'all' ? 'other' : filterType}
+          {campaignId}
+          on:upload={handleUpload}
+          on:error={handleUploadError}
+        />
+      </div>
+    {/if}
 
-  <!-- Toolbar -->
-  <div class="browser-toolbar">
+    <!-- Toolbar -->
+    <div class="browser-toolbar">
     <div class="toolbar-left">
       <input
         type="text"
@@ -325,6 +384,22 @@
       </div>
     {/if}
   </div>
+  {:else if gameSystemId && campaignId}
+    <!-- Compendium Browser -->
+    <CompendiumBrowser
+      systemId={gameSystemId}
+      type={activeSection}
+      {campaignId}
+    />
+  {:else}
+    <!-- No game system selected -->
+    <div class="browser-content">
+      <div class="empty-state">
+        <p>No game system selected for this campaign</p>
+        <p class="empty-hint">Compendium content requires a game system</p>
+      </div>
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -339,27 +414,46 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1rem;
+    padding: 0;
     border-bottom: 1px solid #374151;
     background-color: #111827;
   }
 
-  .header-left {
+  .header-tabs {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    flex: 1;
+  }
+
+  .tab-button {
+    padding: 1rem 1.5rem;
+    background-color: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: #9ca3af;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .tab-button:hover {
+    background-color: #1f2937;
+    color: #d1d5db;
+  }
+
+  .tab-button.active {
+    color: #60a5fa;
+    border-bottom-color: #3b82f6;
+    background-color: #1f2937;
+  }
+
+  .header-right {
+    padding: 0.75rem 1rem;
     display: flex;
     align-items: center;
-    gap: 1rem;
-  }
-
-  .browser-header h3 {
-    margin: 0;
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #f9fafb;
-  }
-
-  .asset-count {
-    font-size: 0.875rem;
-    color: #9ca3af;
   }
 
   .uploader-container {
@@ -495,6 +589,12 @@
     width: 64px;
     height: 64px;
     opacity: 0.5;
+  }
+
+  .empty-hint {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 0.5rem;
   }
 
   .spinner {
