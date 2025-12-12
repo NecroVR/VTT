@@ -9,6 +9,8 @@ services:
       POSTGRES_USER: claude
       POSTGRES_PASSWORD: Claude^YV18
       POSTGRES_DB: vtt
+    ports:
+      - "5433:5432"  # Map to 5433 to avoid conflict with other postgres instances
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:

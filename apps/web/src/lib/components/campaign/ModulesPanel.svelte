@@ -51,7 +51,9 @@
       // (avoids race condition with reactive statements)
       const active = loadedModules.filter(cm => cm.isActive);
       if (active.length > 0) {
-        selectedModuleId = active[0].moduleId;
+        // Use the nested module's id if available (guaranteed correct), fallback to moduleId
+        const firstModule = active[0] as any;
+        selectedModuleId = firstModule.module?.id || active[0].moduleId;
       }
     } catch (err) {
       error = err instanceof Error ? err.message : 'Failed to load campaign modules';
@@ -230,9 +232,11 @@
           <option value="">No modules available</option>
         {:else}
           {#each activeModules as cm}
-            {@const module = $modulesStore.modules.get(cm.moduleId)}
+            {@const cmAny = cm as any}
+            {@const moduleId = cmAny.module?.id || cm.moduleId}
+            {@const module = $modulesStore.modules.get(moduleId) || cmAny.module}
             {#if module}
-              <option value={cm.moduleId}>{module.name}</option>
+              <option value={moduleId}>{module.name}</option>
             {/if}
           {/each}
         {/if}
