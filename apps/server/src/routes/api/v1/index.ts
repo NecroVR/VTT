@@ -30,6 +30,7 @@ import pathsRoute from './paths.js';
 import docsRoute from './docs.js';
 import itemTemplatesRoute from './itemTemplates.js';
 import modulesRoute from './modules.js';
+import formsRoute from './forms.js';
 
 /**
  * API v1 routes
@@ -81,6 +82,9 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
         campaignModules: '/api/v1/campaigns/:campaignId/modules',
         propertyDefinitions: '/api/v1/game-systems/:systemId/property-definitions',
         validationErrors: '/api/v1/modules/:moduleId/validation-errors',
+        forms: '/api/v1/game-systems/:systemId/forms',
+        campaignForms: '/api/v1/campaigns/:campaignId/forms',
+        activeForm: '/api/v1/campaigns/:campaignId/forms/active/:entityType',
       },
     };
   });
@@ -117,6 +121,7 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
   await fastify.register(docsRoute);
   await fastify.register(itemTemplatesRoute);
   await fastify.register(modulesRoute);
+  await fastify.register(formsRoute);
 };
 
 export default apiV1Routes;
