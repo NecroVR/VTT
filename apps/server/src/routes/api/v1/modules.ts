@@ -8,7 +8,7 @@ import {
   campaignModules,
   campaigns,
 } from '@vtt/database';
-import { eq, and, sql, ilike, inArray, isNull, desc } from 'drizzle-orm';
+import { eq, and, sql, ilike, inArray, isNull, desc, getTableColumns } from 'drizzle-orm';
 import type {
   Module,
   ModuleResponse,
@@ -20,6 +20,7 @@ import type {
   ModuleEntityWithProperties,
   ModuleEntityFullResponse,
   EntitySearchParams,
+  EntityGroup,
   CampaignModule,
   AddModuleToCampaignInput,
   UpdateCampaignModuleInput,
@@ -32,6 +33,24 @@ import { authenticate } from '../../../middleware/auth.js';
 import { ModuleLoaderService } from '../../../services/moduleLoader.js';
 import { moduleValidatorService } from '../../../services/moduleValidator.js';
 import { getScheduler } from '../../../services/validationScheduler.js';
+
+/**
+ * Helper function to generate spell level labels
+ */
+function getSpellLevelLabel(level: number): string {
+  if (level === 0) return 'Cantrip';
+  if (level === 1) return '1st Level';
+  if (level === 2) return '2nd Level';
+  if (level === 3) return '3rd Level';
+  return `${level}th Level`;
+}
+
+/**
+ * Helper function to capitalize strings (for item types)
+ */
+function capitalize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
 
 /**
  * Module API routes
@@ -639,6 +658,7 @@ const modulesRoute: FastifyPluginAsync = async (fastify) => {
         pageSize = 50,
         sortBy = 'name',
         sortOrder = 'asc',
+        groupBy,
       } = request.query;
 
       try {
@@ -690,6 +710,104 @@ const modulesRoute: FastifyPluginAsync = async (fastify) => {
 
         const total = countResult?.count || 0;
 
+        // Get all available entity types for this module (regardless of current filter)
+        const typesResult = await fastify.db
+          .selectDistinct({ entityType: moduleEntities.entityType })
+          .from(moduleEntities)
+          .where(eq(moduleEntities.moduleId, moduleId))
+          .orderBy(moduleEntities.entityType);
+
+        const availableTypes = typesResult.map(r => r.entityType);
+
+        // Handle grouping if requested
+        if (groupBy && groupBy !== 'none') {
+          // Determine property key based on groupBy parameter
+          const propertyKey = groupBy === 'level' ? 'level' : 'itemType';
+
+          // Get entities with group keys
+          const entitiesWithGroup = await fastify.db
+            .select({
+              ...getTableColumns(moduleEntities),
+              groupKey: groupBy === 'level'
+                ? sql<number>`COALESCE(${entityProperties.valueInteger}, -1)`.as('group_key')
+                : sql<string>`COALESCE(${entityProperties.valueString}, 'other')`.as('group_key'),
+            })
+            .from(moduleEntities)
+            .leftJoin(
+              entityProperties,
+              and(
+                eq(entityProperties.entityId, moduleEntities.id),
+                eq(entityProperties.propertyKey, propertyKey)
+              )
+            )
+            .where(and(...whereConditions))
+            .orderBy(sql`group_key`, moduleEntities.name)
+            .limit(pageSizeNum)
+            .offset(offset);
+
+          // Get group counts
+          const groupCounts = await fastify.db
+            .select({
+              groupKey: groupBy === 'level'
+                ? sql<number>`COALESCE(${entityProperties.valueInteger}, -1)`
+                : sql<string>`COALESCE(${entityProperties.valueString}, 'other')`,
+              count: sql<number>`count(*)::int`,
+            })
+            .from(moduleEntities)
+            .leftJoin(
+              entityProperties,
+              and(
+                eq(entityProperties.entityId, moduleEntities.id),
+                eq(entityProperties.propertyKey, propertyKey)
+              )
+            )
+            .where(and(...whereConditions))
+            .groupBy(sql`1`)
+            .orderBy(sql`1`);
+
+          // Build groups with labels
+          const groups: EntityGroup[] = groupCounts.map(gc => {
+            const key = gc.groupKey;
+            let label: string;
+
+            if (groupBy === 'level') {
+              const levelNum = typeof key === 'number' ? key : -1;
+              label = levelNum === -1 ? 'Other' : getSpellLevelLabel(levelNum);
+            } else {
+              const typeStr = typeof key === 'string' ? key : 'other';
+              label = typeStr === 'other' ? 'Other' : capitalize(typeStr);
+            }
+
+            return {
+              groupKey: key,
+              groupLabel: label,
+              count: gc.count,
+            };
+          });
+
+          // Build entityGroupKeys map
+          const entityGroupKeys: Record<string, string | number> = {};
+          for (const entity of entitiesWithGroup) {
+            entityGroupKeys[entity.id] = entity.groupKey;
+          }
+
+          // Remove groupKey from entities (it's not part of ModuleEntity type)
+          const entities = entitiesWithGroup.map(({ groupKey, ...entity }) => entity);
+
+          const response: ModuleEntitiesListResponse = {
+            entities: entities as ModuleEntity[],
+            total,
+            page: pageNum,
+            pageSize: pageSizeNum,
+            availableTypes,
+            groups,
+            entityGroupKeys,
+          };
+
+          return reply.status(200).send(response);
+        }
+
+        // No grouping - use original logic
         // Build order by clause
         let orderByClause;
         if (query) {
@@ -715,15 +833,6 @@ const modulesRoute: FastifyPluginAsync = async (fastify) => {
           .orderBy(orderByClause)
           .limit(pageSizeNum)
           .offset(offset);
-
-        // Get all available entity types for this module (regardless of current filter)
-        const typesResult = await fastify.db
-          .selectDistinct({ entityType: moduleEntities.entityType })
-          .from(moduleEntities)
-          .where(eq(moduleEntities.moduleId, moduleId))
-          .orderBy(moduleEntities.entityType);
-
-        const availableTypes = typesResult.map(r => r.entityType);
 
         const response: ModuleEntitiesListResponse = {
           entities: entities as ModuleEntity[],

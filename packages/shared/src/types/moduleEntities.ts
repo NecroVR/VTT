@@ -212,6 +212,18 @@ export interface ModuleEntityResponse {
 }
 
 /**
+ * Group information for grouped entity results
+ */
+export interface EntityGroup {
+  /** The group value (e.g., 0-9 for spell levels, "weapon" for item types) */
+  groupKey: string | number;
+  /** Human-readable label (e.g., "Cantrip", "1st Level", "Weapon") */
+  groupLabel: string;
+  /** Total entities in this group */
+  count: number;
+}
+
+/**
  * List of entities response
  */
 export interface ModuleEntitiesListResponse {
@@ -221,6 +233,10 @@ export interface ModuleEntitiesListResponse {
   pageSize?: number;
   /** All available entity types for this module (for filter dropdown) */
   availableTypes?: string[];
+  /** Group information when groupBy is specified */
+  groups?: EntityGroup[];
+  /** Map of entity ID to group key */
+  entityGroupKeys?: Record<string, string | number>;
 }
 
 /**
@@ -271,6 +287,13 @@ export interface EntitySearchParams {
    * Sort direction
    */
   sortOrder?: 'asc' | 'desc';
+
+  /**
+   * Group results by a property key
+   * 'level' for spells (groups by 0-9)
+   * 'itemType' for items (groups by category)
+   */
+  groupBy?: 'level' | 'itemType' | 'none';
 }
 
 // ============================================================================
