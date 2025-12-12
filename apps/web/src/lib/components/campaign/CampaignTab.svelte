@@ -11,7 +11,6 @@
       campaignId="campaign-123"
       gameSystemId="dnd5e"
       isGM={true}
-      actors={[]}
     />
 -->
 <script lang="ts">
@@ -24,7 +23,6 @@
   export let campaignId: string;
   export let gameSystemId: string | null = null;
   export let isGM: boolean = false;
-  export let actors: any[] = [];
 
   const dispatch = createEventDispatcher();
 
@@ -82,7 +80,6 @@
         <ModulesPanel
           {campaignId}
           {gameSystemId}
-          {actors}
         />
       </div>
     {:else if activeSubTab === 'uploads'}

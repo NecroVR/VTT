@@ -8,7 +8,6 @@
   // Props
   export let campaignId: string;
   export let gameSystemId: string | null;
-  export let actors: any[];
 
   // State
   let entities: ModuleEntity[] = [];
@@ -21,9 +20,6 @@
   let total = 0;
   let hasMore = false;
   let openDropdownId: string | null = null;
-  let addingToActor: string | null = null;
-  let addSuccess: string | null = null;
-  let addError: string | null = null;
   let availableEntityTypes: string[] = [];
   let selectedModuleId: string | null = null;
 
@@ -132,56 +128,6 @@
     openDropdownId = null;
   }
 
-  async function addToActor(entity: ModuleEntity, actorId: string) {
-    if (!browser || !selectedModuleId) return;
-
-    addingToActor = entity.id;
-    addError = null;
-    addSuccess = null;
-    closeDropdown();
-
-    try {
-      const token = localStorage.getItem('vtt_session_id') || sessionStorage.getItem('vtt_session_id');
-
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
-      const response = await fetch(`${API_BASE_URL}/api/v1/actors/${actorId}/items`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          fromModule: {
-            moduleId: selectedModuleId,
-            entityId: entity.id,
-          },
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: response.statusText }));
-        throw new Error(errorData.error || 'Failed to add item to actor');
-      }
-
-      addSuccess = `Added ${entity.name} to actor`;
-      setTimeout(() => {
-        addSuccess = null;
-      }, 3000);
-
-    } catch (err) {
-      addError = err instanceof Error ? err.message : 'Failed to add item to actor';
-      console.error('Error adding item to actor:', err);
-      setTimeout(() => {
-        addError = null;
-      }, 5000);
-    } finally {
-      addingToActor = null;
-    }
-  }
-
   function handleModuleChange(event: Event) {
     const target = event.target as HTMLSelectElement;
     selectedModuleId = target.value;
@@ -204,19 +150,6 @@
 <svelte:window on:click={closeDropdown} />
 
 <div class="modules-panel">
-  <!-- Success/Error Messages -->
-  {#if addSuccess}
-    <div class="notification success">
-      {addSuccess}
-    </div>
-  {/if}
-
-  {#if addError}
-    <div class="notification error">
-      {addError}
-    </div>
-  {/if}
-
   <!-- Module Selection and Filters -->
   <div class="panel-toolbar">
     <div class="module-selector">
@@ -315,39 +248,30 @@
               {/if}
             </div>
             <div class="entity-actions">
-              {#if actors.length > 0}
-                <div class="dropdown-wrapper">
-                  <button
-                    class="button-primary"
-                    class:loading={addingToActor === entity.id}
-                    disabled={addingToActor === entity.id}
-                    on:click={(e) => toggleDropdown(entity.id, e)}
-                  >
-                    {addingToActor === entity.id ? 'Adding...' : 'Add to Actor'}
-                    {#if addingToActor !== entity.id}
-                      <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M3.5 6.5a.5.5 0 0 1 .5.5L8 11l4-4a.5.5 0 0 1 .707.707l-4.5 4.5a.5.5 0 0 1-.707 0l-4.5-4.5A.5.5 0 0 1 3.5 6.5z"/>
-                      </svg>
-                    {/if}
-                  </button>
-                  {#if openDropdownId === entity.id}
-                    <div class="actor-dropdown" on:click|stopPropagation>
-                      {#each actors as actor}
-                        <button
-                          class="dropdown-item"
-                          on:click={() => addToActor(entity, actor.id)}
-                        >
-                          {actor.name}
-                        </button>
-                      {/each}
-                    </div>
-                  {/if}
-                </div>
-              {:else}
-                <div class="no-actors-hint">
-                  Create an actor to add items
-                </div>
-              {/if}
+              <div class="dropdown-wrapper">
+                <button
+                  class="button-secondary"
+                  on:click={(e) => toggleDropdown(entity.id, e)}
+                >
+                  Actions
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M3.5 6.5a.5.5 0 0 1 .5.5L8 11l4-4a.5.5 0 0 1 .707.707l-4.5 4.5a.5.5 0 0 1-.707 0l-4.5-4.5A.5.5 0 0 1 3.5 6.5z"/>
+                  </svg>
+                </button>
+                {#if openDropdownId === entity.id}
+                  <div class="actions-dropdown" on:click|stopPropagation>
+                    <button class="dropdown-item" disabled>
+                      View Details
+                    </button>
+                    <button class="dropdown-item" disabled>
+                      Edit Override
+                    </button>
+                    <button class="dropdown-item" disabled>
+                      Exclude from Campaign
+                    </button>
+                  </div>
+                {/if}
+              </div>
             </div>
           </div>
         {/each}
@@ -651,7 +575,7 @@
     color: #d1d5db;
   }
 
-  .actor-dropdown {
+  .actions-dropdown {
     position: absolute;
     top: calc(100% + 4px);
     right: 0;
@@ -677,14 +601,13 @@
     transition: background-color 0.15s ease;
   }
 
-  .dropdown-item:hover {
+  .dropdown-item:hover:not(:disabled) {
     background-color: #374151;
   }
 
-  .no-actors-hint {
-    font-size: 0.75rem;
+  .dropdown-item:disabled {
     color: #6b7280;
-    padding: 0.5rem;
+    cursor: not-allowed;
   }
 
   .load-more-container {

@@ -11,7 +11,8 @@
  *
  * Usage:
  *   pnpm seed:dnd5e
- *   pnpm seed:dnd5e --reload  # Force reload even if module exists
+ *   pnpm seed:dnd5e --reload         # Reload if module content changed
+ *   pnpm seed:dnd5e --reload --force # Force reload even if content unchanged
  */
 
 import { createDb } from '@vtt/database';
@@ -36,6 +37,7 @@ const MODULE_PATH = GAME_SYSTEMS_PATH;
 
 interface SeedOptions {
   reload?: boolean;
+  force?: boolean;
   verbose?: boolean;
 }
 
@@ -151,8 +153,8 @@ class Dnd5eSeeder {
       }
 
       if (status && options.reload) {
-        console.log('  → Reloading existing module...');
-        await this.moduleLoader.reloadModule(this.db, 'dnd5e-srd', MODULE_PATH);
+        console.log(`  → Reloading existing module${options.force ? ' (forced)' : ''}...`);
+        await this.moduleLoader.reloadModule(this.db, 'dnd5e-srd', MODULE_PATH, options.force);
         console.log('  ✓ Module reloaded');
       } else {
         console.log('  → Loading new module...');
@@ -206,6 +208,7 @@ async function main() {
   const args = process.argv.slice(2);
   const options: SeedOptions = {
     reload: args.includes('--reload'),
+    force: args.includes('--force'),
     verbose: args.includes('--verbose') || args.includes('-v'),
   };
 

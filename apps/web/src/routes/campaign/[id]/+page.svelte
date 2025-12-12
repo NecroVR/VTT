@@ -125,9 +125,6 @@
     ? currentCampaign.ownerId === currentUser.id || (currentCampaign.gmUserIds || []).includes(currentUser.id)
     : false;
 
-  // Get actors for campaign tab
-  $: actors = Array.from($actorsStore.actors.values());
-
   // Define sidebar tabs
   $: tabs = [
     {
@@ -159,8 +156,7 @@
       props: {
         campaignId: campaignId,
         gameSystemId: currentCampaign?.gameSystemId || null,
-        isGM: isGM,
-        actors: actors
+        isGM: isGM
       }
     },
     // Admin tab - only visible to GMs

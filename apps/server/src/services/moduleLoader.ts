@@ -152,8 +152,9 @@ class ModuleLoaderService {
 
   /**
    * Reload a module (update existing records)
+   * @param force - If true, bypasses the hash check and forces reload
    */
-  async reloadModule(db: Database, moduleId: string, modulePath: string): Promise<Module> {
+  async reloadModule(db: Database, moduleId: string, modulePath: string, force: boolean = false): Promise<Module> {
     try {
       // Find existing module
       const [existingModule] = await db
@@ -166,9 +167,9 @@ class ModuleLoaderService {
         throw new Error(`Module ${moduleId} not found in database`);
       }
 
-      // Check if source has changed
+      // Check if source has changed (unless force is true)
       const sourceHash = await this.calculateDirectoryHash(modulePath);
-      if (existingModule.sourceHash === sourceHash) {
+      if (!force && existingModule.sourceHash === sourceHash) {
         console.log(`Module ${moduleId} unchanged, skipping reload`);
         return existingModule as Module;
       }
@@ -423,23 +424,55 @@ class ModuleLoaderService {
     const entityPaths = manifest.entities || [];
 
     if (entityPaths.length === 0) {
-      // Scan default entity directories
-      const defaultDirs = ['items', 'spells', 'monsters', 'races', 'classes', 'features'];
-      for (const dir of defaultDirs) {
-        const dirPath = path.join(modulePath, dir);
-        try {
-          const files = await this.scanEntityDirectory(dirPath, dir);
-          entityFiles.push(...files);
-        } catch (error) {
-          // Directory doesn't exist, skip
-          continue;
+      // Scan default entity directories with proper singular entity type names
+      const defaultDirs: Array<{ dir: string; type: string }> = [
+        { dir: 'items', type: 'item' },
+        { dir: 'spells', type: 'spell' },
+        { dir: 'monsters', type: 'monster' },
+        { dir: 'races', type: 'race' },
+        { dir: 'classes', type: 'class' },
+        { dir: 'backgrounds', type: 'background' },
+        { dir: 'features', type: 'feature' },
+        { dir: 'conditions', type: 'condition' },
+        { dir: 'rules', type: 'rule' },
+      ];
+
+      // Check both root level and compendium subdirectory
+      const basePaths = [modulePath, path.join(modulePath, 'compendium')];
+
+      for (const basePath of basePaths) {
+        for (const { dir, type } of defaultDirs) {
+          const dirPath = path.join(basePath, dir);
+          try {
+            const files = await this.scanEntityDirectory(dirPath, type);
+            entityFiles.push(...files);
+          } catch (error) {
+            // Directory doesn't exist, skip
+            continue;
+          }
         }
       }
     } else {
-      // Load from specified paths
+      // Load from specified paths, inferring type from directory name
+      const dirTypeMap: Record<string, string> = {
+        items: 'item',
+        spells: 'spell',
+        monsters: 'monster',
+        races: 'race',
+        classes: 'class',
+        backgrounds: 'background',
+        features: 'feature',
+        conditions: 'condition',
+        rules: 'rule',
+      };
+
       for (const entityPath of entityPaths) {
         const fullPath = path.join(modulePath, entityPath);
-        const files = await this.loadEntityFile(fullPath);
+        // Infer type from parent directory (e.g., "compendium/spells/cantrips.json" -> "spell")
+        const pathParts = entityPath.split('/');
+        const parentDir = pathParts.length >= 2 ? pathParts[pathParts.length - 2] : '';
+        const inferredType = dirTypeMap[parentDir] || 'item';
+        const files = await this.loadEntityFile(fullPath, inferredType);
         entityFiles.push(...files);
       }
     }
