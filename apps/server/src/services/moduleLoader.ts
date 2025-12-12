@@ -641,8 +641,9 @@ class ModuleLoaderService {
     isArrayElement: boolean,
     arrayIndex: number | null
   ): void {
-    let current = obj;
+    let current: any = obj;
 
+    // Navigate to the parent of the target
     for (let i = 0; i < path.length - 1; i++) {
       const key = path[i];
       const nextKey = path[i + 1];
@@ -659,9 +660,15 @@ class ModuleLoaderService {
 
     const lastKey = path[path.length - 1];
 
-    if (isArrayElement && arrayIndex !== null) {
+    // Check if lastKey is a numeric string (array index)
+    const lastKeyIsNumber = !isNaN(Number(lastKey));
+
+    if (lastKeyIsNumber && isArrayElement && arrayIndex !== null) {
+      // We're setting an array element
       if (!Array.isArray(current)) {
-        current = [];
+        // This shouldn't happen if flattening was correct, but handle it
+        console.warn(`Expected array but got ${typeof current} at path ${path.join('.')}`);
+        return;
       }
       current[arrayIndex] = value;
     } else {

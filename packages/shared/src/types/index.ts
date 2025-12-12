@@ -24,3 +24,7 @@ export * from './sceneViewport.js';
 export * from './path.js';
 export * from './game-systems.js';
 export * from './item-templates.js';
+export * from './modules.js';
+export * from './moduleEntities.js';
+export * from './entityProperties.js';
+export * from './validation.js';

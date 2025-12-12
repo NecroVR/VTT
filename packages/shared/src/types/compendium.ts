@@ -280,3 +280,92 @@ export interface CompendiumEntryDeletedPayload {
   entryId: string;
   compendiumId: string;
 }
+
+// ============================================================================
+// FILE-BASED COMPENDIUM SYSTEM TYPES
+// These types support the new file-based compendium architecture where
+// game content is stored as JSON files and loaded at runtime
+// @see docs/architecture/COMPENDIUM_SYSTEM.md
+// ============================================================================
+
+/**
+ * Types of content that can be stored in a compendium
+ */
+export type FileCompendiumType =
+  | 'items'
+  | 'spells'
+  | 'monsters'
+  | 'races'
+  | 'classes'
+  | 'backgrounds'
+  | 'features'
+  | 'conditions';
+
+/**
+ * A single compendium entry (e.g., one spell, one item)
+ * Represents actual game content that can be instantiated
+ */
+export interface FileCompendiumEntry {
+  id: string;
+  name: string;
+  img?: string;
+  description?: string;
+  templateId: string;
+  source: string;
+  data: Record<string, any>;
+}
+
+/**
+ * A compendium file containing multiple entries
+ * This represents a single JSON file on disk
+ */
+export interface FileCompendiumFile {
+  compendiumId: string;
+  name: string;
+  templateId: string;
+  source: string;
+  entries: FileCompendiumEntry[];
+}
+
+/**
+ * In-memory structure after loading a compendium
+ * Entries are indexed by ID for fast lookup
+ */
+export interface LoadedFileCompendium {
+  systemId: string;
+  type: FileCompendiumType;
+  entries: Map<string, FileCompendiumEntry>;
+}
+
+/**
+ * Parameters for searching compendium content
+ */
+export interface FileCompendiumSearchParams {
+  search?: string;
+  filters?: Record<string, string | string[]>;
+  page?: number;
+  limit?: number;
+}
+
+/**
+ * Search results from compendium API
+ */
+export interface FileCompendiumSearchResult {
+  entries: FileCompendiumEntry[];
+  total: number;
+  page: number;
+  limit: number;
+  hasMore: boolean;
+}
+
+/**
+ * Request to add a compendium entry to an actor
+ * This creates a database record from a file-based entry
+ */
+export interface AddFromFileCompendiumRequest {
+  fromCompendium: {
+    systemId: string;
+    type: FileCompendiumType;
+    entryId: string;
+  };
+}
