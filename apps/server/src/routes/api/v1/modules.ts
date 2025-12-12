@@ -87,6 +87,18 @@ function getCRLabel(cr: string): string {
 }
 
 /**
+ * Helper function to convert CR string to numeric value for sorting
+ */
+function crToNumeric(cr: string): number {
+  if (cr === '0') return 0;
+  if (cr === '1/8' || cr === '0.125') return 0.125;
+  if (cr === '1/4' || cr === '0.25') return 0.25;
+  if (cr === '1/2' || cr === '0.5') return 0.5;
+  const num = parseFloat(cr);
+  return isNaN(num) ? 999 : num; // Unknown CRs sort to end
+}
+
+/**
  * Module API routes
  * Handles module management, entity browsing, and campaign-module relationships
  */
@@ -857,6 +869,15 @@ const modulesRoute: FastifyPluginAsync = async (fastify) => {
               .where(and(...whereConditions))
               .groupBy(sql`1`)
               .orderBy(sql`1`);
+          }
+
+          // Sort groupCounts numerically for CR
+          if (groupBy === 'cr') {
+            groupCounts.sort((a, b) => {
+              const keyA = a.groupKey ?? a.group_key;
+              const keyB = b.groupKey ?? b.group_key;
+              return crToNumeric(String(keyA)) - crToNumeric(String(keyB));
+            });
           }
 
           // Build groups with labels
