@@ -33,6 +33,7 @@
     PersonIcon,
     ImageIcon,
     GearIcon,
+    FolderIcon,
   } from '$lib/components/icons';
 
   // Tab interface
@@ -98,6 +99,7 @@
     person: PersonIcon,
     image: ImageIcon,
     gear: GearIcon,
+    folder: FolderIcon,
   };
 
   function handleTabClick(tabId: string) {
