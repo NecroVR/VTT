@@ -2,6 +2,7 @@ import type { FastifyPluginAsync } from 'fastify';
 import usersRoute from './users.js';
 import authRoute from './auth.js';
 import campaignsRoute from './campaigns.js';
+import gameSystemsRoute from './gameSystems.js';
 import scenesRoute from './scenes.js';
 import tokensRoute from './tokens.js';
 import actorsRoute from './actors.js';
@@ -43,6 +44,7 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
         users: '/api/v1/users',
         auth: '/api/v1/auth',
         campaigns: '/api/v1/campaigns',
+        gameSystems: '/api/v1/game-systems',
         scenes: '/api/v1/scenes',
         actors: '/api/v1/actors',
         items: '/api/v1/items',
@@ -77,6 +79,7 @@ const apiV1Routes: FastifyPluginAsync = async (fastify) => {
   await fastify.register(usersRoute);
   await fastify.register(authRoute);
   await fastify.register(campaignsRoute);
+  await fastify.register(gameSystemsRoute);
   await fastify.register(scenesRoute);
   await fastify.register(tokensRoute);
   await fastify.register(actorsRoute);

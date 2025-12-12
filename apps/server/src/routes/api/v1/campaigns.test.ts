@@ -78,6 +78,7 @@ describe('Campaigns Routes', () => {
         },
         payload: {
           name: 'Test Campaign',
+          gameSystemId: 'dnd5e',
           settings: {
             gridType: 'hex',
             gridSize: 75,
@@ -91,6 +92,7 @@ describe('Campaigns Routes', () => {
       expect(body).toHaveProperty('campaign');
       expect(body.campaign.name).toBe('Test Campaign');
       expect(body.campaign.ownerId).toBe(userId);
+      expect(body.campaign.gameSystemId).toBe('dnd5e');
       expect(body.campaign.settings.gridType).toBe('hex');
       expect(body.campaign.settings.gridSize).toBe(75);
       expect(body.campaign.settings.snapToGrid).toBe(false);
@@ -105,6 +107,7 @@ describe('Campaigns Routes', () => {
         },
         payload: {
           name: 'Test Campaign',
+          gameSystemId: 'dnd5e',
         },
       });
 
@@ -124,6 +127,7 @@ describe('Campaigns Routes', () => {
         },
         payload: {
           name: '  Test Campaign  ',
+          gameSystemId: 'dnd5e',
         },
       });
 
@@ -139,7 +143,9 @@ describe('Campaigns Routes', () => {
         headers: {
           authorization: `Bearer ${sessionId}`,
         },
-        payload: {},
+        payload: {
+          gameSystemId: 'dnd5e',
+        },
       });
 
       expect(response.statusCode).toBe(400);
@@ -156,6 +162,7 @@ describe('Campaigns Routes', () => {
         },
         payload: {
           name: '',
+          gameSystemId: 'dnd5e',
         },
       });
 
@@ -173,6 +180,7 @@ describe('Campaigns Routes', () => {
         },
         payload: {
           name: '   ',
+          gameSystemId: 'dnd5e',
         },
       });
 
@@ -181,12 +189,30 @@ describe('Campaigns Routes', () => {
       expect(body.error).toBe('Campaign name is required');
     });
 
+    it('should return 400 if gameSystemId is missing', async () => {
+      const response = await app.inject({
+        method: 'POST',
+        url: '/api/v1/campaigns',
+        headers: {
+          authorization: `Bearer ${sessionId}`,
+        },
+        payload: {
+          name: 'Test Campaign',
+        },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error).toBe('Game system ID is required');
+    });
+
     it('should return 401 without authorization header', async () => {
       const response = await app.inject({
         method: 'POST',
         url: '/api/v1/campaigns',
         payload: {
           name: 'Test Campaign',
+          gameSystemId: 'dnd5e',
         },
       });
 
@@ -202,6 +228,7 @@ describe('Campaigns Routes', () => {
         },
         payload: {
           name: 'Test Campaign',
+          gameSystemId: 'dnd5e',
         },
       });
 
@@ -228,6 +255,7 @@ describe('Campaigns Routes', () => {
         },
         payload: {
           name: 'First Campaign',
+          gameSystemId: 'dnd5e',
         },
       });
 
@@ -263,6 +291,7 @@ describe('Campaigns Routes', () => {
         },
         payload: {
           name: 'Test Campaign',
+          gameSystemId: 'dnd5e',
         },
       });
 
@@ -291,6 +320,7 @@ describe('Campaigns Routes', () => {
         },
         payload: {
           name: 'Campaign 1',
+          gameSystemId: 'dnd5e',
         },
       });
 
@@ -302,6 +332,7 @@ describe('Campaigns Routes', () => {
         },
         payload: {
           name: 'Campaign 2',
+          gameSystemId: 'pf2e',
         },
       });
 
@@ -314,6 +345,7 @@ describe('Campaigns Routes', () => {
         },
         payload: {
           name: 'Other User Campaign',
+          gameSystemId: 'dnd5e',
         },
       });
     });
@@ -404,6 +436,7 @@ describe('Campaigns Routes', () => {
         },
         payload: {
           name: 'Test Campaign',
+          gameSystemId: 'dnd5e',
         },
       });
       const campaignBody = JSON.parse(campaignResponse.body);
@@ -418,6 +451,7 @@ describe('Campaigns Routes', () => {
         },
         payload: {
           name: 'Other User Campaign',
+          gameSystemId: 'dnd5e',
         },
       });
       const otherCampaignBody = JSON.parse(otherCampaignResponse.body);
@@ -504,6 +538,7 @@ describe('Campaigns Routes', () => {
         },
         payload: {
           name: 'Test Campaign',
+          gameSystemId: 'dnd5e',
           settings: {
             gridType: 'square',
             gridSize: 50,
@@ -523,6 +558,7 @@ describe('Campaigns Routes', () => {
         },
         payload: {
           name: 'Other User Campaign',
+          gameSystemId: 'dnd5e',
         },
       });
       const otherCampaignBody = JSON.parse(otherCampaignResponse.body);
@@ -716,6 +752,23 @@ describe('Campaigns Routes', () => {
 
       expect(response.statusCode).toBe(401);
     });
+
+    it('should prevent changing gameSystemId once set', async () => {
+      const response = await app.inject({
+        method: 'PATCH',
+        url: `/api/v1/campaigns/${campaignId}`,
+        headers: {
+          authorization: `Bearer ${sessionId}`,
+        },
+        payload: {
+          gameSystemId: 'pf2e',
+        },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error).toBe('Cannot change game system once set. The game system is immutable after campaign creation.');
+    });
   });
 
   describe('DELETE /api/v1/campaigns/:id', () => {
@@ -732,6 +785,7 @@ describe('Campaigns Routes', () => {
         },
         payload: {
           name: 'Test Campaign',
+          gameSystemId: 'dnd5e',
         },
       });
       const campaignBody = JSON.parse(campaignResponse.body);
@@ -746,6 +800,7 @@ describe('Campaigns Routes', () => {
         },
         payload: {
           name: 'Other User Campaign',
+          gameSystemId: 'dnd5e',
         },
       });
       const otherCampaignBody = JSON.parse(otherCampaignResponse.body);

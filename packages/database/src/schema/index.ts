@@ -1,5 +1,6 @@
 export * from './users.js';
 export * from './campaigns.js';
+export * from './gameSystems.js';
 export * from './scenes.js';
 export * from './sceneViewports.js';
 export * from './tokens.js';

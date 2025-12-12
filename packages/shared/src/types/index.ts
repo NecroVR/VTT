@@ -22,3 +22,4 @@ export * from './scenePin.js';
 export * from './compendium.js';
 export * from './sceneViewport.js';
 export * from './path.js';
+export * from './game-systems.js';

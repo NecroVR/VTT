@@ -30,6 +30,7 @@ const campaignsRoute: FastifyPluginAsync = async (fastify) => {
             name: campaigns.name,
             ownerId: campaigns.ownerId,
             gmUserIds: campaigns.gmUserIds,
+            gameSystemId: campaigns.gameSystemId,
             settings: campaigns.settings,
             createdAt: campaigns.createdAt,
             updatedAt: campaigns.updatedAt,
@@ -43,6 +44,7 @@ const campaignsRoute: FastifyPluginAsync = async (fastify) => {
           name: campaign.name,
           ownerId: campaign.ownerId,
           gmUserIds: campaign.gmUserIds || [],
+          gameSystemId: campaign.gameSystemId,
           settings: campaign.settings as CampaignSettings,
           createdAt: campaign.createdAt,
           updatedAt: campaign.updatedAt,
@@ -77,6 +79,7 @@ const campaignsRoute: FastifyPluginAsync = async (fastify) => {
             name: campaigns.name,
             ownerId: campaigns.ownerId,
             gmUserIds: campaigns.gmUserIds,
+            gameSystemId: campaigns.gameSystemId,
             settings: campaigns.settings,
             createdAt: campaigns.createdAt,
             updatedAt: campaigns.updatedAt,
@@ -99,6 +102,7 @@ const campaignsRoute: FastifyPluginAsync = async (fastify) => {
           name: campaign.name,
           ownerId: campaign.ownerId,
           gmUserIds: campaign.gmUserIds || [],
+          gameSystemId: campaign.gameSystemId,
           settings: campaign.settings as CampaignSettings,
           createdAt: campaign.createdAt,
           updatedAt: campaign.updatedAt,
@@ -124,11 +128,15 @@ const campaignsRoute: FastifyPluginAsync = async (fastify) => {
         return reply.status(401).send({ error: 'Not authenticated' });
       }
 
-      const { name, settings } = request.body;
+      const { name, settings, gameSystemId } = request.body;
 
       // Validate input
       if (!name || name.trim() === '') {
         return reply.status(400).send({ error: 'Campaign name is required' });
+      }
+
+      if (!gameSystemId) {
+        return reply.status(400).send({ error: 'Game system ID is required' });
       }
 
       try {
@@ -149,6 +157,7 @@ const campaignsRoute: FastifyPluginAsync = async (fastify) => {
             name: name.trim(),
             ownerId: request.user.id,
             gmUserIds: [],
+            gameSystemId: gameSystemId,
             settings: campaignSettings,
           })
           .returning({
@@ -156,6 +165,7 @@ const campaignsRoute: FastifyPluginAsync = async (fastify) => {
             name: campaigns.name,
             ownerId: campaigns.ownerId,
             gmUserIds: campaigns.gmUserIds,
+            gameSystemId: campaigns.gameSystemId,
             settings: campaigns.settings,
             createdAt: campaigns.createdAt,
             updatedAt: campaigns.updatedAt,
@@ -180,6 +190,7 @@ const campaignsRoute: FastifyPluginAsync = async (fastify) => {
           name: newCampaign.name,
           ownerId: newCampaign.ownerId,
           gmUserIds: newCampaign.gmUserIds || [],
+          gameSystemId: newCampaign.gameSystemId,
           settings: newCampaign.settings as CampaignSettings,
           createdAt: newCampaign.createdAt,
           updatedAt: newCampaign.updatedAt,
@@ -206,10 +217,10 @@ const campaignsRoute: FastifyPluginAsync = async (fastify) => {
       }
 
       const { id } = request.params;
-      const { name, settings } = request.body;
+      const { name, settings, gameSystemId } = request.body;
 
       // Validate at least one field is provided
-      if (!name && !settings) {
+      if (!name && !settings && gameSystemId === undefined) {
         return reply.status(400).send({ error: 'At least one field (name or settings) is required' });
       }
 
@@ -227,6 +238,15 @@ const campaignsRoute: FastifyPluginAsync = async (fastify) => {
 
         if (existingCampaign.ownerId !== request.user.id) {
           return reply.status(403).send({ error: 'Only the owner can update this campaign' });
+        }
+
+        // Prevent changing gameSystemId if already set (immutability check)
+        if (gameSystemId !== undefined && existingCampaign.gameSystemId) {
+          if (gameSystemId !== existingCampaign.gameSystemId) {
+            return reply.status(400).send({
+              error: 'Cannot change game system once set. The game system is immutable after campaign creation.'
+            });
+          }
         }
 
         // Build update object
@@ -247,6 +267,11 @@ const campaignsRoute: FastifyPluginAsync = async (fastify) => {
           updateData.settings = { ...currentSettings, ...settings };
         }
 
+        // Allow setting gameSystemId if it's not already set
+        if (gameSystemId !== undefined && !existingCampaign.gameSystemId) {
+          updateData.gameSystemId = gameSystemId;
+        }
+
         // Update campaign
         const [updatedCampaign] = await fastify.db
           .update(campaigns)
@@ -257,6 +282,7 @@ const campaignsRoute: FastifyPluginAsync = async (fastify) => {
             name: campaigns.name,
             ownerId: campaigns.ownerId,
             gmUserIds: campaigns.gmUserIds,
+            gameSystemId: campaigns.gameSystemId,
             settings: campaigns.settings,
             createdAt: campaigns.createdAt,
             updatedAt: campaigns.updatedAt,
@@ -267,6 +293,7 @@ const campaignsRoute: FastifyPluginAsync = async (fastify) => {
           name: updatedCampaign.name,
           ownerId: updatedCampaign.ownerId,
           gmUserIds: updatedCampaign.gmUserIds || [],
+          gameSystemId: updatedCampaign.gameSystemId,
           settings: updatedCampaign.settings as CampaignSettings,
           createdAt: updatedCampaign.createdAt,
           updatedAt: updatedCampaign.updatedAt,

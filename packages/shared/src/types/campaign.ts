@@ -3,6 +3,7 @@ export interface Campaign {
   name: string;
   ownerId: string;
   gmUserIds: string[];
+  gameSystemId?: string | null;
   createdAt: Date;
   settings: CampaignSettings;
 }
@@ -126,11 +127,13 @@ export interface MapLayer {
 // Campaign CRUD API Types
 export interface CreateCampaignRequest {
   name: string;
+  gameSystemId: string;
   settings?: Partial<CampaignSettings>;
 }
 
 export interface UpdateCampaignRequest {
   name?: string;
+  gameSystemId?: string;
   settings?: Partial<CampaignSettings>;
 }
 
