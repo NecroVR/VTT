@@ -121,8 +121,15 @@ function createModulesStore() {
           const newCampaignModules = new Map(state.campaignModules);
           newCampaignModules.set(campaignId, campaignModules);
 
-          // Also update modules map with loaded modules
+          // Extract modules from nested campaign module data
           const modules = new Map(state.modules);
+          campaignModules.forEach((cm: CampaignModule & { module?: Module }) => {
+            if (cm.module) {
+              modules.set(cm.module.id, cm.module);
+            }
+          });
+
+          // Also handle separate modules array if provided
           if (data.modules && Array.isArray(data.modules)) {
             data.modules.forEach((module: Module) => {
               modules.set(module.id, module);
