@@ -24,6 +24,7 @@
   let selectedCampaign: Campaign | null = null;
   let token = '';
   let gameSystems: Map<string, GameSystem> = new Map();
+  let gameSystemsLoaded = false;
 
   const unsubscribeCampaigns = campaignsStore.subscribe(state => {
     campaigns = state.campaigns;
@@ -72,18 +73,24 @@
       if (response.ok) {
         const data = await response.json();
         const systems: GameSystem[] = data.gameSystems || [];
+        // Create new Map to trigger reactivity
         gameSystems = new Map(systems.map(s => [s.systemId, s]));
+        gameSystemsLoaded = true;
       }
     } catch (err) {
       console.error('Failed to fetch game systems:', err);
+      gameSystemsLoaded = true; // Mark as loaded even on error
     }
   }
 
-  function getGameSystemName(gameSystemId?: string | null): string {
+  // Reactive function that depends on gameSystemsLoaded to trigger re-renders
+  $: getGameSystemName = (gameSystemId?: string | null): string => {
+    // Reference gameSystemsLoaded to make this reactive
+    if (!gameSystemsLoaded && gameSystems.size === 0) return 'Loading...';
     if (!gameSystemId) return 'Not specified';
     const system = gameSystems.get(gameSystemId);
     return system ? system.name : 'Unknown System';
-  }
+  };
 
   function createNewCampaign() {
     goto('/campaigns/new');
