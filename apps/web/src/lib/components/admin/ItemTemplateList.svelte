@@ -68,7 +68,11 @@
       }
 
       const data = await response.json();
-      templates = data.templates || [];
+      // Combine game system templates and custom templates into one array
+      templates = [
+        ...(data.templates?.gameSystem || []),
+        ...(data.templates?.custom || []),
+      ];
       applyFilters();
     } catch (err) {
       console.error('Error loading templates:', err);
