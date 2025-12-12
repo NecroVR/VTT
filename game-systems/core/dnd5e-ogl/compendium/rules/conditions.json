@@ -7,181 +7,181 @@
     {
       "id": "blinded",
       "name": "Blinded",
-      "img": "icons/magic/perception/eye-ringed-glow-yellow.webp",
-      "description": "A blinded creature can't see and automatically fails any ability check that requires sight.\n\nAttack rolls against the creature have advantage, and the creature's attack rolls have disadvantage.",
+      "img": "icons/conditions/blinded.webp",
+      "description": "A blinded creature can't see and automatically fails any ability check that requires sight.\nAttack rolls against the creature have advantage, and the creatures attack rolls have disadvantage.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
       "data": {
         "featureType": "condition",
-        "effects": "Can't see, automatically fails ability checks requiring sight, attack rolls against have advantage, own attack rolls have disadvantage"
+        "effects": "A blinded creature can't see and automatically fails any ability check that requires sight."
       }
     },
     {
       "id": "charmed",
       "name": "Charmed",
-      "img": "icons/magic/control/hypnosis-mesmerism-pocket-watch.webp",
-      "description": "A charmed creature can't attack the charmer or target the charmer with harmful abilities or magical effects.\n\nThe charmer has advantage on any ability check to interact socially with the creature.",
+      "img": "icons/conditions/charmed.webp",
+      "description": "A charmed creature cant attack the charmer or target the charmer with harmful abilities or magical effects.\nThe charmer has advantage on any ability check to interact socially with the creature.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
       "data": {
         "featureType": "condition",
-        "effects": "Can't attack charmer or target with harmful effects, charmer has advantage on social ability checks"
+        "effects": "A charmed creature cant attack the charmer or target the charmer with harmful abilities or magical effects."
       }
     },
     {
       "id": "deafened",
       "name": "Deafened",
-      "img": "icons/magic/sonic/scream-wail-shout-teal.webp",
-      "description": "A deafened creature can't hear and automatically fails any ability check that requires hearing.",
+      "img": "icons/conditions/deafened.webp",
+      "description": "A deafened creature cant hear and automatically fails any ability check that requires hearing.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
       "data": {
         "featureType": "condition",
-        "effects": "Can't hear, automatically fails ability checks requiring hearing"
+        "effects": "A deafened creature cant hear and automatically fails any ability check that requires hearing."
       }
     },
     {
       "id": "exhaustion",
       "name": "Exhaustion",
-      "img": "icons/magic/death/skull-horned-worn-fire-blue.webp",
-      "description": "Some special abilities and environmental hazards, such as starvation and the long-term effects of freezing or scorching temperatures, can lead to a special condition called exhaustion. Exhaustion is measured in six levels. An effect can give a creature one or more levels of exhaustion, as specified in the effect's description.\n\nLevel 1: Disadvantage on ability checks\nLevel 2: Speed halved\nLevel 3: Disadvantage on attack rolls and saving throws\nLevel 4: Hit point maximum halved\nLevel 5: Speed reduced to 0\nLevel 6: Death\n\nIf an already exhausted creature suffers another effect that causes exhaustion, its current level of exhaustion increases by the amount specified in the effect's description.\n\nA creature suffers the effect of its current level of exhaustion as well as all lower levels. For example, a creature suffering level 2 exhaustion has its speed halved and has disadvantage on ability checks.\n\nAn effect that removes exhaustion reduces its level as specified in the effect's description, with all exhaustion effects ending if a creature's exhaustion level is reduced below 1.\n\nFinishing a long rest reduces a creature's exhaustion level by 1, provided that the creature has also ingested some food and drink.",
+      "img": "icons/conditions/exhaustion.webp",
+      "description": "Some special abilities and environmental hazards, such as starvation and the long-term effects of freezing or scorching temperatures, can lead to a special condition called exhaustion. Exhaustion is measured in six levels. An effect can give a creature one or more levels of exhaustion, as specified in the effects description.\n\n \n \n \n \n \n\nIf an already exhausted creature suffers another effect that causes exhaustion, its current level of  exhaustion increases by the amount specified in the effects description.\nA creature suffers the effect of its current level of exhaustion as well as all lower levels. For example, a creature suffering level 2 exhaustion has its speed halved and has disadvantage on ability checks. \nAn effect that removes exhaustion reduces its level as specified in the effects description, with all exhaustion effects ending if a creatures exhaustion level is reduced below 1.\nFinishing a long rest reduces a creatures exhaustion level by 1, provided that the creature has also  ingested some food and drink.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
       "data": {
         "featureType": "condition",
-        "effects": "Level 1: Disadvantage on ability checks; Level 2: Speed halved; Level 3: Disadvantage on attack rolls and saves; Level 4: HP max halved; Level 5: Speed 0; Level 6: Death. Effects are cumulative."
+        "effects": "Some special abilities and environmental hazards, such as starvation and the long-term effects of freezing or scorching temperatures, can lead to a sp..."
       }
     },
     {
       "id": "frightened",
       "name": "Frightened",
-      "img": "icons/magic/death/skull-horned-goat-pentagram-red.webp",
-      "description": "A frightened creature has disadvantage on ability checks and attack rolls while the source of its fear is within line of sight.\n\nThe creature can't willingly move closer to the source of its fear.",
+      "img": "icons/conditions/frightened.webp",
+      "description": "A frightened creature has disadvantage on ability checks and attack rolls while the source of its fear is within line of sight.\nThe creature cant willingly move closer to the source of its fear.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
       "data": {
         "featureType": "condition",
-        "effects": "Disadvantage on ability checks and attack rolls while source is visible, can't willingly move closer to source"
+        "effects": "A frightened creature has disadvantage on ability checks and attack rolls while the source of its fear is within line of sight."
       }
     },
     {
       "id": "grappled",
       "name": "Grappled",
-      "img": "icons/skills/melee/unarmed-punch-fist-white-red.webp",
-      "description": "A grappled creature's speed becomes 0, and it can't benefit from any bonus to its speed.\n\nThe condition ends if the grappler is incapacitated.\n\nThe condition also ends if an effect removes the grappled creature from the reach of the grappler or grappling effect, such as when a creature is hurled away by the thunderwave spell.",
+      "img": "icons/conditions/grappled.webp",
+      "description": "A grappled creatures speed becomes 0, and it cant benefit from any bonus to its speed. \nThe condition ends if the grappler is incapacitated (see the condition).\nThe condition also ends if an effect removes the grappled creature from the reach of the grappler or grappling effect, such as when a creature is hurled away by the *thunder-wave* spell.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
       "data": {
         "featureType": "condition",
-        "effects": "Speed becomes 0, can't benefit from speed bonuses, ends if grappler is incapacitated or creature is removed from reach"
+        "effects": "A grappled creatures speed becomes 0, and it cant benefit from any bonus to its speed. "
       }
     },
     {
       "id": "incapacitated",
       "name": "Incapacitated",
-      "img": "icons/magic/control/debuff-chains-shackles-movement-purple.webp",
-      "description": "An incapacitated creature can't take actions or reactions.",
+      "img": "icons/conditions/incapacitated.webp",
+      "description": "An incapacitated creature cant take actions or reactions.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
       "data": {
         "featureType": "condition",
-        "effects": "Can't take actions or reactions"
+        "effects": "An incapacitated creature cant take actions or reactions."
       }
     },
     {
       "id": "invisible",
       "name": "Invisible",
-      "img": "icons/magic/perception/shadow-stealth-eyes-purple.webp",
-      "description": "An invisible creature is impossible to see without the aid of magic or a special sense. For the purpose of hiding, the creature is heavily obscured. The creature's location can be detected by any noise it makes or any tracks it leaves.\n\nAttack rolls against the creature have disadvantage, and the creature's attack rolls have advantage.",
+      "img": "icons/conditions/invisible.webp",
+      "description": "An invisible creature is impossible to see without the aid of magic or a special sense. For the purpose of hiding, the creature is heavily obscured. The creatures location can be detected by any noise it makes or any tracks it leaves.\nAttack rolls against the creature have disadvantage, and the creatures attack rolls have advantage.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
       "data": {
         "featureType": "condition",
-        "effects": "Impossible to see without magic or special sense, heavily obscured for hiding, attack rolls against have disadvantage, own attack rolls have advantage"
+        "effects": "An invisible creature is impossible to see without the aid of magic or a special sense. For the purpose of hiding, the creature is heavily obscured. T..."
       }
     },
     {
       "id": "paralyzed",
       "name": "Paralyzed",
-      "img": "icons/magic/control/debuff-energy-hold-yellow-green.webp",
-      "description": "A paralyzed creature is incapacitated and can't move or speak.\n\nThe creature automatically fails Strength and Dexterity saving throws.\n\nAttack rolls against the creature have advantage.\n\nAny attack that hits the creature is a critical hit if the attacker is within 5 feet of the creature.",
+      "img": "icons/conditions/paralyzed.webp",
+      "description": "A paralyzed creature is incapacitated (see the condition) and cant move or speak. \nThe creature automatically fails Strength and Dexterity saving throws.\nAttack rolls against the creature have advantage. \nAny attack that hits the creature is a critical hit if the attacker is within 5 feet of the creature.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
       "data": {
         "featureType": "condition",
-        "effects": "Incapacitated, can't move or speak, auto-fail Str/Dex saves, attacks against have advantage, hits within 5ft are critical hits"
+        "effects": "A paralyzed creature is incapacitated (see the condition) and cant move or speak. "
       }
     },
     {
       "id": "petrified",
       "name": "Petrified",
-      "img": "icons/magic/earth/projectile-stone-boulder-gray.webp",
-      "description": "A petrified creature is transformed, along with any nonmagical object it is wearing or carrying, into a solid inanimate substance (usually stone). Its weight increases by a factor of ten, and it ceases aging.\n\nThe creature is incapacitated, can't move or speak, and is unaware of its surroundings.\n\nAttack rolls against the creature have advantage.\n\nThe creature automatically fails Strength and Dexterity saving throws.\n\nThe creature has resistance to all damage.\n\nThe creature is immune to poison and disease, although a poison or disease already in its system is suspended, not neutralized.",
+      "img": "icons/conditions/petrified.webp",
+      "description": "A petrified creature is transformed, along with any nonmagical object it is wearing or carrying, into a solid inanimate substance (usually stone). Its weight increases by a factor of ten, and it ceases aging.\nThe creature is incapacitated (see the condition), cant move or speak, and is unaware of its surroundings.\nAttack rolls against the creature have advantage.\nThe creature automatically fails Strength and Dexterity saving throws.\nThe creature has resistance to all damage.\nThe creature is immune to poison and disease, although a poison or disease already in its system is suspended, not neutralized.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
       "data": {
         "featureType": "condition",
-        "effects": "Transformed to stone, weight x10, incapacitated, can't move or speak, unaware of surroundings, attacks against have advantage, auto-fail Str/Dex saves, resistance to all damage, immune to poison and disease"
+        "effects": "A petrified creature is transformed, along with any nonmagical object it is wearing or carrying, into a solid inanimate substance (usually stone). Its..."
       }
     },
     {
       "id": "poisoned",
       "name": "Poisoned",
-      "img": "icons/magic/death/skull-poison-green.webp",
+      "img": "icons/conditions/poisoned.webp",
       "description": "A poisoned creature has disadvantage on attack rolls and ability checks.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
       "data": {
         "featureType": "condition",
-        "effects": "Disadvantage on attack rolls and ability checks"
+        "effects": "A poisoned creature has disadvantage on attack rolls and ability checks."
       }
     },
     {
       "id": "prone",
       "name": "Prone",
-      "img": "icons/skills/movement/feet-winged-boots-brown.webp",
-      "description": "A prone creature's only movement option is to crawl, unless it stands up and thereby ends the condition.\n\nThe creature has disadvantage on attack rolls.\n\nAn attack roll against the creature has advantage if the attacker is within 5 feet of the creature. Otherwise, the attack roll has disadvantage.",
+      "img": "icons/conditions/prone.webp",
+      "description": "A prone creatures only movement option is to crawl, unless it stands up and thereby ends the condition.\nThe creature has disadvantage on attack rolls. \nAn attack roll against the creature has advantage if the attacker is within 5 feet of the creature. Otherwise, the attack roll has disadvantage.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
       "data": {
         "featureType": "condition",
-        "effects": "Can only crawl unless stands up, disadvantage on attack rolls, melee attacks against have advantage, ranged attacks against have disadvantage"
+        "effects": "A prone creatures only movement option is to crawl, unless it stands up and thereby ends the condition."
       }
     },
     {
       "id": "restrained",
       "name": "Restrained",
-      "img": "icons/magic/control/debuff-chains-shackles-movement-green.webp",
-      "description": "A restrained creature's speed becomes 0, and it can't benefit from any bonus to its speed.\n\nAttack rolls against the creature have advantage, and the creature's attack rolls have disadvantage.\n\nThe creature has disadvantage on Dexterity saving throws.",
+      "img": "icons/conditions/restrained.webp",
+      "description": "A restrained creatures speed becomes 0, and it cant benefit from any bonus to its speed.\nAttack rolls against the creature have advantage, and the creatures attack rolls have disadvantage.\nThe creature has disadvantage on Dexterity saving throws.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
       "data": {
         "featureType": "condition",
-        "effects": "Speed becomes 0, can't benefit from speed bonuses, attacks against have advantage, own attacks have disadvantage, disadvantage on Dex saves"
+        "effects": "A restrained creatures speed becomes 0, and it cant benefit from any bonus to its speed."
       }
     },
     {
       "id": "stunned",
       "name": "Stunned",
-      "img": "icons/magic/lightning/bolt-strike-blue.webp",
-      "description": "A stunned creature is incapacitated, can't move, and can speak only falteringly.\n\nThe creature automatically fails Strength and Dexterity saving throws.\n\nAttack rolls against the creature have advantage.",
+      "img": "icons/conditions/stunned.webp",
+      "description": "A stunned creature is incapacitated (see the condition), cant move, and can speak only falteringly.\nThe creature automatically fails Strength and Dexterity saving throws.\nAttack rolls against the creature have advantage.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
       "data": {
         "featureType": "condition",
-        "effects": "Incapacitated, can't move, can only speak falteringly, auto-fail Str/Dex saves, attacks against have advantage"
+        "effects": "A stunned creature is incapacitated (see the condition), cant move, and can speak only falteringly."
       }
     },
     {
       "id": "unconscious",
       "name": "Unconscious",
-      "img": "icons/magic/death/skull-crossed-swords-blue.webp",
-      "description": "An unconscious creature is incapacitated, can't move or speak, and is unaware of its surroundings.\n\nThe creature drops whatever it's holding and falls prone.\n\nThe creature automatically fails Strength and Dexterity saving throws.\n\nAttack rolls against the creature have advantage.\n\nAny attack that hits the creature is a critical hit if the attacker is within 5 feet of the creature.",
+      "img": "icons/conditions/unconscious.webp",
+      "description": "An unconscious creature is incapacitated (see the condition), cant move or speak, and is unaware of its surroundings\nThe creature drops whatever its holding and falls prone.\nThe creature automatically fails Strength and Dexterity saving throws.\nAttack rolls against the creature have advantage.\nAny attack that hits the creature is a critical hit if the attacker is within 5 feet of the creature.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
       "data": {
         "featureType": "condition",
-        "effects": "Incapacitated, can't move or speak, unaware of surroundings, drops held items, falls prone, auto-fail Str/Dex saves, attacks against have advantage, hits within 5ft are critical hits"
+        "effects": "An unconscious creature is incapacitated (see the condition), cant move or speak, and is unaware of its surroundings"
       }
     }
   ]

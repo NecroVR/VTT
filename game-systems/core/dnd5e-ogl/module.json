@@ -27,6 +27,12 @@
     "compendium/items/armor.json",
     "compendium/items/adventuring-gear.json",
     "compendium/items/tools.json",
+    "compendium/items/magic-items-common.json",
+    "compendium/items/magic-items-uncommon.json",
+    "compendium/items/magic-items-rare.json",
+    "compendium/items/magic-items-very-rare.json",
+    "compendium/items/magic-items-legendary.json",
+    "compendium/items/magic-items-artifact.json",
     "compendium/spells/cantrips.json",
     "compendium/spells/level-1.json",
     "compendium/spells/level-2.json",
@@ -47,7 +53,9 @@
     "compendium/races/races.json",
     "compendium/classes/classes.json",
     "compendium/backgrounds/backgrounds.json",
-    "compendium/rules/conditions.json"
+    "compendium/rules/conditions.json",
+    "compendium/rules/damage-types.json",
+    "compendium/rules/rules.json"
   ],
 
   "_comment_data": "Additional metadata stored in the modules.data JSONB column",

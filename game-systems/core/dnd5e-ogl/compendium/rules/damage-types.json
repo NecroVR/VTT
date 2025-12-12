@@ -1,0 +1,164 @@
+{
+  "compendiumId": "dnd5e-srd-damage-types",
+  "name": "Damage Types",
+  "templateId": "dnd5e-feature",
+  "source": "SRD 5.1",
+  "entries": [
+    {
+      "id": "acid",
+      "name": "Acid",
+      "img": "icons/damage/acid.webp",
+      "description": "The corrosive spray of a black dragons breath and the dissolving enzymes secreted by a black pudding deal acid damage.",
+      "templateId": "dnd5e-feature",
+      "source": "SRD 5.1",
+      "data": {
+        "featureType": "damage-type",
+        "examples": "The corrosive spray of a black dragons breath and the dissolving enzymes secreted by a black pudding deal acid damage."
+      }
+    },
+    {
+      "id": "bludgeoning",
+      "name": "Bludgeoning",
+      "img": "icons/damage/bludgeoning.webp",
+      "description": "Blunt force attacks - hammers, falling, constriction, and the like - deal bludgeoning damage.",
+      "templateId": "dnd5e-feature",
+      "source": "SRD 5.1",
+      "data": {
+        "featureType": "damage-type",
+        "examples": "Blunt force attacks - hammers, falling, constriction, and the like - deal bludgeoning damage."
+      }
+    },
+    {
+      "id": "cold",
+      "name": "Cold",
+      "img": "icons/damage/cold.webp",
+      "description": "The infernal chill radiating from an ice devils spear and the frigid blast of a white dragons breath deal cold damage.",
+      "templateId": "dnd5e-feature",
+      "source": "SRD 5.1",
+      "data": {
+        "featureType": "damage-type",
+        "examples": "The infernal chill radiating from an ice devils spear and the frigid blast of a white dragons breath deal cold damage."
+      }
+    },
+    {
+      "id": "fire",
+      "name": "Fire",
+      "img": "icons/damage/fire.webp",
+      "description": "Red dragons breathe fire, and many spells conjure flames to deal fire damage.",
+      "templateId": "dnd5e-feature",
+      "source": "SRD 5.1",
+      "data": {
+        "featureType": "damage-type",
+        "examples": "Red dragons breathe fire, and many spells conjure flames to deal fire damage."
+      }
+    },
+    {
+      "id": "force",
+      "name": "Force",
+      "img": "icons/damage/force.webp",
+      "description": "Force is pure magical energy focused into a damaging form. Most effects that deal force damage are spells, including magic missile and spiritual weapon.",
+      "templateId": "dnd5e-feature",
+      "source": "SRD 5.1",
+      "data": {
+        "featureType": "damage-type",
+        "examples": "Force is pure magical energy focused into a damaging form. Most effects that deal force damage are spells, including magic missile and spiritual weapon."
+      }
+    },
+    {
+      "id": "lightning",
+      "name": "Lightning",
+      "img": "icons/damage/lightning.webp",
+      "description": "A *lightning bolt* spell and a blue dragons breath deal lightning damage.",
+      "templateId": "dnd5e-feature",
+      "source": "SRD 5.1",
+      "data": {
+        "featureType": "damage-type",
+        "examples": "A *lightning bolt* spell and a blue dragons breath deal lightning damage."
+      }
+    },
+    {
+      "id": "necrotic",
+      "name": "Necrotic",
+      "img": "icons/damage/necrotic.webp",
+      "description": "Necrotic damage, dealt by certain undead and a spell such as chill touch, withers matter and even the soul.",
+      "templateId": "dnd5e-feature",
+      "source": "SRD 5.1",
+      "data": {
+        "featureType": "damage-type",
+        "examples": "Necrotic damage, dealt by certain undead and a spell such as chill touch, withers matter and even the soul."
+      }
+    },
+    {
+      "id": "piercing",
+      "name": "Piercing",
+      "img": "icons/damage/piercing.webp",
+      "description": "Puncturing and impaling attacks, including spears and monsters bites, deal piercing damage.",
+      "templateId": "dnd5e-feature",
+      "source": "SRD 5.1",
+      "data": {
+        "featureType": "damage-type",
+        "examples": "Puncturing and impaling attacks, including spears and monsters bites, deal piercing damage."
+      }
+    },
+    {
+      "id": "poison",
+      "name": "Poison",
+      "img": "icons/damage/poison.webp",
+      "description": "Venomous stings and the toxic gas of a green dragons breath deal poison damage.",
+      "templateId": "dnd5e-feature",
+      "source": "SRD 5.1",
+      "data": {
+        "featureType": "damage-type",
+        "examples": "Venomous stings and the toxic gas of a green dragons breath deal poison damage."
+      }
+    },
+    {
+      "id": "psychic",
+      "name": "Psychic",
+      "img": "icons/damage/psychic.webp",
+      "description": "Mental abilities such as a mind flayers psionic blast deal psychic damage.",
+      "templateId": "dnd5e-feature",
+      "source": "SRD 5.1",
+      "data": {
+        "featureType": "damage-type",
+        "examples": "Mental abilities such as a mind flayers psionic blast deal psychic damage."
+      }
+    },
+    {
+      "id": "radiant",
+      "name": "Radiant",
+      "img": "icons/damage/radiant.webp",
+      "description": "Radiant damage, dealt by a clerics *flame strike* spell or an angels smiting weapon, sears the flesh like fire and overloads the spirit with power.",
+      "templateId": "dnd5e-feature",
+      "source": "SRD 5.1",
+      "data": {
+        "featureType": "damage-type",
+        "examples": "Radiant damage, dealt by a clerics *flame strike* spell or an angels smiting weapon, sears the flesh like fire and overloads the spirit with power."
+      }
+    },
+    {
+      "id": "slashing",
+      "name": "Slashing",
+      "img": "icons/damage/slashing.webp",
+      "description": "Swords, axes, and monsters claws deal slashing damage.",
+      "templateId": "dnd5e-feature",
+      "source": "SRD 5.1",
+      "data": {
+        "featureType": "damage-type",
+        "examples": "Swords, axes, and monsters claws deal slashing damage."
+      }
+    },
+    {
+      "id": "thunder",
+      "name": "Thunder",
+      "img": "icons/damage/thunder.webp",
+      "description": "A concussive burst of sound, such as the effect of the *thunderwave* spell, deals thunder damage.",
+      "templateId": "dnd5e-feature",
+      "source": "SRD 5.1",
+      "data": {
+        "featureType": "damage-type",
+        "examples": "A concussive burst of sound, such as the effect of the *thunderwave* spell, deals thunder damage."
+      }
+    }
+  ]
+}

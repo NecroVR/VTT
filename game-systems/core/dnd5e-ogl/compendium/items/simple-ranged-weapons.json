@@ -6,7 +6,7 @@
   "entries": [
     {
       "id": "crossbow-light",
-      "name": "Crossbow, Light",
+      "name": "Crossbow, light",
       "img": "icons/weapons/crossbows/crossbow-light-brown.webp",
       "description": "A small mechanical crossbow.",
       "templateId": "dnd5e-weapon",
@@ -15,10 +15,14 @@
         "weaponType": "simple_ranged",
         "damage": "1d8",
         "damageType": "piercing",
-        "properties": ["ammunition", "loading", "two_handed"],
-        "range": "80/320",
+        "properties": [
+          "ammunition",
+          "loading",
+          "two_handed"
+        ],
         "weight": 5,
-        "price": 25
+        "price": 25,
+        "range": "80/320"
       }
     },
     {
@@ -32,10 +36,13 @@
         "weaponType": "simple_ranged",
         "damage": "1d4",
         "damageType": "piercing",
-        "properties": ["finesse", "thrown"],
-        "range": "20/60",
+        "properties": [
+          "finesse",
+          "thrown"
+        ],
         "weight": 0.25,
-        "price": 0.05
+        "price": 0.05,
+        "range": "20/60"
       }
     },
     {
@@ -49,10 +56,13 @@
         "weaponType": "simple_ranged",
         "damage": "1d6",
         "damageType": "piercing",
-        "properties": ["ammunition", "two_handed"],
-        "range": "80/320",
+        "properties": [
+          "ammunition",
+          "two_handed"
+        ],
         "weight": 2,
-        "price": 25
+        "price": 25,
+        "range": "80/320"
       }
     },
     {
@@ -66,10 +76,12 @@
         "weaponType": "simple_ranged",
         "damage": "1d4",
         "damageType": "bludgeoning",
-        "properties": ["ammunition"],
-        "range": "30/120",
+        "properties": [
+          "ammunition"
+        ],
         "weight": 0,
-        "price": 0.1
+        "price": 0.1,
+        "range": "30/120"
       }
     }
   ]

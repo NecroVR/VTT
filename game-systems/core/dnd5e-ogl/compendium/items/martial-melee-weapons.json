@@ -15,10 +15,12 @@
         "weaponType": "martial_melee",
         "damage": "1d8",
         "damageType": "slashing",
-        "properties": ["versatile"],
-        "versatileDamage": "1d10",
+        "properties": [
+          "versatile"
+        ],
         "weight": 4,
-        "price": 10
+        "price": 10,
+        "versatileDamage": "1d10"
       }
     },
     {
@@ -48,7 +50,11 @@
         "weaponType": "martial_melee",
         "damage": "1d10",
         "damageType": "slashing",
-        "properties": ["heavy", "reach", "two_handed"],
+        "properties": [
+          "heavy",
+          "reach",
+          "two_handed"
+        ],
         "weight": 6,
         "price": 20
       }
@@ -64,7 +70,10 @@
         "weaponType": "martial_melee",
         "damage": "1d12",
         "damageType": "slashing",
-        "properties": ["heavy", "two_handed"],
+        "properties": [
+          "heavy",
+          "two_handed"
+        ],
         "weight": 7,
         "price": 30
       }
@@ -80,7 +89,10 @@
         "weaponType": "martial_melee",
         "damage": "2d6",
         "damageType": "slashing",
-        "properties": ["heavy", "two_handed"],
+        "properties": [
+          "heavy",
+          "two_handed"
+        ],
         "weight": 6,
         "price": 50
       }
@@ -96,7 +108,11 @@
         "weaponType": "martial_melee",
         "damage": "1d10",
         "damageType": "slashing",
-        "properties": ["heavy", "reach", "two_handed"],
+        "properties": [
+          "heavy",
+          "reach",
+          "two_handed"
+        ],
         "weight": 6,
         "price": 20
       }
@@ -112,7 +128,10 @@
         "weaponType": "martial_melee",
         "damage": "1d12",
         "damageType": "piercing",
-        "properties": ["reach", "special"],
+        "properties": [
+          "reach",
+          "special"
+        ],
         "weight": 6,
         "price": 10
       }
@@ -128,10 +147,12 @@
         "weaponType": "martial_melee",
         "damage": "1d8",
         "damageType": "slashing",
-        "properties": ["versatile"],
-        "versatileDamage": "1d10",
+        "properties": [
+          "versatile"
+        ],
         "weight": 3,
-        "price": 15
+        "price": 15,
+        "versatileDamage": "1d10"
       }
     },
     {
@@ -145,7 +166,10 @@
         "weaponType": "martial_melee",
         "damage": "2d6",
         "damageType": "bludgeoning",
-        "properties": ["heavy", "two_handed"],
+        "properties": [
+          "heavy",
+          "two_handed"
+        ],
         "weight": 10,
         "price": 10
       }
@@ -177,7 +201,11 @@
         "weaponType": "martial_melee",
         "damage": "1d10",
         "damageType": "piercing",
-        "properties": ["heavy", "reach", "two_handed"],
+        "properties": [
+          "heavy",
+          "reach",
+          "two_handed"
+        ],
         "weight": 18,
         "price": 5
       }
@@ -193,7 +221,9 @@
         "weaponType": "martial_melee",
         "damage": "1d8",
         "damageType": "piercing",
-        "properties": ["finesse"],
+        "properties": [
+          "finesse"
+        ],
         "weight": 2,
         "price": 25
       }
@@ -209,7 +239,10 @@
         "weaponType": "martial_melee",
         "damage": "1d6",
         "damageType": "slashing",
-        "properties": ["finesse", "light"],
+        "properties": [
+          "finesse",
+          "light"
+        ],
         "weight": 3,
         "price": 25
       }
@@ -225,7 +258,10 @@
         "weaponType": "martial_melee",
         "damage": "1d6",
         "damageType": "piercing",
-        "properties": ["finesse", "light"],
+        "properties": [
+          "finesse",
+          "light"
+        ],
         "weight": 2,
         "price": 10
       }
@@ -241,19 +277,19 @@
         "weaponType": "martial_melee",
         "damage": "1d6",
         "damageType": "piercing",
-        "properties": ["thrown", "versatile"],
-        "versatileDamage": "1d8",
-        "range": {
-          "normal": 20,
-          "long": 60
-        },
+        "properties": [
+          "thrown",
+          "versatile"
+        ],
         "weight": 4,
-        "price": 5
+        "price": 5,
+        "versatileDamage": "1d8",
+        "range": "20/60"
       }
     },
     {
       "id": "war-pick",
-      "name": "War Pick",
+      "name": "War pick",
       "img": "icons/weapons/hammers/pick-war-spiked.webp",
       "description": "A pick designed for war.",
       "templateId": "dnd5e-weapon",
@@ -278,10 +314,12 @@
         "weaponType": "martial_melee",
         "damage": "1d8",
         "damageType": "bludgeoning",
-        "properties": ["versatile"],
-        "versatileDamage": "1d10",
+        "properties": [
+          "versatile"
+        ],
         "weight": 2,
-        "price": 15
+        "price": 15,
+        "versatileDamage": "1d10"
       }
     },
     {
@@ -295,7 +333,10 @@
         "weaponType": "martial_melee",
         "damage": "1d4",
         "damageType": "slashing",
-        "properties": ["finesse", "reach"],
+        "properties": [
+          "finesse",
+          "reach"
+        ],
         "weight": 3,
         "price": 2
       }
