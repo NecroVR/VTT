@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-  import type { Item } from '@vtt/shared';
+  import { createEventDispatcher, onMount } from 'svelte';
+  import type { Item, ItemTemplate, ItemCategory } from '@vtt/shared';
+  import { browser } from '$app/environment';
 
   // Props
   export let isOpen: boolean;
@@ -14,6 +15,18 @@
     delete: string;
   }>();
 
+  // Template selection state
+  let templates: ItemTemplate[] = [];
+  let loadingTemplates = false;
+  let selectedTemplateId: string | null = null;
+  let templatesByCategory: Map<ItemCategory, ItemTemplate[]> = new Map();
+
+  // Get auth token
+  let token = '';
+  if (browser) {
+    token = localStorage.getItem('vtt_session_id') || sessionStorage.getItem('vtt_session_id') || '';
+  }
+
   // Form state
   let formData = {
     name: '',
@@ -24,9 +37,15 @@
     weight: 0,
     price: 0,
     equipped: false,
+    templateId: null as string | null,
     // Type-specific data
     data: {} as Record<string, unknown>
   };
+
+  // Load templates when modal opens
+  $: if (isOpen && !item) {
+    loadTemplates();
+  }
 
   // Initialize form data when item changes
   $: if (item) {
@@ -39,8 +58,10 @@
       weight: item.weight,
       price: item.price,
       equipped: item.equipped,
+      templateId: item.templateId || null,
       data: { ...item.data }
     };
+    selectedTemplateId = item.templateId || null;
   } else {
     formData = {
       name: '',
@@ -51,13 +72,98 @@
       weight: 0,
       price: 0,
       equipped: false,
+      templateId: null,
       data: {}
     };
+    selectedTemplateId = null;
   }
 
   // Error state
   let error: string | null = null;
   let saving = false;
+
+  async function loadTemplates() {
+    if (loadingTemplates || templates.length > 0) return;
+
+    loadingTemplates = true;
+    try {
+      const response = await fetch(`/api/v1/campaigns/${campaignId}/item-templates`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        templates = data.templates || [];
+
+        // Group templates by category
+        templatesByCategory.clear();
+        templates.forEach(template => {
+          if (!templatesByCategory.has(template.category)) {
+            templatesByCategory.set(template.category, []);
+          }
+          templatesByCategory.get(template.category)!.push(template);
+        });
+      }
+    } catch (err) {
+      console.error('Error loading templates:', err);
+    } finally {
+      loadingTemplates = false;
+    }
+  }
+
+  function handleTemplateSelection() {
+    if (!selectedTemplateId) {
+      // Clear template-based defaults
+      formData.templateId = null;
+      return;
+    }
+
+    const template = templates.find(t => t.id === selectedTemplateId);
+    if (!template) return;
+
+    // Update templateId in formData
+    formData.templateId = selectedTemplateId;
+
+    // Pre-fill form with template data
+    if (template.fields) {
+      const defaults: Record<string, unknown> = {};
+
+      template.fields.forEach(field => {
+        if (field.default !== undefined) {
+          defaults[field.name] = field.default;
+        }
+      });
+
+      formData.data = { ...defaults };
+    }
+
+    // Set item type based on category if applicable
+    const categoryToType: Record<string, string> = {
+      weapon: 'weapon',
+      armor: 'armor',
+      spell: 'spell',
+      consumable: 'consumable',
+      tool: 'tool',
+      loot: 'loot',
+      container: 'container',
+    };
+
+    if (categoryToType[template.category]) {
+      formData.itemType = categoryToType[template.category];
+    }
+
+    // Pre-fill basic fields from template defaults if available
+    if (template.physical) {
+      if (template.physical.weight !== undefined) {
+        formData.weight = template.physical.weight;
+      }
+      if (template.physical.price !== undefined) {
+        formData.price = template.physical.price;
+      }
+    }
+  }
 
   async function handleSave() {
     // Validate
@@ -86,6 +192,7 @@
             weight: formData.weight,
             price: formData.price,
             equipped: formData.equipped,
+            templateId: formData.templateId,
             data: formData.data
           })
         });
@@ -105,6 +212,7 @@
             weight: formData.weight,
             price: formData.price,
             equipped: formData.equipped,
+            templateId: formData.templateId,
             data: formData.data
           })
         });
@@ -201,6 +309,50 @@
         {/if}
 
         <form on:submit|preventDefault={handleSave}>
+          <!-- Template Selection (only for new items) -->
+          {#if !item}
+            <section class="form-section">
+              <h3>Item Template</h3>
+
+              <div class="form-row">
+                <label for="item-template">
+                  Select Template (Optional)
+                  {#if loadingTemplates}
+                    <span class="loading-text">Loading templates...</span>
+                  {/if}
+                  <select
+                    id="item-template"
+                    bind:value={selectedTemplateId}
+                    on:change={handleTemplateSelection}
+                    disabled={loadingTemplates}
+                  >
+                    <option value={null}>-- No Template --</option>
+                    {#each Array.from(templatesByCategory.entries()) as [category, categoryTemplates]}
+                      <optgroup label={category.charAt(0).toUpperCase() + category.slice(1)}>
+                        {#each categoryTemplates as template}
+                          <option value={template.id}>{template.name}</option>
+                        {/each}
+                      </optgroup>
+                    {/each}
+                  </select>
+                </label>
+              </div>
+
+              {#if selectedTemplateId}
+                <div class="template-info">
+                  {#each templates.filter(t => t.id === selectedTemplateId) as template}
+                    <p class="template-description">
+                      Template: <strong>{template.name}</strong>
+                      {#if template.fields && template.fields.length > 0}
+                        <span class="field-count">({template.fields.length} fields)</span>
+                      {/if}
+                    </p>
+                  {/each}
+                </div>
+              {/if}
+            </section}
+          {/if}
+
           <!-- Basic Properties -->
           <section class="form-section">
             <h3>Basic Properties</h3>
@@ -761,6 +913,32 @@
     object-fit: cover;
     border-radius: 8px;
     border: 2px solid var(--color-border, #333);
+  }
+
+  .template-info {
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    background-color: rgba(74, 144, 226, 0.1);
+    border-left: 3px solid #4a90e2;
+    border-radius: 4px;
+  }
+
+  .template-description {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--color-text-primary, #ffffff);
+  }
+
+  .field-count {
+    color: var(--color-text-secondary, #aaa);
+    font-size: 0.8125rem;
+  }
+
+  .loading-text {
+    margin-left: 0.5rem;
+    font-size: 0.8125rem;
+    color: #4a90e2;
+    font-style: italic;
   }
 
   .modal-footer {
