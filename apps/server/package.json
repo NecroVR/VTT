@@ -11,7 +11,8 @@
     "test:watch": "vitest",
     "lint": "eslint .",
     "clean": "rm -rf dist node_modules",
-    "seed:dnd5e": "tsx src/scripts/seedDnd5eModule.ts"
+    "seed:dnd5e": "tsx src/scripts/seedDnd5eModule.ts",
+    "seed:forms": "tsx src/scripts/seedDefaultForms.ts"
   },
   "dependencies": {
     "@fastify/cors": "^10.0.1",

@@ -1,0 +1,144 @@
+{
+  "name": "D&D 5e Item Sheet",
+  "description": "Default item sheet for D&D 5th Edition weapons, armor, and equipment",
+  "entityType": "item",
+  "version": "1.0.0",
+  "layout": [
+    {
+      "type": "section",
+      "id": "item-header",
+      "title": "Item Information",
+      "collapsible": false,
+      "children": [
+        {
+          "type": "grid",
+          "id": "header-grid",
+          "columns": 2,
+          "gap": "1rem",
+          "children": [
+            {
+              "type": "field",
+              "id": "item-name",
+              "fieldType": "text",
+              "binding": "name",
+              "label": "Item Name",
+              "required": true,
+              "options": {
+                "placeholder": "Enter item name"
+              }
+            },
+            {
+              "type": "field",
+              "id": "item-type",
+              "fieldType": "select",
+              "binding": "data.type",
+              "label": "Item Type",
+              "options": {
+                "options": [
+                  { "value": "weapon", "label": "Weapon" },
+                  { "value": "armor", "label": "Armor" },
+                  { "value": "potion", "label": "Potion" },
+                  { "value": "scroll", "label": "Scroll" },
+                  { "value": "wand", "label": "Wand" },
+                  { "value": "ring", "label": "Ring" },
+                  { "value": "equipment", "label": "Equipment" },
+                  { "value": "consumable", "label": "Consumable" },
+                  { "value": "treasure", "label": "Treasure" }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "tabs",
+      "id": "item-tabs",
+      "position": "top",
+      "tabs": [
+        {
+          "id": "description",
+          "label": "Description",
+          "children": [
+            {
+              "type": "field",
+              "id": "item-description",
+              "fieldType": "richtext",
+              "binding": "data.description",
+              "label": "Description",
+              "options": {
+                "multiline": true,
+                "placeholder": "Enter item description..."
+              }
+            }
+          ]
+        },
+        {
+          "id": "properties",
+          "label": "Properties",
+          "children": [
+            {
+              "type": "grid",
+              "id": "properties-grid",
+              "columns": 2,
+              "gap": "1rem",
+              "children": [
+                {
+                  "type": "field",
+                  "id": "item-rarity",
+                  "fieldType": "select",
+                  "binding": "data.rarity",
+                  "label": "Rarity",
+                  "options": {
+                    "options": [
+                      { "value": "common", "label": "Common" },
+                      { "value": "uncommon", "label": "Uncommon" },
+                      { "value": "rare", "label": "Rare" },
+                      { "value": "very-rare", "label": "Very Rare" },
+                      { "value": "legendary", "label": "Legendary" },
+                      { "value": "artifact", "label": "Artifact" }
+                    ]
+                  }
+                },
+                {
+                  "type": "field",
+                  "id": "item-attunement",
+                  "fieldType": "checkbox",
+                  "binding": "data.requiresAttunement",
+                  "label": "Requires Attunement"
+                },
+                {
+                  "type": "field",
+                  "id": "item-weight",
+                  "fieldType": "number",
+                  "binding": "data.weight",
+                  "label": "Weight (lb)",
+                  "options": {
+                    "min": 0,
+                    "step": 0.1
+                  }
+                },
+                {
+                  "type": "field",
+                  "id": "item-value",
+                  "fieldType": "number",
+                  "binding": "data.value",
+                  "label": "Value (gp)",
+                  "options": {
+                    "min": 0,
+                    "step": 0.01
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "fragments": [],
+  "styles": {
+    "theme": "default"
+  },
+  "computedFields": []
+}

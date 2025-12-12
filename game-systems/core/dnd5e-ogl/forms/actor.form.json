@@ -1,0 +1,247 @@
+{
+  "name": "D&D 5e Character Sheet",
+  "description": "Default character and NPC sheet for D&D 5th Edition",
+  "entityType": "actor",
+  "version": "1.0.0",
+  "layout": [
+    {
+      "type": "tabs",
+      "id": "main-tabs",
+      "position": "top",
+      "tabs": [
+        {
+          "id": "character",
+          "label": "Character",
+          "children": [
+            {
+              "type": "section",
+              "id": "basic-info",
+              "title": "Character Information",
+              "collapsible": false,
+              "children": [
+                {
+                  "type": "grid",
+                  "id": "info-grid",
+                  "columns": 2,
+                  "gap": "1rem",
+                  "children": [
+                    {
+                      "type": "field",
+                      "id": "name-field",
+                      "fieldType": "text",
+                      "binding": "name",
+                      "label": "Character Name",
+                      "required": true,
+                      "options": {
+                        "placeholder": "Enter character name"
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "class-field",
+                      "fieldType": "text",
+                      "binding": "data.class",
+                      "label": "Class",
+                      "options": {
+                        "placeholder": "Fighter, Wizard, etc."
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "race-field",
+                      "fieldType": "text",
+                      "binding": "data.race",
+                      "label": "Race",
+                      "options": {
+                        "placeholder": "Human, Elf, etc."
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "level-field",
+                      "fieldType": "number",
+                      "binding": "data.level",
+                      "label": "Level",
+                      "options": {
+                        "min": 1,
+                        "max": 20,
+                        "step": 1
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "id": "abilities",
+              "title": "Ability Scores",
+              "collapsible": true,
+              "defaultCollapsed": false,
+              "children": [
+                {
+                  "type": "grid",
+                  "id": "abilities-grid",
+                  "columns": 3,
+                  "gap": "1rem",
+                  "children": [
+                    {
+                      "type": "field",
+                      "id": "strength-field",
+                      "fieldType": "number",
+                      "binding": "data.abilities.strength.value",
+                      "label": "Strength",
+                      "options": {
+                        "min": 1,
+                        "max": 30
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "dexterity-field",
+                      "fieldType": "number",
+                      "binding": "data.abilities.dexterity.value",
+                      "label": "Dexterity",
+                      "options": {
+                        "min": 1,
+                        "max": 30
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "constitution-field",
+                      "fieldType": "number",
+                      "binding": "data.abilities.constitution.value",
+                      "label": "Constitution",
+                      "options": {
+                        "min": 1,
+                        "max": 30
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "intelligence-field",
+                      "fieldType": "number",
+                      "binding": "data.abilities.intelligence.value",
+                      "label": "Intelligence",
+                      "options": {
+                        "min": 1,
+                        "max": 30
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "wisdom-field",
+                      "fieldType": "number",
+                      "binding": "data.abilities.wisdom.value",
+                      "label": "Wisdom",
+                      "options": {
+                        "min": 1,
+                        "max": 30
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "charisma-field",
+                      "fieldType": "number",
+                      "binding": "data.abilities.charisma.value",
+                      "label": "Charisma",
+                      "options": {
+                        "min": 1,
+                        "max": 30
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "id": "hit-points",
+              "title": "Hit Points",
+              "collapsible": false,
+              "children": [
+                {
+                  "type": "grid",
+                  "id": "hp-grid",
+                  "columns": 2,
+                  "gap": "1rem",
+                  "children": [
+                    {
+                      "type": "field",
+                      "id": "hp-current-field",
+                      "fieldType": "number",
+                      "binding": "data.hitPoints.current",
+                      "label": "Current HP",
+                      "options": {
+                        "min": 0
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "hp-max-field",
+                      "fieldType": "number",
+                      "binding": "data.hitPoints.max",
+                      "label": "Max HP",
+                      "options": {
+                        "min": 1
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "inventory",
+          "label": "Inventory",
+          "children": [
+            {
+              "type": "static",
+              "id": "inventory-placeholder",
+              "content": "Inventory management will be implemented here",
+              "contentType": "text",
+              "tag": "p"
+            }
+          ]
+        },
+        {
+          "id": "spells",
+          "label": "Spells",
+          "children": [
+            {
+              "type": "static",
+              "id": "spells-placeholder",
+              "content": "Spell list will be implemented here",
+              "contentType": "text",
+              "tag": "p"
+            }
+          ]
+        },
+        {
+          "id": "notes",
+          "label": "Notes",
+          "children": [
+            {
+              "type": "field",
+              "id": "notes-field",
+              "fieldType": "textarea",
+              "binding": "data.notes",
+              "label": "Character Notes",
+              "options": {
+                "multiline": true,
+                "placeholder": "Enter character background, notes, etc."
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "fragments": [],
+  "styles": {
+    "theme": "default"
+  },
+  "computedFields": []
+}

@@ -31,3 +31,6 @@ export * from './entityProperties.js';
 export * from './propertyDefinitions.js';
 export * from './validationErrors.js';
 export * from './campaignModules.js';
+export * from './forms.js';
+export * from './formLicenses.js';
+export * from './campaignForms.js';

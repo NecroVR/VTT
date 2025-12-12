@@ -28,3 +28,4 @@ export * from './modules.js';
 export * from './moduleEntities.js';
 export * from './entityProperties.js';
 export * from './validation.js';
+export * from './forms.js';
