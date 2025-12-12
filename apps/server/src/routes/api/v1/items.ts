@@ -446,7 +446,7 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
                     // Broadcast each created effect to campaign room
                     for (const effect of createdEffects) {
                       roomManager.broadcast(updatedItem.campaignId, {
-                        type: 'activeEffect:created',
+                        type: 'effect:added',
                         payload: { effect },
                         timestamp: Date.now(),
                       });
@@ -465,7 +465,7 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
               // Broadcast effect deletions to campaign room
               for (const effect of effectsToRemove) {
                 roomManager.broadcast(updatedItem.campaignId, {
-                  type: 'activeEffect:deleted',
+                  type: 'effect:removed',
                   payload: { effectId: effect.id },
                   timestamp: Date.now(),
                 });
@@ -507,7 +507,7 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
                     // Broadcast each created effect to campaign room
                     for (const effect of createdEffects) {
                       roomManager.broadcast(updatedItem.campaignId, {
-                        type: 'activeEffect:created',
+                        type: 'effect:added',
                         payload: { effect },
                         timestamp: Date.now(),
                       });
@@ -526,7 +526,7 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
               // Broadcast effect deletions to campaign room
               for (const effect of effectsToRemove) {
                 roomManager.broadcast(updatedItem.campaignId, {
-                  type: 'activeEffect:deleted',
+                  type: 'effect:removed',
                   payload: { effectId: effect.id },
                   timestamp: Date.now(),
                 });
@@ -614,7 +614,7 @@ const itemsRoute: FastifyPluginAsync = async (fastify) => {
           // Broadcast effect deletions to campaign room
           for (const effect of effectsToRemove) {
             roomManager.broadcast(existingItem.campaignId, {
-              type: 'activeEffect:deleted',
+              type: 'effect:removed',
               payload: { effectId: effect.id },
               timestamp: Date.now(),
             });
