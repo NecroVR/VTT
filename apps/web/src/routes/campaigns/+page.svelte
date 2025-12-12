@@ -70,7 +70,8 @@
       });
 
       if (response.ok) {
-        const systems: GameSystem[] = await response.json();
+        const data = await response.json();
+        const systems: GameSystem[] = data.gameSystems || [];
         gameSystems = new Map(systems.map(s => [s.systemId, s]));
       }
     } catch (err) {

@@ -83,7 +83,8 @@
         throw new Error(errorData.error || 'Failed to fetch game systems');
       }
 
-      gameSystems = await response.json();
+      const data = await response.json();
+      gameSystems = data.gameSystems || [];
       gameSystemsLoading = false;
     } catch (err) {
       gameSystemsError = err instanceof Error ? err.message : 'Failed to load game systems';
