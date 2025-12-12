@@ -1,9 +1,10 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { browser } from '$app/environment';
-  import type { ModuleEntity } from '@vtt/shared';
+  import type { ModuleEntity, EntityGroup } from '@vtt/shared';
   import { modulesStore } from '$lib/stores/modules';
   import { API_BASE_URL } from '$lib/config/api';
+  import CollapsibleGroup from './CollapsibleGroup.svelte';
 
   // Props
   export let campaignId: string;
@@ -23,6 +24,12 @@
   let availableEntityTypes: string[] = [];
   let selectedModuleId: string | null = null;
 
+  // Grouping state
+  let groupBy: 'none' | 'level' | 'itemType' = 'none';
+  let groups: EntityGroup[] = [];
+  let entityGroupKeys: Record<string, string | number> = {};
+  let collapsedGroups: Set<string> = new Set();
+
   // Get campaign modules from store
   $: campaignModules = $modulesStore.campaignModules.get(campaignId) || [];
   $: activeModules = campaignModules.filter(cm => cm.isActive);
@@ -31,6 +38,11 @@
   $: if (browser && selectedModuleId) {
     page = 1;
     loadEntities();
+  }
+
+  // Reset groupBy when entity type changes
+  $: if (selectedEntityType) {
+    groupBy = 'none';
   }
 
   onMount(() => {
@@ -74,6 +86,10 @@
         params.append('entityType', selectedEntityType);
       }
 
+      if (groupBy !== 'none') {
+        params.append('groupBy', groupBy);
+      }
+
       params.append('page', page.toString());
       params.append('pageSize', pageSize.toString());
 
@@ -97,6 +113,17 @@
         // Use available types from API if provided (always complete list)
         if (data.availableTypes) {
           availableEntityTypes = data.availableTypes;
+        }
+        // Store groups and entityGroupKeys from response
+        if (data.groups) {
+          groups = data.groups;
+        } else {
+          groups = [];
+        }
+        if (data.entityGroupKeys) {
+          entityGroupKeys = data.entityGroupKeys;
+        } else {
+          entityGroupKeys = {};
         }
       } else {
         entities = [...entities, ...(data.entities || [])];
@@ -132,6 +159,7 @@
     const target = event.target as HTMLSelectElement;
     selectedModuleId = target.value;
     selectedEntityType = 'all';
+    groupBy = 'none';
     page = 1;
     entities = [];
   }
@@ -144,6 +172,36 @@
     if (!description) return '';
     if (description.length <= maxLength) return description;
     return description.substring(0, maxLength) + '...';
+  }
+
+  function getGroupingOptions(entityType: string): Array<{value: string, label: string}> {
+    if (entityType === 'spell') {
+      return [
+        { value: 'none', label: 'No Grouping' },
+        { value: 'level', label: 'By Level' }
+      ];
+    }
+    if (entityType === 'item') {
+      return [
+        { value: 'none', label: 'No Grouping' },
+        { value: 'itemType', label: 'By Category' }
+      ];
+    }
+    return [];
+  }
+
+  function getEntitiesForGroup(groupKey: string | number): ModuleEntity[] {
+    return entities.filter(e => entityGroupKeys[e.id] === groupKey);
+  }
+
+  function handleGroupToggle(event: CustomEvent<{ groupKey: string | number }>) {
+    const key = String(event.detail.groupKey);
+    if (collapsedGroups.has(key)) {
+      collapsedGroups.delete(key);
+    } else {
+      collapsedGroups.add(key);
+    }
+    collapsedGroups = collapsedGroups; // Trigger reactivity
   }
 </script>
 
@@ -193,6 +251,22 @@
       </div>
     {/if}
 
+    {#if selectedModuleId && (selectedEntityType === 'spell' || selectedEntityType === 'item')}
+      <div class="group-selector">
+        <label for="group-select">Group:</label>
+        <select
+          id="group-select"
+          class="group-select"
+          bind:value={groupBy}
+          on:change={() => { page = 1; loadEntities(); }}
+        >
+          {#each getGroupingOptions(selectedEntityType) as option}
+            <option value={option.value}>{option.label}</option>
+          {/each}
+        </select>
+      </div>
+    {/if}
+
     {#if selectedModuleId}
       <input
         type="text"
@@ -233,49 +307,105 @@
         {/if}
       </div>
     {:else}
-      <div class="entities-list">
-        {#each entities as entity (entity.id)}
-          <div class="entity-card">
-            <div class="entity-info">
-              <div class="entity-header">
-                <div class="entity-name">{entity.name}</div>
-                <div class="entity-type-badge">{entity.entityType}</div>
-              </div>
-              {#if entity.description}
-                <div class="entity-description">
-                  {truncateDescription(entity.description)}
+      {#if groupBy !== 'none' && groups.length > 0}
+        <div class="entities-list grouped">
+          {#each groups as group (group.groupKey)}
+            <CollapsibleGroup
+              groupKey={group.groupKey}
+              groupLabel={group.groupLabel}
+              count={group.count}
+              isCollapsed={collapsedGroups.has(String(group.groupKey))}
+              on:toggle={handleGroupToggle}
+            >
+              {#each getEntitiesForGroup(group.groupKey) as entity (entity.id)}
+                <div class="entity-card">
+                  <div class="entity-info">
+                    <div class="entity-header">
+                      <div class="entity-name">{entity.name}</div>
+                      <div class="entity-type-badge">{entity.entityType}</div>
+                    </div>
+                    {#if entity.description}
+                      <div class="entity-description">
+                        {truncateDescription(entity.description)}
+                      </div>
+                    {/if}
+                  </div>
+                  <div class="entity-actions">
+                    <div class="dropdown-wrapper">
+                      <button
+                        class="button-secondary"
+                        on:click={(e) => toggleDropdown(entity.id, e)}
+                      >
+                        Actions
+                        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                          <path d="M3.5 6.5a.5.5 0 0 1 .5.5L8 11l4-4a.5.5 0 0 1 .707.707l-4.5 4.5a.5.5 0 0 1-.707 0l-4.5-4.5A.5.5 0 0 1 3.5 6.5z"/>
+                        </svg>
+                      </button>
+                      {#if openDropdownId === entity.id}
+                        <div class="actions-dropdown" on:click|stopPropagation>
+                          <button class="dropdown-item" disabled>
+                            View Details
+                          </button>
+                          <button class="dropdown-item" disabled>
+                            Edit Override
+                          </button>
+                          <button class="dropdown-item" disabled>
+                            Exclude from Campaign
+                          </button>
+                        </div>
+                      {/if}
+                    </div>
+                  </div>
                 </div>
-              {/if}
-            </div>
-            <div class="entity-actions">
-              <div class="dropdown-wrapper">
-                <button
-                  class="button-secondary"
-                  on:click={(e) => toggleDropdown(entity.id, e)}
-                >
-                  Actions
-                  <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M3.5 6.5a.5.5 0 0 1 .5.5L8 11l4-4a.5.5 0 0 1 .707.707l-4.5 4.5a.5.5 0 0 1-.707 0l-4.5-4.5A.5.5 0 0 1 3.5 6.5z"/>
-                  </svg>
-                </button>
-                {#if openDropdownId === entity.id}
-                  <div class="actions-dropdown" on:click|stopPropagation>
-                    <button class="dropdown-item" disabled>
-                      View Details
-                    </button>
-                    <button class="dropdown-item" disabled>
-                      Edit Override
-                    </button>
-                    <button class="dropdown-item" disabled>
-                      Exclude from Campaign
-                    </button>
+              {/each}
+            </CollapsibleGroup>
+          {/each}
+        </div>
+      {:else}
+        <div class="entities-list">
+          {#each entities as entity (entity.id)}
+            <div class="entity-card">
+              <div class="entity-info">
+                <div class="entity-header">
+                  <div class="entity-name">{entity.name}</div>
+                  <div class="entity-type-badge">{entity.entityType}</div>
+                </div>
+                {#if entity.description}
+                  <div class="entity-description">
+                    {truncateDescription(entity.description)}
                   </div>
                 {/if}
               </div>
+              <div class="entity-actions">
+                <div class="dropdown-wrapper">
+                  <button
+                    class="button-secondary"
+                    on:click={(e) => toggleDropdown(entity.id, e)}
+                  >
+                    Actions
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M3.5 6.5a.5.5 0 0 1 .5.5L8 11l4-4a.5.5 0 0 1 .707.707l-4.5 4.5a.5.5 0 0 1-.707 0l-4.5-4.5A.5.5 0 0 1 3.5 6.5z"/>
+                    </svg>
+                  </button>
+                  {#if openDropdownId === entity.id}
+                    <div class="actions-dropdown" on:click|stopPropagation>
+                      <button class="dropdown-item" disabled>
+                        View Details
+                      </button>
+                      <button class="dropdown-item" disabled>
+                        Edit Override
+                      </button>
+                      <button class="dropdown-item" disabled>
+                        Exclude from Campaign
+                      </button>
+                    </div>
+                  {/if}
+                </div>
+              </div>
             </div>
-          </div>
-        {/each}
-      </div>
+          {/each}
+        </div>
+      {/if}
 
       {#if hasMore}
         <div class="load-more-container">
@@ -354,21 +484,24 @@
   }
 
   .module-selector,
-  .type-selector {
+  .type-selector,
+  .group-selector {
     display: flex;
     align-items: center;
     gap: 0.5rem;
   }
 
   .module-selector label,
-  .type-selector label {
+  .type-selector label,
+  .group-selector label {
     font-size: 0.875rem;
     color: #d1d5db;
     white-space: nowrap;
   }
 
   .module-select,
-  .type-select {
+  .type-select,
+  .group-select {
     padding: 0.5rem;
     border: 1px solid #4b5563;
     border-radius: 0.375rem;
@@ -378,8 +511,13 @@
     min-width: 150px;
   }
 
+  .group-select {
+    min-width: 120px;
+  }
+
   .module-select:focus,
-  .type-select:focus {
+  .type-select:focus,
+  .group-select:focus {
     outline: none;
     border-color: #60a5fa;
   }
@@ -468,6 +606,12 @@
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+  }
+
+  .entities-list.grouped {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
   .entity-card {
