@@ -1,0 +1,66 @@
+{
+  "$schema": "../../../packages/shared/src/types/modules.ts#ModuleManifest",
+  "_comment": "Module manifest for D&D 5e System Reference Document content",
+
+  "moduleId": "dnd5e-srd",
+  "gameSystemId": "dnd5e-ogl",
+  "name": "D&D 5e System Reference Document",
+  "version": "1.0.0",
+  "author": "Wizards of the Coast",
+  "description": "Official D&D 5th Edition System Reference Document (SRD) content including weapons, armor, spells, monsters, and more. Released under the Open Game License (OGL) 1.0a.",
+
+  "moduleType": "content",
+
+  "isOfficial": true,
+
+  "license": "OGL 1.0a",
+  "homepage": "https://dnd.wizards.com/resources/systems-reference-document",
+
+  "dependencies": [],
+
+  "_comment_entities": "Entity file paths relative to module root. The ModuleLoader will process these files and load them into the EAV database schema.",
+  "entities": [
+    "compendium/items/simple-melee-weapons.json"
+  ],
+
+  "_comment_data": "Additional metadata stored in the modules.data JSONB column",
+  "data": {
+    "legalNotice": "This content is released under the Open Game License Version 1.0a. Product Identity is not included. See LICENSE.txt for complete terms.",
+    "srdVersion": "5.1",
+    "releaseDate": "2016-01-12",
+    "category": "official",
+    "tags": ["srd", "core", "official", "wizards-of-the-coast"],
+
+    "_note": "Current compendium files use a batch format with 'entries' array. The ModuleLoader needs to be updated to handle this format, or compendium files need to be restructured.",
+    "contentStructure": {
+      "format": "compendium-batch",
+      "description": "Each file contains a wrapper object with an 'entries' array of entities"
+    },
+
+    "plannedContent": {
+      "items": {
+        "weapons": ["simple-melee", "simple-ranged", "martial-melee", "martial-ranged"],
+        "armor": ["light", "medium", "heavy", "shields"],
+        "equipment": ["adventuring-gear", "tools", "mounts", "vehicles"],
+        "magic-items": ["potions", "scrolls", "wands", "rings", "rods", "staves", "wondrous"]
+      },
+      "spells": {
+        "levels": ["cantrips", "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th"],
+        "schools": ["abjuration", "conjuration", "divination", "enchantment", "evocation", "illusion", "necromancy", "transmutation"]
+      },
+      "monsters": {
+        "types": ["aberration", "beast", "celestial", "construct", "dragon", "elemental", "fey", "fiend", "giant", "humanoid", "monstrosity", "ooze", "plant", "undead"],
+        "challengeRatings": ["0", "1/8", "1/4", "1/2", "1-30"]
+      },
+      "classes": ["barbarian", "bard", "cleric", "druid", "fighter", "monk", "paladin", "ranger", "rogue", "sorcerer", "warlock", "wizard"],
+      "races": ["dwarf", "elf", "halfling", "human", "dragonborn", "gnome", "half-elf", "half-orc", "tiefling"],
+      "backgrounds": ["acolyte", "criminal", "folk-hero", "noble", "sage", "soldier"],
+      "features": {
+        "class-features": "Class-specific abilities and features",
+        "feats": "Optional character feats",
+        "racial-traits": "Race-specific traits and abilities"
+      },
+      "conditions": ["blinded", "charmed", "deafened", "frightened", "grappled", "incapacitated", "invisible", "paralyzed", "petrified", "poisoned", "prone", "restrained", "stunned", "unconscious", "exhaustion"]
+    }
+  }
+}
