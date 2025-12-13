@@ -1,4 +1,4 @@
-import type { ContentParser, ParsedEntity } from '../../importService';
+import type { ContentParser, ParsedEntity } from '../../importService.js';
 import type { RawImportItem, FoundryItem } from '@vtt/shared';
 
 /**

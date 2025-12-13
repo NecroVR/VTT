@@ -1,8 +1,8 @@
-import { ImportService } from '../../importService';
-import { FoundryActorParser } from './actorParser';
-import { FoundryItemParser } from './itemParser';
-import { FoundrySceneParser } from './sceneParser';
-import { FoundryJournalParser } from './journalParser';
+import { ImportService } from '../../importService.js';
+import { FoundryActorParser } from './actorParser.js';
+import { FoundryItemParser } from './itemParser.js';
+import { FoundrySceneParser } from './sceneParser.js';
+import { FoundryJournalParser } from './journalParser.js';
 
 /**
  * Register all Foundry VTT parsers with the import service
@@ -39,7 +39,7 @@ export function registerFoundryParsers(importService: ImportService): void {
 }
 
 // Export individual parsers for testing
-export { FoundryActorParser } from './actorParser';
-export { FoundryItemParser } from './itemParser';
-export { FoundrySceneParser } from './sceneParser';
-export { FoundryJournalParser } from './journalParser';
+export { FoundryActorParser } from './actorParser.js';
+export { FoundryItemParser } from './itemParser.js';
+export { FoundrySceneParser } from './sceneParser.js';
+export { FoundryJournalParser } from './journalParser.js';
