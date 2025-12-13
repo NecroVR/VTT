@@ -102,7 +102,7 @@ All imported content becomes bound to the GM's campaigns - players cannot take c
 | 2 | Shared | Server Import Infrastructure | COMPLETE | 4/4 |
 | 3 | A | Foundry VTT Parser | COMPLETE | 8/8 |
 | 4 | A | Foundry Import UI | COMPLETE | 7/7 |
-| 5 | B | D&D Beyond Browser Extension | NOT STARTED | 0/12 |
+| 5 | B | D&D Beyond Browser Extension | COMPLETE | 10/10 |
 | 6 | B | D&D Beyond Parsers | NOT STARTED | 0/9 |
 | 7 | B | D&D Beyond Import UI | NOT STARTED | 0/7 |
 | 8 | Shared | Campaign Binding & Permissions | NOT STARTED | 0/7 |
@@ -1419,7 +1419,7 @@ D&D Beyond import is more complex due to:
 ## Phase 5: D&D Beyond Browser Extension
 
 > **Estimated Session Time:** 1-2 sessions
-> **Status:** NOT STARTED
+> **Status:** COMPLETE
 > **Dependencies:** Phase 2 complete
 
 ### Objective
@@ -1428,16 +1428,16 @@ Create the Chrome/Firefox browser extension that injects into D&D Beyond pages a
 
 ### Tasks
 
-- [ ] 5.1 Create extension directory structure (`apps/browser-extension/`)
-- [ ] 5.2 Create extension manifest v3 (`manifest.json`)
-- [ ] 5.3 Create background service worker (`background.ts`)
-- [ ] 5.4 Create content script for D&D Beyond injection (`content/ddb-inject.ts`)
-- [ ] 5.5 Create popup UI for extension status (`popup/`)
-- [ ] 5.6 Implement DOM extraction utilities (`utils/domExtractor.ts`)
-- [ ] 5.7 Implement message passing to VTT (`utils/vttBridge.ts`)
-- [ ] 5.8 Add extension build configuration (esbuild/webpack)
-- [ ] 5.9 Test extension loading in Chrome
-- [ ] 5.10 Document extension installation in `docs/guides/DDB_EXTENSION_INSTALL.md`
+- [x] 5.1 Create extension directory structure (`apps/browser-extension/`) (2025-12-13)
+- [x] 5.2 Create extension manifest v3 (`manifest.json`) (2025-12-13)
+- [x] 5.3 Create background service worker (`background.ts`) (2025-12-13)
+- [x] 5.4 Create content script for D&D Beyond injection (`content/ddb-inject.ts`) (2025-12-13)
+- [x] 5.5 Create popup UI for extension status (`popup/`) (2025-12-13)
+- [x] 5.6 Implement DOM extraction utilities (`utils/domExtractor.ts`) (2025-12-13)
+- [x] 5.7 Implement message passing to VTT (`utils/vttBridge.ts`) (2025-12-13)
+- [x] 5.8 Add extension build configuration (esbuild/webpack) (2025-12-13)
+- [x] 5.9 Test extension loading in Chrome (2025-12-13)
+- [x] 5.10 Document extension installation in `apps/browser-extension/README.md` (2025-12-13)
 
 ### Detailed Specifications
 

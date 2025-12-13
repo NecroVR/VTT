@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VTT Content Importer</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 400px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      color: #333;
+      background: #f5f7fa;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .header p {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 20px;
+    }
+
+    .section {
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #667eea;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #e53e3e;
+    }
+
+    .status-dot.connected {
+      background: #38a169;
+    }
+
+    .status-text {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: #555;
+    }
+
+    input[type="text"],
+    input[type="url"] {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 13px;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus,
+    input[type="url"]:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .button {
+      width: 100%;
+      padding: 10px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .button:hover {
+      background: #5568d3;
+    }
+
+    .button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .button-secondary {
+      background: #e2e8f0;
+      color: #555;
+    }
+
+    .button-secondary:hover {
+      background: #cbd5e0;
+    }
+
+    .stored-count {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: #f7fafc;
+      border-radius: 6px;
+      margin-bottom: 12px;
+    }
+
+    .stored-count-label {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .stored-count-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: #667eea;
+    }
+
+    .help-text {
+      font-size: 12px;
+      color: #999;
+      line-height: 1.5;
+      margin-top: 8px;
+    }
+
+    .message {
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    .message.success {
+      background: #c6f6d5;
+      color: #22543d;
+    }
+
+    .message.error {
+      background: #fed7d7;
+      color: #742a2a;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>VTT Content Importer</h1>
+    <p>Import D&D Beyond content to your VTT</p>
+  </div>
+
+  <div class="content">
+    <!-- Connection Status -->
+    <div class="section">
+      <div class="section-title">Connection Status</div>
+      <div class="status">
+        <div class="status-dot" id="statusDot"></div>
+        <div class="status-text" id="statusText">Checking connection...</div>
+      </div>
+    </div>
+
+    <!-- Configuration -->
+    <div class="section">
+      <div class="section-title">Configuration</div>
+      <div class="form-group">
+        <label for="vttUrl">VTT Server URL</label>
+        <input type="url" id="vttUrl" placeholder="http://localhost:3000">
+      </div>
+      <div class="form-group">
+        <div class="checkbox-group">
+          <input type="checkbox" id="autoSend">
+          <label for="autoSend" style="margin: 0;">Auto-send to VTT</label>
+        </div>
+        <p class="help-text">Automatically send extracted content to VTT without confirmation</p>
+      </div>
+      <button class="button" id="saveConfig">Save Configuration</button>
+    </div>
+
+    <!-- Stored Data -->
+    <div class="section">
+      <div class="section-title">Stored Imports</div>
+      <div class="stored-count">
+        <span class="stored-count-label">Items stored locally:</span>
+        <span class="stored-count-value" id="storedCount">0</span>
+      </div>
+      <button class="button button-secondary" id="clearData">Clear All Data</button>
+      <p class="help-text">Extracted content is stored locally. Click "Clear" to remove all stored data.</p>
+    </div>
+
+    <!-- Message area -->
+    <div id="messageArea"></div>
+
+    <!-- Instructions -->
+    <div class="section">
+      <div class="section-title">How to Use</div>
+      <ol style="font-size: 13px; line-height: 1.8; padding-left: 20px; color: #666;">
+        <li>Navigate to a D&D Beyond page (character, monster, spell, or item)</li>
+        <li>Click the "Import to VTT" button that appears on the page</li>
+        <li>Content will be extracted and stored locally</li>
+        <li>If auto-send is enabled, content will be sent to your VTT immediately</li>
+      </ol>
+    </div>
+  </div>
+
+  <script src="popup.js" type="module"></script>
+</body>
+</html>
