@@ -83,10 +83,11 @@
     </div>
     <div class="group-content">
       <label>
-        <span>Field Type</span>
+        <span title="The type of input field to display">Field Type</span>
         <select
           value={node.fieldType}
           onchange={(e) => onUpdate({ fieldType: (e.target as HTMLSelectElement).value as FormFieldType })}
+          title="Select the type of input field"
         >
           {#each fieldTypes as type}
             <option value={type}>{type}</option>
@@ -119,13 +120,14 @@
     </div>
     <div class="group-content">
       <label>
-        <span>Property Path</span>
+        <span title="The path to the property this field reads from and writes to">Property Path</span>
         <div class="input-with-button">
           <input
             type="text"
             value={node.binding || ''}
             oninput={(e) => onUpdate({ binding: (e.target as HTMLInputElement).value })}
             placeholder="attributes.strength.value"
+            title="Enter the data binding path using dot notation (e.g., attributes.strength.value)"
           />
           <button type="button" class="btn-picker" title="Browse properties" onclick={() => showPicker = true}>
             📋
@@ -411,8 +413,9 @@
           type="checkbox"
           checked={node.required || false}
           onchange={(e) => onUpdate({ required: (e.target as HTMLInputElement).checked })}
+          title="Mark this field as required (must have a value)"
         />
-        <span>Required</span>
+        <span title="Users must provide a value for this field">Required</span>
       </label>
 
       <label class="checkbox-label">
@@ -420,8 +423,9 @@
           type="checkbox"
           checked={node.readonly || false}
           onchange={(e) => onUpdate({ readonly: (e.target as HTMLInputElement).checked })}
+          title="Prevent users from editing this field"
         />
-        <span>Read Only</span>
+        <span title="Field displays value but cannot be edited">Read Only</span>
       </label>
     </div>
   </div>

@@ -21,18 +21,18 @@
   let { node, onUpdate }: Props = $props();
 </script>
 
-<div class="property-editor">
+<div class="property-editor" role="form" aria-label="Component properties editor">
   {#if !node}
-    <div class="no-selection">
+    <div class="no-selection" role="status" aria-live="polite">
       <p>No node selected</p>
       <p class="help-text">Select a component from the canvas to edit its properties</p>
     </div>
   {:else}
     <div class="property-content">
       <!-- Node Type Badge -->
-      <div class="node-type-badge">
+      <div class="node-type-badge" role="status" aria-label="Selected component: {node.type}">
         <span class="type-label">{node.type}</span>
-        <span class="node-id">{node.id.slice(0, 8)}...</span>
+        <span class="node-id" aria-label="Node ID">{node.id.slice(0, 8)}...</span>
       </div>
 
       <!-- Type-specific properties -->
@@ -59,7 +59,7 @@
       {:else if node.type === 'computed'}
         <ComputedProperties {node} {onUpdate} />
       {:else}
-        <div class="unsupported-type">
+        <div class="unsupported-type" role="alert">
           <p>Unsupported node type: {node.type}</p>
         </div>
       {/if}
@@ -67,17 +67,21 @@
       <!-- Common properties for all nodes -->
       <div class="property-group">
         <div class="group-header">
-          <h4>Appearance</h4>
+          <h4 id="appearance-section">Appearance</h4>
         </div>
-        <div class="group-content">
-          <label>
-            <span>CSS Class</span>
+        <div class="group-content" role="group" aria-labelledby="appearance-section">
+          <label for="css-class-input">
+            <span title="Add custom CSS class names to style this component">CSS Class</span>
             <input
+              id="css-class-input"
               type="text"
               value={node.className || ''}
               oninput={(e) => onUpdate({ className: (e.target as HTMLInputElement).value })}
               placeholder="custom-class"
+              title="Enter custom CSS class names separated by spaces"
+              aria-describedby="css-class-help"
             />
+            <span id="css-class-help" class="sr-only">Enter custom CSS class names separated by spaces</span>
           </label>
         </div>
       </div>
@@ -204,5 +208,18 @@
     padding: 1rem;
     text-align: center;
     color: var(--text-muted, #6c757d);
+  }
+
+  /* Screen reader only text */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 </style>
