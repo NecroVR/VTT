@@ -6,7 +6,7 @@ config({ path: '.env.test' });
 
 // Set default test environment variables if not provided
 process.env.NODE_ENV = process.env.NODE_ENV || 'test';
-process.env.DATABASE_URL = process.env.DATABASE_URL || 'postgresql://claude:Claude^YV18@localhost:5432/vtt_test';
+process.env.DATABASE_URL = process.env.DATABASE_URL || 'postgresql://claude:Claude^YV18@localhost:5433/vtt_test';
 process.env.REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379/1';
 process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-secret-key-do-not-use-in-production';
 process.env.PORT = process.env.PORT || '3001';
