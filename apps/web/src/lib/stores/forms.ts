@@ -6,9 +6,17 @@ import * as formsApi from '$lib/api/forms';
 // Store State Types
 // ============================================================================
 
+interface CachedForm {
+  data: FormDefinition;
+  timestamp: number;
+}
+
+// Cache TTL: 5 minutes
+const CACHE_TTL_MS = 5 * 60 * 1000;
+
 interface FormsState {
-  // Cached form definitions by ID
-  forms: Map<string, FormDefinition>;
+  // Cached form definitions by ID with TTL
+  forms: Map<string, CachedForm>;
 
   // Forms by game system (for listing)
   formsBySystem: Map<string, string[]>;
@@ -16,8 +24,8 @@ interface FormsState {
   // Campaign form assignments
   campaignForms: Map<string, CampaignForm[]>;
 
-  // Active form cache per campaign/entityType
-  activeFormCache: Map<string, FormDefinition>;
+  // Active form cache per campaign/entityType with TTL
+  activeFormCache: Map<string, CachedForm>;
 
   // Loading states
   loading: {
@@ -44,6 +52,19 @@ const initialState: FormsState = {
 };
 
 // ============================================================================
+// Helper Functions
+// ============================================================================
+
+/**
+ * Check if a cached form is still valid (not expired)
+ */
+function isCacheValid(cached: CachedForm | undefined): boolean {
+  if (!cached) return false;
+  const age = Date.now() - cached.timestamp;
+  return age < CACHE_TTL_MS;
+}
+
+// ============================================================================
 // Create Store
 // ============================================================================
 
@@ -65,9 +86,10 @@ function createFormsStore() {
         update(s => {
           const newForms = new Map(s.forms);
           const systemFormIds: string[] = [];
+          const now = Date.now();
 
           forms.forEach(form => {
-            newForms.set(form.id, form);
+            newForms.set(form.id, { data: form, timestamp: now });
             systemFormIds.push(form.id);
           });
 
@@ -98,13 +120,16 @@ function createFormsStore() {
      */
     async getForm(formId: string): Promise<FormDefinition> {
       // Check cache first
-      let cachedForm: FormDefinition | undefined;
+      let cached: CachedForm | undefined;
       const unsub = subscribe(s => {
-        cachedForm = s.forms.get(formId);
+        cached = s.forms.get(formId);
       });
       unsub();
 
-      if (cachedForm) return cachedForm;
+      // Return cached if valid
+      if (isCacheValid(cached)) {
+        return cached!.data;
+      }
 
       // Fetch from API
       update(s => ({ ...s, loading: { ...s.loading, forms: true }, error: null }));
@@ -114,7 +139,7 @@ function createFormsStore() {
 
         update(s => {
           const newForms = new Map(s.forms);
-          newForms.set(form.id, form);
+          newForms.set(form.id, { data: form, timestamp: Date.now() });
           return {
             ...s,
             forms: newForms,
@@ -144,7 +169,7 @@ function createFormsStore() {
 
         update(s => {
           const newForms = new Map(s.forms);
-          newForms.set(form.id, form);
+          newForms.set(form.id, { data: form, timestamp: Date.now() });
 
           const newFormsBySystem = new Map(s.formsBySystem);
           const systemForms = newFormsBySystem.get(systemId) || [];
@@ -174,7 +199,7 @@ function createFormsStore() {
 
         update(s => {
           const newForms = new Map(s.forms);
-          newForms.set(form.id, form);
+          newForms.set(form.id, { data: form, timestamp: Date.now() });
           return { ...s, forms: newForms };
         });
 
@@ -229,7 +254,7 @@ function createFormsStore() {
 
         update(s => {
           const newForms = new Map(s.forms);
-          newForms.set(form.id, form);
+          newForms.set(form.id, { data: form, timestamp: Date.now() });
 
           // Add to system list
           const newFormsBySystem = new Map(s.formsBySystem);
@@ -256,13 +281,16 @@ function createFormsStore() {
       const cacheKey = `${campaignId}:${entityType}`;
 
       // Check cache first
-      let cachedForm: FormDefinition | undefined;
+      let cached: CachedForm | undefined;
       const unsub = subscribe(s => {
-        cachedForm = s.activeFormCache.get(cacheKey);
+        cached = s.activeFormCache.get(cacheKey);
       });
       unsub();
 
-      if (cachedForm) return cachedForm;
+      // Return cached if valid
+      if (isCacheValid(cached)) {
+        return cached!.data;
+      }
 
       // Fetch from API
       update(s => ({ ...s, loading: { ...s.loading, activeForm: true }, error: null }));
@@ -271,12 +299,13 @@ function createFormsStore() {
         const form = await formsApi.getActiveForm(campaignId, entityType);
 
         if (form) {
+          const now = Date.now();
           update(s => {
             const newForms = new Map(s.forms);
-            newForms.set(form.id, form);
+            newForms.set(form.id, { data: form, timestamp: now });
 
             const newActiveFormCache = new Map(s.activeFormCache);
-            newActiveFormCache.set(cacheKey, form);
+            newActiveFormCache.set(cacheKey, { data: form, timestamp: now });
 
             return {
               ...s,
@@ -355,7 +384,7 @@ function createFormsStore() {
 
         update(s => {
           const newForms = new Map(s.forms);
-          newForms.set(result.form.id, result.form);
+          newForms.set(result.form.id, { data: result.form, timestamp: Date.now() });
 
           const newFormsBySystem = new Map(s.formsBySystem);
           const systemForms = newFormsBySystem.get(systemId) || [];
@@ -379,6 +408,186 @@ function createFormsStore() {
      */
     clearError() {
       update(s => ({ ...s, error: null }));
+    },
+
+    /**
+     * Save a form as a template
+     */
+    async saveAsTemplate(
+      formId: string,
+      templateName: string,
+      description?: string
+    ): Promise<FormDefinition> {
+      update(s => ({ ...s, error: null }));
+
+      try {
+        // Get the source form
+        const sourceForm = await this.getForm(formId);
+
+        // Create a new form as a template (duplicate with template metadata)
+        const templateForm = await formsApi.duplicateForm(formId, {
+          name: `[Template] ${templateName}`,
+          description: description || `Template: ${templateName}`
+        });
+
+        update(s => {
+          const newForms = new Map(s.forms);
+          newForms.set(templateForm.id, { data: templateForm, timestamp: Date.now() });
+
+          const newFormsBySystem = new Map(s.formsBySystem);
+          const systemForms = newFormsBySystem.get(templateForm.gameSystemId) || [];
+          newFormsBySystem.set(templateForm.gameSystemId, [...systemForms, templateForm.id]);
+
+          return { ...s, forms: newForms, formsBySystem: newFormsBySystem };
+        });
+
+        return templateForm;
+      } catch (err) {
+        update(s => ({
+          ...s,
+          error: err instanceof Error ? err.message : 'Failed to save template'
+        }));
+        throw err;
+      }
+    },
+
+    /**
+     * Create a new form from a template
+     */
+    async createFromTemplate(
+      templateId: string,
+      newName: string,
+      systemId?: string
+    ): Promise<FormDefinition> {
+      update(s => ({ ...s, error: null }));
+
+      try {
+        // Duplicate the template
+        const newForm = await formsApi.duplicateForm(templateId, {
+          name: newName,
+          description: undefined // Clear template description
+        });
+
+        update(s => {
+          const newForms = new Map(s.forms);
+          newForms.set(newForm.id, { data: newForm, timestamp: Date.now() });
+
+          const newFormsBySystem = new Map(s.formsBySystem);
+          const systemForms = newFormsBySystem.get(newForm.gameSystemId) || [];
+          newFormsBySystem.set(newForm.gameSystemId, [...systemForms, newForm.id]);
+
+          return { ...s, forms: newForms, formsBySystem: newFormsBySystem };
+        });
+
+        return newForm;
+      } catch (err) {
+        update(s => ({
+          ...s,
+          error: err instanceof Error ? err.message : 'Failed to create from template'
+        }));
+        throw err;
+      }
+    },
+
+    /**
+     * List all templates for a game system
+     * Includes both built-in templates (from JSON files) and user-created templates
+     */
+    async listTemplates(systemId?: string, entityType?: string): Promise<FormDefinition[]> {
+      update(s => ({ ...s, loading: { ...s.loading, forms: true }, error: null }));
+
+      try {
+        // Load built-in templates from JSON files
+        const builtInTemplates: FormDefinition[] = [];
+
+        // Import built-in templates
+        try {
+          const basicCharacter = await import('$lib/templates/basic-character.template.json');
+          const itemCard = await import('$lib/templates/item-card.template.json');
+          const statBlock = await import('$lib/templates/stat-block.template.json');
+
+          const templateExports = [basicCharacter.default, itemCard.default, statBlock.default];
+
+          // Convert template exports to FormDefinition
+          templateExports.forEach((exportData: any, index: number) => {
+            if (exportData && exportData.form) {
+              const form: FormDefinition = {
+                id: `builtin-template-${index}`,
+                name: exportData.form.name,
+                description: exportData.form.description,
+                gameSystemId: systemId || 'generic',
+                entityType: exportData.form.entityType,
+                version: exportData.form.version,
+                isDefault: false,
+                isLocked: true, // Built-in templates are locked
+                visibility: 'public',
+                ownerId: 'system',
+                layout: exportData.form.layout,
+                fragments: exportData.form.fragments || [],
+                styles: exportData.form.styles,
+                computedFields: exportData.form.computedFields || [],
+                scripts: exportData.form.scripts,
+                createdAt: new Date(exportData.exportedAt),
+                updatedAt: new Date(exportData.exportedAt)
+              };
+
+              // Filter by entity type if specified
+              if (!entityType || form.entityType === entityType) {
+                builtInTemplates.push(form);
+              }
+            }
+          });
+        } catch (importErr) {
+          console.warn('Failed to load built-in templates:', importErr);
+        }
+
+        // Load user-created templates from API
+        const userTemplates: FormDefinition[] = [];
+        if (systemId) {
+          const allForms = await formsApi.listForms(systemId, entityType);
+          // Filter forms that are templates (name starts with [Template])
+          const templates = allForms.filter(f => f.name.startsWith('[Template]'));
+          userTemplates.push(...templates);
+        }
+
+        // Combine built-in and user templates
+        const allTemplates = [...builtInTemplates, ...userTemplates];
+
+        update(s => {
+          const newForms = new Map(s.forms);
+          allTemplates.forEach(template => {
+            newForms.set(template.id, { data: template, timestamp: Date.now() });
+          });
+
+          return {
+            ...s,
+            forms: newForms,
+            loading: { ...s.loading, forms: false }
+          };
+        });
+
+        return allTemplates;
+      } catch (err) {
+        update(s => ({
+          ...s,
+          loading: { ...s.loading, forms: false },
+          error: err instanceof Error ? err.message : 'Failed to load templates'
+        }));
+        throw err;
+      }
+    },
+
+    /**
+     * Delete a user-created template (cannot delete built-in templates)
+     */
+    async deleteTemplate(templateId: string): Promise<void> {
+      // Check if it's a built-in template
+      if (templateId.startsWith('builtin-template-')) {
+        throw new Error('Cannot delete built-in templates');
+      }
+
+      // Use the regular delete form method
+      return this.deleteForm(templateId);
     },
 
     /**
@@ -408,7 +617,8 @@ export function getFormsForSystem(systemId: string): Readable<FormDefinition[]> 
     const formIds = $store.formsBySystem.get(systemId) || [];
     return formIds
       .map(id => $store.forms.get(id))
-      .filter((f): f is FormDefinition => f !== undefined);
+      .filter((cached): cached is CachedForm => cached !== undefined && isCacheValid(cached))
+      .map(cached => cached.data);
   });
 }
 

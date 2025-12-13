@@ -639,9 +639,20 @@ interface CachedResult {
   timestamp: number;
 }
 
+interface PendingEvaluation {
+  fieldId: string;
+  context: Record<string, unknown>;
+  resolve: (value: unknown) => void;
+  timestamp: number;
+}
+
 export class ComputedFieldEngine {
   private cache: Map<string, CachedResult> = new Map();
   private parsedFormulas: Map<string, ASTNode> = new Map();
+  private pendingEvaluations: Map<string, PendingEvaluation[]> = new Map();
+  private evaluationTimers: Map<string, ReturnType<typeof setTimeout>> = new Map();
+  private readonly DEBOUNCE_MS = 50; // Debounce rapid recalculations
+  private readonly CACHE_TTL_MS = 60000; // Cache results for 60 seconds
 
   /**
    * Parse a formula and cache the AST
@@ -657,7 +668,7 @@ export class ComputedFieldEngine {
   }
 
   /**
-   * Evaluate a computed field
+   * Evaluate a computed field (with debouncing)
    */
   evaluate(
     field: FormComputedField,
@@ -672,6 +683,51 @@ export class ComputedFieldEngine {
       }
     }
 
+    // Perform immediate evaluation
+    return this.evaluateImmediate(field, context);
+  }
+
+  /**
+   * Evaluate a computed field with debouncing (returns Promise)
+   */
+  evaluateDebounced(
+    field: FormComputedField,
+    context: Record<string, unknown>
+  ): Promise<unknown> {
+    // Check cache first
+    const cached = this.cache.get(field.id);
+    if (cached && this.isCacheValid(cached, context)) {
+      return Promise.resolve(cached.value);
+    }
+
+    return new Promise<unknown>((resolve) => {
+      // Add to pending evaluations
+      const pending = this.pendingEvaluations.get(field.id) || [];
+      pending.push({ fieldId: field.id, context, resolve, timestamp: Date.now() });
+      this.pendingEvaluations.set(field.id, pending);
+
+      // Clear existing timer
+      const existingTimer = this.evaluationTimers.get(field.id);
+      if (existingTimer) {
+        clearTimeout(existingTimer);
+      }
+
+      // Set new timer
+      const timer = setTimeout(() => {
+        this.flushPendingEvaluations(field.id);
+      }, this.DEBOUNCE_MS);
+
+      this.evaluationTimers.set(field.id, timer);
+    });
+  }
+
+  /**
+   * Immediate evaluation without debouncing
+   */
+  private evaluateImmediate(
+    field: FormComputedField,
+    context: Record<string, unknown>
+  ): unknown {
     // Parse formula if not already parsed
     if (!this.parsedFormulas.has(field.id)) {
       this.parseFormula(field.id, field.formula);
@@ -692,6 +748,35 @@ export class ComputedFieldEngine {
     });
 
     return value;
+  }
+
+  /**
+   * Flush pending evaluations for a field
+   */
+  private flushPendingEvaluations(fieldId: string): void {
+    const pending = this.pendingEvaluations.get(fieldId);
+    if (!pending || pending.length === 0) return;
+
+    // Get the most recent context (since debouncing batches rapid changes)
+    const latest = pending[pending.length - 1];
+
+    // Find the field from the first pending evaluation
+    const field = { id: fieldId, formula: '' } as FormComputedField;
+
+    // Evaluate once with latest context
+    try {
+      const value = this.evaluateImmediate(field, latest.context);
+
+      // Resolve all pending promises with the same value
+      pending.forEach(p => p.resolve(value));
+    } catch (error) {
+      // If evaluation fails, resolve with undefined
+      pending.forEach(p => p.resolve(undefined));
+    }
+
+    // Clear pending evaluations
+    this.pendingEvaluations.delete(fieldId);
+    this.evaluationTimers.delete(fieldId);
   }
 
   /**
@@ -723,8 +808,14 @@ export class ComputedFieldEngine {
    * Check if cached result is still valid
    */
   private isCacheValid(cached: CachedResult, context: Record<string, unknown>): boolean {
+    // Check TTL
+    const age = Date.now() - cached.timestamp;
+    if (age > this.CACHE_TTL_MS) {
+      return false;
+    }
+
     // Cache is valid if all dependencies still have the same values
-    // For simplicity, we just return true here - invalidation is handled explicitly
+    // For simplicity, we rely on explicit invalidation
     return true;
   }
 
