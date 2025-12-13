@@ -189,8 +189,11 @@
     <div class="field-value">
       {#if node.fieldType === 'checkbox'}
         {value ? '✓' : '✗'}
+      {:else if node.fieldType === 'radio' && node.options?.options}
+        {@const selectedOption = node.options.options.find(o => o.value === value)}
+        {selectedOption ? localeResolver.resolve(selectedOption.label) : value ?? '-'}
       {:else if node.fieldType === 'select' && node.options?.options}
-        {node.options.options.find(o => o.value === value)?.label || value}
+        {localeResolver.resolve(node.options.options.find(o => o.value === value)?.label) || value}
       {:else if node.fieldType === 'resource'}
         <div class="field-resource-view">
           {(value as {current?: number})?.current ?? value ?? 0}
@@ -319,6 +322,34 @@
         aria-describedby={helpText ? `help-{node.id}` : undefined}
         onchange={(e) => handleChange(e.currentTarget.checked)}
       />
+    {:else if node.fieldType === 'radio'}
+      <div
+        class="radio-group"
+        class:radio-horizontal={node.options?.layout === 'horizontal'}
+        class:radio-vertical={!node.options?.layout || node.options?.layout === 'vertical'}
+        role="radiogroup"
+        aria-label={label ?? 'Radio group'}
+        aria-required={node.required}
+        aria-describedby={helpText ? `help-{node.id}` : undefined}
+      >
+        {#if node.options?.options}
+          {#each node.options.options as option, i}
+            <label class="radio-option">
+              <input
+                type="radio"
+                name="radio-{node.id}"
+                class="radio-input"
+                value={option.value}
+                checked={value === option.value}
+                disabled={node.readonly}
+                aria-checked={value === option.value}
+                onchange={() => handleChange(option.value)}
+              />
+              <span class="radio-label">{localeResolver.resolve(option.label)}</span>
+            </label>
+          {/each}
+        {/if}
+      </div>
     {:else if node.fieldType === 'select'}
       <select
         id="field-{node.id}"
@@ -331,9 +362,22 @@
         onchange={(e) => handleChange(e.currentTarget.value)}
       >
         <option value="">--Select--</option>
-        {#each node.options?.options || [] as option}
-          <option value={option.value}>{option.label}</option>
-        {/each}
+        {#if node.options?.options}
+          {@const groupedOptions = node.options.options.reduce((acc, opt) => { const group = opt.group ?? ''; if (!acc[group]) acc[group] = []; acc[group].push(opt); return acc; }, {} as Record<string, typeof node.options.options>)}
+          {#each Object.entries(groupedOptions) as [group, opts]}
+            {#if group}
+              <optgroup label={group}>
+                {#each opts as option}
+                  <option value={option.value}>{localeResolver.resolve(option.label)}</option>
+                {/each}
+              </optgroup>
+            {:else}
+              {#each opts as option}
+                <option value={option.value}>{localeResolver.resolve(option.label)}</option>
+              {/each}
+            {/if}
+          {/each}
+        {/if}
       </select>
     {:else if node.fieldType === 'dice'}
       <input
@@ -739,6 +783,50 @@
   .field-help {
     font-size: 0.75rem;
     color: var(--muted-color, #666);
+  }
+
+  /* Radio button field styles */
+  .radio-group {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .radio-horizontal {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .radio-vertical {
+    flex-direction: column;
+  }
+
+  .radio-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+  }
+
+  .radio-input {
+    width: 1rem;
+    height: 1rem;
+    cursor: pointer;
+    margin: 0;
+  }
+
+  .radio-input:disabled {
+    cursor: not-allowed;
+  }
+
+  .radio-label {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .radio-option:has(.radio-input:disabled) .radio-label {
+    cursor: not-allowed;
+    opacity: 0.6;
   }
 
   .field-resource {

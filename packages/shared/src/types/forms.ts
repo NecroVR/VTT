@@ -29,6 +29,7 @@ export type FormFieldType =
   | 'text'        // Single-line text input
   | 'number'      // Numeric input
   | 'checkbox'    // Boolean checkbox
+  | 'radio'       // Radio button group
   | 'select'      // Dropdown selection
   | 'multiselect' // Multi-select dropdown
   | 'textarea'    // Multi-line text
@@ -48,8 +49,11 @@ export type FormFieldType =
  * Type-specific options for form field configuration
  */
 export interface FormFieldTypeOptions {
-  // Select and multiselect field options
+  // Select, multiselect, and radio field options
   options?: { value: string; label: LocalizedString; group?: string }[];
+
+  // Radio field options
+  layout?: 'horizontal' | 'vertical';  // Display direction for radio buttons
 
   // Multiselect field options
   searchable?: boolean;     // Enable search/filter for multiselect
