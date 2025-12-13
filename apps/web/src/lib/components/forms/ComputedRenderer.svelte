@@ -10,37 +10,30 @@
 
   let { node, entity, computedFields }: Props = $props();
 
-  // State
-  let isComputing = $state(false);
-  let computedValue: unknown = $state(undefined);
-  let error: string | undefined = $state(undefined);
+  // Find the computed field definition - stable reference
+  const field = $derived(computedFields?.find(f => f.id === node.fieldId));
 
-  // Find the computed field definition
-  const field = $derived(computedFields.find(f => f.id === node.fieldId));
-
-  // Compute the value whenever entity or field changes
-  $effect(() => {
+  // Compute the value as a derived - no $effect needed
+  // This avoids the infinite loop caused by state updates in effects
+  const computeResult = $derived.by(() => {
     if (!field) {
-      error = `Computed field not found: ${node.fieldId}`;
-      computedValue = undefined;
-      return;
+      return { value: undefined, error: `Computed field not found: ${node.fieldId}` };
     }
 
-    isComputing = true;
-    error = undefined;
-
     try {
-      computedValue = computedFieldEngine.evaluate(field, entity);
+      const value = computedFieldEngine.evaluate(field, entity);
+      return { value, error: undefined };
     } catch (err) {
-      error = (err as Error).message;
-      computedValue = undefined;
-    } finally {
-      isComputing = false;
+      return { value: undefined, error: (err as Error).message };
     }
   });
 
+  // Extract values for template use
+  const computedValue = $derived(computeResult.value);
+  const error = $derived(computeResult.error);
+
   // Format the display value
-  const displayValue = $derived(() => {
+  const displayValue = $derived.by(() => {
     if (error) return null;
     if (computedValue === undefined || computedValue === null) return null;
 
@@ -61,7 +54,7 @@
   });
 </script>
 
-<div class="computed-field" class:has-error={error} class:computing={isComputing}>
+<div class="computed-field" class:has-error={error}>
   {#if node.label}
     <label class="computed-label">
       {node.label}
@@ -69,14 +62,12 @@
   {/if}
 
   <div class="computed-value">
-    {#if isComputing}
-      <span class="loading-indicator">Computing...</span>
-    {:else if error}
+    {#if error}
       <span class="error-message" title={error}>
         Error: {error}
       </span>
-    {:else if displayValue()}
-      <span class="value">{displayValue()}</span>
+    {:else if displayValue}
+      <span class="value">{displayValue}</span>
     {:else}
       <span class="empty-value">—</span>
     {/if}
@@ -92,10 +83,6 @@
     border-radius: 4px;
     background: var(--computed-bg, #f8f9fa);
     border: 1px solid var(--computed-border, #dee2e6);
-  }
-
-  .computed-field.computing {
-    opacity: 0.7;
   }
 
   .computed-field.has-error {
@@ -122,12 +109,6 @@
 
   .empty-value {
     color: var(--text-muted, #6c757d);
-    font-style: italic;
-  }
-
-  .loading-indicator {
-    color: var(--text-muted, #6c757d);
-    font-size: 0.875rem;
     font-style: italic;
   }
 
