@@ -6,6 +6,8 @@
   import * as formsApi from '$lib/api/forms';
   import FormRenderer from '$lib/components/forms/FormRenderer.svelte';
   import { sampleEntities, type SampleEntity } from '$lib/components/designer/sampleEntities';
+  import TemplatesGallery from '$lib/components/designer/TemplatesGallery.svelte';
+  import TemplatePreview from '$lib/components/designer/TemplatePreview.svelte';
   import type { FormDefinition } from '@vtt/shared';
   import type { PageData } from './$types';
 
@@ -26,6 +28,9 @@
   let previewModalOpen = $state(false);
   let previewForm = $state<FormDefinition | null>(null);
   let previewEntity = $state<SampleEntity>(sampleEntities[2]); // Default to fullCharacter
+  let activeTab = $state<'forms' | 'templates'>('forms');
+  let templatePreviewOpen = $state(false);
+  let templateToPreview = $state<FormDefinition | null>(null);
 
   const unsubscribeAuth = authStore.subscribe(state => {
     user = state.user;
@@ -130,6 +135,36 @@
     previewForm = null;
   }
 
+  // Template handlers
+  async function handleSelectTemplate(template: FormDefinition) {
+    const formName = prompt(`Create a new form from "${template.name.replace('[Template] ', '')}"\n\nEnter a name for the new form:`, `My ${template.name.replace('[Template] ', '')}`);
+
+    if (!formName || formName.trim() === '') return;
+
+    try {
+      loading = true;
+      const newForm = await formsStore.createFromTemplate(template.id, formName.trim());
+
+      // Navigate to the new form's designer
+      goto(`/forms/designer/${newForm.id}`);
+    } catch (err) {
+      error = err instanceof Error ? err.message : 'Failed to create form from template';
+      alert(`Failed to create form: ${error}`);
+    } finally {
+      loading = false;
+    }
+  }
+
+  function handleTemplatePreview(template: FormDefinition) {
+    templateToPreview = template;
+    templatePreviewOpen = true;
+  }
+
+  function handleUseTemplate(template: FormDefinition) {
+    templatePreviewOpen = false;
+    handleSelectTemplate(template);
+  }
+
   function getGameSystemName(gameSystemId: string): string {
     const system = gameSystems.find((s: any) => s.systemId === gameSystemId);
     return system ? system.name : 'Unknown System';
@@ -199,7 +234,26 @@
     </button>
   </div>
 
-  <!-- Filters -->
+  <!-- Tabs -->
+  <div class="tabs">
+    <button
+      class="tab"
+      class:active={activeTab === 'forms'}
+      onclick={() => activeTab = 'forms'}
+    >
+      My Forms
+    </button>
+    <button
+      class="tab"
+      class:active={activeTab === 'templates'}
+      onclick={() => activeTab = 'templates'}
+    >
+      Templates
+    </button>
+  </div>
+
+  <!-- Filters (only show on forms tab) -->
+  {#if activeTab === 'forms'}
   <div class="filters">
     <input
       type="text"
@@ -321,7 +375,24 @@
       {/each}
     </div>
   {/if}
+
+  <!-- Templates Tab -->
+  {#if activeTab === 'templates'}
+    <TemplatesGallery
+      gameSystemId={filterGameSystem}
+      entityType={filterEntityType}
+      onSelectTemplate={handleSelectTemplate}
+    />
+  {/if}
 </main>
+
+<!-- Template Preview Modal -->
+<TemplatePreview
+  template={templateToPreview}
+  isOpen={templatePreviewOpen}
+  onUse={handleUseTemplate}
+  onClose={() => templatePreviewOpen = false}
+/>
 
 <!-- Preview Modal -->
 {#if previewModalOpen && previewForm}
@@ -399,6 +470,34 @@
 
   .docs-link svg {
     flex-shrink: 0;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .tab {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-size: var(--font-size-md);
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    transition: all 0.2s;
+  }
+
+  .tab:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .tab.active {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
   }
 
   .filters {
