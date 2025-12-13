@@ -1,5 +1,5 @@
 import { writable, derived, type Readable } from 'svelte/store';
-import type { FormDefinition, LayoutNode, UpdateFormRequest } from '@vtt/shared';
+import type { FormDefinition, LayoutNode, UpdateFormRequest, FormFragment, FragmentParameter } from '@vtt/shared';
 import * as formsApi from '$lib/api/forms';
 
 // ============================================================================
@@ -626,6 +626,22 @@ function createFormDesignerStore() {
     },
 
     /**
+     * Update the entire form from JSON
+     */
+    updateFromJson(updatedForm: FormDefinition) {
+      update(state => {
+        if (!state.form) return state;
+
+        const newState = pushToUndo(state);
+
+        return {
+          ...newState,
+          form: updatedForm
+        };
+      });
+    },
+
+    /**
      * Get a node by ID (helper method)
      */
     getNodeById(nodeId: string): LayoutNode | null {
@@ -663,6 +679,146 @@ function createFormDesignerStore() {
      */
     reset() {
       set(initialState);
+    },
+
+    // ========================================================================
+    // Fragment CRUD Operations
+    // ========================================================================
+
+    /**
+     * Create a new fragment
+     */
+    createFragment(fragment: Omit<FormFragment, 'id' | 'createdAt' | 'updatedAt'>) {
+      update(state => {
+        if (!state.form) return state;
+
+        const newState = pushToUndo(state);
+
+        const newFragment: FormFragment = {
+          ...fragment,
+          id: generateNodeId(),
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+
+        return {
+          ...newState,
+          form: {
+            ...state.form,
+            fragments: [...state.form.fragments, newFragment]
+          }
+        };
+      });
+    },
+
+    /**
+     * Update an existing fragment
+     */
+    updateFragment(fragmentId: string, updates: Partial<Omit<FormFragment, 'id' | 'createdAt' | 'updatedAt'>>) {
+      update(state => {
+        if (!state.form) return state;
+
+        const newState = pushToUndo(state);
+
+        const fragments = state.form.fragments.map(frag => {
+          if (frag.id === fragmentId) {
+            return {
+              ...frag,
+              ...updates,
+              updatedAt: new Date()
+            };
+          }
+          return frag;
+        });
+
+        return {
+          ...newState,
+          form: {
+            ...state.form,
+            fragments
+          }
+        };
+      });
+    },
+
+    /**
+     * Delete a fragment
+     */
+    deleteFragment(fragmentId: string) {
+      update(state => {
+        if (!state.form) return state;
+
+        const newState = pushToUndo(state);
+
+        const fragments = state.form.fragments.filter(frag => frag.id !== fragmentId);
+
+        return {
+          ...newState,
+          form: {
+            ...state.form,
+            fragments
+          }
+        };
+      });
+    },
+
+    /**
+     * Get a fragment by ID
+     */
+    getFragmentById(fragmentId: string): FormFragment | null {
+      let form: FormDefinition | null = null;
+      const unsub = subscribe(s => { form = s.form; });
+      unsub();
+
+      if (!form) return null;
+      return form.fragments.find(frag => frag.id === fragmentId) || null;
+    },
+
+    /**
+     * Check if a fragment is being used in the layout
+     */
+    isFragmentInUse(fragmentId: string): boolean {
+      let form: FormDefinition | null = null;
+      const unsub = subscribe(s => { form = s.form; });
+      unsub();
+
+      if (!form) return false;
+
+      function checkNodes(nodes: LayoutNode[]): boolean {
+        for (const node of nodes) {
+          if (node.type === 'fragmentRef' && node.fragmentId === fragmentId) {
+            return true;
+          }
+
+          // Check children
+          if ('children' in node && Array.isArray(node.children)) {
+            if (checkNodes(node.children)) return true;
+          }
+
+          // Check tabs
+          if ('tabs' in node && Array.isArray(node.tabs)) {
+            for (const tab of node.tabs) {
+              if (checkNodes(tab.children)) return true;
+            }
+          }
+
+          // Check itemTemplate
+          if ('itemTemplate' in node && Array.isArray(node.itemTemplate)) {
+            if (checkNodes(node.itemTemplate)) return true;
+          }
+
+          // Check then/else
+          if ('then' in node && Array.isArray(node.then)) {
+            if (checkNodes(node.then)) return true;
+          }
+          if ('else' in node && Array.isArray(node.else)) {
+            if (checkNodes(node.else)) return true;
+          }
+        }
+        return false;
+      }
+
+      return checkNodes(form.layout);
     }
   };
 }

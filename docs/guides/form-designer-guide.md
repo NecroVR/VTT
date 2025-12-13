@@ -1309,16 +1309,241 @@ Add custom CSS classes to components for advanced styling:
 
 ### Fragment Reusability
 
-Create common fragments once and reuse them:
+See the dedicated Fragment Library section below for comprehensive information on creating and managing reusable form fragments.
 
-1. Create a fragment for common elements (e.g., "Ability Score Block")
-2. Use Fragment Reference to insert it multiple times
-3. Changes to the fragment automatically update all references
+---
 
-**Use Cases:**
-- Ability scores block (used in character sheets, NPC sheets)
-- Weapon stats block (used in character weapons, item cards)
-- Spell format (used in spell lists, spellbooks)
+## The Fragment Library (Phase 3.8)
+
+The Fragment Library allows you to create reusable pieces of form layout that can be inserted multiple times with different parameters. This is perfect for repeated patterns like ability score blocks, skill displays, or any component structure you use frequently.
+
+### What are Fragments?
+
+A **fragment** is a self-contained, parameterizable piece of form layout consisting of:
+- **Name and description** - What the fragment represents
+- **Parameters** - Customizable values (bindings, labels, options)
+- **Content** - The actual layout nodes (fields, containers, etc.)
+
+Think of fragments as templates or building blocks you can customize each time you use them.
+
+### When to Use Fragments
+
+Use fragments for:
+- **Repeated patterns** - Ability scores, stat blocks, resource displays
+- **Consistent layouts** - Standard formatting across forms
+- **Reusable components** - Share common structures
+- **Parameterized templates** - Same layout, different data bindings
+
+**Example**: A "Skill Block" fragment displays a skill name, modifier, and proficiency checkbox. Create it once and reuse for all 18 D&D skills with different parameters.
+
+### The Fragment Library Panel
+
+Located in the lower-left panel below the Tree View.
+
+**Features:**
+- **Search bar** - Filter fragments by name or description
+- **Create button** (+ New) - Opens Fragment Editor for new fragments
+- **Fragment cards** - Show name, description, parameter count
+- **Edit button** (✎) - Opens Fragment Editor for existing fragment
+- **Delete button** (🗑) - Removes fragment with confirmation
+- **Drag support** - Drag fragments onto canvas (future feature)
+
+**Empty State**: Shows "Create First Fragment" button when no fragments exist.
+
+### Creating a Fragment
+
+1. Click **+ New** in the Fragment Library header
+2. The Fragment Editor modal opens
+3. Fill in basic information:
+   - **Name** - Descriptive name (e.g., "Ability Score Block")
+   - **Description** - Purpose and usage notes
+4. Define parameters (see below)
+5. Click **Create Fragment**
+
+The fragment is created empty - you'll add content separately.
+
+### Editing Fragments
+
+1. Find the fragment in the library
+2. Click the **✎** (edit) icon
+3. Modify name, description, or parameters
+4. Click **Save Changes**
+
+**What You Can Edit:**
+- Fragment name and description
+- Parameters (add, modify, remove)
+- Fragment content (via JSON editor currently)
+
+### Deleting Fragments
+
+1. Click the **🗑** (delete) icon
+2. Review the confirmation dialog
+3. **Warning**: Check if fragment is in use first
+4. Click **Delete** to confirm
+
+**Important**: Deleting a fragment doesn't remove existing Fragment Reference nodes. Update those manually.
+
+### Fragment Parameters
+
+Parameters make fragments flexible and reusable.
+
+**Parameter Types:**
+- **Binding** - Data path (e.g., "attributes.strength.value")
+- **Literal** - Static value (e.g., "Strength", "AC")
+
+**Parameter Properties:**
+- **Name** - Identifier used in fragment content
+- **Type** - Binding or Literal
+- **Default Value** - Optional fallback
+- **Description** - Usage documentation
+
+**Example** - Ability Score Block parameters:
+```
+Name: abilityName
+Type: Literal
+Default: "Ability"
+Description: Display name for the ability
+
+Name: valuePath
+Type: Binding
+Description: Path to the ability score value
+
+Name: modifierPath
+Type: Binding
+Description: Path to the calculated modifier
+```
+
+**Managing Parameters:**
+1. In Fragment Editor, scroll to "Add Parameter" section
+2. Fill in parameter details
+3. Click **Add Parameter**
+4. To edit: Click ✎, modify, click **Update**
+5. To delete: Click 🗑, confirm
+
+### Using Fragment References
+
+Insert fragments into your form using Fragment Reference components.
+
+1. Drag **Fragment Reference** (🔗) from Component Palette (Dynamic category)
+2. Drop onto canvas
+3. Select the Fragment Reference node
+4. In Property Editor:
+   - **Fragment ID** - Choose which fragment
+   - **Parameters** - Provide values for each parameter
+5. Fragment content renders at this location
+
+**Parameter Values:**
+- Binding parameters: Enter data path like "abilities.str.value"
+- Literal parameters: Enter static text like "Strength"
+
+**Example** - Six ability scores using one fragment:
+```
+Grid (2 columns)
+├── Fragment Reference: Ability Score Block
+│   Parameters: { name: "STR", valuePath: "abilities.str.value", modifierPath: "abilities.str.modifier" }
+├── Fragment Reference: Ability Score Block
+│   Parameters: { name: "DEX", valuePath: "abilities.dex.value", modifierPath: "abilities.dex.modifier" }
+├── Fragment Reference: Ability Score Block
+│   Parameters: { name: "CON", valuePath: "abilities.con.value", modifierPath: "abilities.con.modifier" }
+... (continue for INT, WIS, CHA)
+```
+
+### Fragment Best Practices
+
+**Keep Fragments Focused:**
+- One fragment = one reusable pattern
+- Don't make fragments overly complex
+- Break large structures into multiple fragments
+
+**Use Clear Names:**
+- Good: "Ability Score Block", "Skill with Proficiency"
+- Bad: "Fragment 1", "Random Fields"
+
+**Document Parameters:**
+- Always provide parameter descriptions
+- Use clear, meaningful parameter names
+- Provide sensible defaults when possible
+
+**Plan Parameters:**
+- Identify what needs to be customizable
+- Don't over-parameterize
+- Common parameters: labels, bindings, flags
+
+**Test Thoroughly:**
+- Use fragment in multiple places
+- Verify parameters work correctly
+- Test edge cases (empty values, long text)
+
+### Example: Skill Fragment
+
+Creating a reusable D&D skill block.
+
+**Step 1: Create Fragment**
+1. Click **+ New**
+2. Name: "Skill Block"
+3. Description: "Skill with modifier and proficiency checkbox"
+
+**Step 2: Define Parameters**
+```
+skillName (Literal)
+- Default: "Skill"
+- Description: "Display name"
+
+modifierPath (Binding)
+- Description: "Path to skill modifier"
+
+proficiencyPath (Binding)
+- Description: "Path to proficiency boolean"
+```
+
+**Step 3: Define Content** (via JSON currently)
+Add to fragment's content array:
+```json
+{
+  "type": "flex",
+  "direction": "row",
+  "gap": "0.5rem",
+  "children": [
+    {
+      "type": "field",
+      "fieldType": "checkbox",
+      "binding": "{{proficiencyPath}}",
+      "label": ""
+    },
+    {
+      "type": "static",
+      "content": "{{skillName}}",
+      "contentType": "text"
+    },
+    {
+      "type": "field",
+      "fieldType": "number",
+      "binding": "{{modifierPath}}",
+      "label": "",
+      "readonly": true
+    }
+  ]
+}
+```
+
+**Step 4: Use Fragment**
+Create 18 Fragment References for D&D skills:
+```
+skillName: "Acrobatics"
+modifierPath: "skills.acrobatics.modifier"
+proficiencyPath: "skills.acrobatics.proficient"
+```
+
+Repeat for all skills!
+
+### Future Enhancements
+
+**Coming Soon:**
+- **Visual content editor** - Edit fragment layout in the Fragment Editor modal
+- **Drag from library** - Drag fragments directly onto canvas
+- **Fragment preview** - See fragment content before using
+- **Fragment templates** - Pre-built fragment library
+- **Cross-form fragments** - Share fragments between forms
 
 ---
 
@@ -1326,7 +1551,6 @@ Create common fragments once and reuse them:
 
 The Form Designer is actively being developed. Upcoming features include:
 
-- **Fragment Library** - Browse and manage reusable fragments
 - **Template Gallery** - Start from pre-built form templates
 - **Drag-to-reorder** on canvas - Drag components directly on the canvas
 - **Keyboard shortcuts** - Faster editing with keyboard

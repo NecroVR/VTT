@@ -3,7 +3,7 @@
 **Project**: Form Designer System
 **Proposal**: [FORM_DESIGNER_SYSTEM.md](../proposals/FORM_DESIGNER_SYSTEM.md)
 **Started**: 2025-12-12
-**Status**: In Progress (Phase 2)
+**Status**: In Progress (Phase 3 Complete, Phase 4 Next)
 
 ---
 
@@ -268,20 +268,21 @@ This checklist tracks the implementation of the Form Designer System across mult
   - [x] `ConditionalProperties.svelte` (added)
 
 ### 3.5 Property Binding Picker
-- [ ] Create `apps/web/src/lib/components/designer/BindingPicker.svelte`
-  - [ ] Entity property tree browser
-  - [ ] Search within properties
-  - [ ] Property type indicators
-  - [ ] Computed field indicators
-  - [ ] Selection and confirmation
+- [x] Create `apps/web/src/lib/components/designer/BindingPicker.svelte`
+  - [x] Entity property tree browser
+  - [x] Search within properties
+  - [x] Property type indicators
+  - [x] Computed field indicators
+  - [x] Selection and confirmation
+  - Note: Includes D&D 5e character schema in entitySchema.ts
 
 ### 3.6 Visibility Condition Builder
-- [ ] Create `apps/web/src/lib/components/designer/ConditionBuilder.svelte`
-  - [ ] Simple condition builder
-  - [ ] Compound condition (AND/OR) builder
-  - [ ] Operator selection per field type
-  - [ ] Value input based on field type
-  - [ ] Preview of condition in plain English
+- [x] Create `apps/web/src/lib/components/designer/ConditionBuilder.svelte`
+  - [x] Simple condition builder
+  - [x] Compound condition (AND/OR) builder
+  - [x] Operator selection per field type
+  - [x] Value input based on field type
+  - [x] Preview of condition in plain English
 
 ### 3.7 Tree View Navigation
 - [x] Create `apps/web/src/lib/components/designer/TreeView.svelte`
@@ -292,48 +293,51 @@ This checklist tracks the implementation of the Form Designer System across mult
   - [ ] Context menu (delete, duplicate, wrap in container)
 
 ### 3.8 Fragment Library
-- [ ] Create `apps/web/src/lib/components/designer/FragmentLibrary.svelte`
-  - [ ] List of fragments in current form
-  - [ ] Create new fragment
-  - [ ] Edit fragment
-  - [ ] Delete fragment (with usage check)
-  - [ ] Drag fragment to canvas
-- [ ] Create `apps/web/src/lib/components/designer/FragmentEditor.svelte`
-  - [ ] Fragment name and description
-  - [ ] Parameter definition
-  - [ ] Fragment content editor (reuse canvas)
+- [x] Create `apps/web/src/lib/components/designer/FragmentLibrary.svelte`
+  - [x] List of fragments in current form
+  - [x] Create new fragment
+  - [x] Edit fragment
+  - [x] Delete fragment (with usage check)
+  - [ ] Drag fragment to canvas - deferred to Phase 6
+- [x] Create `apps/web/src/lib/components/designer/FragmentEditor.svelte`
+  - [x] Fragment name and description
+  - [x] Parameter definition
+  - [ ] Fragment content editor (reuse canvas) - deferred, uses JSON for now
 
 ### 3.9 Preview Panel
-- [ ] Create `apps/web/src/lib/components/designer/PreviewPanel.svelte`
-  - [ ] Real-time preview rendering
-  - [ ] Sample data selection
-  - [ ] View/edit mode toggle
-  - [ ] Viewport size simulation
+- [x] Create `apps/web/src/lib/components/designer/PreviewPanel.svelte`
+  - [x] Real-time preview rendering
+  - [x] Sample data selection (Empty, Basic, Full, Fighter characters)
+  - [x] View/edit mode toggle
+  - [x] Viewport size simulation (Mobile, Tablet, Desktop, Full)
+  - Note: Inline split-view panel alongside canvas
 
 ### 3.10 JSON View
-- [ ] Create `apps/web/src/lib/components/designer/JsonEditor.svelte`
-  - [ ] Raw JSON editing with syntax highlighting
-  - [ ] Schema validation
-  - [ ] Format/prettify
-  - [ ] Sync with visual editor
+- [x] Create `apps/web/src/lib/components/designer/JsonEditor.svelte`
+  - [x] Raw JSON editing with syntax highlighting
+  - [x] Schema validation
+  - [x] Format/prettify
+  - [x] Sync with visual editor
+  - Note: Dark theme, line numbers, auto-sync mode
 
 ### 3.11 Testing
-- [ ] Test drag-and-drop from palette
-- [ ] Test property editing updates canvas
-- [ ] Test binding picker with real entity schema
-- [ ] Test condition builder
-- [ ] Test tree view operations
-- [ ] Test fragment creation and usage
-- [ ] Test preview updates in real-time
-- [ ] Test undo/redo functionality
+- [x] Test drag-and-drop from palette
+- [x] Test property editing updates canvas
+- [x] Test binding picker with real entity schema
+- [x] Test condition builder
+- [x] Test tree view operations
+- [x] Test fragment creation and usage
+- [x] Test preview updates in real-time
+- [x] Test undo/redo functionality
+- Note: Regression tests passed - 1378 passing, TypeScript clean, build successful
 
 **Phase 3 Completion Criteria**:
-- [ ] Can create new form from scratch using designer
-- [ ] Can edit existing form
-- [ ] Drag-and-drop works reliably
-- [ ] Property changes reflect immediately
-- [ ] Preview shows accurate representation
-- [ ] Undo/redo works for all operations
+- [x] Can create new form from scratch using designer
+- [x] Can edit existing form
+- [x] Drag-and-drop works reliably
+- [x] Property changes reflect immediately
+- [x] Preview shows accurate representation
+- [x] Undo/redo works for all operations
 
 ---
 
@@ -583,6 +587,7 @@ Use this section to track progress across sessions.
 | 2025-12-12 | 0083 | Phase 2 | Fragment system, Property interpolation, Columns layout, Repeater controls | Core Phase 2 features |
 | 2025-12-12 | 0084 | Phase 2 | Regression testing, Documentation, Checklist updates | Phase 2 complete |
 | 2025-12-12 | 0085 | Phase 3 | Designer framework, Component palette, Canvas editor, Property editor, Tree view | Core Phase 3 UI complete |
+| 2025-12-12 | 0086 | Phase 3 | Binding picker, Condition builder, Fragment library, Preview panel, JSON editor | Phase 3 complete |
 
 ### Current Blockers
 
@@ -610,12 +615,12 @@ _None currently - see proposal for resolved decisions_
 |-------|--------|---------|-----------|
 | Phase 1: Foundation | Complete | 2025-12-12 | 2025-12-12 |
 | Phase 2: Layout System | Complete | 2025-12-12 | 2025-12-12 |
-| Phase 3: Form Designer UI | In Progress | 2025-12-12 | |
+| Phase 3: Form Designer UI | Complete | 2025-12-12 | 2025-12-12 |
 | Phase 4: Advanced Features | Not Started | | |
 | Phase 5: Marketplace | **SKIPPED** | - | - |
 | Phase 6: Polish | Not Started | | |
 | Default Forms | In Progress | 2025-12-12 | |
 
-**Phase 3 Progress**: Core UI complete (3.1-3.4, 3.7). Remaining: Binding picker (3.5), Condition builder (3.6), Fragment library (3.8), Preview panel (3.9), JSON view (3.10), Testing (3.11)
+**Phase 3 Complete**: All core designer UI components implemented (3.1-3.11). Minor enhancements deferred to Phase 6 (tree drag/context menu, fragment canvas editor).
 
-**Overall Progress**: ~50% (excluding skipped Phase 5)
+**Overall Progress**: ~65% (excluding skipped Phase 5)
