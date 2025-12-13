@@ -16,8 +16,6 @@ interface FormDesignerState {
   mode: 'design' | 'preview';
   saving: boolean;
   error: string | null;
-  feedbackMessage: string | null;
-  feedbackType: 'info' | 'success' | 'error' | null;
 }
 
 const initialState: FormDesignerState = {
@@ -29,41 +27,8 @@ const initialState: FormDesignerState = {
   isDirty: false,
   mode: 'design',
   saving: false,
-  error: null,
-  feedbackMessage: null,
-  feedbackType: null
+  error: null
 };
-
-// ============================================================================
-// Cross-Form Clipboard Support (localStorage)
-// ============================================================================
-
-const CLIPBOARD_STORAGE_KEY = 'vtt-form-designer-clipboard';
-
-/**
- * Save clipboard to localStorage for cross-form copy/paste
- */
-function saveClipboardToStorage(node: LayoutNode): void {
-  try {
-    localStorage.setItem(CLIPBOARD_STORAGE_KEY, JSON.stringify(node));
-  } catch (err) {
-    console.warn('Failed to save clipboard to localStorage:', err);
-  }
-}
-
-/**
- * Load clipboard from localStorage
- */
-function loadClipboardFromStorage(): LayoutNode | null {
-  try {
-    const stored = localStorage.getItem(CLIPBOARD_STORAGE_KEY);
-    if (!stored) return null;
-    return JSON.parse(stored) as LayoutNode;
-  } catch (err) {
-    console.warn('Failed to load clipboard from localStorage:', err);
-    return null;
-  }
-}
 
 // ============================================================================
 // Helper Functions
@@ -521,43 +486,9 @@ function createFormDesignerStore() {
         const nodeToCopy = findNodeInLayout(state.form.layout, nodeId);
         if (!nodeToCopy) return state;
 
-        const clonedNode = cloneNode(nodeToCopy);
-        saveClipboardToStorage(clonedNode);
-
         return {
           ...state,
-          clipboard: clonedNode,
-          feedbackMessage: 'Node copied to clipboard',
-          feedbackType: 'success'
-        };
-      });
-    },
-
-    /**
-     * Cut a node to clipboard (copy + delete)
-     */
-    cutNode(nodeId: string) {
-      update(state => {
-        if (!state.form) return state;
-
-        const nodeToCut = findNodeInLayout(state.form.layout, nodeId);
-        if (!nodeToCut) return state;
-
-        // Copy to clipboard
-        const clonedNode = cloneNode(nodeToCut);
-        saveClipboardToStorage(clonedNode);
-
-        // Remove from layout
-        const newState = pushToUndo(state);
-        const newLayout = removeNodeFromLayout(state.form.layout, nodeId);
-
-        return {
-          ...newState,
-          form: { ...state.form, layout: newLayout },
-          clipboard: clonedNode,
-          selectedNodeId: state.selectedNodeId === nodeId ? null : state.selectedNodeId,
-          feedbackMessage: 'Node cut to clipboard',
-          feedbackType: 'success'
+          clipboard: cloneNode(nodeToCopy)
         };
       });
     },
@@ -567,17 +498,10 @@ function createFormDesignerStore() {
      */
     pasteNode(parentId: string) {
       update(state => {
-        if (!state.form) return state;
-
-        // Try to load from localStorage if clipboard is empty
-        let clipboard = state.clipboard;
-        if (!clipboard) {
-          clipboard = loadClipboardFromStorage();
-          if (!clipboard) return state;
-        }
+        if (!state.form || !state.clipboard) return state;
 
         const newState = pushToUndo(state);
-        const nodeToPaste = cloneNode(clipboard); // Clone again to allow multiple pastes
+        const nodeToPaste = cloneNode(state.clipboard); // Clone again to allow multiple pastes
 
         let newLayout;
         if (parentId === 'root') {
@@ -589,10 +513,7 @@ function createFormDesignerStore() {
         return {
           ...newState,
           form: { ...state.form, layout: newLayout },
-          clipboard, // Update clipboard in case it was loaded from storage
-          selectedNodeId: nodeToPaste.id, // Auto-select the pasted node
-          feedbackMessage: 'Node pasted',
-          feedbackType: 'success'
+          selectedNodeId: nodeToPaste.id // Auto-select the pasted node
         };
       });
     },
@@ -771,17 +692,6 @@ function createFormDesignerStore() {
     },
 
     /**
-     * Clear feedback message
-     */
-    clearFeedback() {
-      update(state => ({
-        ...state,
-        feedbackMessage: null,
-        feedbackType: null
-      }));
-    },
-
-    /**
      * Reset to initial state
      */
     reset() {
@@ -926,193 +836,6 @@ function createFormDesignerStore() {
       }
 
       return checkNodes(form.layout);
-    },
-
-    // ========================================================================
-    // Keyboard Navigation Helpers
-    // ========================================================================
-
-    /**
-     * Get all visible nodes in tree order (depth-first)
-     */
-    getVisibleNodes(expandedNodes: Set<string>): string[] {
-      let form: FormDefinition | null = null;
-      const unsub = subscribe(s => { form = s.form; });
-      unsub();
-
-      if (!form) return [];
-
-      const visibleIds: string[] = [];
-
-      function collectVisibleNodes(nodes: LayoutNode[], isVisible: boolean = true) {
-        for (const node of nodes) {
-          if (isVisible) {
-            visibleIds.push(node.id);
-          }
-
-          const isExpanded = expandedNodes.has(node.id);
-          const shouldShowChildren = isVisible && isExpanded;
-
-          // Collect from children arrays
-          if ('children' in node && Array.isArray(node.children)) {
-            collectVisibleNodes(node.children, shouldShowChildren);
-          }
-
-          // Collect from tabs
-          if ('tabs' in node && Array.isArray(node.tabs)) {
-            for (const tab of node.tabs) {
-              collectVisibleNodes(tab.children, shouldShowChildren);
-            }
-          }
-
-          // Collect from itemTemplate
-          if ('itemTemplate' in node && Array.isArray(node.itemTemplate)) {
-            collectVisibleNodes(node.itemTemplate, shouldShowChildren);
-          }
-
-          // Collect from then/else branches
-          if ('then' in node && Array.isArray(node.then)) {
-            collectVisibleNodes(node.then, shouldShowChildren);
-          }
-          if ('else' in node && Array.isArray(node.else)) {
-            collectVisibleNodes(node.else, shouldShowChildren);
-          }
-        }
-      }
-
-      collectVisibleNodes(form.layout, true);
-      return visibleIds;
-    },
-
-    /**
-     * Get the next visible node in tree order
-     */
-    getNextVisibleNode(currentNodeId: string, expandedNodes: Set<string>): string | null {
-      const visibleNodes = this.getVisibleNodes(expandedNodes);
-      const currentIndex = visibleNodes.indexOf(currentNodeId);
-
-      if (currentIndex === -1 || currentIndex === visibleNodes.length - 1) {
-        return null;
-      }
-
-      return visibleNodes[currentIndex + 1];
-    },
-
-    /**
-     * Get the previous visible node in tree order
-     */
-    getPrevVisibleNode(currentNodeId: string, expandedNodes: Set<string>): string | null {
-      const visibleNodes = this.getVisibleNodes(expandedNodes);
-      const currentIndex = visibleNodes.indexOf(currentNodeId);
-
-      if (currentIndex <= 0) {
-        return null;
-      }
-
-      return visibleNodes[currentIndex - 1];
-    },
-
-    /**
-     * Get the first root node ID
-     */
-    getFirstNode(): string | null {
-      let form: FormDefinition | null = null;
-      const unsub = subscribe(s => { form = s.form; });
-      unsub();
-
-      if (!form || form.layout.length === 0) return null;
-      return form.layout[0].id;
-    },
-
-    /**
-     * Get the last visible node considering expansion state
-     */
-    getLastVisibleNode(expandedNodes: Set<string>): string | null {
-      const visibleNodes = this.getVisibleNodes(expandedNodes);
-      if (visibleNodes.length === 0) return null;
-      return visibleNodes[visibleNodes.length - 1];
-    },
-
-    /**
-     * Get parent node ID
-     */
-    getParentNodeId(nodeId: string): string | null {
-      let form: FormDefinition | null = null;
-      const unsub = subscribe(s => { form = s.form; });
-      unsub();
-
-      if (!form) return null;
-
-      const result = findParentNode(form.layout, nodeId);
-      return result ? result.parent.id : null;
-    },
-
-    /**
-     * Get first child ID of a node
-     */
-    getFirstChildId(nodeId: string): string | null {
-      const node = this.getNodeById(nodeId);
-      if (!node) return null;
-
-      // Check children array
-      if ('children' in node && Array.isArray(node.children) && node.children.length > 0) {
-        return node.children[0].id;
-      }
-
-      // Check tabs
-      if ('tabs' in node && Array.isArray(node.tabs) && node.tabs.length > 0) {
-        const firstTab = node.tabs[0];
-        if (firstTab.children.length > 0) {
-          return firstTab.children[0].id;
-        }
-      }
-
-      // Check itemTemplate
-      if ('itemTemplate' in node && Array.isArray(node.itemTemplate) && node.itemTemplate.length > 0) {
-        return node.itemTemplate[0].id;
-      }
-
-      // Check then branch
-      if ('then' in node && Array.isArray(node.then) && node.then.length > 0) {
-        return node.then[0].id;
-      }
-
-      // Check else branch
-      if ('else' in node && Array.isArray(node.else) && node.else.length > 0) {
-        return node.else[0].id;
-      }
-
-      return null;
-    },
-
-    /**
-     * Check if node has children
-     */
-    hasChildren(nodeId: string): boolean {
-      const node = this.getNodeById(nodeId);
-      if (!node) return false;
-
-      if ('children' in node && Array.isArray(node.children) && node.children.length > 0) {
-        return true;
-      }
-
-      if ('tabs' in node && Array.isArray(node.tabs)) {
-        return node.tabs.some(tab => tab.children.length > 0);
-      }
-
-      if ('itemTemplate' in node && Array.isArray(node.itemTemplate) && node.itemTemplate.length > 0) {
-        return true;
-      }
-
-      if ('then' in node && Array.isArray(node.then) && node.then.length > 0) {
-        return true;
-      }
-
-      if ('else' in node && Array.isArray(node.else) && node.else.length > 0) {
-        return true;
-      }
-
-      return false;
     }
   };
 }
@@ -1159,11 +882,3 @@ export const isSaving = derived(formDesignerStore, ($store) => $store.saving);
  * Designer error
  */
 export const designerError = derived(formDesignerStore, ($store) => $store.error);
-
-/**
- * Feedback message
- */
-export const designerFeedback = derived(formDesignerStore, ($store) => ({
-  message: $store.feedbackMessage,
-  type: $store.feedbackType
-}));

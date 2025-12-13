@@ -1,0 +1,194 @@
+{
+  "exportVersion": "1.0",
+  "exportedAt": "2025-12-12T00:00:00.000Z",
+  "form": {
+    "name": "Basic Character Sheet",
+    "description": "A simple character sheet template with name, description, and basic stats",
+    "entityType": "actor",
+    "version": 1,
+    "layout": [
+      {
+        "id": "root-container",
+        "type": "container",
+        "children": [
+          {
+            "id": "header-section",
+            "type": "section",
+            "title": {
+              "literal": "Character Information"
+            },
+            "collapsible": false,
+            "children": [
+              {
+                "id": "name-field",
+                "type": "field",
+                "fieldType": "text",
+                "binding": "name",
+                "label": {
+                  "literal": "Character Name"
+                },
+                "required": true,
+                "options": {
+                  "placeholder": {
+                    "literal": "Enter character name..."
+                  }
+                }
+              },
+              {
+                "id": "description-field",
+                "type": "field",
+                "fieldType": "textarea",
+                "binding": "description",
+                "label": {
+                  "literal": "Description"
+                },
+                "options": {
+                  "placeholder": {
+                    "literal": "Character background and description..."
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "stats-section",
+            "type": "section",
+            "title": {
+              "literal": "Attributes"
+            },
+            "collapsible": true,
+            "defaultCollapsed": false,
+            "children": [
+              {
+                "id": "stats-grid",
+                "type": "grid",
+                "columns": 3,
+                "gap": "1rem",
+                "children": [
+                  {
+                    "id": "strength-field",
+                    "type": "field",
+                    "fieldType": "number",
+                    "binding": "attributes.strength",
+                    "label": {
+                      "literal": "Strength"
+                    },
+                    "options": {
+                      "min": 1,
+                      "max": 20,
+                      "step": 1
+                    }
+                  },
+                  {
+                    "id": "dexterity-field",
+                    "type": "field",
+                    "fieldType": "number",
+                    "binding": "attributes.dexterity",
+                    "label": {
+                      "literal": "Dexterity"
+                    },
+                    "options": {
+                      "min": 1,
+                      "max": 20,
+                      "step": 1
+                    }
+                  },
+                  {
+                    "id": "constitution-field",
+                    "type": "field",
+                    "fieldType": "number",
+                    "binding": "attributes.constitution",
+                    "label": {
+                      "literal": "Constitution"
+                    },
+                    "options": {
+                      "min": 1,
+                      "max": 20,
+                      "step": 1
+                    }
+                  },
+                  {
+                    "id": "intelligence-field",
+                    "type": "field",
+                    "fieldType": "number",
+                    "binding": "attributes.intelligence",
+                    "label": {
+                      "literal": "Intelligence"
+                    },
+                    "options": {
+                      "min": 1,
+                      "max": 20,
+                      "step": 1
+                    }
+                  },
+                  {
+                    "id": "wisdom-field",
+                    "type": "field",
+                    "fieldType": "number",
+                    "binding": "attributes.wisdom",
+                    "label": {
+                      "literal": "Wisdom"
+                    },
+                    "options": {
+                      "min": 1,
+                      "max": 20,
+                      "step": 1
+                    }
+                  },
+                  {
+                    "id": "charisma-field",
+                    "type": "field",
+                    "fieldType": "number",
+                    "binding": "attributes.charisma",
+                    "label": {
+                      "literal": "Charisma"
+                    },
+                    "options": {
+                      "min": 1,
+                      "max": 20,
+                      "step": 1
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "health-section",
+            "type": "section",
+            "title": {
+              "literal": "Health"
+            },
+            "collapsible": true,
+            "defaultCollapsed": false,
+            "children": [
+              {
+                "id": "hp-field",
+                "type": "field",
+                "fieldType": "resource",
+                "binding": "health.current",
+                "label": {
+                  "literal": "Hit Points"
+                },
+                "options": {
+                  "showMax": true,
+                  "showBar": true,
+                  "barColor": "#dc2626"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fragments": [],
+    "computedFields": [],
+    "styles": {
+      "theme": "default"
+    }
+  },
+  "metadata": {
+    "license": "free",
+    "notes": "Basic character sheet template for quick start"
+  }
+}

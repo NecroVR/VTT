@@ -1,0 +1,500 @@
+{
+  "exportVersion": "1.0",
+  "exportedAt": "2025-12-12T00:00:00.000Z",
+  "form": {
+    "name": "Monster Stat Block",
+    "description": "A comprehensive monster/NPC stat block template",
+    "entityType": "actor",
+    "version": 1,
+    "layout": [
+      {
+        "id": "root-container",
+        "type": "container",
+        "children": [
+          {
+            "id": "header-section",
+            "type": "section",
+            "title": {
+              "literal": "Basic Information"
+            },
+            "collapsible": false,
+            "children": [
+              {
+                "id": "name-field",
+                "type": "field",
+                "fieldType": "text",
+                "binding": "name",
+                "label": {
+                  "literal": "Creature Name"
+                },
+                "required": true,
+                "className": "large-text"
+              },
+              {
+                "id": "creature-type-grid",
+                "type": "grid",
+                "columns": 2,
+                "gap": "1rem",
+                "children": [
+                  {
+                    "id": "type-field",
+                    "type": "field",
+                    "fieldType": "select",
+                    "binding": "creatureType",
+                    "label": {
+                      "literal": "Type"
+                    },
+                    "options": {
+                      "options": [
+                        {
+                          "value": "aberration",
+                          "label": {
+                            "literal": "Aberration"
+                          }
+                        },
+                        {
+                          "value": "beast",
+                          "label": {
+                            "literal": "Beast"
+                          }
+                        },
+                        {
+                          "value": "celestial",
+                          "label": {
+                            "literal": "Celestial"
+                          }
+                        },
+                        {
+                          "value": "construct",
+                          "label": {
+                            "literal": "Construct"
+                          }
+                        },
+                        {
+                          "value": "dragon",
+                          "label": {
+                            "literal": "Dragon"
+                          }
+                        },
+                        {
+                          "value": "elemental",
+                          "label": {
+                            "literal": "Elemental"
+                          }
+                        },
+                        {
+                          "value": "fey",
+                          "label": {
+                            "literal": "Fey"
+                          }
+                        },
+                        {
+                          "value": "fiend",
+                          "label": {
+                            "literal": "Fiend"
+                          }
+                        },
+                        {
+                          "value": "giant",
+                          "label": {
+                            "literal": "Giant"
+                          }
+                        },
+                        {
+                          "value": "humanoid",
+                          "label": {
+                            "literal": "Humanoid"
+                          }
+                        },
+                        {
+                          "value": "monstrosity",
+                          "label": {
+                            "literal": "Monstrosity"
+                          }
+                        },
+                        {
+                          "value": "ooze",
+                          "label": {
+                            "literal": "Ooze"
+                          }
+                        },
+                        {
+                          "value": "plant",
+                          "label": {
+                            "literal": "Plant"
+                          }
+                        },
+                        {
+                          "value": "undead",
+                          "label": {
+                            "literal": "Undead"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "id": "size-field",
+                    "type": "field",
+                    "fieldType": "select",
+                    "binding": "size",
+                    "label": {
+                      "literal": "Size"
+                    },
+                    "options": {
+                      "options": [
+                        {
+                          "value": "tiny",
+                          "label": {
+                            "literal": "Tiny"
+                          }
+                        },
+                        {
+                          "value": "small",
+                          "label": {
+                            "literal": "Small"
+                          }
+                        },
+                        {
+                          "value": "medium",
+                          "label": {
+                            "literal": "Medium"
+                          }
+                        },
+                        {
+                          "value": "large",
+                          "label": {
+                            "literal": "Large"
+                          }
+                        },
+                        {
+                          "value": "huge",
+                          "label": {
+                            "literal": "Huge"
+                          }
+                        },
+                        {
+                          "value": "gargantuan",
+                          "label": {
+                            "literal": "Gargantuan"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "ac-hp-grid",
+                "type": "grid",
+                "columns": 2,
+                "gap": "1rem",
+                "children": [
+                  {
+                    "id": "ac-field",
+                    "type": "field",
+                    "fieldType": "number",
+                    "binding": "armorClass",
+                    "label": {
+                      "literal": "Armor Class"
+                    },
+                    "options": {
+                      "min": 1,
+                      "max": 30,
+                      "step": 1
+                    }
+                  },
+                  {
+                    "id": "hp-field",
+                    "type": "field",
+                    "fieldType": "resource",
+                    "binding": "health.current",
+                    "label": {
+                      "literal": "Hit Points"
+                    },
+                    "options": {
+                      "showMax": true,
+                      "showBar": true,
+                      "barColor": "#dc2626"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "abilities-section",
+            "type": "section",
+            "title": {
+              "literal": "Ability Scores"
+            },
+            "collapsible": true,
+            "defaultCollapsed": false,
+            "children": [
+              {
+                "id": "abilities-grid",
+                "type": "grid",
+                "columns": 6,
+                "gap": "0.5rem",
+                "children": [
+                  {
+                    "id": "str-field",
+                    "type": "field",
+                    "fieldType": "number",
+                    "binding": "abilities.strength",
+                    "label": {
+                      "literal": "STR"
+                    },
+                    "options": {
+                      "min": 1,
+                      "max": 30,
+                      "step": 1
+                    }
+                  },
+                  {
+                    "id": "dex-field",
+                    "type": "field",
+                    "fieldType": "number",
+                    "binding": "abilities.dexterity",
+                    "label": {
+                      "literal": "DEX"
+                    },
+                    "options": {
+                      "min": 1,
+                      "max": 30,
+                      "step": 1
+                    }
+                  },
+                  {
+                    "id": "con-field",
+                    "type": "field",
+                    "fieldType": "number",
+                    "binding": "abilities.constitution",
+                    "label": {
+                      "literal": "CON"
+                    },
+                    "options": {
+                      "min": 1,
+                      "max": 30,
+                      "step": 1
+                    }
+                  },
+                  {
+                    "id": "int-field",
+                    "type": "field",
+                    "fieldType": "number",
+                    "binding": "abilities.intelligence",
+                    "label": {
+                      "literal": "INT"
+                    },
+                    "options": {
+                      "min": 1,
+                      "max": 30,
+                      "step": 1
+                    }
+                  },
+                  {
+                    "id": "wis-field",
+                    "type": "field",
+                    "fieldType": "number",
+                    "binding": "abilities.wisdom",
+                    "label": {
+                      "literal": "WIS"
+                    },
+                    "options": {
+                      "min": 1,
+                      "max": 30,
+                      "step": 1
+                    }
+                  },
+                  {
+                    "id": "cha-field",
+                    "type": "field",
+                    "fieldType": "number",
+                    "binding": "abilities.charisma",
+                    "label": {
+                      "literal": "CHA"
+                    },
+                    "options": {
+                      "min": 1,
+                      "max": 30,
+                      "step": 1
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "speeds-section",
+            "type": "section",
+            "title": {
+              "literal": "Speed"
+            },
+            "collapsible": true,
+            "defaultCollapsed": false,
+            "children": [
+              {
+                "id": "speeds-grid",
+                "type": "grid",
+                "columns": 4,
+                "gap": "1rem",
+                "children": [
+                  {
+                    "id": "walk-speed",
+                    "type": "field",
+                    "fieldType": "number",
+                    "binding": "speed.walk",
+                    "label": {
+                      "literal": "Walk (ft)"
+                    },
+                    "options": {
+                      "min": 0,
+                      "step": 5
+                    }
+                  },
+                  {
+                    "id": "fly-speed",
+                    "type": "field",
+                    "fieldType": "number",
+                    "binding": "speed.fly",
+                    "label": {
+                      "literal": "Fly (ft)"
+                    },
+                    "options": {
+                      "min": 0,
+                      "step": 5
+                    }
+                  },
+                  {
+                    "id": "swim-speed",
+                    "type": "field",
+                    "fieldType": "number",
+                    "binding": "speed.swim",
+                    "label": {
+                      "literal": "Swim (ft)"
+                    },
+                    "options": {
+                      "min": 0,
+                      "step": 5
+                    }
+                  },
+                  {
+                    "id": "burrow-speed",
+                    "type": "field",
+                    "fieldType": "number",
+                    "binding": "speed.burrow",
+                    "label": {
+                      "literal": "Burrow (ft)"
+                    },
+                    "options": {
+                      "min": 0,
+                      "step": 5
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "features-section",
+            "type": "section",
+            "title": {
+              "literal": "Special Abilities"
+            },
+            "collapsible": true,
+            "defaultCollapsed": false,
+            "children": [
+              {
+                "id": "abilities-repeater",
+                "type": "repeater",
+                "binding": "specialAbilities",
+                "addLabel": {
+                  "literal": "Add Ability"
+                },
+                "emptyMessage": {
+                  "literal": "No special abilities"
+                },
+                "allowReorder": true,
+                "allowDelete": true,
+                "itemTemplate": [
+                  {
+                    "id": "ability-name",
+                    "type": "field",
+                    "fieldType": "text",
+                    "binding": "name",
+                    "label": {
+                      "literal": "Ability Name"
+                    }
+                  },
+                  {
+                    "id": "ability-description",
+                    "type": "field",
+                    "fieldType": "textarea",
+                    "binding": "description",
+                    "label": {
+                      "literal": "Description"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "actions-section",
+            "type": "section",
+            "title": {
+              "literal": "Actions"
+            },
+            "collapsible": true,
+            "defaultCollapsed": false,
+            "children": [
+              {
+                "id": "actions-repeater",
+                "type": "repeater",
+                "binding": "actions",
+                "addLabel": {
+                  "literal": "Add Action"
+                },
+                "emptyMessage": {
+                  "literal": "No actions"
+                },
+                "allowReorder": true,
+                "allowDelete": true,
+                "itemTemplate": [
+                  {
+                    "id": "action-name",
+                    "type": "field",
+                    "fieldType": "text",
+                    "binding": "name",
+                    "label": {
+                      "literal": "Action Name"
+                    }
+                  },
+                  {
+                    "id": "action-description",
+                    "type": "field",
+                    "fieldType": "textarea",
+                    "binding": "description",
+                    "label": {
+                      "literal": "Description"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fragments": [],
+    "computedFields": [],
+    "styles": {
+      "theme": "default"
+    }
+  },
+  "metadata": {
+    "license": "free",
+    "notes": "Comprehensive monster stat block template"
+  }
+}
