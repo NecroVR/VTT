@@ -18,7 +18,7 @@ export class FoundryItemParser implements ContentParser {
       entityType,
       entityId: `foundry-${foundry._id}`,
       name: foundry.name,
-      description: system.description?.value || '',
+      description: (system.description as any)?.value || '',
       img: foundry.img,
       data,
       sourceId: foundry._id

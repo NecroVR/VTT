@@ -70,7 +70,7 @@ export class FoundryJournalParser implements ContentParser {
     if (foundry.pages && foundry.pages.length > 0) {
       const firstTextPage = foundry.pages.find(p => p.type === 'text');
       if (firstTextPage) {
-        const content = firstTextPage.text?.content || firstTextPage.content || '';
+        const content = firstTextPage.text?.content || (firstTextPage as any).content || '';
         // Extract first 200 characters of text content, stripping HTML
         return this.stripHtml(content).substring(0, 200);
       }
@@ -90,7 +90,7 @@ export class FoundryJournalParser implements ContentParser {
       // Try to extract first image from text content
       const firstTextPage = foundry.pages.find(p => p.type === 'text');
       if (firstTextPage) {
-        const content = firstTextPage.text?.content || firstTextPage.content || '';
+        const content = firstTextPage.text?.content || (firstTextPage as any).content || '';
         const imgMatch = content.match(/<img[^>]+src="([^">]+)"/);
         if (imgMatch) {
           return imgMatch[1];

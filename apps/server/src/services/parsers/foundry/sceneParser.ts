@@ -141,6 +141,6 @@ export class FoundrySceneParser implements ContentParser {
 
   private extractDescription(foundry: FoundryScene): string {
     // Scenes typically don't have descriptions in Foundry, but check flags
-    return foundry.flags?.['core']?.['notes'] || '';
+    return (foundry.flags as any)?.['core']?.['notes'] || '';
   }
 }
