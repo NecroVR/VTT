@@ -1,0 +1,2097 @@
+{
+  "name": "D&D 5e Complete Character Sheet",
+  "description": "Comprehensive character sheet for D&D 5th Edition with all core features",
+  "entityType": "actor",
+  "version": "1.0.0",
+  "layout": [
+    {
+      "type": "section",
+      "id": "header-section",
+      "title": "Character Header",
+      "collapsible": false,
+      "children": [
+        {
+          "type": "grid",
+          "id": "header-grid",
+          "columns": 3,
+          "gap": "1rem",
+          "children": [
+            {
+              "type": "field",
+              "id": "name-field",
+              "fieldType": "text",
+              "binding": "name",
+              "label": "Character Name",
+              "required": true,
+              "options": {
+                "placeholder": "Enter character name"
+              }
+            },
+            {
+              "type": "field",
+              "id": "class-field",
+              "fieldType": "text",
+              "binding": "data.class",
+              "label": "Class & Subclass",
+              "options": {
+                "placeholder": "e.g., Fighter (Champion)"
+              }
+            },
+            {
+              "type": "field",
+              "id": "level-field",
+              "fieldType": "number",
+              "binding": "data.level",
+              "label": "Level",
+              "options": {
+                "min": 1,
+                "max": 20,
+                "step": 1
+              }
+            },
+            {
+              "type": "field",
+              "id": "race-field",
+              "fieldType": "text",
+              "binding": "data.race",
+              "label": "Race",
+              "options": {
+                "placeholder": "e.g., Human, Elf"
+              }
+            },
+            {
+              "type": "field",
+              "id": "background-field",
+              "fieldType": "text",
+              "binding": "data.background",
+              "label": "Background",
+              "options": {
+                "placeholder": "e.g., Soldier, Noble"
+              }
+            },
+            {
+              "type": "field",
+              "id": "alignment-field",
+              "fieldType": "select",
+              "binding": "data.alignment",
+              "label": "Alignment",
+              "options": {
+                "options": [
+                  { "value": "lg", "label": "Lawful Good" },
+                  { "value": "ng", "label": "Neutral Good" },
+                  { "value": "cg", "label": "Chaotic Good" },
+                  { "value": "ln", "label": "Lawful Neutral" },
+                  { "value": "tn", "label": "True Neutral" },
+                  { "value": "cn", "label": "Chaotic Neutral" },
+                  { "value": "le", "label": "Lawful Evil" },
+                  { "value": "ne", "label": "Neutral Evil" },
+                  { "value": "ce", "label": "Chaotic Evil" }
+                ]
+              }
+            },
+            {
+              "type": "field",
+              "id": "xp-field",
+              "fieldType": "number",
+              "binding": "data.experience.current",
+              "label": "Experience Points",
+              "options": {
+                "min": 0
+              }
+            },
+            {
+              "type": "computed",
+              "id": "proficiency-bonus",
+              "fieldId": "proficiency-bonus-calc",
+              "label": "Proficiency Bonus",
+              "format": "+{value}"
+            },
+            {
+              "type": "field",
+              "id": "inspiration-field",
+              "fieldType": "checkbox",
+              "binding": "data.inspiration",
+              "label": "Inspiration"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "tabs",
+      "id": "main-tabs",
+      "position": "top",
+      "tabs": [
+        {
+          "id": "character-tab",
+          "label": "Character",
+          "children": [
+            {
+              "type": "grid",
+              "id": "main-grid",
+              "columns": "2fr 1fr",
+              "gap": "1rem",
+              "children": [
+                {
+                  "type": "container",
+                  "id": "left-column",
+                  "children": [
+                    {
+                      "type": "section",
+                      "id": "abilities",
+                      "title": "Ability Scores",
+                      "collapsible": true,
+                      "defaultCollapsed": false,
+                      "children": [
+                        {
+                          "type": "grid",
+                          "id": "abilities-grid",
+                          "columns": 3,
+                          "gap": "0.75rem",
+                          "children": [
+                            {
+                              "type": "group",
+                              "id": "str-group",
+                              "title": "Strength",
+                              "border": true,
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "strength-field",
+                                  "fieldType": "number",
+                                  "binding": "data.abilities.strength.value",
+                                  "label": "Score",
+                                  "options": {
+                                    "min": 1,
+                                    "max": 30
+                                  }
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "str-modifier",
+                                  "fieldId": "str-mod-calc",
+                                  "label": "Modifier",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "group",
+                              "id": "dex-group",
+                              "title": "Dexterity",
+                              "border": true,
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "dexterity-field",
+                                  "fieldType": "number",
+                                  "binding": "data.abilities.dexterity.value",
+                                  "label": "Score",
+                                  "options": {
+                                    "min": 1,
+                                    "max": 30
+                                  }
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "dex-modifier",
+                                  "fieldId": "dex-mod-calc",
+                                  "label": "Modifier",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "group",
+                              "id": "con-group",
+                              "title": "Constitution",
+                              "border": true,
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "constitution-field",
+                                  "fieldType": "number",
+                                  "binding": "data.abilities.constitution.value",
+                                  "label": "Score",
+                                  "options": {
+                                    "min": 1,
+                                    "max": 30
+                                  }
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "con-modifier",
+                                  "fieldId": "con-mod-calc",
+                                  "label": "Modifier",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "group",
+                              "id": "int-group",
+                              "title": "Intelligence",
+                              "border": true,
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "intelligence-field",
+                                  "fieldType": "number",
+                                  "binding": "data.abilities.intelligence.value",
+                                  "label": "Score",
+                                  "options": {
+                                    "min": 1,
+                                    "max": 30
+                                  }
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "int-modifier",
+                                  "fieldId": "int-mod-calc",
+                                  "label": "Modifier",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "group",
+                              "id": "wis-group",
+                              "title": "Wisdom",
+                              "border": true,
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "wisdom-field",
+                                  "fieldType": "number",
+                                  "binding": "data.abilities.wisdom.value",
+                                  "label": "Score",
+                                  "options": {
+                                    "min": 1,
+                                    "max": 30
+                                  }
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "wis-modifier",
+                                  "fieldId": "wis-mod-calc",
+                                  "label": "Modifier",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "group",
+                              "id": "cha-group",
+                              "title": "Charisma",
+                              "border": true,
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "charisma-field",
+                                  "fieldType": "number",
+                                  "binding": "data.abilities.charisma.value",
+                                  "label": "Score",
+                                  "options": {
+                                    "min": 1,
+                                    "max": 30
+                                  }
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "cha-modifier",
+                                  "fieldId": "cha-mod-calc",
+                                  "label": "Modifier",
+                                  "format": "{value}"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "section",
+                      "id": "saving-throws",
+                      "title": "Saving Throws",
+                      "collapsible": true,
+                      "defaultCollapsed": false,
+                      "children": [
+                        {
+                          "type": "grid",
+                          "id": "saves-grid",
+                          "columns": 2,
+                          "gap": "0.5rem",
+                          "children": [
+                            {
+                              "type": "flex",
+                              "id": "str-save-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "align": "center",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "str-save-prof",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.saves.strength.proficient",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "str-save-bonus",
+                                  "fieldId": "str-save-calc",
+                                  "label": "Strength",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "flex",
+                              "id": "dex-save-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "align": "center",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "dex-save-prof",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.saves.dexterity.proficient",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "dex-save-bonus",
+                                  "fieldId": "dex-save-calc",
+                                  "label": "Dexterity",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "flex",
+                              "id": "con-save-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "align": "center",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "con-save-prof",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.saves.constitution.proficient",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "con-save-bonus",
+                                  "fieldId": "con-save-calc",
+                                  "label": "Constitution",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "flex",
+                              "id": "int-save-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "align": "center",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "int-save-prof",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.saves.intelligence.proficient",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "int-save-bonus",
+                                  "fieldId": "int-save-calc",
+                                  "label": "Intelligence",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "flex",
+                              "id": "wis-save-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "align": "center",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "wis-save-prof",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.saves.wisdom.proficient",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "wis-save-bonus",
+                                  "fieldId": "wis-save-calc",
+                                  "label": "Wisdom",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "flex",
+                              "id": "cha-save-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "align": "center",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "cha-save-prof",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.saves.charisma.proficient",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "cha-save-bonus",
+                                  "fieldId": "cha-save-calc",
+                                  "label": "Charisma",
+                                  "format": "{value}"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "section",
+                      "id": "skills",
+                      "title": "Skills",
+                      "collapsible": true,
+                      "defaultCollapsed": false,
+                      "children": [
+                        {
+                          "type": "grid",
+                          "id": "skills-grid",
+                          "columns": 2,
+                          "gap": "0.5rem",
+                          "children": [
+                            {
+                              "type": "flex",
+                              "id": "acrobatics-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "align": "center",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "acrobatics-prof",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.skills.acrobatics.proficient",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "acrobatics-bonus",
+                                  "fieldId": "acrobatics-calc",
+                                  "label": "Acrobatics (Dex)",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "flex",
+                              "id": "animal-handling-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "align": "center",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "animal-handling-prof",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.skills.animalHandling.proficient",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "animal-handling-bonus",
+                                  "fieldId": "animal-handling-calc",
+                                  "label": "Animal Handling (Wis)",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "flex",
+                              "id": "arcana-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "align": "center",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "arcana-prof",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.skills.arcana.proficient",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "arcana-bonus",
+                                  "fieldId": "arcana-calc",
+                                  "label": "Arcana (Int)",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "flex",
+                              "id": "athletics-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "align": "center",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "athletics-prof",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.skills.athletics.proficient",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "athletics-bonus",
+                                  "fieldId": "athletics-calc",
+                                  "label": "Athletics (Str)",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "flex",
+                              "id": "deception-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "align": "center",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "deception-prof",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.skills.deception.proficient",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "deception-bonus",
+                                  "fieldId": "deception-calc",
+                                  "label": "Deception (Cha)",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "flex",
+                              "id": "history-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "align": "center",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "history-prof",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.skills.history.proficient",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "history-bonus",
+                                  "fieldId": "history-calc",
+                                  "label": "History (Int)",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "flex",
+                              "id": "insight-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "align": "center",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "insight-prof",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.skills.insight.proficient",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "insight-bonus",
+                                  "fieldId": "insight-calc",
+                                  "label": "Insight (Wis)",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "flex",
+                              "id": "intimidation-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "align": "center",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "intimidation-prof",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.skills.intimidation.proficient",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "intimidation-bonus",
+                                  "fieldId": "intimidation-calc",
+                                  "label": "Intimidation (Cha)",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "flex",
+                              "id": "investigation-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "align": "center",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "investigation-prof",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.skills.investigation.proficient",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "investigation-bonus",
+                                  "fieldId": "investigation-calc",
+                                  "label": "Investigation (Int)",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "flex",
+                              "id": "medicine-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "align": "center",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "medicine-prof",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.skills.medicine.proficient",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "medicine-bonus",
+                                  "fieldId": "medicine-calc",
+                                  "label": "Medicine (Wis)",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "flex",
+                              "id": "nature-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "align": "center",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "nature-prof",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.skills.nature.proficient",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "nature-bonus",
+                                  "fieldId": "nature-calc",
+                                  "label": "Nature (Int)",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "flex",
+                              "id": "perception-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "align": "center",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "perception-prof",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.skills.perception.proficient",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "perception-bonus",
+                                  "fieldId": "perception-calc",
+                                  "label": "Perception (Wis)",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "flex",
+                              "id": "performance-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "align": "center",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "performance-prof",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.skills.performance.proficient",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "performance-bonus",
+                                  "fieldId": "performance-calc",
+                                  "label": "Performance (Cha)",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "flex",
+                              "id": "persuasion-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "align": "center",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "persuasion-prof",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.skills.persuasion.proficient",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "persuasion-bonus",
+                                  "fieldId": "persuasion-calc",
+                                  "label": "Persuasion (Cha)",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "flex",
+                              "id": "religion-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "align": "center",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "religion-prof",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.skills.religion.proficient",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "religion-bonus",
+                                  "fieldId": "religion-calc",
+                                  "label": "Religion (Int)",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "flex",
+                              "id": "sleight-of-hand-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "align": "center",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "sleight-of-hand-prof",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.skills.sleightOfHand.proficient",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "sleight-of-hand-bonus",
+                                  "fieldId": "sleight-of-hand-calc",
+                                  "label": "Sleight of Hand (Dex)",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "flex",
+                              "id": "stealth-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "align": "center",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "stealth-prof",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.skills.stealth.proficient",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "stealth-bonus",
+                                  "fieldId": "stealth-calc",
+                                  "label": "Stealth (Dex)",
+                                  "format": "{value}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "flex",
+                              "id": "survival-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "align": "center",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "survival-prof",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.skills.survival.proficient",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "computed",
+                                  "id": "survival-bonus",
+                                  "fieldId": "survival-calc",
+                                  "label": "Survival (Wis)",
+                                  "format": "{value}"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "container",
+                  "id": "right-column",
+                  "children": [
+                    {
+                      "type": "section",
+                      "id": "combat-stats",
+                      "title": "Combat",
+                      "collapsible": false,
+                      "children": [
+                        {
+                          "type": "grid",
+                          "id": "combat-grid",
+                          "columns": 2,
+                          "gap": "0.75rem",
+                          "children": [
+                            {
+                              "type": "field",
+                              "id": "ac-field",
+                              "fieldType": "number",
+                              "binding": "data.combat.armorClass",
+                              "label": "Armor Class",
+                              "options": {
+                                "min": 0
+                              }
+                            },
+                            {
+                              "type": "computed",
+                              "id": "initiative",
+                              "fieldId": "initiative-calc",
+                              "label": "Initiative",
+                              "format": "{value}"
+                            },
+                            {
+                              "type": "field",
+                              "id": "speed-field",
+                              "fieldType": "number",
+                              "binding": "data.combat.speed",
+                              "label": "Speed (ft)",
+                              "options": {
+                                "min": 0,
+                                "step": 5
+                              }
+                            },
+                            {
+                              "type": "computed",
+                              "id": "passive-perception",
+                              "fieldId": "passive-perception-calc",
+                              "label": "Passive Perception",
+                              "format": "{value}"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "section",
+                      "id": "hit-points",
+                      "title": "Hit Points",
+                      "collapsible": false,
+                      "children": [
+                        {
+                          "type": "field",
+                          "id": "hp-resource",
+                          "fieldType": "resource",
+                          "binding": "data.hitPoints",
+                          "label": "Hit Points",
+                          "options": {
+                            "showMax": true,
+                            "showBar": true,
+                            "barColor": "#dc3545"
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "temp-hp-field",
+                          "fieldType": "number",
+                          "binding": "data.hitPoints.temp",
+                          "label": "Temporary HP",
+                          "options": {
+                            "min": 0
+                          }
+                        },
+                        {
+                          "type": "grid",
+                          "id": "hit-dice-grid",
+                          "columns": 2,
+                          "gap": "0.5rem",
+                          "children": [
+                            {
+                              "type": "field",
+                              "id": "hit-dice-field",
+                              "fieldType": "dice",
+                              "binding": "data.hitDice.type",
+                              "label": "Hit Dice"
+                            },
+                            {
+                              "type": "field",
+                              "id": "hit-dice-remaining",
+                              "fieldType": "number",
+                              "binding": "data.hitDice.current",
+                              "label": "Remaining",
+                              "options": {
+                                "min": 0
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "section",
+                      "id": "death-saves",
+                      "title": "Death Saves",
+                      "collapsible": true,
+                      "defaultCollapsed": true,
+                      "children": [
+                        {
+                          "type": "grid",
+                          "id": "death-saves-grid",
+                          "columns": 1,
+                          "gap": "0.5rem",
+                          "children": [
+                            {
+                              "type": "static",
+                              "id": "successes-label",
+                              "content": "Successes",
+                              "contentType": "text",
+                              "tag": "label"
+                            },
+                            {
+                              "type": "flex",
+                              "id": "successes-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "success-1",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.deathSaves.successes.0",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "field",
+                                  "id": "success-2",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.deathSaves.successes.1",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "field",
+                                  "id": "success-3",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.deathSaves.successes.2",
+                                  "label": ""
+                                }
+                              ]
+                            },
+                            {
+                              "type": "static",
+                              "id": "failures-label",
+                              "content": "Failures",
+                              "contentType": "text",
+                              "tag": "label"
+                            },
+                            {
+                              "type": "flex",
+                              "id": "failures-row",
+                              "direction": "row",
+                              "gap": "0.5rem",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "failure-1",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.deathSaves.failures.0",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "field",
+                                  "id": "failure-2",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.deathSaves.failures.1",
+                                  "label": ""
+                                },
+                                {
+                                  "type": "field",
+                                  "id": "failure-3",
+                                  "fieldType": "checkbox",
+                                  "binding": "data.deathSaves.failures.2",
+                                  "label": ""
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "id": "features-traits",
+              "title": "Features & Traits",
+              "collapsible": true,
+              "defaultCollapsed": false,
+              "children": [
+                {
+                  "type": "repeater",
+                  "id": "features-repeater",
+                  "binding": "data.features",
+                  "addLabel": "Add Feature",
+                  "emptyMessage": "No features or traits added yet",
+                  "allowReorder": true,
+                  "allowDelete": true,
+                  "itemTemplate": [
+                    {
+                      "type": "grid",
+                      "id": "feature-item-grid",
+                      "columns": "2fr 1fr",
+                      "gap": "0.5rem",
+                      "children": [
+                        {
+                          "type": "field",
+                          "id": "feature-name",
+                          "fieldType": "text",
+                          "binding": "name",
+                          "label": "Feature Name",
+                          "options": {
+                            "placeholder": "e.g., Second Wind, Darkvision"
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "feature-source",
+                          "fieldType": "text",
+                          "binding": "source",
+                          "label": "Source",
+                          "options": {
+                            "placeholder": "Class, Race, etc."
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "feature-description",
+                          "fieldType": "textarea",
+                          "binding": "description",
+                          "label": "Description",
+                          "options": {
+                            "multiline": true,
+                            "placeholder": "Feature description..."
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "spells-tab",
+          "label": "Spells",
+          "children": [
+            {
+              "type": "conditional",
+              "id": "spellcasting-conditional",
+              "condition": {
+                "type": "simple",
+                "field": "data.spellcasting.enabled",
+                "operator": "equals",
+                "value": true
+              },
+              "then": [
+                {
+                  "type": "section",
+                  "id": "spellcasting-section",
+                  "title": "Spellcasting",
+                  "collapsible": false,
+                  "children": [
+                    {
+                      "type": "grid",
+                      "id": "spellcasting-grid",
+                      "columns": 3,
+                      "gap": "1rem",
+                      "children": [
+                        {
+                          "type": "field",
+                          "id": "spellcasting-class",
+                          "fieldType": "text",
+                          "binding": "data.spellcasting.class",
+                          "label": "Spellcasting Class",
+                          "options": {
+                            "placeholder": "Wizard, Cleric, etc."
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "spellcasting-ability",
+                          "fieldType": "select",
+                          "binding": "data.spellcasting.ability",
+                          "label": "Spellcasting Ability",
+                          "options": {
+                            "options": [
+                              { "value": "intelligence", "label": "Intelligence" },
+                              { "value": "wisdom", "label": "Wisdom" },
+                              { "value": "charisma", "label": "Charisma" }
+                            ]
+                          }
+                        },
+                        {
+                          "type": "computed",
+                          "id": "spell-save-dc",
+                          "fieldId": "spell-save-dc-calc",
+                          "label": "Spell Save DC",
+                          "format": "{value}"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "section",
+                      "id": "spell-slots",
+                      "title": "Spell Slots",
+                      "collapsible": true,
+                      "defaultCollapsed": false,
+                      "children": [
+                        {
+                          "type": "grid",
+                          "id": "spell-slots-grid",
+                          "columns": 3,
+                          "gap": "0.5rem",
+                          "children": [
+                            {
+                              "type": "field",
+                              "id": "slots-1",
+                              "fieldType": "resource",
+                              "binding": "data.spellSlots.level1",
+                              "label": "1st Level",
+                              "options": {
+                                "showMax": true,
+                                "showBar": true,
+                                "barColor": "#6c63ff"
+                              }
+                            },
+                            {
+                              "type": "field",
+                              "id": "slots-2",
+                              "fieldType": "resource",
+                              "binding": "data.spellSlots.level2",
+                              "label": "2nd Level",
+                              "options": {
+                                "showMax": true,
+                                "showBar": true,
+                                "barColor": "#6c63ff"
+                              }
+                            },
+                            {
+                              "type": "field",
+                              "id": "slots-3",
+                              "fieldType": "resource",
+                              "binding": "data.spellSlots.level3",
+                              "label": "3rd Level",
+                              "options": {
+                                "showMax": true,
+                                "showBar": true,
+                                "barColor": "#6c63ff"
+                              }
+                            },
+                            {
+                              "type": "field",
+                              "id": "slots-4",
+                              "fieldType": "resource",
+                              "binding": "data.spellSlots.level4",
+                              "label": "4th Level",
+                              "options": {
+                                "showMax": true,
+                                "showBar": true,
+                                "barColor": "#6c63ff"
+                              }
+                            },
+                            {
+                              "type": "field",
+                              "id": "slots-5",
+                              "fieldType": "resource",
+                              "binding": "data.spellSlots.level5",
+                              "label": "5th Level",
+                              "options": {
+                                "showMax": true,
+                                "showBar": true,
+                                "barColor": "#6c63ff"
+                              }
+                            },
+                            {
+                              "type": "field",
+                              "id": "slots-6",
+                              "fieldType": "resource",
+                              "binding": "data.spellSlots.level6",
+                              "label": "6th Level",
+                              "options": {
+                                "showMax": true,
+                                "showBar": true,
+                                "barColor": "#6c63ff"
+                              }
+                            },
+                            {
+                              "type": "field",
+                              "id": "slots-7",
+                              "fieldType": "resource",
+                              "binding": "data.spellSlots.level7",
+                              "label": "7th Level",
+                              "options": {
+                                "showMax": true,
+                                "showBar": true,
+                                "barColor": "#6c63ff"
+                              }
+                            },
+                            {
+                              "type": "field",
+                              "id": "slots-8",
+                              "fieldType": "resource",
+                              "binding": "data.spellSlots.level8",
+                              "label": "8th Level",
+                              "options": {
+                                "showMax": true,
+                                "showBar": true,
+                                "barColor": "#6c63ff"
+                              }
+                            },
+                            {
+                              "type": "field",
+                              "id": "slots-9",
+                              "fieldType": "resource",
+                              "binding": "data.spellSlots.level9",
+                              "label": "9th Level",
+                              "options": {
+                                "showMax": true,
+                                "showBar": true,
+                                "barColor": "#6c63ff"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "section",
+                      "id": "spells-list",
+                      "title": "Spells",
+                      "collapsible": true,
+                      "defaultCollapsed": false,
+                      "children": [
+                        {
+                          "type": "static",
+                          "id": "spells-placeholder",
+                          "content": "Spell list and management will be implemented with spell item references",
+                          "contentType": "text",
+                          "tag": "p"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "else": [
+                {
+                  "type": "section",
+                  "id": "no-spellcasting",
+                  "title": "Spellcasting",
+                  "collapsible": false,
+                  "children": [
+                    {
+                      "type": "field",
+                      "id": "enable-spellcasting",
+                      "fieldType": "checkbox",
+                      "binding": "data.spellcasting.enabled",
+                      "label": "Enable Spellcasting"
+                    },
+                    {
+                      "type": "static",
+                      "id": "no-spells-message",
+                      "content": "This character does not have spellcasting enabled. Check the box above to enable.",
+                      "contentType": "text",
+                      "tag": "p"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "equipment-tab",
+          "label": "Equipment",
+          "children": [
+            {
+              "type": "section",
+              "id": "currency",
+              "title": "Currency",
+              "collapsible": true,
+              "defaultCollapsed": false,
+              "children": [
+                {
+                  "type": "grid",
+                  "id": "currency-grid",
+                  "columns": 5,
+                  "gap": "0.5rem",
+                  "children": [
+                    {
+                      "type": "field",
+                      "id": "cp-field",
+                      "fieldType": "number",
+                      "binding": "data.currency.cp",
+                      "label": "Copper (cp)",
+                      "options": {
+                        "min": 0
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "sp-field",
+                      "fieldType": "number",
+                      "binding": "data.currency.sp",
+                      "label": "Silver (sp)",
+                      "options": {
+                        "min": 0
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "ep-field",
+                      "fieldType": "number",
+                      "binding": "data.currency.ep",
+                      "label": "Electrum (ep)",
+                      "options": {
+                        "min": 0
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "gp-field",
+                      "fieldType": "number",
+                      "binding": "data.currency.gp",
+                      "label": "Gold (gp)",
+                      "options": {
+                        "min": 0
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "pp-field",
+                      "fieldType": "number",
+                      "binding": "data.currency.pp",
+                      "label": "Platinum (pp)",
+                      "options": {
+                        "min": 0
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "id": "inventory",
+              "title": "Inventory",
+              "collapsible": true,
+              "defaultCollapsed": false,
+              "children": [
+                {
+                  "type": "repeater",
+                  "id": "inventory-repeater",
+                  "binding": "data.inventory",
+                  "addLabel": "Add Item",
+                  "emptyMessage": "No items in inventory",
+                  "allowReorder": true,
+                  "allowDelete": true,
+                  "itemTemplate": [
+                    {
+                      "type": "grid",
+                      "id": "inventory-item-grid",
+                      "columns": "3fr 1fr 1fr 1fr",
+                      "gap": "0.5rem",
+                      "children": [
+                        {
+                          "type": "field",
+                          "id": "item-name",
+                          "fieldType": "text",
+                          "binding": "name",
+                          "label": "Item Name",
+                          "options": {
+                            "placeholder": "Item name"
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "item-quantity",
+                          "fieldType": "number",
+                          "binding": "quantity",
+                          "label": "Qty",
+                          "options": {
+                            "min": 0,
+                            "step": 1
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "item-weight",
+                          "fieldType": "number",
+                          "binding": "weight",
+                          "label": "Weight (lb)",
+                          "options": {
+                            "min": 0,
+                            "step": 0.1
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "item-equipped",
+                          "fieldType": "checkbox",
+                          "binding": "equipped",
+                          "label": "Equipped"
+                        },
+                        {
+                          "type": "field",
+                          "id": "item-notes",
+                          "fieldType": "textarea",
+                          "binding": "notes",
+                          "label": "Notes",
+                          "options": {
+                            "multiline": true,
+                            "placeholder": "Item notes..."
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "id": "weapons",
+              "title": "Weapons",
+              "collapsible": true,
+              "defaultCollapsed": false,
+              "children": [
+                {
+                  "type": "repeater",
+                  "id": "weapons-repeater",
+                  "binding": "data.weapons",
+                  "addLabel": "Add Weapon",
+                  "emptyMessage": "No weapons equipped",
+                  "allowReorder": true,
+                  "allowDelete": true,
+                  "itemTemplate": [
+                    {
+                      "type": "grid",
+                      "id": "weapon-item-grid",
+                      "columns": "2fr 1fr 1fr 1fr",
+                      "gap": "0.5rem",
+                      "children": [
+                        {
+                          "type": "field",
+                          "id": "weapon-name",
+                          "fieldType": "text",
+                          "binding": "name",
+                          "label": "Weapon Name",
+                          "options": {
+                            "placeholder": "Longsword, Shortbow, etc."
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "weapon-attack-bonus",
+                          "fieldType": "text",
+                          "binding": "attackBonus",
+                          "label": "Attack Bonus",
+                          "options": {
+                            "placeholder": "+5"
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "weapon-damage",
+                          "fieldType": "dice",
+                          "binding": "damage",
+                          "label": "Damage"
+                        },
+                        {
+                          "type": "field",
+                          "id": "weapon-damage-type",
+                          "fieldType": "text",
+                          "binding": "damageType",
+                          "label": "Damage Type",
+                          "options": {
+                            "placeholder": "Slashing, Piercing, etc."
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "weapon-properties",
+                          "fieldType": "textarea",
+                          "binding": "properties",
+                          "label": "Properties",
+                          "options": {
+                            "multiline": true,
+                            "placeholder": "Finesse, Versatile (1d10), etc."
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "notes-tab",
+          "label": "Notes",
+          "children": [
+            {
+              "type": "section",
+              "id": "personality",
+              "title": "Personality",
+              "collapsible": true,
+              "defaultCollapsed": false,
+              "children": [
+                {
+                  "type": "grid",
+                  "id": "personality-grid",
+                  "columns": 1,
+                  "gap": "0.75rem",
+                  "children": [
+                    {
+                      "type": "field",
+                      "id": "personality-traits",
+                      "fieldType": "textarea",
+                      "binding": "data.personality.traits",
+                      "label": "Personality Traits",
+                      "options": {
+                        "multiline": true,
+                        "placeholder": "Describe personality traits..."
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "ideals",
+                      "fieldType": "textarea",
+                      "binding": "data.personality.ideals",
+                      "label": "Ideals",
+                      "options": {
+                        "multiline": true,
+                        "placeholder": "What does your character believe in?"
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "bonds",
+                      "fieldType": "textarea",
+                      "binding": "data.personality.bonds",
+                      "label": "Bonds",
+                      "options": {
+                        "multiline": true,
+                        "placeholder": "Who or what is your character connected to?"
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "flaws",
+                      "fieldType": "textarea",
+                      "binding": "data.personality.flaws",
+                      "label": "Flaws",
+                      "options": {
+                        "multiline": true,
+                        "placeholder": "What are your character's weaknesses?"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "id": "appearance",
+              "title": "Appearance",
+              "collapsible": true,
+              "defaultCollapsed": false,
+              "children": [
+                {
+                  "type": "grid",
+                  "id": "appearance-grid",
+                  "columns": 2,
+                  "gap": "0.75rem",
+                  "children": [
+                    {
+                      "type": "field",
+                      "id": "age",
+                      "fieldType": "text",
+                      "binding": "data.appearance.age",
+                      "label": "Age",
+                      "options": {
+                        "placeholder": "25"
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "height",
+                      "fieldType": "text",
+                      "binding": "data.appearance.height",
+                      "label": "Height",
+                      "options": {
+                        "placeholder": "6'2\""
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "weight",
+                      "fieldType": "text",
+                      "binding": "data.appearance.weight",
+                      "label": "Weight",
+                      "options": {
+                        "placeholder": "180 lbs"
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "eyes",
+                      "fieldType": "text",
+                      "binding": "data.appearance.eyes",
+                      "label": "Eyes",
+                      "options": {
+                        "placeholder": "Blue"
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "hair",
+                      "fieldType": "text",
+                      "binding": "data.appearance.hair",
+                      "label": "Hair",
+                      "options": {
+                        "placeholder": "Brown"
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "skin",
+                      "fieldType": "text",
+                      "binding": "data.appearance.skin",
+                      "label": "Skin",
+                      "options": {
+                        "placeholder": "Fair"
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "appearance-description",
+                      "fieldType": "textarea",
+                      "binding": "data.appearance.description",
+                      "label": "Description",
+                      "options": {
+                        "multiline": true,
+                        "placeholder": "Physical description..."
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "id": "backstory",
+              "title": "Backstory",
+              "collapsible": true,
+              "defaultCollapsed": false,
+              "children": [
+                {
+                  "type": "field",
+                  "id": "backstory-field",
+                  "fieldType": "richtext",
+                  "binding": "data.backstory",
+                  "label": "Character Backstory",
+                  "options": {
+                    "multiline": true,
+                    "placeholder": "Write your character's backstory..."
+                  }
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "id": "notes",
+              "title": "Notes",
+              "collapsible": true,
+              "defaultCollapsed": false,
+              "children": [
+                {
+                  "type": "field",
+                  "id": "notes-field",
+                  "fieldType": "richtext",
+                  "binding": "data.notes",
+                  "label": "Character Notes",
+                  "options": {
+                    "multiline": true,
+                    "placeholder": "Additional notes, session logs, etc."
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "fragments": [],
+  "styles": {
+    "theme": "default"
+  },
+  "computedFields": [
+    {
+      "id": "proficiency-bonus-calc",
+      "name": "Proficiency Bonus",
+      "description": "Calculated proficiency bonus based on character level",
+      "formula": "Math.floor(((@level - 1) / 4) + 2)",
+      "resultType": "number",
+      "dependencies": ["data.level"]
+    },
+    {
+      "id": "str-mod-calc",
+      "name": "Strength Modifier",
+      "description": "Strength ability modifier",
+      "formula": "Math.floor((@abilities.strength.value - 10) / 2)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.strength.value"]
+    },
+    {
+      "id": "dex-mod-calc",
+      "name": "Dexterity Modifier",
+      "description": "Dexterity ability modifier",
+      "formula": "Math.floor((@abilities.dexterity.value - 10) / 2)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.dexterity.value"]
+    },
+    {
+      "id": "con-mod-calc",
+      "name": "Constitution Modifier",
+      "description": "Constitution ability modifier",
+      "formula": "Math.floor((@abilities.constitution.value - 10) / 2)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.constitution.value"]
+    },
+    {
+      "id": "int-mod-calc",
+      "name": "Intelligence Modifier",
+      "description": "Intelligence ability modifier",
+      "formula": "Math.floor((@abilities.intelligence.value - 10) / 2)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.intelligence.value"]
+    },
+    {
+      "id": "wis-mod-calc",
+      "name": "Wisdom Modifier",
+      "description": "Wisdom ability modifier",
+      "formula": "Math.floor((@abilities.wisdom.value - 10) / 2)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.wisdom.value"]
+    },
+    {
+      "id": "cha-mod-calc",
+      "name": "Charisma Modifier",
+      "description": "Charisma ability modifier",
+      "formula": "Math.floor((@abilities.charisma.value - 10) / 2)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.charisma.value"]
+    },
+    {
+      "id": "initiative-calc",
+      "name": "Initiative",
+      "description": "Initiative bonus (DEX modifier)",
+      "formula": "Math.floor((@abilities.dexterity.value - 10) / 2)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.dexterity.value"]
+    },
+    {
+      "id": "str-save-calc",
+      "name": "Strength Save",
+      "description": "Strength saving throw bonus",
+      "formula": "Math.floor((@abilities.strength.value - 10) / 2) + (@saves.strength.proficient ? Math.floor(((@level - 1) / 4) + 2) : 0)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.strength.value", "data.saves.strength.proficient", "data.level"]
+    },
+    {
+      "id": "dex-save-calc",
+      "name": "Dexterity Save",
+      "description": "Dexterity saving throw bonus",
+      "formula": "Math.floor((@abilities.dexterity.value - 10) / 2) + (@saves.dexterity.proficient ? Math.floor(((@level - 1) / 4) + 2) : 0)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.dexterity.value", "data.saves.dexterity.proficient", "data.level"]
+    },
+    {
+      "id": "con-save-calc",
+      "name": "Constitution Save",
+      "description": "Constitution saving throw bonus",
+      "formula": "Math.floor((@abilities.constitution.value - 10) / 2) + (@saves.constitution.proficient ? Math.floor(((@level - 1) / 4) + 2) : 0)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.constitution.value", "data.saves.constitution.proficient", "data.level"]
+    },
+    {
+      "id": "int-save-calc",
+      "name": "Intelligence Save",
+      "description": "Intelligence saving throw bonus",
+      "formula": "Math.floor((@abilities.intelligence.value - 10) / 2) + (@saves.intelligence.proficient ? Math.floor(((@level - 1) / 4) + 2) : 0)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.intelligence.value", "data.saves.intelligence.proficient", "data.level"]
+    },
+    {
+      "id": "wis-save-calc",
+      "name": "Wisdom Save",
+      "description": "Wisdom saving throw bonus",
+      "formula": "Math.floor((@abilities.wisdom.value - 10) / 2) + (@saves.wisdom.proficient ? Math.floor(((@level - 1) / 4) + 2) : 0)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.wisdom.value", "data.saves.wisdom.proficient", "data.level"]
+    },
+    {
+      "id": "cha-save-calc",
+      "name": "Charisma Save",
+      "description": "Charisma saving throw bonus",
+      "formula": "Math.floor((@abilities.charisma.value - 10) / 2) + (@saves.charisma.proficient ? Math.floor(((@level - 1) / 4) + 2) : 0)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.charisma.value", "data.saves.charisma.proficient", "data.level"]
+    },
+    {
+      "id": "acrobatics-calc",
+      "name": "Acrobatics",
+      "description": "Acrobatics skill bonus",
+      "formula": "Math.floor((@abilities.dexterity.value - 10) / 2) + (@skills.acrobatics.proficient ? Math.floor(((@level - 1) / 4) + 2) : 0)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.dexterity.value", "data.skills.acrobatics.proficient", "data.level"]
+    },
+    {
+      "id": "animal-handling-calc",
+      "name": "Animal Handling",
+      "description": "Animal Handling skill bonus",
+      "formula": "Math.floor((@abilities.wisdom.value - 10) / 2) + (@skills.animalHandling.proficient ? Math.floor(((@level - 1) / 4) + 2) : 0)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.wisdom.value", "data.skills.animalHandling.proficient", "data.level"]
+    },
+    {
+      "id": "arcana-calc",
+      "name": "Arcana",
+      "description": "Arcana skill bonus",
+      "formula": "Math.floor((@abilities.intelligence.value - 10) / 2) + (@skills.arcana.proficient ? Math.floor(((@level - 1) / 4) + 2) : 0)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.intelligence.value", "data.skills.arcana.proficient", "data.level"]
+    },
+    {
+      "id": "athletics-calc",
+      "name": "Athletics",
+      "description": "Athletics skill bonus",
+      "formula": "Math.floor((@abilities.strength.value - 10) / 2) + (@skills.athletics.proficient ? Math.floor(((@level - 1) / 4) + 2) : 0)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.strength.value", "data.skills.athletics.proficient", "data.level"]
+    },
+    {
+      "id": "deception-calc",
+      "name": "Deception",
+      "description": "Deception skill bonus",
+      "formula": "Math.floor((@abilities.charisma.value - 10) / 2) + (@skills.deception.proficient ? Math.floor(((@level - 1) / 4) + 2) : 0)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.charisma.value", "data.skills.deception.proficient", "data.level"]
+    },
+    {
+      "id": "history-calc",
+      "name": "History",
+      "description": "History skill bonus",
+      "formula": "Math.floor((@abilities.intelligence.value - 10) / 2) + (@skills.history.proficient ? Math.floor(((@level - 1) / 4) + 2) : 0)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.intelligence.value", "data.skills.history.proficient", "data.level"]
+    },
+    {
+      "id": "insight-calc",
+      "name": "Insight",
+      "description": "Insight skill bonus",
+      "formula": "Math.floor((@abilities.wisdom.value - 10) / 2) + (@skills.insight.proficient ? Math.floor(((@level - 1) / 4) + 2) : 0)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.wisdom.value", "data.skills.insight.proficient", "data.level"]
+    },
+    {
+      "id": "intimidation-calc",
+      "name": "Intimidation",
+      "description": "Intimidation skill bonus",
+      "formula": "Math.floor((@abilities.charisma.value - 10) / 2) + (@skills.intimidation.proficient ? Math.floor(((@level - 1) / 4) + 2) : 0)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.charisma.value", "data.skills.intimidation.proficient", "data.level"]
+    },
+    {
+      "id": "investigation-calc",
+      "name": "Investigation",
+      "description": "Investigation skill bonus",
+      "formula": "Math.floor((@abilities.intelligence.value - 10) / 2) + (@skills.investigation.proficient ? Math.floor(((@level - 1) / 4) + 2) : 0)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.intelligence.value", "data.skills.investigation.proficient", "data.level"]
+    },
+    {
+      "id": "medicine-calc",
+      "name": "Medicine",
+      "description": "Medicine skill bonus",
+      "formula": "Math.floor((@abilities.wisdom.value - 10) / 2) + (@skills.medicine.proficient ? Math.floor(((@level - 1) / 4) + 2) : 0)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.wisdom.value", "data.skills.medicine.proficient", "data.level"]
+    },
+    {
+      "id": "nature-calc",
+      "name": "Nature",
+      "description": "Nature skill bonus",
+      "formula": "Math.floor((@abilities.intelligence.value - 10) / 2) + (@skills.nature.proficient ? Math.floor(((@level - 1) / 4) + 2) : 0)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.intelligence.value", "data.skills.nature.proficient", "data.level"]
+    },
+    {
+      "id": "perception-calc",
+      "name": "Perception",
+      "description": "Perception skill bonus",
+      "formula": "Math.floor((@abilities.wisdom.value - 10) / 2) + (@skills.perception.proficient ? Math.floor(((@level - 1) / 4) + 2) : 0)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.wisdom.value", "data.skills.perception.proficient", "data.level"]
+    },
+    {
+      "id": "performance-calc",
+      "name": "Performance",
+      "description": "Performance skill bonus",
+      "formula": "Math.floor((@abilities.charisma.value - 10) / 2) + (@skills.performance.proficient ? Math.floor(((@level - 1) / 4) + 2) : 0)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.charisma.value", "data.skills.performance.proficient", "data.level"]
+    },
+    {
+      "id": "persuasion-calc",
+      "name": "Persuasion",
+      "description": "Persuasion skill bonus",
+      "formula": "Math.floor((@abilities.charisma.value - 10) / 2) + (@skills.persuasion.proficient ? Math.floor(((@level - 1) / 4) + 2) : 0)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.charisma.value", "data.skills.persuasion.proficient", "data.level"]
+    },
+    {
+      "id": "religion-calc",
+      "name": "Religion",
+      "description": "Religion skill bonus",
+      "formula": "Math.floor((@abilities.intelligence.value - 10) / 2) + (@skills.religion.proficient ? Math.floor(((@level - 1) / 4) + 2) : 0)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.intelligence.value", "data.skills.religion.proficient", "data.level"]
+    },
+    {
+      "id": "sleight-of-hand-calc",
+      "name": "Sleight of Hand",
+      "description": "Sleight of Hand skill bonus",
+      "formula": "Math.floor((@abilities.dexterity.value - 10) / 2) + (@skills.sleightOfHand.proficient ? Math.floor(((@level - 1) / 4) + 2) : 0)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.dexterity.value", "data.skills.sleightOfHand.proficient", "data.level"]
+    },
+    {
+      "id": "stealth-calc",
+      "name": "Stealth",
+      "description": "Stealth skill bonus",
+      "formula": "Math.floor((@abilities.dexterity.value - 10) / 2) + (@skills.stealth.proficient ? Math.floor(((@level - 1) / 4) + 2) : 0)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.dexterity.value", "data.skills.stealth.proficient", "data.level"]
+    },
+    {
+      "id": "survival-calc",
+      "name": "Survival",
+      "description": "Survival skill bonus",
+      "formula": "Math.floor((@abilities.wisdom.value - 10) / 2) + (@skills.survival.proficient ? Math.floor(((@level - 1) / 4) + 2) : 0)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.wisdom.value", "data.skills.survival.proficient", "data.level"]
+    },
+    {
+      "id": "passive-perception-calc",
+      "name": "Passive Perception",
+      "description": "Passive Perception score",
+      "formula": "10 + Math.floor((@abilities.wisdom.value - 10) / 2) + (@skills.perception.proficient ? Math.floor(((@level - 1) / 4) + 2) : 0)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.wisdom.value", "data.skills.perception.proficient", "data.level"]
+    },
+    {
+      "id": "spell-save-dc-calc",
+      "name": "Spell Save DC",
+      "description": "Spell save DC based on spellcasting ability",
+      "formula": "8 + Math.floor(((@level - 1) / 4) + 2) + (@spellcasting.ability === 'intelligence' ? Math.floor((@abilities.intelligence.value - 10) / 2) : @spellcasting.ability === 'wisdom' ? Math.floor((@abilities.wisdom.value - 10) / 2) : Math.floor((@abilities.charisma.value - 10) / 2))",
+      "resultType": "number",
+      "dependencies": ["data.level", "data.spellcasting.ability", "data.abilities.intelligence.value", "data.abilities.wisdom.value", "data.abilities.charisma.value"]
+    }
+  ]
+}

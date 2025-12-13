@@ -10,7 +10,7 @@ The following default forms are provided for the D&D 5th Edition Open Game Licen
 
 **Location**: `game-systems/core/dnd5e-ogl/forms/actor.form.json`
 
-**Purpose**: Default character and NPC sheet for D&D 5th Edition.
+**Purpose**: Basic character and NPC sheet for D&D 5th Edition.
 
 **Key Features**:
 - Character information (name, class, race, level)
@@ -19,6 +19,161 @@ The following default forms are provided for the D&D 5th Edition Open Game Licen
 - Tabbed interface for inventory, spells, and notes
 
 **Entity Type**: `actor`
+
+### Complete Character Sheet (`character.form.json`)
+
+**Location**: `game-systems/core/dnd5e-ogl/forms/character.form.json`
+
+**Purpose**: Comprehensive character sheet for D&D 5th Edition with all core features including computed fields for automatic calculations.
+
+**Key Features**:
+
+- **Header Section**:
+  - Character Name (required)
+  - Class & Subclass
+  - Level (1-20)
+  - Race
+  - Background
+  - Alignment (dropdown with all 9 alignments)
+  - Experience Points
+  - Proficiency Bonus (computed from level)
+  - Inspiration (checkbox)
+
+- **Character Tab**:
+  - **Ability Scores**:
+    - All six abilities (STR, DEX, CON, INT, WIS, CHA) with values 1-30
+    - Computed modifiers displayed for each ability
+    - Organized in bordered groups for clarity
+
+  - **Saving Throws**:
+    - All six saving throws with proficiency checkboxes
+    - Computed bonuses (ability modifier + proficiency if proficient)
+
+  - **Skills**:
+    - All 18 D&D 5e skills with proficiency checkboxes
+    - Computed bonuses for each skill
+    - Ability source shown in parentheses (e.g., "Acrobatics (Dex)")
+
+  - **Combat Stats**:
+    - Armor Class (manual entry)
+    - Initiative (computed from DEX modifier)
+    - Speed in feet
+    - Passive Perception (computed: 10 + Perception bonus)
+
+  - **Hit Points**:
+    - Resource field with current/max and visual bar
+    - Temporary HP field
+    - Hit Dice (type and remaining count)
+
+  - **Death Saves** (collapsible):
+    - 3 success checkboxes
+    - 3 failure checkboxes
+
+  - **Features & Traits** (repeater):
+    - Feature name, source, and description
+    - Reorderable and deletable
+    - For class features, racial traits, feats, etc.
+
+- **Spells Tab**:
+  - Conditional rendering based on spellcasting enabled flag
+  - **Spellcasting Section** (when enabled):
+    - Spellcasting class
+    - Spellcasting ability (INT/WIS/CHA dropdown)
+    - Spell Save DC (computed: 8 + proficiency + ability modifier)
+    - Spell Slots for levels 1-9 (resource fields with visual bars)
+    - Spell list placeholder (for future spell item references)
+  - **No Spellcasting** (when disabled):
+    - Checkbox to enable spellcasting
+    - Informative message
+
+- **Equipment Tab**:
+  - **Currency**:
+    - Five currency types (cp, sp, ep, gp, pp)
+
+  - **Inventory** (repeater):
+    - Item name, quantity, weight, equipped checkbox
+    - Item notes
+    - Reorderable and deletable
+
+  - **Weapons** (repeater):
+    - Weapon name, attack bonus, damage dice, damage type
+    - Properties description
+    - Reorderable and deletable
+
+- **Notes Tab**:
+  - **Personality**:
+    - Personality Traits
+    - Ideals
+    - Bonds
+    - Flaws
+
+  - **Appearance**:
+    - Age, Height, Weight
+    - Eyes, Hair, Skin
+    - Physical Description
+
+  - **Backstory** (rich text):
+    - Character backstory editor
+
+  - **Notes** (rich text):
+    - General notes, session logs, etc.
+
+**Entity Type**: `actor`
+
+**Data Bindings**:
+- `name` - Character name
+- `data.class` - Class and subclass
+- `data.level` - Character level (1-20)
+- `data.race` - Race
+- `data.background` - Background
+- `data.alignment` - Alignment code
+- `data.experience.current` - Current XP
+- `data.inspiration` - Inspiration flag
+- `data.abilities.{ability}.value` - Ability scores
+- `data.saves.{ability}.proficient` - Saving throw proficiency
+- `data.skills.{skill}.proficient` - Skill proficiency
+- `data.combat.armorClass` - AC value
+- `data.combat.speed` - Speed in feet
+- `data.hitPoints` - HP resource (current/max)
+- `data.hitPoints.temp` - Temporary HP
+- `data.hitDice.type` - Hit dice type
+- `data.hitDice.current` - Remaining hit dice
+- `data.deathSaves.successes` - Death save success array
+- `data.deathSaves.failures` - Death save failure array
+- `data.features` - Features array (name, source, description)
+- `data.spellcasting.enabled` - Spellcasting enabled flag
+- `data.spellcasting.class` - Spellcasting class
+- `data.spellcasting.ability` - Spellcasting ability
+- `data.spellSlots.level{1-9}` - Spell slot resources
+- `data.currency.{cp/sp/ep/gp/pp}` - Currency amounts
+- `data.inventory` - Inventory items array
+- `data.weapons` - Weapons array
+- `data.personality.{traits/ideals/bonds/flaws}` - Personality info
+- `data.appearance.{age/height/weight/eyes/hair/skin/description}` - Appearance info
+- `data.backstory` - Character backstory
+- `data.notes` - General notes
+
+**Computed Fields**:
+- **Proficiency Bonus**: `Math.floor(((@level - 1) / 4) + 2)`
+- **Ability Modifiers** (6 fields): `Math.floor((@abilities.{ability}.value - 10) / 2)`
+- **Initiative**: Same as DEX modifier
+- **Saving Throws** (6 fields): Ability modifier + (proficiency bonus if proficient)
+- **Skills** (18 fields): Ability modifier + (proficiency bonus if proficient)
+- **Passive Perception**: `10 + Perception bonus`
+- **Spell Save DC**: `8 + proficiency + spellcasting ability modifier`
+
+**Layout Features**:
+- Two-column layout on Character tab (abilities/skills on left, combat stats on right)
+- Tabbed interface for organization
+- Collapsible sections for less frequently used features
+- Visual resource bars for HP and spell slots
+- Grid layouts for organized presentation
+- Flex layouts for checkbox + computed value rows
+
+**Styling**:
+- Default theme
+- Responsive grid layouts
+- Visual resource bars with color coding (red for HP, purple for spell slots)
 
 ### Item Sheet (`item.form.json`)
 
@@ -325,7 +480,8 @@ All forms should:
 ## Version History
 
 - **1.0.0** (2025-12-12): Initial default forms for D&D 5e
-  - Actor/Character sheet
+  - Basic Actor/Character sheet
+  - Complete Character sheet with computed fields
   - Item sheet
   - Spell card
   - Monster stat block
