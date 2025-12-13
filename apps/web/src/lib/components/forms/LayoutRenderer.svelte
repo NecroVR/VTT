@@ -38,8 +38,13 @@
   let repeaterContainerRef = $state<HTMLElement | null>(null);
   let dragDropCleanup: (() => void) | null = null;
 
-  // Initialize state based on node type
+  // Initialize state based on node type - use $effect.pre to run before render
+  // and only on mount (empty dependency via checking if already initialized)
+  let initialized = $state(false);
+
   $effect(() => {
+    if (initialized) return; // Only run once per component instance
+
     if (node.type === 'section') {
       sectionCollapsed = node.defaultCollapsed || false;
     } else if (node.type === 'tabs') {
@@ -50,13 +55,7 @@
         visitedTabs = new Set([initialTab]);
       }
     }
-  });
-
-  // Track active tab changes for lazy rendering
-  $effect(() => {
-    if (activeTabId && node.type === 'tabs') {
-      visitedTabs = new Set([...visitedTabs, activeTabId]);
-    }
+    initialized = true;
   });
 
   // Setup drag & drop for repeater when container is available
@@ -495,7 +494,7 @@
           <button
             class="tab-button"
             class:active={activeTabId === tab.id}
-            onclick={() => { activeTabId = tab.id; }}
+            onclick={() => { activeTabId = tab.id; visitedTabs = new Set([...visitedTabs, tab.id]); }}
           >
             {#if tab.icon}
               <span class="tab-icon">{tab.icon}</span>
