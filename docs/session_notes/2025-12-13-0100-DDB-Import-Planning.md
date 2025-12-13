@@ -1,18 +1,40 @@
-# Session Notes: D&D Beyond Import Planning
+# Session Notes: Content Import Planning (Foundry VTT + D&D Beyond)
 
 > **Session ID:** 0100
 > **Date:** 2025-12-13
-> **Focus:** Research and planning for D&D Beyond content import feature
+> **Focus:** Research and planning for multi-source content import feature
 
 ---
 
 ## Session Summary
 
-This session focused on researching the technical and legal landscape for importing D&D Beyond content into the VTT, analyzing the existing module architecture, and creating a comprehensive multi-phase implementation plan.
+This session focused on researching the technical and legal landscape for importing content from **both Foundry VTT and D&D Beyond** into the VTT. We analyzed the existing module architecture and created a comprehensive multi-phase implementation plan covering both import sources, with Foundry VTT as the simpler first implementation.
 
 ---
 
 ## Research Findings
+
+### Foundry VTT Technical Landscape
+
+**Key Finding: Open and User-Friendly**
+
+Foundry VTT is significantly more open than D&D Beyond:
+- **Explicit data ownership** - Users own their created data per license
+- **Built-in JSON export** - Right-click export for actors, items, scenes, journals
+- **Local storage** - All data stored as accessible JSON files
+- **Public API** - Comprehensive JavaScript API, REST API modules available
+- **No ToS restrictions** on third-party import/export tools
+
+**Data Format:**
+- World data: JSON files in User Data directory
+- Compendiums: LevelDB (binary) but convertible to JSON via CLI
+- Images: Separate files (WebP, PNG, SVG) - need ZIP upload approach
+
+**Legal Status:**
+- ✅ User-created content: Full ownership, export freely
+- ✅ SRD content: CC BY 4.0, redistributable
+- ⚠️ Imported DDB content: Gray area (not Foundry's concern)
+- ⚠️ Purchased modules: Personal use only
 
 ### D&D Beyond Technical Landscape
 
@@ -88,21 +110,34 @@ User selected this approach based on:
 ## Implementation Plan Created
 
 A comprehensive 9-phase implementation plan was created at:
-`docs/architecture/DND_BEYOND_IMPORT_PLAN.md`
+`docs/architecture/CONTENT_IMPORT_PLAN.md`
 
 ### Phase Summary
 
-| Phase | Name | Scope |
-|-------|------|-------|
-| 1 | Foundation & Database Schema | Types, schema, migrations |
-| 2 | Browser Extension Core | Chrome/Firefox extension |
-| 3 | Server Import API | API endpoints, import service |
-| 4 | Content Parsers - Characters | Character data transformation |
-| 5 | Content Parsers - Monsters | Monster stat block transformation |
-| 6 | Content Parsers - Spells & Items | Spell/item transformation |
-| 7 | Frontend Import UI | React components, wizard flow |
-| 8 | Campaign Binding & Permissions | Access control, binding system |
-| 9 | Testing & Documentation | E2E tests, user guides |
+| Phase | Part | Name | Scope |
+|-------|------|------|-------|
+| 1 | Shared | Foundation & Database Schema | Types, schema, migrations |
+| 2 | Shared | Server Import Infrastructure | API endpoints, import service, image handling |
+| 3 | A | Foundry VTT Parser | Actor, item, scene, journal parsers |
+| 4 | A | Foundry Import UI | File upload, content preview, progress |
+| 5 | B | D&D Beyond Browser Extension | Chrome/Firefox extension, DOM extraction |
+| 6 | B | D&D Beyond Parsers | Character, monster, spell, item parsers |
+| 7 | B | D&D Beyond Import UI | Extension integration, progress |
+| 8 | Shared | Campaign Binding & Permissions | Access control, binding system |
+| 9 | Shared | Testing & Documentation | E2E tests, user guides |
+
+### Implementation Order
+
+**Part A (Foundry VTT)** should be implemented first because:
+- Simpler (file upload, no browser extension)
+- Legally clear (users own their data)
+- Documented, stable data formats
+- Provides immediate value for migrating GMs
+
+**Part B (D&D Beyond)** comes second because:
+- More complex (requires browser extension)
+- Legal gray area
+- Undocumented, potentially changing DOM structure
 
 ### Key Design Decisions in Plan
 
@@ -111,15 +146,27 @@ A comprehensive 9-phase implementation plan was created at:
 3. **Explicit Acceptance Criteria**: Clear definition of "done" for each task
 4. **Sample Code**: Detailed implementation specifications included
 5. **File Manifests**: Every phase lists files to create/modify
+6. **Image Handling**: Comprehensive image import for all content types
+
+### Image Handling (Added per User Request)
+
+The plan includes explicit image import requirements:
+- **Foundry**: ZIP upload containing JSON + image files
+- **D&D Beyond**: CDN download of character portraits, monster art, spell/item icons
+- **Processing**: Sharp for resize, optimize, convert to WebP
+- **Storage**: Local uploads directory (S3 for production)
+- **Rate Limiting**: Max 5 concurrent downloads for D&D Beyond
+- **Fallbacks**: Use game-icons.net icons when images unavailable
 
 ---
 
-## Files Created
+## Files Created/Modified
 
 | File | Purpose |
 |------|---------|
-| `docs/architecture/DND_BEYOND_IMPORT_PLAN.md` | Comprehensive implementation plan |
+| `docs/architecture/CONTENT_IMPORT_PLAN.md` | Comprehensive implementation plan (v2.1) |
 | `docs/session_notes/2025-12-13-0100-DDB-Import-Planning.md` | This session note |
+| `docs/architecture/DND_BEYOND_IMPORT_PLAN.md` | DELETED (superseded by CONTENT_IMPORT_PLAN.md) |
 
 ---
 
