@@ -2,7 +2,7 @@
   "name": "D&D 5e Consumable",
   "description": "Consumable items for D&D 5th Edition including potions, scrolls, wands, and other limited-use items",
   "entityType": "consumable",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "layout": [
     {
       "type": "section",
@@ -538,7 +538,7 @@
       "id": "uses-remaining",
       "name": "Uses Remaining",
       "description": "Calculated remaining uses",
-      "formula": "(@uses.current || 0)",
+      "formula": "(data.uses.current || 0)",
       "resultType": "number",
       "dependencies": ["data.uses.current"]
     },
@@ -546,7 +546,7 @@
       "id": "uses-percentage",
       "name": "Uses Percentage",
       "description": "Percentage of uses remaining",
-      "formula": "((@uses.current || 0) / (@uses.max || 1)) * 100",
+      "formula": "((data.uses.current || 0) / (data.uses.max || 1)) * 100",
       "resultType": "number",
       "dependencies": ["data.uses.current", "data.uses.max"]
     }

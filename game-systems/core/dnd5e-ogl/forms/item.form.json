@@ -990,7 +990,7 @@
       "id": "total-ac",
       "name": "Total Armor Class",
       "description": "Calculated total AC for armor including magical bonuses",
-      "formula": "(@armor.baseAC || 0) + (@armor.acBonus || 0)",
+      "formula": "(data.armor.baseAC || 0) + (data.armor.acBonus || 0)",
       "resultType": "number",
       "dependencies": ["data.armor.baseAC", "data.armor.acBonus"]
     },
@@ -998,7 +998,7 @@
       "id": "total-attack-bonus",
       "name": "Total Attack Bonus",
       "description": "Calculated total attack bonus for weapons including magical bonuses",
-      "formula": "(@weapon.attackBonus || 0) + (@magical.bonus || 0)",
+      "formula": "(data.weapon.attackBonus || 0) + (data.magical.bonus || 0)",
       "resultType": "number",
       "dependencies": ["data.weapon.attackBonus", "data.magical.bonus"]
     },
@@ -1006,7 +1006,7 @@
       "id": "total-damage-bonus",
       "name": "Total Damage Bonus",
       "description": "Calculated total damage bonus for weapons including magical bonuses",
-      "formula": "(@weapon.damage.bonus || 0) + (@magical.bonus || 0)",
+      "formula": "(data.weapon.damage.bonus || 0) + (data.magical.bonus || 0)",
       "resultType": "number",
       "dependencies": ["data.weapon.damage.bonus", "data.magical.bonus"]
     }

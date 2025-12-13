@@ -2,7 +2,7 @@
   "name": "D&D 5e Monster Stat Block",
   "description": "Default monster and NPC stat block for D&D 5th Edition following official stat block format",
   "entityType": "monster",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "layout": [
     {
       "type": "section",
@@ -908,7 +908,7 @@
       "id": "strength-modifier",
       "name": "Strength Modifier",
       "description": "Calculated strength modifier",
-      "formula": "floor((@abilities.strength - 10) / 2)",
+      "formula": "floor((data.abilities.strength - 10) / 2)",
       "resultType": "number",
       "dependencies": ["data.abilities.strength"]
     },
@@ -916,7 +916,7 @@
       "id": "dexterity-modifier",
       "name": "Dexterity Modifier",
       "description": "Calculated dexterity modifier",
-      "formula": "floor((@abilities.dexterity - 10) / 2)",
+      "formula": "floor((data.abilities.dexterity - 10) / 2)",
       "resultType": "number",
       "dependencies": ["data.abilities.dexterity"]
     },
@@ -924,7 +924,7 @@
       "id": "constitution-modifier",
       "name": "Constitution Modifier",
       "description": "Calculated constitution modifier",
-      "formula": "floor((@abilities.constitution - 10) / 2)",
+      "formula": "floor((data.abilities.constitution - 10) / 2)",
       "resultType": "number",
       "dependencies": ["data.abilities.constitution"]
     },
@@ -932,7 +932,7 @@
       "id": "intelligence-modifier",
       "name": "Intelligence Modifier",
       "description": "Calculated intelligence modifier",
-      "formula": "floor((@abilities.intelligence - 10) / 2)",
+      "formula": "floor((data.abilities.intelligence - 10) / 2)",
       "resultType": "number",
       "dependencies": ["data.abilities.intelligence"]
     },
@@ -940,7 +940,7 @@
       "id": "wisdom-modifier",
       "name": "Wisdom Modifier",
       "description": "Calculated wisdom modifier",
-      "formula": "floor((@abilities.wisdom - 10) / 2)",
+      "formula": "floor((data.abilities.wisdom - 10) / 2)",
       "resultType": "number",
       "dependencies": ["data.abilities.wisdom"]
     },
@@ -948,7 +948,7 @@
       "id": "charisma-modifier",
       "name": "Charisma Modifier",
       "description": "Calculated charisma modifier",
-      "formula": "floor((@abilities.charisma - 10) / 2)",
+      "formula": "floor((data.abilities.charisma - 10) / 2)",
       "resultType": "number",
       "dependencies": ["data.abilities.charisma"]
     }

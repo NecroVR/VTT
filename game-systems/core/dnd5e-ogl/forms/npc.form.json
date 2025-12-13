@@ -2,7 +2,7 @@
   "name": "D&D 5e NPC Sheet",
   "description": "Roleplay-focused NPC sheet for D&D 5th Edition - more detailed than monsters, optimized for social encounters",
   "entityType": "actor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "layout": [
     {
       "type": "section",
@@ -1092,7 +1092,7 @@
       "id": "str-mod-calc",
       "name": "Strength Modifier",
       "description": "Strength ability modifier",
-      "formula": "Math.floor((@abilities.strength.value - 10) / 2)",
+      "formula": "floor((data.abilities.strength.value - 10) / 2)",
       "resultType": "number",
       "dependencies": ["data.abilities.strength.value"]
     },
@@ -1100,7 +1100,7 @@
       "id": "dex-mod-calc",
       "name": "Dexterity Modifier",
       "description": "Dexterity ability modifier",
-      "formula": "Math.floor((@abilities.dexterity.value - 10) / 2)",
+      "formula": "floor((data.abilities.dexterity.value - 10) / 2)",
       "resultType": "number",
       "dependencies": ["data.abilities.dexterity.value"]
     },
@@ -1108,7 +1108,7 @@
       "id": "con-mod-calc",
       "name": "Constitution Modifier",
       "description": "Constitution ability modifier",
-      "formula": "Math.floor((@abilities.constitution.value - 10) / 2)",
+      "formula": "floor((data.abilities.constitution.value - 10) / 2)",
       "resultType": "number",
       "dependencies": ["data.abilities.constitution.value"]
     },
@@ -1116,7 +1116,7 @@
       "id": "int-mod-calc",
       "name": "Intelligence Modifier",
       "description": "Intelligence ability modifier",
-      "formula": "Math.floor((@abilities.intelligence.value - 10) / 2)",
+      "formula": "floor((data.abilities.intelligence.value - 10) / 2)",
       "resultType": "number",
       "dependencies": ["data.abilities.intelligence.value"]
     },
@@ -1124,7 +1124,7 @@
       "id": "wis-mod-calc",
       "name": "Wisdom Modifier",
       "description": "Wisdom ability modifier",
-      "formula": "Math.floor((@abilities.wisdom.value - 10) / 2)",
+      "formula": "floor((data.abilities.wisdom.value - 10) / 2)",
       "resultType": "number",
       "dependencies": ["data.abilities.wisdom.value"]
     },
@@ -1132,7 +1132,7 @@
       "id": "cha-mod-calc",
       "name": "Charisma Modifier",
       "description": "Charisma ability modifier",
-      "formula": "Math.floor((@abilities.charisma.value - 10) / 2)",
+      "formula": "floor((data.abilities.charisma.value - 10) / 2)",
       "resultType": "number",
       "dependencies": ["data.abilities.charisma.value"]
     }

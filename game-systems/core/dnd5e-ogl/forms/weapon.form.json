@@ -2,7 +2,7 @@
   "name": "D&D 5e Weapon Card",
   "description": "Weapon card for D&D 5th Edition including mundane and magical weapons",
   "entityType": "weapon",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "layout": [
     {
       "type": "section",
@@ -611,7 +611,7 @@
       "id": "total-attack-bonus",
       "name": "Total Attack Bonus",
       "description": "Combined attack bonus including magic bonus",
-      "formula": "(@attackBonus || 0) + (@magicBonus || 0)",
+      "formula": "(data.attackBonus || 0) + (data.magicBonus || 0)",
       "resultType": "number",
       "dependencies": ["data.attackBonus", "data.magicBonus"]
     },
@@ -619,7 +619,7 @@
       "id": "total-damage-bonus",
       "name": "Total Damage Bonus",
       "description": "Magic bonus to damage",
-      "formula": "@magicBonus || 0",
+      "formula": "data.magicBonus || 0",
       "resultType": "number",
       "dependencies": ["data.magicBonus"]
     },
@@ -627,7 +627,7 @@
       "id": "is-magical",
       "name": "Is Magical Weapon",
       "description": "Whether this is a magical weapon",
-      "formula": "@rarity !== 'common'",
+      "formula": "data.rarity !== 'common'",
       "resultType": "boolean",
       "dependencies": ["data.rarity"]
     },
@@ -635,7 +635,7 @@
       "id": "is-ranged",
       "name": "Is Ranged Weapon",
       "description": "Whether this is a ranged weapon",
-      "formula": "@category === 'simple-ranged' || @category === 'martial-ranged'",
+      "formula": "data.category === 'simple-ranged' || data.category === 'martial-ranged'",
       "resultType": "boolean",
       "dependencies": ["data.category"]
     }
