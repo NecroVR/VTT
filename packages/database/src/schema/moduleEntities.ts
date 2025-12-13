@@ -26,6 +26,11 @@ export const moduleEntities = pgTable('module_entities', {
   sourcePath: text('source_path'),
   sourceLineNumber: integer('source_line_number'),
 
+  // Import Source Tracking
+  sourceType: text('source_type'),        // 'foundryvtt', 'dndbeyond', etc.
+  sourceId: text('source_id'),            // ID from source system
+  sourceUrl: text('source_url'),          // Original URL if applicable
+
   // Validation Status
   validationStatus: text('validation_status').notNull().default('pending'),
   validationErrors: jsonb('validation_errors').default([]),
@@ -45,6 +50,7 @@ export const moduleEntities = pgTable('module_entities', {
 }, (table) => ({
   moduleIdx: index('idx_module_entities_module').on(table.moduleId),
   entityTypeIdx: index('idx_module_entities_type').on(table.entityType),
+  sourceIdx: index('idx_module_entities_source').on(table.sourceType, table.sourceId),
   searchIdx: index('idx_module_entities_search').using(
     'gin',
     sql`to_tsvector('english', ${table.searchText})`

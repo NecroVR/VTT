@@ -1,0 +1,16 @@
+You are implementing Phase 1 (tasks 1.1-1.4) of the Content Import System.
+
+Read the task description in .tasks/phase1_foundation.md and the detailed specifications in docs/architecture/CONTENT_IMPORT_PLAN.md.
+
+Your job is to:
+1. Create packages/shared/src/types/contentImport.ts with ALL types from the plan
+2. Export the types from packages/shared/src/types/index.ts
+3. Create packages/database/src/schema/importSources.ts
+4. Create packages/database/src/schema/importJobs.ts
+5. Update packages/database/src/schema/moduleEntities.ts to add source columns
+6. Export schemas from packages/database/src/schema/index.ts
+7. Verify TypeScript compilation by running pnpm build in packages/shared and packages/database
+
+Follow the existing code patterns in the codebase. Match the exact specifications from CONTENT_IMPORT_PLAN.md.
+
+Report back with files created/modified and confirmation of successful TypeScript compilation.
