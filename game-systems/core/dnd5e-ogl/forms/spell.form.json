@@ -1,0 +1,327 @@
+{
+  "name": "D&D 5e Spell Card",
+  "description": "Default spell card for D&D 5th Edition spells",
+  "entityType": "spell",
+  "version": "1.0.0",
+  "layout": [
+    {
+      "type": "section",
+      "id": "spell-header",
+      "title": "Spell Information",
+      "collapsible": false,
+      "children": [
+        {
+          "type": "field",
+          "id": "spell-name",
+          "fieldType": "text",
+          "binding": "name",
+          "label": "Spell Name",
+          "required": true,
+          "options": {
+            "placeholder": "Enter spell name"
+          }
+        },
+        {
+          "type": "grid",
+          "id": "header-grid",
+          "columns": 3,
+          "gap": "1rem",
+          "children": [
+            {
+              "type": "field",
+              "id": "spell-level",
+              "fieldType": "select",
+              "binding": "data.level",
+              "label": "Level",
+              "required": true,
+              "options": {
+                "options": [
+                  { "value": "0", "label": "Cantrip" },
+                  { "value": "1", "label": "1st Level" },
+                  { "value": "2", "label": "2nd Level" },
+                  { "value": "3", "label": "3rd Level" },
+                  { "value": "4", "label": "4th Level" },
+                  { "value": "5", "label": "5th Level" },
+                  { "value": "6", "label": "6th Level" },
+                  { "value": "7", "label": "7th Level" },
+                  { "value": "8", "label": "8th Level" },
+                  { "value": "9", "label": "9th Level" }
+                ]
+              }
+            },
+            {
+              "type": "field",
+              "id": "spell-school",
+              "fieldType": "select",
+              "binding": "data.school",
+              "label": "School",
+              "required": true,
+              "options": {
+                "options": [
+                  { "value": "abjuration", "label": "Abjuration" },
+                  { "value": "conjuration", "label": "Conjuration" },
+                  { "value": "divination", "label": "Divination" },
+                  { "value": "enchantment", "label": "Enchantment" },
+                  { "value": "evocation", "label": "Evocation" },
+                  { "value": "illusion", "label": "Illusion" },
+                  { "value": "necromancy", "label": "Necromancy" },
+                  { "value": "transmutation", "label": "Transmutation" }
+                ]
+              }
+            },
+            {
+              "type": "container",
+              "id": "tags-container",
+              "children": [
+                {
+                  "type": "field",
+                  "id": "spell-ritual",
+                  "fieldType": "checkbox",
+                  "binding": "data.ritual",
+                  "label": "Ritual"
+                },
+                {
+                  "type": "field",
+                  "id": "spell-concentration",
+                  "fieldType": "checkbox",
+                  "binding": "data.concentration",
+                  "label": "Concentration"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "casting-info",
+      "title": "Casting Information",
+      "collapsible": false,
+      "children": [
+        {
+          "type": "grid",
+          "id": "casting-grid",
+          "columns": 2,
+          "gap": "1rem",
+          "children": [
+            {
+              "type": "field",
+              "id": "casting-time",
+              "fieldType": "text",
+              "binding": "data.castingTime",
+              "label": "Casting Time",
+              "required": true,
+              "options": {
+                "placeholder": "1 action, 1 bonus action, etc."
+              }
+            },
+            {
+              "type": "field",
+              "id": "spell-range",
+              "fieldType": "text",
+              "binding": "data.range",
+              "label": "Range",
+              "required": true,
+              "options": {
+                "placeholder": "Self, Touch, 30 feet, etc."
+              }
+            },
+            {
+              "type": "container",
+              "id": "components-container",
+              "children": [
+                {
+                  "type": "static",
+                  "id": "components-label",
+                  "content": "Components",
+                  "contentType": "text",
+                  "tag": "label",
+                  "className": "field-label"
+                },
+                {
+                  "type": "flex",
+                  "id": "components-flex",
+                  "direction": "row",
+                  "gap": "1rem",
+                  "children": [
+                    {
+                      "type": "field",
+                      "id": "component-verbal",
+                      "fieldType": "checkbox",
+                      "binding": "data.components.verbal",
+                      "label": "V"
+                    },
+                    {
+                      "type": "field",
+                      "id": "component-somatic",
+                      "fieldType": "checkbox",
+                      "binding": "data.components.somatic",
+                      "label": "S"
+                    },
+                    {
+                      "type": "field",
+                      "id": "component-material",
+                      "fieldType": "checkbox",
+                      "binding": "data.components.material",
+                      "label": "M"
+                    }
+                  ]
+                },
+                {
+                  "type": "conditional",
+                  "id": "material-conditional",
+                  "condition": {
+                    "type": "simple",
+                    "field": "data.components.material",
+                    "operator": "equals",
+                    "value": true
+                  },
+                  "then": [
+                    {
+                      "type": "field",
+                      "id": "material-description",
+                      "fieldType": "text",
+                      "binding": "data.components.materialDescription",
+                      "label": "Material Components",
+                      "options": {
+                        "placeholder": "Describe the material components"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "field",
+              "id": "spell-duration",
+              "fieldType": "text",
+              "binding": "data.duration",
+              "label": "Duration",
+              "required": true,
+              "options": {
+                "placeholder": "Instantaneous, 1 minute, etc."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "spell-description",
+      "title": "Description",
+      "collapsible": false,
+      "children": [
+        {
+          "type": "field",
+          "id": "description-field",
+          "fieldType": "richtext",
+          "binding": "data.description",
+          "label": "Spell Description",
+          "required": true,
+          "options": {
+            "multiline": true,
+            "placeholder": "Enter the spell's description and effects...",
+            "showPreview": true
+          }
+        }
+      ]
+    },
+    {
+      "type": "conditional",
+      "id": "higher-levels-conditional",
+      "condition": {
+        "type": "simple",
+        "field": "data.hasHigherLevels",
+        "operator": "equals",
+        "value": true
+      },
+      "then": [
+        {
+          "type": "section",
+          "id": "higher-levels-section",
+          "title": "At Higher Levels",
+          "collapsible": true,
+          "defaultCollapsed": false,
+          "children": [
+            {
+              "type": "field",
+              "id": "higher-levels-field",
+              "fieldType": "richtext",
+              "binding": "data.atHigherLevels",
+              "label": "Higher Level Effects",
+              "options": {
+                "multiline": true,
+                "placeholder": "Describe what happens when cast at higher levels...",
+                "showPreview": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "spell-metadata",
+      "title": "Additional Information",
+      "collapsible": true,
+      "defaultCollapsed": false,
+      "children": [
+        {
+          "type": "grid",
+          "id": "metadata-grid",
+          "columns": 1,
+          "gap": "1rem",
+          "children": [
+            {
+              "type": "field",
+              "id": "has-higher-levels",
+              "fieldType": "checkbox",
+              "binding": "data.hasHigherLevels",
+              "label": "Has Higher Level Scaling"
+            },
+            {
+              "type": "field",
+              "id": "spell-classes",
+              "fieldType": "tags",
+              "binding": "data.classes",
+              "label": "Classes",
+              "options": {
+                "suggestions": [
+                  "Bard",
+                  "Cleric",
+                  "Druid",
+                  "Paladin",
+                  "Ranger",
+                  "Sorcerer",
+                  "Warlock",
+                  "Wizard",
+                  "Artificer"
+                ],
+                "allowCustom": true,
+                "placeholder": "Select or type classes that can cast this spell"
+              }
+            },
+            {
+              "type": "field",
+              "id": "spell-source",
+              "fieldType": "text",
+              "binding": "data.source",
+              "label": "Source",
+              "options": {
+                "placeholder": "PHB, XGE, TCE, etc."
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "fragments": [],
+  "styles": {
+    "theme": "default",
+    "customCSS": ".field-label { font-weight: 600; margin-bottom: 0.5rem; display: block; }"
+  },
+  "computedFields": []
+}

@@ -1,6 +1,7 @@
 import { writable, derived, type Readable } from 'svelte/store';
 import type { FormDefinition, CampaignForm, FormExport, FormImportValidation } from '@vtt/shared';
 import * as formsApi from '$lib/api/forms';
+import { LRUCache } from '$lib/utils/lruCache';
 
 // ============================================================================
 // Store State Types
@@ -13,6 +14,10 @@ interface CachedForm {
 
 // Cache TTL: 5 minutes
 const CACHE_TTL_MS = 5 * 60 * 1000;
+
+// LRU Cache for form definitions (max 100 forms, 5 min TTL)
+const formDefCache = new LRUCache<string, FormDefinition>(100, CACHE_TTL_MS);
+const activeFormCache = new LRUCache<string, FormDefinition>(50, CACHE_TTL_MS);
 
 interface FormsState {
   // Cached form definitions by ID with TTL
@@ -119,7 +124,13 @@ function createFormsStore() {
      * Get a single form by ID
      */
     async getForm(formId: string): Promise<FormDefinition> {
-      // Check cache first
+      // Check LRU cache first
+      const cachedForm = formDefCache.get(formId);
+      if (cachedForm) {
+        return cachedForm;
+      }
+
+      // Check store cache as fallback
       let cached: CachedForm | undefined;
       const unsub = subscribe(s => {
         cached = s.forms.get(formId);
@@ -128,6 +139,8 @@ function createFormsStore() {
 
       // Return cached if valid
       if (isCacheValid(cached)) {
+        // Update LRU cache
+        formDefCache.set(formId, cached!.data);
         return cached!.data;
       }
 
@@ -136,6 +149,9 @@ function createFormsStore() {
 
       try {
         const form = await formsApi.getForm(formId);
+
+        // Update both caches
+        formDefCache.set(form.id, form);
 
         update(s => {
           const newForms = new Map(s.forms);
@@ -280,7 +296,13 @@ function createFormsStore() {
     async getActiveForm(campaignId: string, entityType: string): Promise<FormDefinition | null> {
       const cacheKey = `${campaignId}:${entityType}`;
 
-      // Check cache first
+      // Check LRU cache first
+      const cachedActiveForm = activeFormCache.get(cacheKey);
+      if (cachedActiveForm) {
+        return cachedActiveForm;
+      }
+
+      // Check store cache as fallback
       let cached: CachedForm | undefined;
       const unsub = subscribe(s => {
         cached = s.activeFormCache.get(cacheKey);
@@ -289,6 +311,8 @@ function createFormsStore() {
 
       // Return cached if valid
       if (isCacheValid(cached)) {
+        // Update LRU cache
+        activeFormCache.set(cacheKey, cached!.data);
         return cached!.data;
       }
 
@@ -300,6 +324,11 @@ function createFormsStore() {
 
         if (form) {
           const now = Date.now();
+
+          // Update LRU caches
+          activeFormCache.set(cacheKey, form);
+          formDefCache.set(form.id, form);
+
           update(s => {
             const newForms = new Map(s.forms);
             newForms.set(form.id, { data: form, timestamp: now });
@@ -333,6 +362,22 @@ function createFormsStore() {
      * Invalidate active form cache
      */
     invalidateActiveFormCache(campaignId?: string, entityType?: string) {
+      // Invalidate LRU cache
+      if (campaignId && entityType) {
+        activeFormCache.delete(`${campaignId}:${entityType}`);
+      } else if (campaignId) {
+        // Clear all entries for this campaign from LRU cache
+        const keys = activeFormCache.keys();
+        for (const key of keys) {
+          if (key.startsWith(`${campaignId}:`)) {
+            activeFormCache.delete(key);
+          }
+        }
+      } else {
+        activeFormCache.clear();
+      }
+
+      // Invalidate store cache
       update(s => {
         const newCache = new Map(s.activeFormCache);
 

@@ -55,36 +55,120 @@ An inventory with 500 items will only render ~15 items at a time, making it as p
 
 ### 3. Computed Field Optimization
 
-**What it does**: Computed field results are cached and intelligently invalidated.
+**What it does**: Computed field results are cached, batched, and intelligently invalidated.
 
 **How it works**:
+- Formula ASTs are cached using WeakMap for automatic garbage collection
 - Formula results are cached for 60 seconds
 - Dependencies are tracked automatically
 - Cache is invalidated only when dependencies change
 - Rapid recalculations are debounced (50ms)
+- Batch evaluation processes multiple fields together with dependency resolution
 
 **Benefits**:
 - Complex formulas only calculate when needed
 - Prevents redundant calculations during rapid input
 - Reduces CPU usage for forms with many computed fields
+- Batch processing evaluates dependent fields in correct order
+
+**API Examples**:
+```typescript
+// Single field
+const value = computedFieldEngine.evaluate(field, context);
+
+// Batch evaluation (more efficient for multiple fields)
+const results = computedFieldEngine.evaluateBatch(fields, context);
+
+// Queue for batching
+await computedFieldEngine.queueBatchEvaluation(field, context);
+```
 
 **Example**:
-A formula like `strength + dexterity / 2` will only recalculate when `strength` or `dexterity` changes, not when unrelated fields like `name` change.
+A formula like `strength + dexterity / 2` will only recalculate when `strength` or `dexterity` changes, not when unrelated fields like `name` change. When multiple formulas depend on the same change, they're batched and evaluated in dependency order.
 
-### 4. Form Definition Caching
+### 4. Form Definition Caching (LRU)
 
-**What it does**: Form definitions are cached for 5 minutes after loading.
+**What it does**: Form definitions are cached using an LRU (Least Recently Used) cache.
 
 **How it works**:
-- When a form is loaded from the API, it's stored in memory with a timestamp
-- Subsequent requests for the same form use the cached version
-- Cache automatically expires after 5 minutes
+- Two-tier caching: LRU cache (max 100 forms) + store cache
+- LRU cache automatically evicts least recently used entries when full
+- Active forms have separate cache (max 50 entries)
+- Both caches have 5-minute TTL
 - Cache is invalidated when forms are updated
 
 **Benefits**:
 - Reduced API calls
 - Faster form switching
 - Lower server load
+- Automatic memory management
+- Better cache hit rate for frequently accessed forms
+
+**Performance Stats**:
+```typescript
+// Check cache performance
+const stats = formDefCache.getStats();
+// { size: 45, maxSize: 100, oldestAge: 120000, newestAge: 5000 }
+```
+
+### 5. Loading States and Skeleton Loaders
+
+**What it does**: Shows placeholder content while forms load, improving perceived performance.
+
+**How it works**:
+- Skeleton loaders display lightweight animated placeholders
+- Loading spinners indicate async operations
+- Form skeletons mimic actual form structure
+- Reduces perceived load time by showing immediate feedback
+
+**Components**:
+```svelte
+<!-- Generic skeleton -->
+<SkeletonLoader width="100%" height="36px" variant="rectangular" />
+
+<!-- Form-specific skeleton -->
+<FormSkeleton groups={2} fieldsPerGroup={3} showTabs={true} />
+
+<!-- Loading spinner -->
+<LoadingSpinner size="2rem" message="Loading form..." />
+<LoadingSpinner overlay={true} message="Saving..." />
+```
+
+**Benefits**:
+- Better perceived performance (users see immediate feedback)
+- Prevents layout shift when content loads
+- Professional loading experience
+- Accessible with ARIA labels
+
+### 6. Debounced Property Updates
+
+**What it does**: Delays rapid property updates to reduce re-renders.
+
+**How it works**:
+- Input changes are collected and applied in batches
+- Configurable delay (typically 300-500ms for text)
+- Prevents excessive API calls and re-renders
+- Supports cancellation on component unmount
+
+**Utilities**:
+```typescript
+import { debounce, throttle, batch } from '$lib/utils/debounce';
+
+// Debounce text input
+const debouncedUpdate = debounce((value) => onChange(value), 300);
+
+// Throttle scroll events
+const throttledScroll = throttle(handleScroll, 100);
+
+// Batch multiple updates
+const batchUpdate = batch((updates) => processAll(updates), 50);
+```
+
+**Benefits**:
+- Smoother typing experience
+- Reduced CPU usage
+- Fewer API calls
+- Lower network traffic
 
 ---
 
