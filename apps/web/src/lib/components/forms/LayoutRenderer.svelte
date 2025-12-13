@@ -2,9 +2,11 @@
   import type { LayoutNode, FormFragment, FormComputedField, VisibilityCondition } from '@vtt/shared';
   import { localeResolver } from '$lib/services/localization';
   import { sanitizeStyles } from '$lib/utils/cssSanitizer';
+  import { createDragDrop } from '$lib/utils/dragdrop';
   import FieldRenderer from './FieldRenderer.svelte';
   import ComputedRenderer from './ComputedRenderer.svelte';
   import DOMPurify from 'isomorphic-dompurify';
+  import { contextMenu, type ContextMenuEntry } from '$lib/actions/contextMenu';
 
   interface Props {
     node: LayoutNode;
@@ -31,6 +33,10 @@
   const ITEM_HEIGHT = 80; // Estimated height of repeater item in pixels
   const BUFFER_SIZE = 5; // Number of items to render above/below viewport
 
+  // Drag & drop state for repeaters
+  let repeaterContainerRef = $state<HTMLElement | null>(null);
+  let dragDropCleanup: (() => void) | null = null;
+
   // Initialize state based on node type
   $effect(() => {
     if (node.type === 'section') {
@@ -49,6 +55,36 @@
   $effect(() => {
     if (activeTabId && node.type === 'tabs') {
       visitedTabs = new Set([...visitedTabs, activeTabId]);
+    }
+  });
+
+  // Setup drag & drop for repeater when container is available
+  $effect(() => {
+    if (node.type === 'repeater' && repeaterContainerRef && mode === 'edit' && node.allowReorder !== false) {
+      // Cleanup previous instance if exists
+      if (dragDropCleanup) {
+        dragDropCleanup();
+      }
+
+      // Initialize drag & drop
+      dragDropCleanup = createDragDrop(
+        repeaterContainerRef,
+        '.repeater-item',
+        '.drag-handle',
+        {
+          onReorder: (fromIndex, toIndex) => {
+            moveItem(node.binding, fromIndex, toIndex);
+          }
+        }
+      );
+
+      // Cleanup on unmount
+      return () => {
+        if (dragDropCleanup) {
+          dragDropCleanup();
+          dragDropCleanup = null;
+        }
+      };
     }
   });
 
@@ -123,6 +159,77 @@
     const [movedItem] = newArray.splice(fromIndex, 1);
     newArray.splice(toIndex, 0, movedItem);
     onChange(path, newArray);
+  }
+
+  function duplicateItem(path: string, index: number): void {
+    const currentArray = (getValueByPath(entity, path) as unknown[]) || [];
+    if (index < 0 || index >= currentArray.length) {
+      return; // Invalid index
+    }
+    const itemToDuplicate = currentArray[index];
+    // Deep clone the item
+    const duplicatedItem = JSON.parse(JSON.stringify(itemToDuplicate));
+    const newArray = [...currentArray];
+    newArray.splice(index + 1, 0, duplicatedItem);
+    onChange(path, newArray);
+  }
+
+  // Create context menu for repeater items
+  function createRepeaterItemContextMenu(
+    path: string,
+    index: number,
+    totalItems: number,
+    allowReorder: boolean,
+    allowDelete: boolean,
+    minItems?: number,
+    maxItems?: number
+  ): ContextMenuEntry[] {
+    const items: ContextMenuEntry[] = [];
+
+    // Duplicate item
+    const canDuplicate = maxItems === undefined || totalItems < maxItems;
+    items.push({
+      id: 'duplicate',
+      label: 'Duplicate',
+      icon: '⎘',
+      disabled: !canDuplicate,
+      action: () => duplicateItem(path, index)
+    });
+
+    // Delete item
+    const canDelete = allowDelete && (minItems === undefined || totalItems > minItems);
+    items.push({
+      id: 'delete',
+      label: 'Delete',
+      icon: '✕',
+      danger: true,
+      disabled: !canDelete,
+      action: () => removeItem(path, index)
+    });
+
+    if (allowReorder && totalItems > 1) {
+      items.push({ type: 'divider' });
+
+      // Move up
+      items.push({
+        id: 'move-up',
+        label: 'Move Up',
+        icon: '▲',
+        disabled: index === 0,
+        action: () => moveItem(path, index, index - 1)
+      });
+
+      // Move down
+      items.push({
+        id: 'move-down',
+        label: 'Move Down',
+        icon: '▼',
+        disabled: index === totalItems - 1,
+        action: () => moveItem(path, index, index + 1)
+      });
+    }
+
+    return items;
   }
 
   // Calculate visible range for virtual scrolling
@@ -473,6 +580,7 @@
         <div class="repeater-empty">{node.emptyMessage}</div>
       {:else}
         <div
+          bind:this={repeaterContainerRef}
           class="repeater-container"
           class:virtual={useVirtualScrolling}
           style:height={useVirtualScrolling ? `${Math.min(600, totalHeight)}px` : 'auto'}
@@ -484,7 +592,26 @@
               <div style:position="absolute" style:top="{offsetY}px" style:left="0" style:right="0">
                 {#each items.slice(visibleRange.start, visibleRange.end) as item, relativeIndex}
                   {@const index = visibleRange.start + relativeIndex}
-                  <div class="repeater-item" style:min-height="{ITEM_HEIGHT}px">
+                  {@const repeaterMenuItems = mode === 'edit' ? createRepeaterItemContextMenu(
+                    node.binding,
+                    index,
+                    items.length,
+                    node.allowReorder !== false,
+                    node.allowDelete !== false,
+                    node.minItems,
+                    node.maxItems
+                  ) : []}
+                  <div
+                    class="repeater-item"
+                    style:min-height="{ITEM_HEIGHT}px"
+                    data-index={index}
+                    use:contextMenu={{ items: repeaterMenuItems, disabled: repeaterMenuItems.length === 0 }}
+                  >
+                    {#if mode === 'edit' && node.allowReorder !== false && items.length > 1}
+                      <div class="drag-handle" title="Drag to reorder">
+                        ⋮⋮
+                      </div>
+                    {/if}
                     <div class="repeater-item-content">
                       {#each node.itemTemplate as templateNode}
                         <svelte:self
@@ -538,7 +665,25 @@
           {:else}
             <!-- Non-virtual scrolling for small lists -->
             {#each items as item, index}
-              <div class="repeater-item">
+              {@const repeaterMenuItems = mode === 'edit' ? createRepeaterItemContextMenu(
+                node.binding,
+                index,
+                items.length,
+                node.allowReorder !== false,
+                node.allowDelete !== false,
+                node.minItems,
+                node.maxItems
+              ) : []}
+              <div
+                class="repeater-item"
+                data-index={index}
+                use:contextMenu={{ items: repeaterMenuItems, disabled: repeaterMenuItems.length === 0 }}
+              >
+                {#if mode === 'edit' && node.allowReorder !== false && items.length > 1}
+                  <div class="drag-handle" title="Drag to reorder">
+                    ⋮⋮
+                  </div>
+                {/if}
                 <div class="repeater-item-content">
                   {#each node.itemTemplate as templateNode}
                     <svelte:self
@@ -762,7 +907,61 @@
     border: 1px solid var(--border-color, #ccc);
     border-radius: 4px;
     align-items: start;
+    position: relative;
+    transition: opacity 0.2s, background-color 0.2s;
   }
+
+  /* Drag & drop styles */
+  .repeater-item.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+  }
+
+  .repeater-item.drag-over {
+    background: rgba(0, 123, 255, 0.1);
+  }
+
+  .drag-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem;
+    cursor: grab;
+    user-select: none;
+    color: var(--muted-color, #666);
+    font-size: 1rem;
+    line-height: 1;
+    min-width: 20px;
+    transition: color 0.2s;
+  }
+
+  .drag-handle:hover {
+    color: var(--primary-color, #007bff);
+  }
+
+  .drag-handle:active {
+    cursor: grabbing;
+  }
+
+  .repeater-item[draggable="true"] .drag-handle {
+    cursor: grab;
+  }
+
+  .repeater-item[draggable="true"]:active .drag-handle {
+    cursor: grabbing;
+  }
+
+  /* Drop indicator (created dynamically by JS) */
+  :global(.drop-indicator) {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--primary-color, #007bff);
+    pointer-events: none;
+    z-index: 1000;
+  }
+
   .repeater-container.virtual .repeater-item {
     border-left: none;
     border-right: none;

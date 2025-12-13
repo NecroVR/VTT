@@ -5,6 +5,7 @@
   import DOMPurify from 'isomorphic-dompurify';
   import CodeEditor from './CodeEditor.svelte';
   import RichTextEditorWrapper from './RichTextEditorWrapper.svelte';
+  import { contextMenu, type ContextMenuEntry } from '$lib/actions/contextMenu';
 
   interface Props {
     node: FieldNode;
@@ -177,9 +178,46 @@
       FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur']
     });
   }
+
+  // Context menu for edit mode fields
+  let fieldContextMenu = $derived.by((): ContextMenuEntry[] => {
+    if (mode !== 'edit' || node.readonly) return [];
+
+    const items: ContextMenuEntry[] = [];
+
+    // Clear value option (if field has a value)
+    if (value != null && value !== '') {
+      items.push({
+        id: 'clear',
+        label: 'Clear Value',
+        icon: '✕',
+        action: () => {
+          handleChange(null);
+        }
+      });
+    }
+
+    // Reset to default option (if field has a default value)
+    if (node.defaultValue !== undefined && value !== node.defaultValue) {
+      items.push({
+        id: 'reset',
+        label: 'Reset to Default',
+        icon: '↺',
+        action: () => {
+          handleChange(node.defaultValue);
+        }
+      });
+    }
+
+    return items;
+  });
 </script>
 
-<div class="field-wrapper" class:required={node.required}>
+<div
+  class="field-wrapper"
+  class:required={node.required}
+  use:contextMenu={{ items: fieldContextMenu, disabled: fieldContextMenu.length === 0 }}
+>
   {#if label}
     <label class="field-label" for="field-{node.id}">
       {label}
