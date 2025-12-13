@@ -21,6 +21,114 @@
 
   // Multiselect search query state
   let searchQuery = $state('');
+  // File upload state
+  let fileError = $state('');
+  let uploadProgress = $state(0);
+  let isUploading = $state(false);
+
+  // Validate file type
+  function validateFileType(file: File, accept?: string): boolean {
+    if (!accept) return true;
+    const acceptTypes = accept.split(',').map(t => t.trim());
+    return acceptTypes.some(type => {
+      if (type.startsWith('.')) {
+        return file.name.toLowerCase().endsWith(type.toLowerCase());
+      }
+      if (type.endsWith('/*')) {
+        return file.type.startsWith(type.slice(0, -1));
+      }
+      return file.type === type;
+    });
+  }
+
+  // Format file size for display
+  function formatFileSize(bytes: number): string {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  // Convert file to base64
+  function fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.onprogress = (e) => {
+        if (e.lengthComputable) uploadProgress = (e.loaded / e.total) * 100;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Handle file selection
+  async function handleFileSelect(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const files = input.files;
+    if (!files?.length) return;
+    await processFiles(Array.from(files));
+    input.value = ''; // Reset for re-selection
+  }
+
+  // Handle drag and drop
+  function handleDrop(event: DragEvent) {
+    event.preventDefault();
+    const files = event.dataTransfer?.files;
+    if (files?.length) processFiles(Array.from(files));
+  }
+
+  // Process selected files
+  async function processFiles(files: File[]) {
+    const accept = node.options?.accept as string | undefined;
+    const maxSize = (node.options?.maxSize as number) || 10 * 1024 * 1024; // 10MB default
+    const multiple = node.options?.multiple;
+
+    fileError = '';
+
+    for (const file of files) {
+      // Validate type
+      if (!validateFileType(file, accept)) {
+        fileError = `Invalid file type. Accepted: ${accept}`;
+        continue;
+      }
+      // Validate size
+      if (file.size > maxSize) {
+        fileError = `File too large. Maximum: ${formatFileSize(maxSize)}`;
+        continue;
+      }
+
+      isUploading = true;
+      uploadProgress = 0;
+
+      try {
+        const base64 = await fileToBase64(file);
+        const fileData = { name: file.name, size: file.size, type: file.type, data: base64 };
+
+        if (multiple) {
+          const current = Array.isArray(value) ? value : [];
+          handleChange([...current, fileData]);
+        } else {
+          handleChange(fileData);
+        }
+      } catch (err) {
+        fileError = 'Failed to process file';
+      } finally {
+        isUploading = false;
+        uploadProgress = 0;
+      }
+    }
+  }
+
+  // Remove uploaded file
+  function removeFile(index?: number) {
+    if (node.options?.multiple && typeof index === 'number') {
+      const current = Array.isArray(value) ? value : [];
+      handleChange(current.filter((_, i) => i !== index));
+    } else {
+      handleChange(null);
+    }
+  }
+
 
   // Resolve binding path (handle {{index}} for repeaters)
   let resolvedBinding = $derived.by(() => {
@@ -128,6 +236,30 @@
         {:else}
           <span class="text-gray-400">No image</span>
         {/if}
+      {:else if node.fieldType === 'file'}
+        <div class="file-view">
+          {#if value}
+            {#if node.options?.multiple && Array.isArray(value)}
+              {#each value as file}
+                <div class="file-item-view">
+                  {#if node.options?.preview && file.type?.startsWith('image/')}
+                    <img src={file.data} alt={file.name} class="file-preview-view" />
+                  {:else}
+                    <span>📄 {file.name}</span>
+                  {/if}
+                </div>
+              {/each}
+            {:else if value && typeof value === 'object'}
+              {#if node.options?.preview && value.type?.startsWith('image/')}
+                <img src={value.data} alt={value.name} class="file-preview-view" />
+              {:else}
+                <span>📄 {value.name}</span>
+              {/if}
+            {/if}
+          {:else}
+            <span class="no-file">No file uploaded</span>
+          {/if}
+        </div>
       {:else if node.fieldType === 'richtext'}
         <div class="richtext-view">{@html sanitizeHtml(String(value ?? ''))}</div>
       {:else}
@@ -462,6 +594,81 @@
         />
         {#if value}
           <img src={value as string} alt="Preview" class="image-preview-small" />
+        {/if}
+      </div>
+    {:else if node.fieldType === 'file'}
+      <div class="file-upload-container">
+        <!-- Dropzone -->
+        <div
+          class="file-upload-dropzone"
+          class:dragover={false}
+          role="button"
+          tabindex="0"
+          ondrop={handleDrop}
+          ondragover={(e) => e.preventDefault()}
+          onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') document.getElementById(`file-${node.id}`)?.click(); }}
+        >
+          <input
+            id="file-{node.id}"
+            type="file"
+            accept={node.options?.accept as string | undefined}
+            multiple={node.options?.multiple}
+            onchange={handleFileSelect}
+            class="file-input-hidden"
+          />
+          <div class="file-upload-content">
+            <span class="file-upload-icon">📁</span>
+            <span class="file-upload-text">Drop files here or click to browse</span>
+            {#if node.options?.accept}
+              <span class="file-upload-hint">Accepted: {node.options.accept}</span>
+            {/if}
+            {#if node.options?.maxSize}
+              <span class="file-upload-hint">Max size: {formatFileSize(node.options.maxSize as number)}</span>
+            {/if}
+          </div>
+        </div>
+
+        <!-- Progress -->
+        {#if isUploading}
+          <div class="file-upload-progress">
+            <div class="progress-bar" style="width: {uploadProgress}%"></div>
+          </div>
+        {/if}
+
+        <!-- Error -->
+        {#if fileError}
+          <div class="file-upload-error">{fileError}</div>
+        {/if}
+
+        <!-- File List -->
+        {#if value}
+          <div class="file-list">
+            {#if node.options?.multiple && Array.isArray(value)}
+              {#each value as file, i}
+                <div class="file-item">
+                  {#if node.options?.preview && file.type?.startsWith('image/')}
+                    <img src={file.data} alt={file.name} class="file-preview" />
+                  {/if}
+                  <div class="file-info">
+                    <span class="file-name">{file.name}</span>
+                    <span class="file-size">{formatFileSize(file.size)}</span>
+                  </div>
+                  <button type="button" class="file-remove" onclick={() => removeFile(i)}>×</button>
+                </div>
+              {/each}
+            {:else if value && typeof value === 'object'}
+              <div class="file-item">
+                {#if node.options?.preview && value.type?.startsWith('image/')}
+                  <img src={value.data} alt={value.name} class="file-preview" />
+                {/if}
+                <div class="file-info">
+                  <span class="file-name">{value.name}</span>
+                  <span class="file-size">{formatFileSize(value.size)}</span>
+                </div>
+                <button type="button" class="file-remove" onclick={() => removeFile()}>×</button>
+              </div>
+            {/if}
+          </div>
         {/if}
       </div>
     {:else if node.fieldType === 'date'}
@@ -816,4 +1023,52 @@
   .multiselect-option.disabled input[type="checkbox"] { cursor: not-allowed; }
   .multiselect-option-label { flex: 1; font-size: 0.875rem; }
   .multiselect-no-options { padding: 1rem; text-align: center; color: var(--muted-color, #666); font-size: 0.875rem; }
+
+  /* File Upload Styles */
+  .file-upload-container { width: 100%; }
+
+  .file-upload-dropzone {
+    border: 2px dashed var(--border-color, #444);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .file-upload-dropzone:hover, .file-upload-dropzone.dragover {
+    border-color: var(--color-accent, #4a90e2);
+    background: rgba(74, 144, 226, 0.1);
+  }
+
+  .file-input-hidden { display: none; }
+
+  .file-upload-content { display: flex; flex-direction: column; gap: 0.5rem; align-items: center; }
+  .file-upload-icon { font-size: 2rem; }
+  .file-upload-text { font-weight: 500; }
+  .file-upload-hint { font-size: 0.75rem; color: var(--color-text-secondary, #888); }
+
+  .file-upload-progress { height: 4px; background: var(--color-bg-secondary, #2a2a2a); border-radius: 2px; margin-top: 0.5rem; overflow: hidden; }
+  .progress-bar { height: 100%; background: var(--color-accent, #4a90e2); transition: width 0.2s; }
+
+  .file-upload-error { color: var(--color-error, #e74c3c); font-size: 0.875rem; margin-top: 0.5rem; }
+
+  .file-list { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+  .file-item {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 0.5rem; background: var(--color-bg-secondary, #2a2a2a);
+    border-radius: 4px;
+  }
+  .file-preview { width: 48px; height: 48px; object-fit: cover; border-radius: 4px; }
+  .file-info { flex: 1; display: flex; flex-direction: column; }
+  .file-name { font-weight: 500; word-break: break-all; }
+  .file-size { font-size: 0.75rem; color: var(--color-text-secondary, #888); }
+  .file-remove {
+    background: none; border: none; color: var(--color-error, #e74c3c);
+    font-size: 1.25rem; cursor: pointer; padding: 0.25rem;
+  }
+
+  .file-view { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .file-item-view { padding: 0.25rem; }
+  .file-preview-view { max-width: 150px; max-height: 150px; border-radius: 4px; }
+  .no-file { color: var(--color-text-secondary, #888); font-style: italic; }
 </style>
