@@ -13,6 +13,7 @@
 10. [Working with Components](#working-with-components)
 11. [Tips and Best Practices](#tips-and-best-practices)
 12. [Common Workflows](#common-workflows)
+13. [Computed Fields](#computed-fields)
 
 ---
 
@@ -1588,6 +1589,217 @@ Repeat for all skills!
 
 ---
 
+## Computed Fields
+
+### Overview
+
+Computed fields allow you to display values that are automatically calculated from other entity properties using formulas. This is perfect for derived stats like ability modifiers, attack bonuses, or encumbrance totals.
+
+**Use Cases:**
+- **Ability Modifiers** - Calculate `floor((strength - 10) / 2)`
+- **Attack Bonuses** - Compute `proficiencyBonus + dexterityModifier`
+- **Encumbrance** - Total up `sum(inventory.*.weight)`
+- **Conditional Values** - Use `if(level >= 5, 2, 1)` for proficiency dice
+
+### Creating Computed Fields
+
+Computed fields are defined at the **form level** in the Form Settings and then referenced by Computed Field components in your layout.
+
+**Step 1: Define the Computed Field**
+1. In the Form Designer, access the **Form Settings** panel
+2. Navigate to the **Computed Fields** section
+3. Click **"Add Computed Field"**
+4. Enter:
+   - **ID**: Unique identifier (e.g., `strengthModifier`)
+   - **Name**: Display name (e.g., "Strength Modifier")
+   - **Description**: Optional explanation
+   - **Formula**: The calculation expression
+   - **Result Type**: `number`, `string`, or `boolean`
+
+**Step 2: Add to Layout**
+1. Drag a **Computed Field** component from the palette
+2. In the Property Editor, select your computed field from the dropdown
+3. Set the display label (optional)
+4. Set the format string (optional, e.g., `{value} HP`)
+
+### Formula Language Reference
+
+#### Property References
+Access entity data using dot notation:
+```
+abilities.strength.value
+character.level
+inventory.0.weight
+```
+
+#### Mathematical Operators
+```
++  Addition
+-  Subtraction
+*  Multiplication
+/  Division
+%  Modulo (remainder)
+^  Power (exponentiation)
+```
+
+#### Comparison Operators
+```
+==  Equals
+!=  Not equals
+<   Less than
+>   Greater than
+<=  Less than or equal
+>=  Greater than or equal
+```
+
+#### Logical Operators
+```
+and  Logical AND
+or   Logical OR
+not  Logical NOT
+```
+
+#### Built-in Functions
+
+**Math Functions:**
+- `floor(x)` - Round down to nearest integer
+- `ceil(x)` - Round up to nearest integer
+- `round(x)` - Round to nearest integer
+- `abs(x)` - Absolute value
+- `sqrt(x)` - Square root
+- `min(a, b, ...)` - Return smallest value
+- `max(a, b, ...)` - Return largest value
+
+**Array Functions:**
+- `sum(array)` - Sum all values in array
+- `count(array)` - Count items in array
+
+**Conditional Function:**
+- `if(condition, trueValue, falseValue)` - Return value based on condition
+
+### Formula Examples
+
+**Ability Modifier (D&D 5e)**
+```
+floor((abilities.strength.value - 10) / 2)
+```
+Calculates the ability modifier from the ability score.
+
+**Attack Bonus**
+```
+proficiencyBonus + abilities.dexterity.modifier
+```
+Adds proficiency bonus to dexterity modifier.
+
+**Total Inventory Weight**
+```
+sum(inventory.*.weight)
+```
+Sums the weight of all items in inventory (uses wildcard `*`).
+
+**Proficiency Dice by Level**
+```
+if(level >= 5, 2, 1)
+```
+Returns 2 dice if level is 5 or higher, otherwise 1.
+
+**AC Calculation**
+```
+10 + abilities.dexterity.modifier + armor.bonus
+```
+Computes armor class from multiple sources.
+
+**Spell Save DC**
+```
+8 + proficiencyBonus + abilities.wisdom.modifier
+```
+Calculates spell save difficulty class.
+
+**Encumbrance Status**
+```
+if(totalWeight > abilities.strength.value * 15, "Encumbered", "Normal")
+```
+Returns string based on encumbrance threshold.
+
+**Min/Max HP**
+```
+max(1, hitDice + abilities.constitution.modifier)
+```
+Ensures HP never goes below 1.
+
+### Testing Formulas
+
+The Property Editor includes a **Formula Editor** with live testing:
+
+1. Click **"Edit Formula"** on a computed field
+2. Enter your formula in the text area
+3. Formula syntax is validated in real-time
+4. Use the **Test Data** field to provide sample entity data as JSON
+5. See the computed result immediately
+6. Click **"Save Formula"** when satisfied
+
+**Example Test Data:**
+```json
+{
+  "abilities": {
+    "strength": {
+      "value": 16
+    }
+  },
+  "level": 5,
+  "proficiencyBonus": 3
+}
+```
+
+### Displaying Computed Values
+
+**Format Strings:**
+Use `{value}` as a placeholder in the format string:
+```
+{value}            → "3"
+{value} HP         → "3 HP"
+Modifier: {value}  → "Modifier: 3"
++{value}           → "+3"
+```
+
+**Read-Only:**
+Computed fields are always read-only and update automatically when dependent values change.
+
+**Error Handling:**
+If a formula fails to evaluate (e.g., missing property, division by zero), the computed field displays an error message instead of the value.
+
+### Advanced Features
+
+**Dependency Tracking:**
+The engine automatically tracks which properties each formula depends on and recalculates only when those properties change.
+
+**Result Caching:**
+Computed results are cached for performance. The cache is invalidated automatically when dependencies change.
+
+**Sandboxed Execution:**
+All formulas run in a secure sandbox with:
+- No access to global JavaScript objects
+- 1-second timeout for long-running calculations
+- Memory limits to prevent abuse
+
+### Limitations
+
+- **No Custom Functions**: Only built-in functions are available
+- **No Recursion**: Computed fields cannot reference other computed fields
+- **No Side Effects**: Formulas are read-only and cannot modify entity data
+- **Numeric Focus**: Most functions work with numbers; string operations are limited
+
+### Best Practices
+
+1. **Keep Formulas Simple**: Complex logic is harder to debug
+2. **Test Thoroughly**: Use the formula editor to test edge cases
+3. **Use Descriptive Names**: Name computed fields clearly (e.g., `strengthModifier` not `sm`)
+4. **Document Formulas**: Add descriptions to explain complex calculations
+5. **Handle Edge Cases**: Use `if()` to handle zero, null, or missing values
+6. **Prefer Wildcards**: Use `inventory.*.weight` instead of hardcoded indices
+
+---
+
 ## What's Next?
 
 The Form Designer is actively being developed. Upcoming features include:
@@ -1598,6 +1810,7 @@ The Form Designer is actively being developed. Upcoming features include:
 - **Form validation preview** - Test required fields and validation
 - **Import/Export** - Share forms between campaigns
 - **Game system schemas** - Support for multiple game systems beyond D&D 5e
+- **Computed Field Improvements** - Reference other computed fields, custom functions
 
 Stay tuned for updates!
 
@@ -1615,6 +1828,6 @@ If you need assistance:
 
 ---
 
-**Document Version**: 1.0
+**Document Version**: 1.1
 **Last Updated**: 2025-12-12
-**Form Designer Version**: Phase 3 (Designer UI Complete)
+**Form Designer Version**: Phase 4.2-4.3 (Computed Fields & Formula Language)

@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { LayoutNode, FormFragment, FormComputedField, VisibilityCondition } from '@vtt/shared';
+  import { localeResolver } from '$lib/services/localization';
   import FieldRenderer from './FieldRenderer.svelte';
+  import ComputedRenderer from './ComputedRenderer.svelte';
 
   interface Props {
     node: LayoutNode;
@@ -198,7 +200,7 @@
       style={node.style ? Object.entries(node.style).map(([k, v]) => `${k}: ${v}`).join(';') : ''}
     >
       {#if node.type === 'group' && node.title}
-        <div class="group-title">{node.title}</div>
+        <div class="group-title">{localeResolver.resolve(node.title)}</div>
       {/if}
       {#each node.children as child}
         <svelte:self
@@ -290,7 +292,7 @@
         {#if node.icon}
           <span class="section-icon">{node.icon}</span>
         {/if}
-        <span class="section-title">{node.title}</span>
+        <span class="section-title">{localeResolver.resolve(node.title)}</span>
         {#if node.collapsible}
           <span class="collapse-indicator">{sectionCollapsed ? '▶' : '▼'}</span>
         {/if}
@@ -497,6 +499,12 @@
     {:else}
       <div class="fragment-error">Fragment not found: {node.fragmentId}</div>
     {/if}
+  {:else if node.type === 'computed'}
+    <ComputedRenderer
+      {node}
+      {entity}
+      {computedFields}
+    />
   {:else}
     <!-- Unknown node type -->
     <div class="unknown-node">Unknown node type: {(node as unknown as {type: string}).type}</div>
