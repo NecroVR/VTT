@@ -1800,6 +1800,227 @@ All formulas run in a secure sandbox with:
 
 ---
 
+## The Style Editor
+
+### Overview
+
+The Style Editor allows you to customize the visual appearance of your forms with themes, colors, and custom CSS. Access it by clicking the **Styles** tab in the right panel of the Form Designer.
+
+### Theme Selection
+
+**Built-in Themes:**
+- **Default** - Standard neutral theme with blue accents
+- **Dark** - Dark mode theme with high contrast
+- **Light** - Clean light theme with minimal colors
+- **Parchment** - Fantasy/medieval theme with parchment-like appearance
+
+**Applying a Theme:**
+1. Click the **Styles** tab in the right panel
+2. Select a theme from the **Theme** dropdown
+3. The preview updates immediately
+4. Click **Save** to apply permanently
+
+### Custom Variables
+
+Override theme colors and spacing without writing CSS.
+
+**Theme Color Variables:**
+- **Primary Color** - Main accent color (buttons, links)
+- **Secondary Color** - Secondary accent color
+- **Background** - Main background color
+- **Surface** - Card and panel backgrounds
+- **Text** - Primary text color
+- **Border** - Border and divider color
+
+**Customizing Colors:**
+1. Navigate to the **Variables** tab in the Style Editor
+2. Click on a color picker to change a theme color
+3. Or enter a hex value directly (e.g., `#ff5733`)
+4. Changes apply immediately in preview
+5. Click **Save** to keep changes
+
+**Adding Custom Variables:**
+1. Click **"+ Add Variable"** in the Variables tab
+2. Enter a CSS variable name (must start with `--`, e.g., `--my-color`)
+3. Enter a value (e.g., `#ff0000` for red)
+4. Use the variable in your custom CSS
+
+### Custom CSS
+
+For advanced styling, add custom CSS rules to your form.
+
+**Writing Custom CSS:**
+1. Navigate to the **Custom CSS** tab in the Style Editor
+2. Enter CSS rules in the text area:
+   ```css
+   .my-field {
+     color: #333;
+     font-size: 1.2rem;
+     padding: 1rem;
+   }
+   ```
+3. Click **"Apply & Sanitize"** to validate and apply the CSS
+4. Preview the changes in the Preview Panel
+5. Click **Save** to keep the changes
+
+**CSS Scoping:**
+All custom CSS is automatically scoped to your form, so it won't affect other forms or the application UI.
+
+**Allowed CSS Properties:**
+For security, only safe CSS properties are allowed:
+- **Colors**: `color`, `background-color`, `border-color`
+- **Typography**: `font-size`, `font-family`, `font-weight`, `text-align`, `line-height`
+- **Spacing**: `padding`, `margin`, `gap`
+- **Sizing**: `width`, `height`, `max-width`, `max-height`
+- **Layout**: `display`, `flex`, `grid`, `flex-direction`, `justify-content`, `align-items`
+- **Visual**: `opacity`, `box-shadow`, `border-radius`, `transform`, `transition`
+
+**Blocked for Security:**
+- `position: fixed/sticky`
+- `z-index`
+- `@import` statements
+- `url()` with external URLs
+- JavaScript expressions
+
+### Using CSS Classes
+
+Apply custom styles to specific components:
+
+1. **Add CSS Class to Component:**
+   - Select the component in the designer
+   - Open the **Properties** tab
+   - Enter class name in the **CSS Class** field (e.g., `highlight-box`)
+
+2. **Define the Style:**
+   - Switch to the **Styles** tab
+   - Navigate to **Custom CSS**
+   - Add your CSS rule:
+     ```css
+     .highlight-box {
+       background-color: #fff3cd;
+       border: 2px solid #ffc107;
+       padding: 1rem;
+     }
+     ```
+
+3. **Apply and Save:**
+   - Click **"Apply & Sanitize"**
+   - Save the form
+   - The component now has your custom style
+
+### CSS Examples
+
+**Accent Panel:**
+```css
+.accent-panel {
+  background-color: var(--form-primary-color);
+  color: white;
+  padding: var(--form-spacing-md);
+  border-radius: var(--form-radius-lg);
+}
+```
+
+**Character Portrait:**
+```css
+.character-portrait {
+  border: 3px solid var(--form-border-color);
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+```
+
+**Stat Box:**
+```css
+.stat-box {
+  background-color: var(--form-surface-color);
+  border: 1px solid var(--form-border-color);
+  padding: var(--form-spacing-sm);
+  text-align: center;
+  border-radius: var(--form-radius-md);
+}
+
+.stat-box .value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--form-primary-color);
+}
+```
+
+**Fantasy Header:**
+```css
+.fantasy-header {
+  font-family: 'Georgia', serif;
+  font-size: 1.5rem;
+  text-align: center;
+  color: var(--form-text-color);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  border-bottom: 2px solid var(--form-border-color);
+  padding-bottom: var(--form-spacing-sm);
+}
+```
+
+### Theme Variables Reference
+
+Use these variables in your custom CSS for consistency:
+
+**Colors:**
+- `--form-bg-color` - Background color
+- `--form-surface-color` - Surface/card color
+- `--form-primary-color` - Primary accent
+- `--form-secondary-color` - Secondary accent
+- `--form-text-color` - Main text color
+- `--form-text-muted-color` - Muted text color
+- `--form-border-color` - Border color
+- `--form-error-color` - Error state color
+- `--form-success-color` - Success state color
+
+**Fonts:**
+- `--form-font-body` - Body text font
+- `--form-font-heading` - Heading font
+- `--form-font-monospace` - Monospace font
+
+**Spacing:**
+- `--form-spacing-xs` - Extra small (0.25rem)
+- `--form-spacing-sm` - Small (0.5rem)
+- `--form-spacing-md` - Medium (1rem)
+- `--form-spacing-lg` - Large (1.5rem)
+- `--form-spacing-xl` - Extra large (2rem)
+
+**Border Radius:**
+- `--form-radius-sm` - Small radius (0.25rem)
+- `--form-radius-md` - Medium radius (0.5rem)
+- `--form-radius-lg` - Large radius (1rem)
+
+### Best Practices
+
+1. **Start with a Theme**: Choose a built-in theme before adding custom CSS
+2. **Use Variables**: Reference theme variables instead of hardcoding colors
+3. **Test in Preview**: Always preview your styles before saving
+4. **Keep it Simple**: Avoid overly complex CSS that's hard to maintain
+5. **Use Semantic Classes**: Name classes based on meaning (e.g., `stat-box`) not appearance (e.g., `blue-box`)
+6. **Check Different Devices**: Preview on mobile and tablet sizes if possible
+7. **Don't Override Core Styles**: Style your components, not the designer itself
+
+### Troubleshooting
+
+**CSS Not Applying:**
+- Check that you clicked **"Apply & Sanitize"** after editing
+- Verify the CSS class name matches exactly (case-sensitive)
+- Make sure the property is in the allowed list
+- Check browser console for syntax errors
+
+**Colors Look Wrong:**
+- Verify color values are valid hex (`#ff0000`) or CSS color names
+- Check if theme variables are being used correctly
+- Preview in both light and dark modes
+
+**Layout Issues:**
+- Use the Preview Panel to test your styles
+- Check that sizing properties (`width`, `height`) have valid units
+- Avoid conflicting CSS rules
+
+---
+
 ## What's Next?
 
 The Form Designer is actively being developed. Upcoming features include:
@@ -1828,6 +2049,277 @@ If you need assistance:
 
 ---
 
-**Document Version**: 1.1
+**Document Version**: 1.2
 **Last Updated**: 2025-12-12
-**Form Designer Version**: Phase 4.2-4.3 (Computed Fields & Formula Language)
+**Form Designer Version**: Phase 4.4 (Custom Styling System)
+
+---
+
+## Form Version History
+
+The Form Designer automatically tracks changes to your forms, allowing you to view previous versions and revert changes if needed.
+
+### How Versioning Works
+
+**Automatic Version Tracking:**
+- Every time you make structural changes to a form (layout, fragments, styles, or computed fields), the system automatically increments the version number
+- The previous version is saved to history before applying your changes
+- Non-structural changes (like name or description) don't create new versions
+- The system keeps up to 50 versions per form (oldest are automatically cleaned up)
+
+**What's Saved in Each Version:**
+- Complete form layout
+- All fragments
+- Computed fields
+- Styles configuration
+- Scripts (if any)
+- Optional change notes explaining what changed
+- Timestamp and author information
+
+### API Endpoints
+
+**Get Version History:**
+```
+GET /api/v1/forms/:formId/versions
+```
+
+Returns list of all versions (summaries only):
+```json
+{
+  "versions": [
+    {
+      "id": "uuid",
+      "formId": "uuid",
+      "version": 5,
+      "changeNotes": "Added inventory section",
+      "createdBy": "user-uuid",
+      "createdAt": "2025-12-12T10:30:00Z"
+    }
+  ]
+}
+```
+
+**Get Specific Version:**
+```
+GET /api/v1/forms/:formId/versions/:version
+```
+
+Returns full version data including layout, fragments, computed fields, and styles.
+
+**Revert to Version:**
+```
+POST /api/v1/forms/:formId/versions/:version/revert
+{
+  "changeNotes": "Reverted due to layout issues" // Optional
+}
+```
+
+### Adding Change Notes
+
+When saving a form with structural changes, include optional notes in the update request:
+
+```typescript
+PATCH /api/v1/forms/:formId
+{
+  "layout": [...],
+  "fragments": [...],
+  "changeNotes": "Added skill proficiency section" // Optional
+}
+```
+
+### Version Behavior
+
+**What Creates a New Version:**
+- Changes to `layout`
+- Changes to `fragments`
+- Changes to `computedFields`
+- Changes to `styles`
+
+**What Doesn't Create a New Version:**
+- Changes to `name`
+- Changes to `description`
+- Changes to `visibility`, `licenseType`, or `price`
+
+**Revert Behavior:**
+When reverting to version N:
+1. Current version M is saved as "Pre-revert snapshot"
+2. Form content is updated with version N's content
+3. New version M+1 is created with the reverted content
+4. Version number always increases (never decreases)
+
+### Best Practices
+
+**When to Add Change Notes:**
+- Major redesigns or restructuring
+- Adding/removing significant features
+- Before making experimental changes
+- When collaborating with other GMs
+
+**Version Management:**
+- System keeps 50 most recent versions automatically
+- Oldest versions are deleted when limit is reached
+- Important milestones should be documented in change notes
+- Critical versions can be saved as separate forms
+
+### Edge Cases
+
+**Locked Forms:**
+- Cannot revert locked forms (returns 403 error)
+- Must unlock form before reverting
+
+**Concurrent Edits:**
+- Last save wins in concurrent edit scenarios
+- Previous changes may be lost
+- Check version history if conflicts suspected
+
+**Missing Authors:**
+- Versions created before user tracking show null `createdBy`
+- Display as "Unknown" in UI
+
+**Version Limit:**
+- Configurable via `MAX_VERSION_HISTORY` constant (default: 50)
+- Automatic cleanup prevents database bloat
+- Consider backing up critical forms separately
+
+---
+
+## Localization (Internationalization)
+
+### Overview
+
+The Form Designer supports localization through a unified **LocalizedString** type. This allows form labels, help text, placeholders, and content to be displayed in different languages based on locale preferences.
+
+### LocalizedString Type
+
+Any text that can be displayed to users uses the `LocalizedString` type, which supports two modes:
+
+1. **Literal Mode**: Direct text values (default, simple mode)
+2. **Locale Key Mode**: Translation keys with fallback literals
+
+**Type Structure:**
+```typescript
+interface LocalizedString {
+  literal?: string;      // Direct text value (fallback)
+  localeKey?: string;    // Locale key for translation
+}
+```
+
+### Fallback Chain
+
+When resolving a LocalizedString for display, the system follows this chain:
+
+1. If `localeKey` is present, look up translation in locale data
+2. If translation not found or `localeKey` missing, use `literal` value
+3. If `literal` not present, return `localeKey` as-is (for debugging)
+
+This ensures content is **always displayed** even if translations are not available.
+
+### Using the Locale Key Picker
+
+The **LocaleKeyPicker** component appears in property editors for localizable fields:
+
+#### Literal Mode (Default)
+- Simple text input
+- Value stored directly as literal
+- Good for quick prototyping or single-language forms
+
+#### Locale Key Mode
+- Two inputs:
+  - **Locale Key**: Translation key (e.g., `form.character-sheet.strength.label`)
+  - **Fallback**: Literal value shown if translation not found
+- Suggested prefix shown based on component (e.g., `form.{formName}.{nodeId}.label`)
+- Preview shows resolved value
+
+#### Switching Modes
+- Click the **Literal** or **Locale Key** button to toggle
+- Mode persists per field
+- Fallback literal is preserved when switching to locale key mode
+
+### Locale Key Naming Convention
+
+Follow this naming pattern for consistency:
+
+```
+{namespace}.{category}.{identifier}.{property}
+```
+
+**Examples:**
+```
+form.character-sheet.abilities-section.title
+form.character-sheet.strength-field.label
+form.character-sheet.strength-field.help
+form.inventory.add-item.label
+ui.common.save
+ui.common.cancel
+```
+
+**Guidelines:**
+- Use lowercase, kebab-case for all parts
+- Keep identifiers descriptive but concise
+- Group related keys with common prefixes
+- Use consistent property suffixes (`.label`, `.help`, `.placeholder`, etc.)
+
+### Fields That Support Localization
+
+#### Field Components
+- **Label**: `label` property
+- **Help Text**: `helpText` property  
+- **Placeholder**: `options.placeholder` property
+- **Select Options**: Each option's `label` property
+
+#### Layout Components
+- **Tabs**: Each tab's `label` property
+- **Sections**: `title` property
+- **Groups**: `title` property
+- **Static Content**: `content` property
+- **Images**: `alt` property (for alt text)
+- **Repeaters**: `addLabel` and `emptyMessage` properties
+- **Computed Fields**: `label` property
+
+### Loading Translations
+
+Translations are loaded through the locale resolution service:
+
+```typescript
+import { localeResolver } from '$lib/services/localization';
+
+// Load translations for a locale
+localeResolver.loadLocale('es', {
+  'form.character-sheet.strength.label': 'Fuerza',
+  'form.character-sheet.strength.help': 'Modificador de fuerza del personaje',
+  // ... more translations
+});
+
+// Set active locale
+localeResolver.setLocale('es');
+```
+
+**Note:** In production, translations will be loaded automatically from game system locale files.
+
+### Backwards Compatibility
+
+Forms created before localization support continue to work:
+
+- String values are automatically converted to `LocalizedString` with literal value
+- No migration needed for existing forms
+- New forms can use either mode
+
+### Best Practices
+
+1. **Start with Literals**: Use literal mode for prototyping, then add locale keys later
+2. **Always Provide Fallbacks**: Include meaningful literal values even when using locale keys
+3. **Consistent Naming**: Follow the naming convention for easier management
+4. **Reuse Keys**: Use common keys (like `ui.common.save`) across forms
+5. **Test Fallbacks**: Verify forms work correctly when translations are missing
+
+### Future Enhancements
+
+Planned localization features:
+
+- Game system locale file integration
+- Bulk translation management UI
+- Translation import/export
+- Auto-suggestion of existing locale keys
+- Translation coverage reporting
+
+---

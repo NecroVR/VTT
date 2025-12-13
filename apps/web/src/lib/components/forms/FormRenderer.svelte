@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { FormDefinition, LayoutNode } from '@vtt/shared';
   import LayoutRenderer from './LayoutRenderer.svelte';
+  import { getTheme, themeToCssVariables } from '$lib/services/formThemes';
+  import { sanitizeAndScopeCustomCss, generateFormScopeClass, validateCustomProperties } from '$lib/services/cssSanitizer';
 
   // Props using Svelte 5 syntax
   interface Props {
@@ -22,6 +24,41 @@
   // Track changes for dirty state
   let isDirty = $state(false);
 
+  // Generate scope class for this form
+  const scopeClass = generateFormScopeClass(form.id);
+
+  // Compute theme variables
+  const themeVariables = $derived(() => {
+    const themeName = form.styles?.theme || 'default';
+    const theme = getTheme(themeName);
+    if (!theme) return {};
+    return themeToCssVariables(theme);
+  });
+
+  // Compute custom CSS variables
+  const customVariables = $derived(() => {
+    if (!form.styles?.variables) return {};
+    return validateCustomProperties(form.styles.variables);
+  });
+
+  // Compute all CSS variables
+  const allVariables = $derived(() => {
+    return { ...themeVariables(), ...customVariables() };
+  });
+
+  // Compute scoped custom CSS
+  const scopedCustomCss = $derived(() => {
+    if (!form.styles?.customCSS) return '';
+    return sanitizeAndScopeCustomCss(form.styles.customCSS, form.id);
+  });
+
+  // Convert variables to CSS style string
+  const cssVariablesStyle = $derived(() => {
+    return Object.entries(allVariables())
+      .map(([key, value]) => `${key}: ${value}`)
+      .join('; ');
+  });
+
   function handleFieldChange(path: string, value: unknown) {
     isDirty = true;
     onChange?.(path, value);
@@ -33,7 +70,20 @@
   }
 </script>
 
-<div class="form-renderer" class:view-mode={mode === 'view'} class:edit-mode={mode === 'edit'}>
+<svelte:head>
+  {#if scopedCustomCss()}
+    <style>
+      {@html scopedCustomCss()}
+    </style>
+  {/if}
+</svelte:head>
+
+<div
+  class="form-renderer {scopeClass}"
+  class:view-mode={mode === 'view'}
+  class:edit-mode={mode === 'edit'}
+  style={cssVariablesStyle()}
+>
   <div class="form-content">
     {#each form.layout as node}
       <LayoutRenderer
@@ -66,29 +116,39 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+    background: var(--form-bg-color, #ffffff);
+    color: var(--form-text-color, #212529);
+    font-family: var(--form-font-body, system-ui, sans-serif);
   }
 
   .form-content {
     flex: 1;
     overflow-y: auto;
-    padding: 1rem;
+    padding: var(--form-spacing-md, 1rem);
   }
 
   .form-actions {
-    padding: 0.5rem 1rem;
-    border-top: 1px solid var(--border-color, #ccc);
+    padding: var(--form-spacing-sm, 0.5rem) var(--form-spacing-md, 1rem);
+    border-top: 1px solid var(--form-border-color, #ccc);
     display: flex;
     justify-content: flex-end;
-    gap: 0.5rem;
+    gap: var(--form-spacing-sm, 0.5rem);
+    background: var(--form-surface-color, #f8f9fa);
   }
 
   .save-btn {
-    padding: 0.5rem 1rem;
-    background: var(--primary-color, #007bff);
+    padding: var(--form-spacing-sm, 0.5rem) var(--form-spacing-md, 1rem);
+    background: var(--form-primary-color, #007bff);
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--form-radius-md, 4px);
     cursor: pointer;
+    font-weight: 500;
+    transition: opacity 0.2s;
+  }
+
+  .save-btn:hover:not(:disabled) {
+    opacity: 0.9;
   }
 
   .save-btn:disabled {

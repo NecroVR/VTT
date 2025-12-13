@@ -626,6 +626,23 @@ function createFormDesignerStore() {
     },
 
     /**
+     * Update form styles
+     */
+    updateStyles(styles: FormDefinition['styles']) {
+      update(state => {
+        if (!state.form) return state;
+
+        const newState = pushToUndo(state);
+
+        return {
+          ...newState,
+          form: { ...state.form, styles },
+          isDirty: true
+        };
+      });
+    },
+
+    /**
      * Update the entire form from JSON
      */
     updateFromJson(updatedForm: FormDefinition) {

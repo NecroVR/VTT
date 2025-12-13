@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify';
-import { forms, formLicenses, campaignForms, campaigns, gameSystems } from '@vtt/database';
+import { forms, formVersions, formLicenses, campaignForms, campaigns, gameSystems } from '@vtt/database';
 import { eq, and, or, desc, sql } from 'drizzle-orm';
 import type {
   CreateFormRequest,
@@ -9,8 +9,17 @@ import type {
   UpdateCampaignFormRequest,
   FormDefinition,
   CampaignForm,
+  FormVersion,
+  FormVersionSummary,
+  RevertFormVersionRequest,
+  FormExport,
+  ImportFormRequest,
+  FormImportValidation,
 } from '@vtt/shared';
 import { authenticate } from '../../../middleware/auth.js';
+
+// Configuration
+const MAX_VERSION_HISTORY = 50; // Maximum number of versions to keep per form
 
 /**
  * Form API routes
@@ -361,10 +370,46 @@ const formsRoute: FastifyPluginAsync = async (fastify) => {
           updateData.price = updates.price.toString();
         }
 
-        // Increment version if structural changes were made
+        // Increment version and save history if structural changes were made
         if (shouldIncrementVersion) {
           const currentVersion = parseInt(existingForm.version, 10);
           updateData.version = (currentVersion + 1).toString();
+
+          // Save current version to history
+          await fastify.db.insert(formVersions).values({
+            formId: existingForm.id,
+            version: currentVersion,
+            layout: existingForm.layout,
+            fragments: existingForm.fragments,
+            computedFields: existingForm.computedFields,
+            styles: existingForm.styles,
+            scripts: existingForm.scripts,
+            changeNotes: updates.changeNotes ?? null,
+            createdBy: request.user.id,
+          });
+
+          // Cleanup old versions if exceeding limit
+          const versionCount = await fastify.db
+            .select({ id: formVersions.id })
+            .from(formVersions)
+            .where(eq(formVersions.formId, formId));
+
+          if (versionCount.length >= MAX_VERSION_HISTORY) {
+            // Get oldest versions to delete
+            const versionsToDelete = await fastify.db
+              .select({ id: formVersions.id })
+              .from(formVersions)
+              .where(eq(formVersions.formId, formId))
+              .orderBy(formVersions.createdAt)
+              .limit(versionCount.length - MAX_VERSION_HISTORY + 1);
+
+            if (versionsToDelete.length > 0) {
+              const idsToDelete = versionsToDelete.map(v => v.id);
+              await fastify.db
+                .delete(formVersions)
+                .where(sql`${formVersions.id} = ANY(${idsToDelete})`);
+            }
+          }
         }
 
         // Update form
@@ -1054,6 +1099,577 @@ const formsRoute: FastifyPluginAsync = async (fastify) => {
       } catch (error) {
         fastify.log.error(error, 'Failed to fetch active form');
         return reply.status(500).send({ error: 'Failed to fetch active form' });
+      }
+    }
+  );
+
+  // ============================================================================
+  // Form Version History Endpoints
+  // ============================================================================
+
+  /**
+   * GET /api/v1/forms/:formId/versions - Get version history for a form
+   * Returns summary list of all versions (without full layout data)
+   */
+  fastify.get<{ Params: { formId: string } }>(
+    '/forms/:formId/versions',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      if (!request.user) {
+        return reply.status(401).send({ error: 'Not authenticated' });
+      }
+
+      const { formId } = request.params;
+
+      try {
+        // Verify form exists and user has access
+        const [form] = await fastify.db
+          .select()
+          .from(forms)
+          .where(eq(forms.id, formId))
+          .limit(1);
+
+        if (!form) {
+          return reply.status(404).send({ error: 'Form not found' });
+        }
+
+        // Check access: owner or public form
+        const isPublic = form.visibility === 'public' || form.visibility === 'marketplace';
+        const isOwner = form.ownerId === request.user.id;
+
+        if (!isPublic && !isOwner) {
+          return reply.status(403).send({ error: 'Access denied' });
+        }
+
+        // Fetch version history (newest first)
+        const versions = await fastify.db
+          .select({
+            id: formVersions.id,
+            formId: formVersions.formId,
+            version: formVersions.version,
+            changeNotes: formVersions.changeNotes,
+            createdBy: formVersions.createdBy,
+            createdAt: formVersions.createdAt,
+          })
+          .from(formVersions)
+          .where(eq(formVersions.formId, formId))
+          .orderBy(desc(formVersions.version));
+
+        const formattedVersions: FormVersionSummary[] = versions.map((v) => ({
+          id: v.id,
+          formId: v.formId,
+          version: v.version,
+          changeNotes: v.changeNotes ?? undefined,
+          createdBy: v.createdBy ?? undefined,
+          createdAt: v.createdAt,
+        }));
+
+        return reply.status(200).send({ versions: formattedVersions });
+      } catch (error) {
+        fastify.log.error(error, 'Failed to fetch form version history');
+        return reply.status(500).send({ error: 'Failed to fetch form version history' });
+      }
+    }
+  );
+
+  /**
+   * GET /api/v1/forms/:formId/versions/:version - Get specific form version
+   * Returns full version data including layout
+   */
+  fastify.get<{ Params: { formId: string; version: string } }>(
+    '/forms/:formId/versions/:version',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      if (!request.user) {
+        return reply.status(401).send({ error: 'Not authenticated' });
+      }
+
+      const { formId, version } = request.params;
+      const versionNumber = parseInt(version, 10);
+
+      if (isNaN(versionNumber)) {
+        return reply.status(400).send({ error: 'Invalid version number' });
+      }
+
+      try {
+        // Verify form exists and user has access
+        const [form] = await fastify.db
+          .select()
+          .from(forms)
+          .where(eq(forms.id, formId))
+          .limit(1);
+
+        if (!form) {
+          return reply.status(404).send({ error: 'Form not found' });
+        }
+
+        // Check access
+        const isPublic = form.visibility === 'public' || form.visibility === 'marketplace';
+        const isOwner = form.ownerId === request.user.id;
+
+        if (!isPublic && !isOwner) {
+          return reply.status(403).send({ error: 'Access denied' });
+        }
+
+        // Fetch specific version
+        const [formVersion] = await fastify.db
+          .select()
+          .from(formVersions)
+          .where(
+            and(
+              eq(formVersions.formId, formId),
+              eq(formVersions.version, versionNumber)
+            )
+          )
+          .limit(1);
+
+        if (!formVersion) {
+          return reply.status(404).send({ error: 'Version not found' });
+        }
+
+        const formattedVersion: FormVersion = {
+          id: formVersion.id,
+          formId: formVersion.formId,
+          version: formVersion.version,
+          layout: formVersion.layout as any,
+          fragments: (formVersion.fragments || []) as any,
+          computedFields: (formVersion.computedFields || []) as any,
+          styles: (formVersion.styles || {}) as any,
+          scripts: formVersion.scripts ? (formVersion.scripts as any) : undefined,
+          changeNotes: formVersion.changeNotes ?? undefined,
+          createdBy: formVersion.createdBy ?? undefined,
+          createdAt: formVersion.createdAt,
+        };
+
+        return reply.status(200).send({ version: formattedVersion });
+      } catch (error) {
+        fastify.log.error(error, 'Failed to fetch form version');
+        return reply.status(500).send({ error: 'Failed to fetch form version' });
+      }
+    }
+  );
+
+  /**
+   * POST /api/v1/forms/:formId/versions/:version/revert - Revert form to specific version
+   * Creates a new version with the content from the specified version
+   */
+  fastify.post<{
+    Params: { formId: string; version: string };
+    Body: RevertFormVersionRequest;
+  }>(
+    '/forms/:formId/versions/:version/revert',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      if (!request.user) {
+        return reply.status(401).send({ error: 'Not authenticated' });
+      }
+
+      const { formId, version } = request.params;
+      const { changeNotes } = request.body;
+      const versionNumber = parseInt(version, 10);
+
+      if (isNaN(versionNumber)) {
+        return reply.status(400).send({ error: 'Invalid version number' });
+      }
+
+      try {
+        // Verify form exists and user is owner
+        const [form] = await fastify.db
+          .select()
+          .from(forms)
+          .where(eq(forms.id, formId))
+          .limit(1);
+
+        if (!form) {
+          return reply.status(404).send({ error: 'Form not found' });
+        }
+
+        // Only owner can revert
+        if (form.ownerId !== request.user.id) {
+          return reply.status(403).send({ error: 'Only the owner can revert this form' });
+        }
+
+        // Prevent reverting locked forms
+        if (form.isLocked) {
+          return reply.status(403).send({ error: 'Cannot revert locked form' });
+        }
+
+        // Fetch the version to revert to
+        const [targetVersion] = await fastify.db
+          .select()
+          .from(formVersions)
+          .where(
+            and(
+              eq(formVersions.formId, formId),
+              eq(formVersions.version, versionNumber)
+            )
+          )
+          .limit(1);
+
+        if (!targetVersion) {
+          return reply.status(404).send({ error: 'Version not found' });
+        }
+
+        // Save current version to history
+        const currentVersion = parseInt(form.version, 10);
+        await fastify.db.insert(formVersions).values({
+          formId: form.id,
+          version: currentVersion,
+          layout: form.layout,
+          fragments: form.fragments,
+          computedFields: form.computedFields,
+          styles: form.styles,
+          scripts: form.scripts,
+          changeNotes: `Pre-revert snapshot (before reverting to v${versionNumber})`,
+          createdBy: request.user.id,
+        });
+
+        // Update form with reverted content
+        const newVersion = currentVersion + 1;
+        const revertNote = changeNotes || `Reverted to version ${versionNumber}`;
+
+        const [updatedForm] = await fastify.db
+          .update(forms)
+          .set({
+            version: newVersion.toString(),
+            layout: targetVersion.layout,
+            fragments: targetVersion.fragments,
+            computedFields: targetVersion.computedFields,
+            styles: targetVersion.styles,
+            scripts: targetVersion.scripts,
+            updatedAt: new Date(),
+          })
+          .where(eq(forms.id, formId))
+          .returning();
+
+        // Record the revert in history
+        await fastify.db.insert(formVersions).values({
+          formId: form.id,
+          version: newVersion,
+          layout: targetVersion.layout,
+          fragments: targetVersion.fragments,
+          computedFields: targetVersion.computedFields,
+          styles: targetVersion.styles,
+          scripts: targetVersion.scripts,
+          changeNotes: revertNote,
+          createdBy: request.user.id,
+        });
+
+        // Cleanup old versions if exceeding limit
+        const versionCount = await fastify.db
+          .select({ id: formVersions.id })
+          .from(formVersions)
+          .where(eq(formVersions.formId, formId));
+
+        if (versionCount.length > MAX_VERSION_HISTORY) {
+          const versionsToDelete = await fastify.db
+            .select({ id: formVersions.id })
+            .from(formVersions)
+            .where(eq(formVersions.formId, formId))
+            .orderBy(formVersions.createdAt)
+            .limit(versionCount.length - MAX_VERSION_HISTORY);
+
+          if (versionsToDelete.length > 0) {
+            const idsToDelete = versionsToDelete.map(v => v.id);
+            await fastify.db
+              .delete(formVersions)
+              .where(sql`${formVersions.id} = ANY(${idsToDelete})`);
+          }
+        }
+
+        // Format response
+        const formattedForm: FormDefinition = {
+          id: updatedForm.id,
+          name: updatedForm.name,
+          description: updatedForm.description ?? undefined,
+          gameSystemId: updatedForm.gameSystemId,
+          entityType: updatedForm.entityType,
+          version: parseInt(updatedForm.version, 10),
+          isDefault: updatedForm.isDefault,
+          isLocked: updatedForm.isLocked,
+          visibility: updatedForm.visibility as 'private' | 'campaign' | 'public' | 'marketplace',
+          licenseType: (updatedForm.licenseType || undefined) as 'free' | 'paid' | 'subscription' | undefined,
+          price: updatedForm.price ? parseFloat(updatedForm.price) : undefined,
+          ownerId: updatedForm.ownerId,
+          layout: updatedForm.layout as any,
+          fragments: updatedForm.fragments as any,
+          styles: updatedForm.styles as any,
+          computedFields: updatedForm.computedFields as any,
+          scripts: updatedForm.scripts ? (updatedForm.scripts as any) : undefined,
+          createdAt: updatedForm.createdAt,
+          updatedAt: updatedForm.updatedAt,
+        };
+
+        return reply.status(200).send({ form: formattedForm });
+      } catch (error) {
+        fastify.log.error(error, 'Failed to revert form version');
+        return reply.status(500).send({ error: 'Failed to revert form version' });
+      }
+    }
+  );
+
+  // ============================================================================
+  // Form Import/Export Endpoints
+  // ============================================================================
+
+  /**
+   * GET /api/v1/forms/:formId/export - Export a form as JSON
+   * Returns complete form definition with metadata for standalone use
+   */
+  fastify.get<{ Params: { formId: string } }>(
+    '/forms/:formId/export',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      if (!request.user) {
+        return reply.status(401).send({ error: 'Not authenticated' });
+      }
+
+      const { formId } = request.params;
+
+      try {
+        // Fetch form
+        const [form] = await fastify.db
+          .select()
+          .from(forms)
+          .where(eq(forms.id, formId))
+          .limit(1);
+
+        if (!form) {
+          return reply.status(404).send({ error: 'Form not found' });
+        }
+
+        // Check access: public form OR user owns it
+        const isPublic = form.visibility === 'public' || form.visibility === 'marketplace';
+        const isOwner = form.ownerId === request.user.id;
+
+        if (!isPublic && !isOwner) {
+          return reply.status(403).send({ error: 'Access denied' });
+        }
+
+        // Build export object
+        const exportData: FormExport = {
+          exportVersion: '1.0',
+          exportedAt: new Date().toISOString(),
+          form: {
+            name: form.name,
+            description: form.description ?? undefined,
+            entityType: form.entityType,
+            gameSystemId: form.gameSystemId,
+            version: parseInt(form.version, 10),
+            layout: form.layout as any,
+            fragments: form.fragments as any,
+            computedFields: form.computedFields as any,
+            styles: form.styles as any,
+            scripts: form.scripts ? (form.scripts as any) : undefined,
+          },
+          metadata: {
+            exportedBy: request.user.username || request.user.email,
+            sourceUrl: `${process.env.BASE_URL || 'http://localhost'}/forms/${formId}`,
+            license: form.licenseType || 'free',
+            notes: `Exported from VTT Platform on ${new Date().toLocaleDateString()}`,
+          },
+        };
+
+        return reply.status(200).send({ export: exportData });
+      } catch (error) {
+        fastify.log.error(error, 'Failed to export form');
+        return reply.status(500).send({ error: 'Failed to export form' });
+      }
+    }
+  );
+
+  /**
+   * POST /api/v1/game-systems/:systemId/forms/import - Import a form from JSON
+   * Validates and imports form with conflict resolution
+   */
+  fastify.post<{
+    Params: { systemId: string };
+    Body: ImportFormRequest;
+  }>(
+    '/game-systems/:systemId/forms/import',
+    { preHandler: authenticate },
+    async (request, reply) => {
+      if (!request.user) {
+        return reply.status(401).send({ error: 'Not authenticated' });
+      }
+
+      const { systemId } = request.params;
+      const { formData, conflictResolution } = request.body;
+
+      try {
+        // Validate export version
+        if (formData.exportVersion !== '1.0') {
+          return reply.status(400).send({
+            error: `Unsupported export version: ${formData.exportVersion}`,
+          });
+        }
+
+        // Validate required fields
+        if (!formData.form.name || !formData.form.entityType) {
+          return reply.status(400).send({
+            error: 'Invalid form data: name and entityType are required',
+          });
+        }
+
+        // Check for game system compatibility
+        const warnings: string[] = [];
+        const errors: string[] = [];
+        const conflicts: FormImportValidation['conflicts'] = {};
+
+        if (formData.form.gameSystemId && formData.form.gameSystemId !== systemId) {
+          conflicts.gameSystemMismatch = true;
+          conflicts.gameSystemId = formData.form.gameSystemId;
+          warnings.push(
+            `Form was created for game system ${formData.form.gameSystemId} but importing to ${systemId}`
+          );
+        }
+
+        // Check for name conflicts
+        const [existingForm] = await fastify.db
+          .select()
+          .from(forms)
+          .where(
+            and(
+              eq(forms.gameSystemId, systemId),
+              eq(forms.name, formData.form.name),
+              eq(forms.ownerId, request.user.id)
+            )
+          )
+          .limit(1);
+
+        let finalName = formData.form.name;
+        if (existingForm) {
+          conflicts.nameConflict = true;
+          if (conflictResolution?.nameConflict === 'rename') {
+            finalName = `${formData.form.name} (Imported)`;
+          } else if (conflictResolution?.nameConflict !== 'replace') {
+            errors.push(`Form with name "${formData.form.name}" already exists`);
+          }
+        }
+
+        // Check for fragment ID conflicts (regenerate if needed)
+        let finalLayout = formData.form.layout;
+        let finalFragments = formData.form.fragments;
+
+        if (conflictResolution?.fragmentConflict === 'regenerate') {
+          // Regenerate all fragment IDs
+          const oldToNewIds = new Map<string, string>();
+
+          finalFragments = formData.form.fragments.map((fragment) => {
+            const newId = `fragment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            oldToNewIds.set(fragment.id, newId);
+            return { ...fragment, id: newId };
+          });
+
+          // Update fragment references in layout
+          const updateFragmentRefs = (nodes: any[]): any[] => {
+            return nodes.map((node) => {
+              if (node.type === 'fragmentRef' && oldToNewIds.has(node.fragmentId)) {
+                return { ...node, fragmentId: oldToNewIds.get(node.fragmentId) };
+              }
+              if (node.children) {
+                return { ...node, children: updateFragmentRefs(node.children) };
+              }
+              if (node.tabs) {
+                return {
+                  ...node,
+                  tabs: node.tabs.map((tab: any) => ({
+                    ...tab,
+                    children: updateFragmentRefs(tab.children),
+                  })),
+                };
+              }
+              if (node.then) {
+                node = { ...node, then: updateFragmentRefs(node.then) };
+              }
+              if (node.else) {
+                node = { ...node, else: updateFragmentRefs(node.else) };
+              }
+              if (node.itemTemplate) {
+                node = { ...node, itemTemplate: updateFragmentRefs(node.itemTemplate) };
+              }
+              return node;
+            });
+          };
+
+          finalLayout = updateFragmentRefs(formData.form.layout);
+        }
+
+        // If there are errors, return validation result
+        if (errors.length > 0) {
+          return reply.status(400).send({
+            validation: {
+              valid: false,
+              warnings,
+              errors,
+              conflicts,
+            },
+          });
+        }
+
+        // If replacing, delete the existing form
+        if (existingForm && conflictResolution?.nameConflict === 'replace') {
+          await fastify.db.delete(forms).where(eq(forms.id, existingForm.id));
+        }
+
+        // Create the imported form
+        const [newForm] = await fastify.db
+          .insert(forms)
+          .values({
+            name: finalName.trim(),
+            description: formData.form.description ?? null,
+            gameSystemId: systemId,
+            entityType: formData.form.entityType.trim(),
+            version: '1',
+            isDefault: false,
+            isLocked: false,
+            visibility: 'private',
+            licenseType: 'free',
+            price: '0.00',
+            ownerId: request.user.id,
+            layout: finalLayout,
+            fragments: finalFragments,
+            styles: formData.form.styles ?? {},
+            computedFields: formData.form.computedFields ?? [],
+            scripts: formData.form.scripts ?? [],
+          })
+          .returning();
+
+        // Format response
+        const formattedForm: FormDefinition = {
+          id: newForm.id,
+          name: newForm.name,
+          description: newForm.description ?? undefined,
+          gameSystemId: newForm.gameSystemId,
+          entityType: newForm.entityType,
+          version: parseInt(newForm.version, 10),
+          isDefault: newForm.isDefault,
+          isLocked: newForm.isLocked,
+          visibility: newForm.visibility as 'private' | 'campaign' | 'public' | 'marketplace',
+          licenseType: (newForm.licenseType || undefined) as 'free' | 'paid' | 'subscription' | undefined,
+          price: newForm.price ? parseFloat(newForm.price) : undefined,
+          ownerId: newForm.ownerId,
+          layout: newForm.layout as any,
+          fragments: newForm.fragments as any,
+          styles: newForm.styles as any,
+          computedFields: newForm.computedFields as any,
+          scripts: newForm.scripts ? (newForm.scripts as any) : undefined,
+          createdAt: newForm.createdAt,
+          updatedAt: newForm.updatedAt,
+        };
+
+        return reply.status(201).send({
+          form: formattedForm,
+          validation: {
+            valid: true,
+            warnings,
+            errors: [],
+            conflicts,
+          },
+        });
+      } catch (error) {
+        fastify.log.error(error, 'Failed to import form');
+        return reply.status(500).send({ error: 'Failed to import form' });
       }
     }
   );

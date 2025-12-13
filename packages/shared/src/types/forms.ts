@@ -6,6 +6,19 @@
  */
 
 // ============================================================================
+// Localization
+// ============================================================================
+
+/**
+ * Localized string that can either be a literal value or a locale key
+ * Falls back to literal if locale key is not found
+ */
+export interface LocalizedString {
+  literal?: string;      // Direct text value
+  localeKey?: string;    // Locale key for translation
+}
+
+// ============================================================================
 // Field Types
 // ============================================================================
 
@@ -34,7 +47,7 @@ export type FormFieldType =
  */
 export interface FormFieldTypeOptions {
   // Select field options
-  options?: { value: string; label: string; labelKey?: string }[];
+  options?: { value: string; label: LocalizedString }[];
 
   // Numeric constraints (number, slider, rating)
   min?: number;
@@ -43,8 +56,7 @@ export interface FormFieldTypeOptions {
 
   // Text field options
   multiline?: boolean;
-  placeholder?: string;
-  placeholderKey?: string;  // i18n key for placeholder
+  placeholder?: LocalizedString;
 
   // Reference field options
   entityType?: string;      // 'actor', 'item', etc.
@@ -52,6 +64,8 @@ export interface FormFieldTypeOptions {
 
   // Resource field options
   showMax?: boolean;        // Show max value input
+  showBar?: boolean;        // Show visual progress bar
+  barColor?: string;        // Color for progress bar
 
   // Image field options
   accept?: string;          // Accepted file types
@@ -59,10 +73,24 @@ export interface FormFieldTypeOptions {
 
   // Date field options
   includeTime?: boolean;    // Include time picker
+  format?: string;          // Date format string
 
   // Tags field options
   suggestions?: string[];   // Tag suggestions
   allowCustom?: boolean;    // Allow custom tags
+
+  // Rating field options
+  iconStyle?: 'stars' | 'circles' | 'pips';  // Icon style for rating
+
+  // Slider field options
+  showValue?: boolean;      // Show current value label
+  showTicks?: boolean;      // Show tick marks
+
+  // Rich text field options
+  showPreview?: boolean;    // Show markdown preview toggle
+
+  // Color field options
+  presets?: string[];       // Preset color palette (hex values)
 }
 
 // ============================================================================
@@ -128,10 +156,8 @@ export interface FieldNode extends BaseLayoutNode {
   type: 'field';
   fieldType: FormFieldType;
   binding: string;                      // Dot notation path to entity property
-  label?: string;                       // Display label
-  labelKey?: string;                    // i18n key for label
-  helpText?: string;                    // Help text
-  helpTextKey?: string;                 // i18n key for help text
+  label?: LocalizedString;              // Display label
+  helpText?: LocalizedString;           // Help text
   required?: boolean;                   // Whether field is required
   readonly?: boolean;                   // Whether field is read-only
   options?: FormFieldTypeOptions;       // Type-specific options
@@ -186,8 +212,7 @@ export interface ColumnsNode extends BaseLayoutNode {
  */
 export interface TabDefinition {
   id: string;
-  label: string;
-  labelKey?: string;                    // i18n key
+  label: LocalizedString;
   icon?: string;                        // Icon class or URL
   children: LayoutNode[];
 }
@@ -207,8 +232,7 @@ export interface TabsNode extends BaseLayoutNode {
  */
 export interface SectionNode extends BaseLayoutNode {
   type: 'section';
-  title?: string;
-  titleKey?: string;                    // i18n key
+  title?: LocalizedString;
   icon?: string;
   collapsible?: boolean;
   defaultCollapsed?: boolean;
@@ -220,8 +244,7 @@ export interface SectionNode extends BaseLayoutNode {
  */
 export interface GroupNode extends BaseLayoutNode {
   type: 'group';
-  title?: string;
-  titleKey?: string;                    // i18n key
+  title?: LocalizedString;
   border?: boolean;                     // Show border
   children: LayoutNode[];
 }
@@ -233,10 +256,8 @@ export interface RepeaterNode extends BaseLayoutNode {
   type: 'repeater';
   binding: string;                      // Path to array property
   itemTemplate: LayoutNode[];           // Template for each item
-  addLabel?: string;                    // Label for "Add" button
-  addLabelKey?: string;                 // i18n key
-  emptyMessage?: string;                // Message when empty
-  emptyMessageKey?: string;             // i18n key
+  addLabel?: LocalizedString;           // Label for "Add" button
+  emptyMessage?: LocalizedString;       // Message when empty
   minItems?: number;                    // Minimum number of items
   maxItems?: number;                    // Maximum number of items
   allowReorder?: boolean;               // Allow drag-and-drop reordering
@@ -258,8 +279,7 @@ export interface ConditionalNode extends BaseLayoutNode {
  */
 export interface StaticNode extends BaseLayoutNode {
   type: 'static';
-  content: string;                      // Content (may contain {{binding}} interpolation)
-  contentKey?: string;                  // i18n key
+  content: LocalizedString;             // Content (may contain {{binding}} interpolation)
   contentType?: 'text' | 'html' | 'markdown' | 'image' | 'icon';
   tag?: string;                         // HTML tag to use (default 'div')
   alt?: string;                         // Alt text for images
@@ -274,8 +294,7 @@ export interface StaticNode extends BaseLayoutNode {
 export interface ImageNode extends BaseLayoutNode {
   type: 'image';
   src: string;                          // URL or {{binding}} interpolation
-  alt?: string;
-  altKey?: string;                      // i18n key
+  alt?: LocalizedString;
   width?: string;
   height?: string;
   objectFit?: 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
@@ -315,8 +334,7 @@ export interface FragmentRefNode extends BaseLayoutNode {
 export interface ComputedNode extends BaseLayoutNode {
   type: 'computed';
   fieldId: string;                      // Reference to computed field definition
-  label?: string;
-  labelKey?: string;                    // i18n key
+  label?: LocalizedString;
   format?: string;                      // Format string for display (e.g., '{value} HP')
 }
 
@@ -470,6 +488,39 @@ export interface CampaignForm {
 }
 
 // ============================================================================
+// Form Versioning
+// ============================================================================
+
+/**
+ * Historical version of a form
+ */
+export interface FormVersion {
+  id: string;
+  formId: string;
+  version: number;
+  layout: LayoutNode[];
+  fragments: FormFragment[];
+  computedFields: FormComputedField[];
+  styles: FormStyles;
+  scripts?: string[];
+  changeNotes?: string;
+  createdBy?: string;
+  createdAt: Date;
+}
+
+/**
+ * Summary of a form version (without full layout data)
+ */
+export interface FormVersionSummary {
+  id: string;
+  formId: string;
+  version: number;
+  changeNotes?: string;
+  createdBy?: string;
+  createdAt: Date;
+}
+
+// ============================================================================
 // API Request Types
 // ============================================================================
 
@@ -501,6 +552,7 @@ export interface UpdateFormRequest {
   visibility?: 'private' | 'campaign' | 'public' | 'marketplace';
   licenseType?: 'free' | 'paid' | 'subscription';
   price?: number;
+  changeNotes?: string;  // Optional notes about this version change
 }
 
 /**
@@ -602,4 +654,97 @@ export interface FormValidationResponse {
 export interface FormPreviewResponse {
   form: FormDefinition;
   sampleData: Record<string, unknown>;  // Sample entity data for preview
+}
+
+/**
+ * Single form version response
+ */
+export interface FormVersionResponse {
+  version: FormVersion;
+}
+
+/**
+ * Multiple form versions response (summaries only)
+ */
+export interface FormVersionsListResponse {
+  versions: FormVersionSummary[];
+}
+
+/**
+ * Request to revert to a specific form version
+ */
+export interface RevertFormVersionRequest {
+  changeNotes?: string;
+}
+
+// ============================================================================
+// Form Import/Export
+// ============================================================================
+
+/**
+ * Form export format - complete standalone form package
+ */
+export interface FormExport {
+  exportVersion: string;  // "1.0"
+  exportedAt: string;     // ISO timestamp
+  form: {
+    name: string;
+    description?: string;
+    entityType: string;
+    gameSystemId?: string;
+    version: number;
+    layout: LayoutNode[];
+    fragments: FormFragment[];
+    computedFields: FormComputedField[];
+    styles: FormStyles;
+    scripts?: string[];
+  };
+  metadata: {
+    exportedBy?: string;
+    sourceUrl?: string;
+    license?: string;
+    notes?: string;
+  };
+}
+
+/**
+ * Form import validation result
+ */
+export interface FormImportValidation {
+  valid: boolean;
+  warnings: string[];
+  errors: string[];
+  conflicts: {
+    nameConflict?: boolean;
+    fragmentIdConflicts?: string[];
+    gameSystemMismatch?: boolean;
+    gameSystemId?: string;
+    missingDependencies?: string[];
+  };
+}
+
+/**
+ * Request to import a form
+ */
+export interface ImportFormRequest {
+  formData: FormExport;
+  conflictResolution?: {
+    nameConflict?: 'rename' | 'replace';  // How to handle duplicate names
+    fragmentConflict?: 'regenerate' | 'keep';  // How to handle fragment ID conflicts
+  };
+}
+
+/**
+ * Form export response
+ */
+export interface FormExportResponse {
+  export: FormExport;
+}
+
+/**
+ * Form import response
+ */
+export interface FormImportResponse {
+  form: FormDefinition;
+  validation: FormImportValidation;
 }

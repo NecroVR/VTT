@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, boolean, jsonb, numeric, index } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, uuid, boolean, jsonb, numeric, integer, index, unique } from 'drizzle-orm/pg-core';
 import { users } from './users.js';
 
 /**
@@ -42,4 +42,26 @@ export const forms = pgTable('forms', {
   entityTypeIdx: index('idx_forms_entity_type').on(table.entityType),
   ownerIdx: index('idx_forms_owner').on(table.ownerId),
   visibilityIdx: index('idx_forms_visibility').on(table.visibility),
+}));
+
+/**
+ * Form Versions table
+ * Stores historical versions of forms for rollback and comparison
+ */
+export const formVersions = pgTable('form_versions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  formId: uuid('form_id').notNull().references(() => forms.id, { onDelete: 'cascade' }),
+  version: integer('version').notNull(),
+  layout: jsonb('layout').notNull().default([]),
+  fragments: jsonb('fragments').default([]),
+  computedFields: jsonb('computed_fields').default([]),
+  styles: jsonb('styles').default({}),
+  scripts: jsonb('scripts').default([]),
+  changeNotes: text('change_notes'),
+  createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => ({
+  formIdIdx: index('form_versions_form_id_idx').on(table.formId),
+  createdAtIdx: index('form_versions_created_at_idx').on(table.createdAt),
+  formVersionUnique: unique('form_version_unique').on(table.formId, table.version),
 }));

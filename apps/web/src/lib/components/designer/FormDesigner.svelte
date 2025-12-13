@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { FormDefinition, FormFragment } from '@vtt/shared';
   import { formDesignerStore, canUndo, canRedo, isSaving, selectedNode } from '$lib/stores/formDesigner';
+  import { formsStore } from '$lib/stores/forms';
   import { goto } from '$app/navigation';
   import FormRenderer from '$lib/components/forms/FormRenderer.svelte';
   import ComponentPalette from './ComponentPalette.svelte';
@@ -11,6 +12,8 @@
   import PreviewPanel from './PreviewPanel.svelte';
   import FragmentLibrary from './FragmentLibrary.svelte';
   import FragmentEditor from './FragmentEditor.svelte';
+  import StyleEditor from './StyleEditor.svelte';
+  import ImportFormModal from './ImportFormModal.svelte';
 
   // Props
   interface Props {
@@ -31,6 +34,7 @@
   let saveError = $state<string | null>(null);
   let viewMode = $state<'canvas' | 'json'>('canvas');
   let showInlinePreview = $state(false);
+  let rightPanelTab = $state<'properties' | 'styles'>('properties');
 
   // Fragment editor state
   let fragmentEditorOpen = $state(false);
@@ -165,6 +169,53 @@
     fragmentEditorOpen = false;
     editingFragment = null;
   }
+
+  // Handle style updates
+  function handleUpdateStyles(styles: FormStyles) {
+    formDesignerStore.updateStyles(styles);
+  }
+
+  // Import modal state
+  let importModalOpen = $state(false);
+
+  // Handle export
+  async function handleExport() {
+    if (!formDefinition.id) return;
+
+    try {
+      const exportData = await formsStore.exportForm(formDefinition.id);
+
+      // Create filename
+      const timestamp = new Date().toISOString().split('T')[0];
+      const filename = `form-${formDefinition.name.toLowerCase().replace(/\s+/g, '-')}-v${formDefinition.version}-${timestamp}.json`;
+
+      // Download file
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      saveError = err instanceof Error ? err.message : 'Failed to export form';
+    }
+  }
+
+  // Handle import
+  function handleImport() {
+    importModalOpen = true;
+  }
+
+  // Handle imported form
+  function handleImported(event: CustomEvent) {
+    const form = event.detail;
+    saveError = null;
+    // Optionally navigate to the imported form or show success message
+    console.log('Form imported successfully:', form);
+  }
 </script>
 
 <div class="form-designer">
@@ -236,6 +287,22 @@
           </button>
         {/if}
       {/if}
+      <button
+        type="button"
+        class="btn btn-secondary"
+        onclick={handleExport}
+        title="Export form as JSON"
+      >
+        <i class="fas fa-download"></i> Export
+      </button>
+      <button
+        type="button"
+        class="btn btn-secondary"
+        onclick={handleImport}
+        title="Import form from JSON"
+      >
+        <i class="fas fa-upload"></i> Import
+      </button>
       <button
         type="button"
         class="btn btn-primary"
@@ -340,16 +407,36 @@
         </div>
       {/if}
 
-      <!-- Right Panel: Properties -->
+      <!-- Right Panel: Properties & Styles -->
       <div class="panel panel-right">
-        <div class="panel-header">
-          <h3>Properties</h3>
+        <div class="panel-tabs">
+          <button
+            class="panel-tab"
+            class:active={rightPanelTab === 'properties'}
+            onclick={() => rightPanelTab = 'properties'}
+          >
+            Properties
+          </button>
+          <button
+            class="panel-tab"
+            class:active={rightPanelTab === 'styles'}
+            onclick={() => rightPanelTab = 'styles'}
+          >
+            Styles
+          </button>
         </div>
         <div class="panel-content properties-panel">
-          <PropertyEditor
-            node={_selectedNode}
-            onUpdate={handleUpdateNode}
-          />
+          {#if rightPanelTab === 'properties'}
+            <PropertyEditor
+              node={_selectedNode}
+              onUpdate={handleUpdateNode}
+            />
+          {:else if store.form}
+            <StyleEditor
+              styles={store.form.styles}
+              onUpdate={handleUpdateStyles}
+            />
+          {/if}
         </div>
       </div>
     </div>
@@ -361,6 +448,13 @@
     isOpen={fragmentEditorOpen}
     onSave={handleSaveFragment}
     onCancel={handleCancelFragment}
+  />
+
+  <!-- Import Form Modal -->
+  <ImportFormModal
+    gameSystemId={formDefinition.gameSystemId}
+    bind:isOpen={importModalOpen}
+    on:imported={handleImported}
   />
 </div>
 
@@ -532,6 +626,35 @@
     font-weight: 600;
     text-transform: uppercase;
     color: var(--text-muted, #6c757d);
+  }
+
+  .panel-tabs {
+    display: flex;
+    background: var(--panel-header-bg, #f8f9fa);
+    border-bottom: 1px solid var(--border-color, #ddd);
+  }
+
+  .panel-tab {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-muted, #6c757d);
+    transition: all 0.2s;
+  }
+
+  .panel-tab:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .panel-tab.active {
+    color: var(--primary-color, #007bff);
+    border-bottom-color: var(--primary-color, #007bff);
+    background: white;
   }
 
   .panel-content {
