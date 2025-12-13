@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import type { ModuleEntity, ModuleEntityType } from '@vtt/shared';
+  import EntityImage from '../common/EntityImage.svelte';
 
   export let entities: ModuleEntity[];
   export let selectedEntityId: string | null = null;
@@ -96,11 +97,12 @@
           on:click={() => handleEntityClick(entity)}
         >
           <div class="card-thumbnail">
-            {#if entity.img}
-              <img src={entity.img} alt={entity.name} />
-            {:else}
-              <div class="card-icon">{getEntityTypeIcon(entity.entityType)}</div>
-            {/if}
+            <EntityImage
+              src={entity.img}
+              alt={entity.name}
+              entityType={entity.entityType}
+              size="large"
+            />
           </div>
 
           <div class="card-content">
@@ -139,11 +141,12 @@
           on:click={() => handleEntityClick(entity)}
         >
           <div class="row-thumbnail">
-            {#if entity.img}
-              <img src={entity.img} alt={entity.name} />
-            {:else}
-              <div class="row-icon">{getEntityTypeIcon(entity.entityType)}</div>
-            {/if}
+            <EntityImage
+              src={entity.img}
+              alt={entity.name}
+              entityType={entity.entityType}
+              size="medium"
+            />
           </div>
 
           <div class="row-info">

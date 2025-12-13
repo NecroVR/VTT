@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import type { CompendiumEntry, CompendiumEntityType } from '@vtt/shared';
+  import EntityImage from '../common/EntityImage.svelte';
 
   export let entry: CompendiumEntry;
   export let selected: boolean = false;
@@ -57,13 +58,12 @@
   tabindex="0"
 >
   <div class="entry-thumbnail">
-    {#if entry.img}
-      <img src={entry.img} alt={entry.name} />
-    {:else}
-      <div class="entry-icon">
-        {getEntityIcon(entry.entityType)}
-      </div>
-    {/if}
+    <EntityImage
+      src={entry.img}
+      alt={entry.name}
+      entityType={entry.entityType}
+      size="large"
+    />
   </div>
   <div class="entry-info">
     <div class="entry-name" title={entry.name}>

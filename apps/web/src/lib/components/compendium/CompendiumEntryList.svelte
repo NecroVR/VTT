@@ -2,6 +2,7 @@
   import { createEventDispatcher } from 'svelte';
   import type { CompendiumEntry } from '@vtt/shared';
   import CompendiumEntryCard from './CompendiumEntryCard.svelte';
+  import EntityImage from '../common/EntityImage.svelte';
 
   export let entries: CompendiumEntry[];
   export let selectedEntryId: string | null = null;
@@ -75,11 +76,12 @@
           tabindex="0"
         >
           <div class="row-thumbnail">
-            {#if entry.img}
-              <img src={entry.img} alt={entry.name} />
-            {:else}
-              <div class="row-icon">📄</div>
-            {/if}
+            <EntityImage
+              src={entry.img}
+              alt={entry.name}
+              entityType={entry.entityType}
+              size="medium"
+            />
           </div>
           <div class="row-info">
             <div class="row-name">{entry.name}</div>
