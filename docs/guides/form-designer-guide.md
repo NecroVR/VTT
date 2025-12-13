@@ -9,9 +9,10 @@
 6. [The Property Editor](#the-property-editor)
 7. [The Tree View](#the-tree-view)
 8. [Toolbar Actions](#toolbar-actions)
-9. [Working with Components](#working-with-components)
-10. [Tips and Best Practices](#tips-and-best-practices)
-11. [Common Workflows](#common-workflows)
+9. [The Preview Panel](#the-preview-panel)
+10. [Working with Components](#working-with-components)
+11. [Tips and Best Practices](#tips-and-best-practices)
+12. [Common Workflows](#common-workflows)
 
 ---
 
@@ -571,6 +572,161 @@ Saves your form to the server:
 - Shows an error banner if save fails
 
 **Tip**: Save frequently to avoid losing work!
+
+### Show/Hide Preview Button
+
+Toggles the inline preview panel:
+- Only visible in Design mode when viewing the Canvas
+- Click **Show Preview** to open a side-by-side preview panel
+- The preview panel appears between the Canvas and Properties panels
+- Click **Hide Preview** to close the preview panel and reclaim screen space
+- Use the preview panel to see real-time updates while editing
+
+See the [Preview Panel](#the-preview-panel) section for detailed information on using the preview features.
+
+---
+
+## The Preview Panel
+
+The Preview Panel is an inline preview that shows alongside your canvas, letting you see how your form renders in real-time as you make changes. This is different from the full-screen Preview mode accessed via the Preview button.
+
+### Opening the Preview Panel
+
+1. Make sure you're in Design mode (not Preview mode)
+2. Make sure you're viewing the Canvas (not JSON view)
+3. Click the **Show Preview** button in the toolbar
+4. The preview panel appears between the Canvas and Properties panels
+5. Click **Hide Preview** to close it
+
+### Preview Panel Features
+
+The preview panel includes several tools for testing your form:
+
+#### Sample Data Selection
+
+Choose different test entities to see how your form handles various data scenarios:
+
+- **Empty Entity** - Test empty states and placeholders
+- **Basic Character** - Minimal character data (name, class, level, race)
+- **Full Character** - Complete D&D 5e character with all fields populated
+- **Fighter Character** - Alternative full character example
+- **Custom JSON** - Provide your own test data as JSON
+
+**To select sample data:**
+1. Use the dropdown at the top of the preview panel
+2. Select a sample entity
+3. The form re-renders immediately with the new data
+4. Choose "Custom JSON" to provide your own test data
+
+#### View/Edit Mode Toggle
+
+Switch between view and edit modes to test both interaction styles:
+
+- **View Mode** - Read-only display of form data
+- **Edit Mode** - Interactive form with editable fields
+
+**To toggle mode:**
+1. Click the mode button in the preview controls
+2. The button shows the current mode (View or Edit)
+3. Click to switch between modes
+4. Changes are immediate
+
+#### Viewport Size Simulation
+
+Test how your form looks at different screen sizes:
+
+- **Mobile (📱)** - 375px width (smartphone)
+- **Tablet (📱)** - 768px width (tablet)
+- **Desktop (💻)** - 1024px width (standard monitor)
+- **Full (⬛)** - 100% of preview panel width
+
+**To change viewport size:**
+1. Click one of the viewport buttons
+2. The preview container resizes to the selected width
+3. The active viewport is highlighted
+4. A size badge at the bottom shows the current width
+5. Use this to ensure your form is responsive
+
+#### Custom JSON Data
+
+When you need to test with specific data:
+
+1. Select "Custom JSON" from the sample data dropdown
+2. A JSON editor appears below the controls
+3. Enter your test data as valid JSON
+4. Invalid JSON shows an error message
+5. The preview updates automatically when JSON is valid
+
+**Example custom JSON:**
+```json
+{
+  "name": "Test Character",
+  "class": "Wizard",
+  "level": 10,
+  "attributes": {
+    "intelligence": { "value": 18 }
+  }
+}
+```
+
+### Real-Time Updates
+
+The preview panel updates automatically when you:
+- Add or remove components
+- Change component properties
+- Modify field bindings
+- Reorder components
+- Update form structure
+
+You don't need to click a refresh button - changes appear instantly.
+
+### Preview vs Full Preview Mode
+
+**Preview Panel** (inline):
+- Shows alongside the canvas
+- Use for quick checks while editing
+- See changes in real-time
+- Doesn't hide the designer interface
+- Toggle on/off as needed
+
+**Preview Mode** (full-screen):
+- Accessed via the Preview button in toolbar
+- Hides the designer interface completely
+- Shows full-screen form renderer
+- Use for final testing
+- Click Design to return to editing
+
+### Tips for Using the Preview Panel
+
+**Test with Multiple Datasets:**
+- Start with Empty Entity to check placeholders
+- Use Basic Character for minimal data
+- Test Full Character for complex layouts
+- Create Custom JSON for edge cases
+
+**Check Responsiveness:**
+- Toggle between viewport sizes
+- Ensure layouts work on mobile
+- Check that multi-column grids collapse properly
+- Verify text doesn't overflow
+
+**Test Both Modes:**
+- View mode for read-only display
+- Edit mode to test field interactions
+- Make sure required fields are clearly marked
+- Check that validation works as expected
+
+**Keep It Open While Editing:**
+- The preview panel is designed to stay open
+- See changes instantly as you work
+- Close it when you need more screen space
+- Reopen it to verify your changes
+
+**Use with Tree View:**
+- Select components in the tree view
+- See them highlighted in both canvas and preview
+- Navigate complex forms easily
+- Understand the structure better
 
 ---
 

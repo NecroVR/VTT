@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { FormDefinition } from '@vtt/shared';
+  import type { FormDefinition, FormFragment } from '@vtt/shared';
   import { formDesignerStore, canUndo, canRedo, isSaving, selectedNode } from '$lib/stores/formDesigner';
   import { goto } from '$app/navigation';
   import FormRenderer from '$lib/components/forms/FormRenderer.svelte';
@@ -7,6 +7,10 @@
   import DesignerCanvas from './DesignerCanvas.svelte';
   import TreeView from './TreeView.svelte';
   import PropertyEditor from './PropertyEditor.svelte';
+  import JsonEditor from './JsonEditor.svelte';
+  import PreviewPanel from './PreviewPanel.svelte';
+  import FragmentLibrary from './FragmentLibrary.svelte';
+  import FragmentEditor from './FragmentEditor.svelte';
 
   // Props
   interface Props {
@@ -25,6 +29,12 @@
   // Local state
   let formName = $state(formDefinition.name);
   let saveError = $state<string | null>(null);
+  let viewMode = $state<'canvas' | 'json'>('canvas');
+  let showInlinePreview = $state(false);
+
+  // Fragment editor state
+  let fragmentEditorOpen = $state(false);
+  let editingFragment = $state<FormFragment | null>(null);
 
   // Initialize the store with the form
   $effect(() => {
@@ -102,6 +112,59 @@
       formDesignerStore.updateNode(store.selectedNodeId, updates);
     }
   }
+
+  // Handle JSON apply
+  function handleJsonApply(formJson: string) {
+    try {
+      const parsed = JSON.parse(formJson) as FormDefinition;
+      formDesignerStore.updateFromJson(parsed);
+      saveError = null;
+    } catch (err) {
+      saveError = err instanceof Error ? err.message : 'Failed to apply JSON changes';
+    }
+  }
+
+  // Toggle view mode
+  function toggleViewMode() {
+    viewMode = viewMode === 'canvas' ? 'json' : 'canvas';
+  }
+
+  // Toggle inline preview
+  function toggleInlinePreview() {
+    showInlinePreview = !showInlinePreview;
+  }
+
+  // Fragment CRUD handlers
+  function handleCreateFragment() {
+    editingFragment = null;
+    fragmentEditorOpen = true;
+  }
+
+  function handleEditFragment(fragment: FormFragment) {
+    editingFragment = fragment;
+    fragmentEditorOpen = true;
+  }
+
+  function handleDeleteFragment(fragmentId: string) {
+    formDesignerStore.deleteFragment(fragmentId);
+  }
+
+  function handleSaveFragment(fragmentData: Partial<FormFragment>) {
+    if (editingFragment && fragmentData.id) {
+      // Update existing fragment
+      formDesignerStore.updateFragment(fragmentData.id, fragmentData);
+    } else {
+      // Create new fragment
+      formDesignerStore.createFragment(fragmentData as Omit<FormFragment, 'id' | 'createdAt' | 'updatedAt'>);
+    }
+    fragmentEditorOpen = false;
+    editingFragment = null;
+  }
+
+  function handleCancelFragment() {
+    fragmentEditorOpen = false;
+    editingFragment = null;
+  }
 </script>
 
 <div class="form-designer">
@@ -153,6 +216,26 @@
       >
         {store.mode === 'design' ? 'Preview' : 'Design'}
       </button>
+      {#if store.mode === 'design'}
+        <button
+          type="button"
+          class="btn btn-secondary"
+          onclick={toggleViewMode}
+          title="Toggle between visual canvas and JSON editor"
+        >
+          {viewMode === 'canvas' ? 'JSON' : 'Canvas'}
+        </button>
+        {#if viewMode === 'canvas'}
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick={toggleInlinePreview}
+            title="Toggle inline preview panel"
+          >
+            {showInlinePreview ? 'Hide Preview' : 'Show Preview'}
+          </button>
+        {/if}
+      {/if}
       <button
         type="button"
         class="btn btn-primary"
@@ -183,9 +266,17 @@
         />
       {/if}
     </div>
+  {:else if viewMode === 'json'}
+    <!-- JSON Editor View -->
+    <div class="json-view">
+      <JsonEditor
+        form={store.form}
+        onApply={handleJsonApply}
+      />
+    </div>
   {:else}
-    <!-- Design Mode: Three-panel layout -->
-    <div class="designer-layout">
+    <!-- Design Mode: Three or Four-panel layout -->
+    <div class="designer-layout" class:with-preview={showInlinePreview}>
       <!-- Left Panel: Component Palette & Tree View -->
       <div class="panel panel-left">
         <div class="palette-section">
@@ -203,6 +294,17 @@
               layout={store.form.layout}
               selectedNodeId={store.selectedNodeId}
               onSelectNode={handleSelectNode}
+            />
+          {/if}
+        </div>
+
+        <div class="fragment-section">
+          {#if store.form}
+            <FragmentLibrary
+              fragments={store.form.fragments}
+              onCreateFragment={handleCreateFragment}
+              onEditFragment={handleEditFragment}
+              onDeleteFragment={handleDeleteFragment}
             />
           {/if}
         </div>
@@ -224,6 +326,20 @@
         </div>
       </div>
 
+      <!-- Preview Panel (optional) -->
+      {#if showInlinePreview}
+        <div class="panel panel-preview">
+          <div class="panel-header">
+            <h3>Preview</h3>
+          </div>
+          <div class="panel-content preview-panel-content">
+            {#if store.form}
+              <PreviewPanel form={store.form} />
+            {/if}
+          </div>
+        </div>
+      {/if}
+
       <!-- Right Panel: Properties -->
       <div class="panel panel-right">
         <div class="panel-header">
@@ -238,6 +354,14 @@
       </div>
     </div>
   {/if}
+
+  <!-- Fragment Editor Modal -->
+  <FragmentEditor
+    fragment={editingFragment}
+    isOpen={fragmentEditorOpen}
+    onSave={handleSaveFragment}
+    onCancel={handleCancelFragment}
+  />
 </div>
 
 <style>
@@ -361,6 +485,14 @@
     background: white;
   }
 
+  /* JSON View */
+  .json-view {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
   /* Designer Layout */
   .designer-layout {
     flex: 1;
@@ -368,6 +500,11 @@
     grid-template-columns: 250px 1fr 300px;
     gap: 0;
     overflow: hidden;
+  }
+
+  /* Four-panel layout when preview is visible */
+  .designer-layout.with-preview {
+    grid-template-columns: 250px 1fr 400px 300px;
   }
 
   /* Panels */
@@ -411,6 +548,10 @@
     padding: 0;
   }
 
+  .panel-content.preview-panel-content {
+    padding: 0;
+  }
+
   /* Left Panel */
   .panel-left {
     grid-column: 1;
@@ -437,6 +578,15 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    border-bottom: 1px solid var(--border-color, #ddd);
+  }
+
+  .fragment-section {
+    flex: 0 0 auto;
+    max-height: 30%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   /* Center Panel */
@@ -445,9 +595,20 @@
     background: var(--canvas-bg, #fafafa);
   }
 
+  /* Preview Panel */
+  .panel-preview {
+    grid-column: 3;
+    background: var(--bg-color, #fafafa);
+  }
+
   /* Right Panel */
   .panel-right {
     grid-column: 3;
+  }
+
+  /* Adjust right panel position when preview is visible */
+  .with-preview .panel-right {
+    grid-column: 4;
   }
 
   /* Placeholder Styles */
