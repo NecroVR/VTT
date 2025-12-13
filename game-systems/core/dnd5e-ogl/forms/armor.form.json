@@ -1,0 +1,570 @@
+{
+  "name": "D&D 5e Armor Card",
+  "description": "Comprehensive armor sheet for D&D 5th Edition armor and shields",
+  "entityType": "armor",
+  "version": "1.0.0",
+  "layout": [
+    {
+      "type": "section",
+      "id": "armor-header",
+      "title": "Armor Information",
+      "collapsible": false,
+      "children": [
+        {
+          "type": "field",
+          "id": "armor-name",
+          "fieldType": "text",
+          "binding": "name",
+          "label": "Armor Name",
+          "required": true,
+          "options": {
+            "placeholder": "Enter armor name"
+          }
+        },
+        {
+          "type": "grid",
+          "id": "header-grid",
+          "columns": 2,
+          "gap": "1rem",
+          "children": [
+            {
+              "type": "field",
+              "id": "armor-type",
+              "fieldType": "select",
+              "binding": "data.armorType",
+              "label": "Armor Type",
+              "required": true,
+              "options": {
+                "options": [
+                  { "value": "light", "label": "Light Armor" },
+                  { "value": "medium", "label": "Medium Armor" },
+                  { "value": "heavy", "label": "Heavy Armor" },
+                  { "value": "shield", "label": "Shield" }
+                ]
+              }
+            },
+            {
+              "type": "field",
+              "id": "armor-rarity",
+              "fieldType": "select",
+              "binding": "data.rarity",
+              "label": "Rarity",
+              "required": true,
+              "options": {
+                "options": [
+                  { "value": "common", "label": "Common" },
+                  { "value": "uncommon", "label": "Uncommon" },
+                  { "value": "rare", "label": "Rare" },
+                  { "value": "very-rare", "label": "Very Rare" },
+                  { "value": "legendary", "label": "Legendary" },
+                  { "value": "artifact", "label": "Artifact" }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "armor-stats",
+      "title": "Armor Statistics",
+      "collapsible": false,
+      "children": [
+        {
+          "type": "grid",
+          "id": "stats-grid",
+          "columns": 2,
+          "gap": "1rem",
+          "children": [
+            {
+              "type": "conditional",
+              "id": "base-ac-conditional",
+              "condition": {
+                "type": "simple",
+                "field": "data.armorType",
+                "operator": "not-equals",
+                "value": "shield"
+              },
+              "then": [
+                {
+                  "type": "field",
+                  "id": "base-ac",
+                  "fieldType": "number",
+                  "binding": "data.baseAC",
+                  "label": "Base AC",
+                  "required": true,
+                  "options": {
+                    "min": 10,
+                    "max": 20,
+                    "step": 1,
+                    "placeholder": "Base armor class"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "conditional",
+              "id": "shield-bonus-conditional",
+              "condition": {
+                "type": "simple",
+                "field": "data.armorType",
+                "operator": "equals",
+                "value": "shield"
+              },
+              "then": [
+                {
+                  "type": "field",
+                  "id": "shield-bonus",
+                  "fieldType": "number",
+                  "binding": "data.acBonus",
+                  "label": "AC Bonus",
+                  "required": true,
+                  "options": {
+                    "min": 1,
+                    "max": 5,
+                    "step": 1,
+                    "placeholder": "Shield AC bonus"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "conditional",
+              "id": "max-dex-conditional",
+              "condition": {
+                "type": "or",
+                "conditions": [
+                  {
+                    "type": "simple",
+                    "field": "data.armorType",
+                    "operator": "equals",
+                    "value": "medium"
+                  },
+                  {
+                    "type": "simple",
+                    "field": "data.armorType",
+                    "operator": "equals",
+                    "value": "heavy"
+                  }
+                ]
+              },
+              "then": [
+                {
+                  "type": "field",
+                  "id": "max-dex-bonus",
+                  "fieldType": "number",
+                  "binding": "data.maxDexBonus",
+                  "label": "Max Dex Bonus",
+                  "options": {
+                    "min": 0,
+                    "max": 5,
+                    "step": 1,
+                    "placeholder": "Maximum Dexterity bonus"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "conditional",
+              "id": "strength-req-conditional",
+              "condition": {
+                "type": "simple",
+                "field": "data.armorType",
+                "operator": "equals",
+                "value": "heavy"
+              },
+              "then": [
+                {
+                  "type": "field",
+                  "id": "strength-requirement",
+                  "fieldType": "number",
+                  "binding": "data.strengthRequirement",
+                  "label": "Strength Requirement",
+                  "options": {
+                    "min": 0,
+                    "max": 20,
+                    "step": 1,
+                    "placeholder": "Required Strength score"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "field",
+              "id": "stealth-disadvantage",
+              "fieldType": "checkbox",
+              "binding": "data.stealthDisadvantage",
+              "label": "Imposes Stealth Disadvantage"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "physical-properties",
+      "title": "Physical Properties",
+      "collapsible": false,
+      "children": [
+        {
+          "type": "grid",
+          "id": "physical-grid",
+          "columns": 2,
+          "gap": "1rem",
+          "children": [
+            {
+              "type": "field",
+              "id": "armor-weight",
+              "fieldType": "number",
+              "binding": "data.weight",
+              "label": "Weight (lb)",
+              "options": {
+                "min": 0,
+                "step": 0.1,
+                "placeholder": "Weight in pounds"
+              }
+            },
+            {
+              "type": "field",
+              "id": "armor-cost",
+              "fieldType": "number",
+              "binding": "data.cost",
+              "label": "Cost (gp)",
+              "options": {
+                "min": 0,
+                "step": 0.01,
+                "placeholder": "Cost in gold pieces"
+              }
+            },
+            {
+              "type": "field",
+              "id": "don-time",
+              "fieldType": "select",
+              "binding": "data.donTime",
+              "label": "Don Time",
+              "options": {
+                "options": [
+                  { "value": "1-action", "label": "1 Action" },
+                  { "value": "1-minute", "label": "1 Minute" },
+                  { "value": "5-minutes", "label": "5 Minutes" },
+                  { "value": "10-minutes", "label": "10 Minutes" }
+                ]
+              }
+            },
+            {
+              "type": "field",
+              "id": "doff-time",
+              "fieldType": "select",
+              "binding": "data.doffTime",
+              "label": "Doff Time",
+              "options": {
+                "options": [
+                  { "value": "1-action", "label": "1 Action" },
+                  { "value": "1-minute", "label": "1 Minute" },
+                  { "value": "5-minutes", "label": "5 Minutes" },
+                  { "value": "10-minutes", "label": "10 Minutes" }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "attunement-section",
+      "title": "Attunement",
+      "collapsible": true,
+      "defaultCollapsed": false,
+      "children": [
+        {
+          "type": "field",
+          "id": "requires-attunement",
+          "fieldType": "checkbox",
+          "binding": "data.requiresAttunement",
+          "label": "Requires Attunement"
+        },
+        {
+          "type": "conditional",
+          "id": "attunement-requirements-conditional",
+          "condition": {
+            "type": "simple",
+            "field": "data.requiresAttunement",
+            "operator": "equals",
+            "value": true
+          },
+          "then": [
+            {
+              "type": "field",
+              "id": "attunement-requirements",
+              "fieldType": "text",
+              "binding": "data.attunementRequirements",
+              "label": "Attunement Requirements",
+              "options": {
+                "placeholder": "e.g., by a cleric, paladin, or other good-aligned character"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "description-section",
+      "title": "Description",
+      "collapsible": false,
+      "children": [
+        {
+          "type": "field",
+          "id": "armor-description",
+          "fieldType": "richtext",
+          "binding": "data.description",
+          "label": "Description",
+          "options": {
+            "multiline": true,
+            "placeholder": "Enter detailed description of the armor...",
+            "showPreview": true
+          }
+        },
+        {
+          "type": "field",
+          "id": "armor-appearance",
+          "fieldType": "text",
+          "binding": "data.appearance",
+          "label": "Appearance",
+          "options": {
+            "placeholder": "Describe the armor's visual appearance"
+          }
+        }
+      ]
+    },
+    {
+      "type": "conditional",
+      "id": "magic-properties-conditional",
+      "condition": {
+        "type": "simple",
+        "field": "data.rarity",
+        "operator": "not-equals",
+        "value": "common"
+      },
+      "then": [
+        {
+          "type": "section",
+          "id": "magic-properties",
+          "title": "Magic Properties",
+          "collapsible": true,
+          "defaultCollapsed": false,
+          "children": [
+            {
+              "type": "grid",
+              "id": "magic-grid",
+              "columns": 2,
+              "gap": "1rem",
+              "children": [
+                {
+                  "type": "field",
+                  "id": "magic-ac-bonus",
+                  "fieldType": "number",
+                  "binding": "data.magicACBonus",
+                  "label": "Magic AC Bonus",
+                  "options": {
+                    "min": 0,
+                    "max": 3,
+                    "step": 1,
+                    "placeholder": "+1, +2, +3"
+                  }
+                },
+                {
+                  "type": "field",
+                  "id": "has-charges",
+                  "fieldType": "checkbox",
+                  "binding": "data.hasCharges",
+                  "label": "Has Charges"
+                }
+              ]
+            },
+            {
+              "type": "field",
+              "id": "additional-effects",
+              "fieldType": "richtext",
+              "binding": "data.additionalEffects",
+              "label": "Additional Magical Effects",
+              "options": {
+                "multiline": true,
+                "placeholder": "Describe any additional magical properties...",
+                "showPreview": true
+              }
+            },
+            {
+              "type": "conditional",
+              "id": "charges-conditional",
+              "condition": {
+                "type": "simple",
+                "field": "data.hasCharges",
+                "operator": "equals",
+                "value": true
+              },
+              "then": [
+                {
+                  "type": "grid",
+                  "id": "charges-grid",
+                  "columns": 2,
+                  "gap": "1rem",
+                  "children": [
+                    {
+                      "type": "field",
+                      "id": "max-charges",
+                      "fieldType": "number",
+                      "binding": "data.charges.max",
+                      "label": "Maximum Charges",
+                      "options": {
+                        "min": 1,
+                        "max": 50,
+                        "step": 1,
+                        "placeholder": "Maximum number of charges"
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "current-charges",
+                      "fieldType": "number",
+                      "binding": "data.charges.current",
+                      "label": "Current Charges",
+                      "options": {
+                        "min": 0,
+                        "max": 50,
+                        "step": 1,
+                        "placeholder": "Current number of charges"
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "charge-recovery",
+                      "fieldType": "text",
+                      "binding": "data.charges.recovery",
+                      "label": "Charge Recovery",
+                      "options": {
+                        "placeholder": "e.g., 1d6+4 charges at dawn"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "field",
+              "id": "special-abilities",
+              "fieldType": "repeater",
+              "binding": "data.specialAbilities",
+              "label": "Special Abilities",
+              "options": {
+                "addButtonText": "Add Ability",
+                "removeButtonText": "Remove",
+                "minItems": 0,
+                "maxItems": 10,
+                "itemTemplate": {
+                  "type": "grid",
+                  "id": "ability-template",
+                  "columns": 1,
+                  "gap": "0.5rem",
+                  "children": [
+                    {
+                      "type": "field",
+                      "id": "ability-name",
+                      "fieldType": "text",
+                      "binding": "name",
+                      "label": "Ability Name",
+                      "required": true,
+                      "options": {
+                        "placeholder": "Name of the special ability"
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "ability-description",
+                      "fieldType": "richtext",
+                      "binding": "description",
+                      "label": "Description",
+                      "required": true,
+                      "options": {
+                        "multiline": true,
+                        "placeholder": "Describe the ability and its effects...",
+                        "showPreview": false
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "ability-activation",
+                      "fieldType": "text",
+                      "binding": "activation",
+                      "label": "Activation",
+                      "options": {
+                        "placeholder": "e.g., 1 action, 1 bonus action"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "computed-stats",
+      "title": "Computed Statistics",
+      "collapsible": true,
+      "defaultCollapsed": true,
+      "children": [
+        {
+          "type": "static",
+          "id": "computed-info",
+          "content": "These values are automatically calculated based on armor properties.",
+          "contentType": "text",
+          "tag": "p",
+          "className": "help-text"
+        },
+        {
+          "type": "grid",
+          "id": "computed-grid",
+          "columns": 1,
+          "gap": "1rem",
+          "children": [
+            {
+              "type": "field",
+              "id": "total-ac",
+              "fieldType": "computed",
+              "binding": "data.totalAC",
+              "label": "Total AC (with magic bonus)",
+              "options": {
+                "readonly": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "fragments": [],
+  "styles": {
+    "theme": "default",
+    "customCSS": ".help-text { font-size: 0.9rem; color: #666; margin-bottom: 1rem; } .field-label { font-weight: 600; margin-bottom: 0.5rem; display: block; }"
+  },
+  "computedFields": [
+    {
+      "id": "total-ac-computation",
+      "binding": "data.totalAC",
+      "formula": {
+        "type": "expression",
+        "expression": "(data.armorType === 'shield' ? 0 : (data.baseAC || 0)) + (data.magicACBonus || 0)"
+      },
+      "dependencies": [
+        "data.armorType",
+        "data.baseAC",
+        "data.magicACBonus"
+      ]
+    }
+  ]
+}

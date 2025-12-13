@@ -622,14 +622,39 @@ This checklist tracks the implementation of the Form Designer System across mult
   - [x] Material components (conditional)
   - [x] Tags field for classes
   - Note: 327 lines
-- [ ] Item card form (`item.form.json`)
-  - [ ] Header (name, type, rarity)
-  - [ ] Properties (weight, cost)
-  - [ ] Description
-  - [ ] Type-specific properties
-- [ ] Weapon card form (`weapon.form.json`)
-- [ ] Armor card form (`armor.form.json`)
-- [ ] NPC sheet form (`npc.form.json`)
+- [x] Item card form (`item.form.json`)
+  - [x] Header (name, type, rarity)
+  - [x] Properties (weight, cost)
+  - [x] Description
+  - [x] Type-specific properties (weapon, armor, shield, consumable, tool, container)
+  - [x] Magical item properties (bonus, abilities, charges)
+  - [x] Computed fields for totals
+  - Note: ~1014 lines, comprehensive type-specific conditionals
+- [x] Weapon card form (`weapon.form.json`)
+  - [x] Header (name, category, rarity)
+  - [x] Combat stats (damage dice, type, attack bonus, range)
+  - [x] Properties (all 10 D&D weapon properties)
+  - [x] Conditional versatile/thrown fields
+  - [x] Physical properties (weight, cost, attunement)
+  - [x] Magic properties (conditional on rarity)
+  - Note: ~407 lines, computed fields for totals
+- [x] Armor card form (`armor.form.json`)
+  - [x] Header (name, type, rarity)
+  - [x] Armor stats (AC, dex bonus, strength req, stealth)
+  - [x] Physical properties (weight, cost, don/doff time)
+  - [x] Attunement (conditional)
+  - [x] Magic properties with abilities repeater
+  - [x] Computed total AC field
+  - Note: ~479 lines, type-specific conditionals
+- [x] NPC sheet form (`npc.form.json`)
+  - [x] Header (name, title, race, occupation, alignment)
+  - [x] Quick stats (AC, HP, speed, abilities)
+  - [x] Roleplay (personality, ideals, bonds, flaws, mannerisms)
+  - [x] Appearance (physical description, distinguishing features)
+  - [x] Social (location, faction, relationships, attitude)
+  - [x] Secrets & plot hooks (GM only tab)
+  - [x] Combat section (conditional)
+  - Note: ~560 lines, roleplay-focused with optional combat
 
 ---
 
@@ -652,6 +677,7 @@ Use this section to track progress across sessions.
 | 2025-12-12 | 0090 | Phase 6 | Accessibility (6.6), Documentation (6.7), Final Testing (6.8), Performance (6.4) | Parallel agent work |
 | 2025-12-12 | 0091 | Phase 6 | Copy/Paste (6.2), Keyboard Nav (6.5), Security fixes (XSS, CSS, formula limits) | Security hardening |
 | 2025-12-12 | 0091 | Forms | Character sheet, Monster stat block, Spell card default forms | D&D 5e forms created |
+| 2025-12-12 | 0092 | Forms | Item, Weapon, Armor, NPC forms - all D&D 5e default forms complete | Form Designer 100% complete |
 
 ### Current Blockers
 
@@ -683,7 +709,7 @@ _None currently - see proposal for resolved decisions_
 | Phase 4: Advanced Features | Complete | 2025-12-12 | 2025-12-12 |
 | Phase 5: Marketplace | **SKIPPED** | - | - |
 | Phase 6: Polish | **Complete** | 2025-12-12 | 2025-12-12 |
-| Default Forms | In Progress | 2025-12-12 | |
+| Default Forms | **Complete** | 2025-12-12 | 2025-12-12 |
 
 **Phase 6 Complete**: All polish and optimization features implemented (6.1-6.8):
 - Undo/Redo system with history panel (snapshot-based, 50 operation depth)
@@ -699,5 +725,9 @@ _None currently - see proposal for resolved decisions_
 - D&D 5e Character Sheet (~2097 lines, 30 computed fields, 4 tabs)
 - D&D 5e Monster Stat Block (~1000+ lines, conditional sections)
 - D&D 5e Spell Card (327 lines, conditional material components)
+- D&D 5e Item Card (~1014 lines, type-specific properties, magical items)
+- D&D 5e Weapon Card (~407 lines, properties, magic, computed fields)
+- D&D 5e Armor Card (~479 lines, type conditionals, magic abilities)
+- D&D 5e NPC Sheet (~560 lines, roleplay-focused, optional combat)
 
-**Overall Progress**: ~95% (excluding skipped Phase 5)
+**Overall Progress**: 100% COMPLETE (excluding skipped Phase 5 Marketplace)

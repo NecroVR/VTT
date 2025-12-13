@@ -1,0 +1,1140 @@
+{
+  "name": "D&D 5e NPC Sheet",
+  "description": "Roleplay-focused NPC sheet for D&D 5th Edition - more detailed than monsters, optimized for social encounters",
+  "entityType": "actor",
+  "version": "1.0.0",
+  "layout": [
+    {
+      "type": "section",
+      "id": "npc-header",
+      "title": "NPC Identity",
+      "collapsible": false,
+      "children": [
+        {
+          "type": "grid",
+          "id": "header-grid",
+          "columns": 2,
+          "gap": "1rem",
+          "children": [
+            {
+              "type": "field",
+              "id": "npc-name",
+              "fieldType": "text",
+              "binding": "name",
+              "label": "NPC Name",
+              "required": true,
+              "options": {
+                "placeholder": "Elara Moonwhisper"
+              }
+            },
+            {
+              "type": "field",
+              "id": "title-role",
+              "fieldType": "text",
+              "binding": "data.titleRole",
+              "label": "Title/Role",
+              "options": {
+                "placeholder": "Tavern Owner, Guard Captain, Merchant"
+              }
+            }
+          ]
+        },
+        {
+          "type": "grid",
+          "id": "basic-info-grid",
+          "columns": 4,
+          "gap": "0.75rem",
+          "children": [
+            {
+              "type": "field",
+              "id": "race",
+              "fieldType": "select",
+              "binding": "data.race",
+              "label": "Race",
+              "options": {
+                "options": [
+                  { "value": "human", "label": "Human" },
+                  { "value": "elf", "label": "Elf" },
+                  { "value": "dwarf", "label": "Dwarf" },
+                  { "value": "halfling", "label": "Halfling" },
+                  { "value": "gnome", "label": "Gnome" },
+                  { "value": "half-elf", "label": "Half-Elf" },
+                  { "value": "half-orc", "label": "Half-Orc" },
+                  { "value": "tiefling", "label": "Tiefling" },
+                  { "value": "dragonborn", "label": "Dragonborn" },
+                  { "value": "other", "label": "Other" }
+                ]
+              }
+            },
+            {
+              "type": "field",
+              "id": "occupation",
+              "fieldType": "text",
+              "binding": "data.occupation",
+              "label": "Occupation/Class",
+              "options": {
+                "placeholder": "Blacksmith, Wizard, Fighter"
+              }
+            },
+            {
+              "type": "field",
+              "id": "alignment",
+              "fieldType": "select",
+              "binding": "data.alignment",
+              "label": "Alignment",
+              "options": {
+                "options": [
+                  { "value": "lg", "label": "Lawful Good" },
+                  { "value": "ng", "label": "Neutral Good" },
+                  { "value": "cg", "label": "Chaotic Good" },
+                  { "value": "ln", "label": "Lawful Neutral" },
+                  { "value": "tn", "label": "True Neutral" },
+                  { "value": "cn", "label": "Chaotic Neutral" },
+                  { "value": "le", "label": "Lawful Evil" },
+                  { "value": "ne", "label": "Neutral Evil" },
+                  { "value": "ce", "label": "Chaotic Evil" }
+                ]
+              }
+            },
+            {
+              "type": "field",
+              "id": "cr-level",
+              "fieldType": "text",
+              "binding": "data.crLevel",
+              "label": "CR/Level",
+              "options": {
+                "placeholder": "CR 2 or Level 5"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "tabs",
+      "id": "main-tabs",
+      "position": "top",
+      "tabs": [
+        {
+          "id": "roleplay-tab",
+          "label": "Roleplay",
+          "children": [
+            {
+              "type": "section",
+              "id": "personality-section",
+              "title": "Personality",
+              "collapsible": false,
+              "children": [
+                {
+                  "type": "grid",
+                  "id": "personality-grid",
+                  "columns": 1,
+                  "gap": "0.75rem",
+                  "children": [
+                    {
+                      "type": "field",
+                      "id": "personality-traits",
+                      "fieldType": "textarea",
+                      "binding": "data.personality.traits",
+                      "label": "Personality Traits",
+                      "options": {
+                        "multiline": true,
+                        "placeholder": "Cheerful and optimistic. Always sees the best in people. Talks quickly when excited."
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "ideals",
+                      "fieldType": "textarea",
+                      "binding": "data.personality.ideals",
+                      "label": "Ideals",
+                      "options": {
+                        "multiline": true,
+                        "placeholder": "Freedom. Everyone deserves to make their own choices."
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "bonds",
+                      "fieldType": "textarea",
+                      "binding": "data.personality.bonds",
+                      "label": "Bonds",
+                      "options": {
+                        "multiline": true,
+                        "placeholder": "I would die to protect my family. The town depends on my shop."
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "flaws",
+                      "fieldType": "textarea",
+                      "binding": "data.personality.flaws",
+                      "label": "Flaws",
+                      "options": {
+                        "multiline": true,
+                        "placeholder": "I'm terrible with money. Can't resist a good gambling game."
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "id": "voice-mannerisms",
+              "title": "Voice & Mannerisms",
+              "collapsible": true,
+              "defaultCollapsed": false,
+              "children": [
+                {
+                  "type": "grid",
+                  "id": "voice-grid",
+                  "columns": 1,
+                  "gap": "0.75rem",
+                  "children": [
+                    {
+                      "type": "field",
+                      "id": "mannerisms",
+                      "fieldType": "text",
+                      "binding": "data.voice.mannerisms",
+                      "label": "Mannerisms",
+                      "options": {
+                        "placeholder": "Taps fingers when thinking, fidgets with jewelry, clears throat often"
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "voice-notes",
+                      "fieldType": "text",
+                      "binding": "data.voice.notes",
+                      "label": "Voice Notes",
+                      "options": {
+                        "placeholder": "Deep gravelly voice, Scottish accent, speaks slowly and deliberately"
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "catchphrase",
+                      "fieldType": "text",
+                      "binding": "data.voice.catchphrase",
+                      "label": "Catchphrase/Common Saying",
+                      "options": {
+                        "placeholder": "As my father used to say..."
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "id": "appearance-section",
+              "title": "Appearance",
+              "collapsible": true,
+              "defaultCollapsed": false,
+              "children": [
+                {
+                  "type": "grid",
+                  "id": "appearance-basic-grid",
+                  "columns": 3,
+                  "gap": "0.75rem",
+                  "children": [
+                    {
+                      "type": "field",
+                      "id": "age",
+                      "fieldType": "text",
+                      "binding": "data.appearance.age",
+                      "label": "Age",
+                      "options": {
+                        "placeholder": "Mid-40s"
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "height",
+                      "fieldType": "text",
+                      "binding": "data.appearance.height",
+                      "label": "Height",
+                      "options": {
+                        "placeholder": "5'8\""
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "build",
+                      "fieldType": "text",
+                      "binding": "data.appearance.build",
+                      "label": "Build",
+                      "options": {
+                        "placeholder": "Stocky, Athletic, Thin"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "field",
+                  "id": "physical-description",
+                  "fieldType": "textarea",
+                  "binding": "data.appearance.description",
+                  "label": "Physical Description",
+                  "options": {
+                    "multiline": true,
+                    "placeholder": "Detailed physical appearance - hair color, eye color, facial features, overall impression"
+                  }
+                },
+                {
+                  "type": "field",
+                  "id": "distinguishing-features",
+                  "fieldType": "tags",
+                  "binding": "data.appearance.distinguishingFeatures",
+                  "label": "Distinguishing Features",
+                  "options": {
+                    "allowCustom": true,
+                    "suggestions": ["scar", "tattoo", "missing finger", "limp", "eyepatch", "burn marks", "unique jewelry"]
+                  }
+                },
+                {
+                  "type": "field",
+                  "id": "typical-attire",
+                  "fieldType": "text",
+                  "binding": "data.appearance.attire",
+                  "label": "Typical Attire",
+                  "options": {
+                    "placeholder": "Fine merchant's clothes, leather apron, city guard uniform"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "id": "social-section",
+              "title": "Social Information",
+              "collapsible": true,
+              "defaultCollapsed": false,
+              "children": [
+                {
+                  "type": "grid",
+                  "id": "social-grid",
+                  "columns": 2,
+                  "gap": "0.75rem",
+                  "children": [
+                    {
+                      "type": "field",
+                      "id": "location",
+                      "fieldType": "text",
+                      "binding": "data.social.location",
+                      "label": "Usual Location",
+                      "options": {
+                        "placeholder": "The Prancing Pony tavern, North Gate guardhouse"
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "faction",
+                      "fieldType": "text",
+                      "binding": "data.social.faction",
+                      "label": "Faction/Organization",
+                      "options": {
+                        "placeholder": "Merchant's Guild, Harpers, City Watch"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "field",
+                  "id": "attitude",
+                  "fieldType": "select",
+                  "binding": "data.social.attitude",
+                  "label": "Attitude Toward Party",
+                  "options": {
+                    "options": [
+                      { "value": "friendly", "label": "Friendly" },
+                      { "value": "helpful", "label": "Helpful" },
+                      { "value": "indifferent", "label": "Indifferent" },
+                      { "value": "suspicious", "label": "Suspicious" },
+                      { "value": "unfriendly", "label": "Unfriendly" },
+                      { "value": "hostile", "label": "Hostile" }
+                    ]
+                  }
+                },
+                {
+                  "type": "section",
+                  "id": "relationships-section",
+                  "title": "Relationships",
+                  "collapsible": true,
+                  "defaultCollapsed": false,
+                  "children": [
+                    {
+                      "type": "repeater",
+                      "id": "relationships-repeater",
+                      "binding": "data.social.relationships",
+                      "addLabel": "Add Relationship",
+                      "emptyMessage": "No relationships defined",
+                      "allowReorder": true,
+                      "allowDelete": true,
+                      "itemTemplate": [
+                        {
+                          "type": "grid",
+                          "id": "relationship-grid",
+                          "columns": "2fr 1fr",
+                          "gap": "0.5rem",
+                          "children": [
+                            {
+                              "type": "field",
+                              "id": "relationship-name",
+                              "fieldType": "text",
+                              "binding": "name",
+                              "label": "Person/Group",
+                              "options": {
+                                "placeholder": "Lord Harrington, Thieves' Guild"
+                              }
+                            },
+                            {
+                              "type": "field",
+                              "id": "relationship-type",
+                              "fieldType": "select",
+                              "binding": "type",
+                              "label": "Type",
+                              "options": {
+                                "options": [
+                                  { "value": "family", "label": "Family" },
+                                  { "value": "friend", "label": "Friend" },
+                                  { "value": "rival", "label": "Rival" },
+                                  { "value": "enemy", "label": "Enemy" },
+                                  { "value": "employer", "label": "Employer" },
+                                  { "value": "employee", "label": "Employee" },
+                                  { "value": "ally", "label": "Ally" },
+                                  { "value": "other", "label": "Other" }
+                                ]
+                              }
+                            },
+                            {
+                              "type": "field",
+                              "id": "relationship-notes",
+                              "fieldType": "textarea",
+                              "binding": "notes",
+                              "label": "Notes",
+                              "options": {
+                                "multiline": true,
+                                "placeholder": "Details about this relationship"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "stats-tab",
+          "label": "Stats",
+          "children": [
+            {
+              "type": "section",
+              "id": "quick-stats",
+              "title": "Quick Stats",
+              "collapsible": false,
+              "children": [
+                {
+                  "type": "grid",
+                  "id": "combat-basics-grid",
+                  "columns": 3,
+                  "gap": "1rem",
+                  "children": [
+                    {
+                      "type": "field",
+                      "id": "armor-class",
+                      "fieldType": "number",
+                      "binding": "data.combat.armorClass",
+                      "label": "Armor Class",
+                      "options": {
+                        "min": 1,
+                        "max": 30
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "hit-points",
+                      "fieldType": "resource",
+                      "binding": "data.hitPoints",
+                      "label": "Hit Points",
+                      "options": {
+                        "showMax": true,
+                        "showBar": true,
+                        "barColor": "#dc3545"
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "speed",
+                      "fieldType": "number",
+                      "binding": "data.combat.speed",
+                      "label": "Speed (ft)",
+                      "options": {
+                        "min": 0,
+                        "step": 5
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "id": "ability-scores",
+              "title": "Ability Scores",
+              "collapsible": true,
+              "defaultCollapsed": false,
+              "children": [
+                {
+                  "type": "grid",
+                  "id": "abilities-grid",
+                  "columns": 6,
+                  "gap": "0.5rem",
+                  "children": [
+                    {
+                      "type": "group",
+                      "id": "str-group",
+                      "title": "STR",
+                      "border": true,
+                      "children": [
+                        {
+                          "type": "field",
+                          "id": "strength",
+                          "fieldType": "number",
+                          "binding": "data.abilities.strength.value",
+                          "label": "Score",
+                          "options": {
+                            "min": 1,
+                            "max": 30
+                          }
+                        },
+                        {
+                          "type": "computed",
+                          "id": "str-mod",
+                          "fieldId": "str-mod-calc",
+                          "label": "Mod",
+                          "format": "{value}"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "group",
+                      "id": "dex-group",
+                      "title": "DEX",
+                      "border": true,
+                      "children": [
+                        {
+                          "type": "field",
+                          "id": "dexterity",
+                          "fieldType": "number",
+                          "binding": "data.abilities.dexterity.value",
+                          "label": "Score",
+                          "options": {
+                            "min": 1,
+                            "max": 30
+                          }
+                        },
+                        {
+                          "type": "computed",
+                          "id": "dex-mod",
+                          "fieldId": "dex-mod-calc",
+                          "label": "Mod",
+                          "format": "{value}"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "group",
+                      "id": "con-group",
+                      "title": "CON",
+                      "border": true,
+                      "children": [
+                        {
+                          "type": "field",
+                          "id": "constitution",
+                          "fieldType": "number",
+                          "binding": "data.abilities.constitution.value",
+                          "label": "Score",
+                          "options": {
+                            "min": 1,
+                            "max": 30
+                          }
+                        },
+                        {
+                          "type": "computed",
+                          "id": "con-mod",
+                          "fieldId": "con-mod-calc",
+                          "label": "Mod",
+                          "format": "{value}"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "group",
+                      "id": "int-group",
+                      "title": "INT",
+                      "border": true,
+                      "children": [
+                        {
+                          "type": "field",
+                          "id": "intelligence",
+                          "fieldType": "number",
+                          "binding": "data.abilities.intelligence.value",
+                          "label": "Score",
+                          "options": {
+                            "min": 1,
+                            "max": 30
+                          }
+                        },
+                        {
+                          "type": "computed",
+                          "id": "int-mod",
+                          "fieldId": "int-mod-calc",
+                          "label": "Mod",
+                          "format": "{value}"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "group",
+                      "id": "wis-group",
+                      "title": "WIS",
+                      "border": true,
+                      "children": [
+                        {
+                          "type": "field",
+                          "id": "wisdom",
+                          "fieldType": "number",
+                          "binding": "data.abilities.wisdom.value",
+                          "label": "Score",
+                          "options": {
+                            "min": 1,
+                            "max": 30
+                          }
+                        },
+                        {
+                          "type": "computed",
+                          "id": "wis-mod",
+                          "fieldId": "wis-mod-calc",
+                          "label": "Mod",
+                          "format": "{value}"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "group",
+                      "id": "cha-group",
+                      "title": "CHA",
+                      "border": true,
+                      "children": [
+                        {
+                          "type": "field",
+                          "id": "charisma",
+                          "fieldType": "number",
+                          "binding": "data.abilities.charisma.value",
+                          "label": "Score",
+                          "options": {
+                            "min": 1,
+                            "max": 30
+                          }
+                        },
+                        {
+                          "type": "computed",
+                          "id": "cha-mod",
+                          "fieldId": "cha-mod-calc",
+                          "label": "Mod",
+                          "format": "{value}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "conditional",
+              "id": "combat-conditional",
+              "condition": {
+                "type": "simple",
+                "field": "data.combat.isCombatant",
+                "operator": "equals",
+                "value": true
+              },
+              "then": [
+                {
+                  "type": "section",
+                  "id": "combat-section",
+                  "title": "Combat Abilities",
+                  "collapsible": true,
+                  "defaultCollapsed": false,
+                  "children": [
+                    {
+                      "type": "field",
+                      "id": "is-combatant-toggle",
+                      "fieldType": "checkbox",
+                      "binding": "data.combat.isCombatant",
+                      "label": "Is Combatant"
+                    },
+                    {
+                      "type": "section",
+                      "id": "attacks-section",
+                      "title": "Attacks",
+                      "collapsible": true,
+                      "defaultCollapsed": false,
+                      "children": [
+                        {
+                          "type": "repeater",
+                          "id": "attacks-repeater",
+                          "binding": "data.combat.attacks",
+                          "addLabel": "Add Attack",
+                          "emptyMessage": "No attacks defined",
+                          "allowReorder": true,
+                          "allowDelete": true,
+                          "itemTemplate": [
+                            {
+                              "type": "grid",
+                              "id": "attack-grid",
+                              "columns": "2fr 1fr 1fr",
+                              "gap": "0.5rem",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "attack-name",
+                                  "fieldType": "text",
+                                  "binding": "name",
+                                  "label": "Attack Name",
+                                  "options": {
+                                    "placeholder": "Longsword, Shortbow"
+                                  }
+                                },
+                                {
+                                  "type": "field",
+                                  "id": "attack-bonus",
+                                  "fieldType": "text",
+                                  "binding": "attackBonus",
+                                  "label": "Attack Bonus",
+                                  "options": {
+                                    "placeholder": "+5"
+                                  }
+                                },
+                                {
+                                  "type": "field",
+                                  "id": "attack-damage",
+                                  "fieldType": "text",
+                                  "binding": "damage",
+                                  "label": "Damage",
+                                  "options": {
+                                    "placeholder": "1d8+3 slashing"
+                                  }
+                                },
+                                {
+                                  "type": "field",
+                                  "id": "attack-notes",
+                                  "fieldType": "textarea",
+                                  "binding": "notes",
+                                  "label": "Notes",
+                                  "options": {
+                                    "multiline": true,
+                                    "placeholder": "Range, special properties, etc."
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "section",
+                      "id": "special-abilities-section",
+                      "title": "Special Abilities",
+                      "collapsible": true,
+                      "defaultCollapsed": false,
+                      "children": [
+                        {
+                          "type": "repeater",
+                          "id": "abilities-repeater",
+                          "binding": "data.combat.specialAbilities",
+                          "addLabel": "Add Ability",
+                          "emptyMessage": "No special abilities",
+                          "allowReorder": true,
+                          "allowDelete": true,
+                          "itemTemplate": [
+                            {
+                              "type": "field",
+                              "id": "ability-name",
+                              "fieldType": "text",
+                              "binding": "name",
+                              "label": "Ability Name",
+                              "options": {
+                                "placeholder": "Second Wind, Action Surge"
+                              }
+                            },
+                            {
+                              "type": "field",
+                              "id": "ability-description",
+                              "fieldType": "textarea",
+                              "binding": "description",
+                              "label": "Description",
+                              "options": {
+                                "multiline": true,
+                                "placeholder": "Ability description and mechanics"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "else": [
+                {
+                  "type": "field",
+                  "id": "is-combatant-checkbox",
+                  "fieldType": "checkbox",
+                  "binding": "data.combat.isCombatant",
+                  "label": "Is Combatant (enable to add combat abilities)"
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "id": "skills-languages",
+              "title": "Skills & Languages",
+              "collapsible": true,
+              "defaultCollapsed": true,
+              "children": [
+                {
+                  "type": "field",
+                  "id": "skills",
+                  "fieldType": "tags",
+                  "binding": "data.skills",
+                  "label": "Notable Skills",
+                  "options": {
+                    "allowCustom": true,
+                    "suggestions": ["Persuasion", "Deception", "Insight", "Perception", "Stealth", "Investigation", "History", "Arcana", "Religion", "Nature", "Medicine", "Survival", "Athletics", "Acrobatics", "Performance", "Intimidation"]
+                  }
+                },
+                {
+                  "type": "field",
+                  "id": "languages",
+                  "fieldType": "tags",
+                  "binding": "data.languages",
+                  "label": "Languages",
+                  "options": {
+                    "allowCustom": true,
+                    "suggestions": ["Common", "Elvish", "Dwarvish", "Draconic", "Giant", "Gnomish", "Goblin", "Halfling", "Orc", "Abyssal", "Celestial", "Infernal", "Primordial", "Sylvan", "Undercommon"]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "secrets-tab",
+          "label": "Secrets & Plot",
+          "children": [
+            {
+              "type": "section",
+              "id": "gm-notes-warning",
+              "collapsible": false,
+              "children": [
+                {
+                  "type": "static",
+                  "id": "gm-warning",
+                  "content": "GM ONLY - This tab contains secret information not known to players",
+                  "contentType": "text",
+                  "tag": "p",
+                  "className": "gm-warning"
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "id": "secrets-section",
+              "title": "Secrets",
+              "collapsible": true,
+              "defaultCollapsed": false,
+              "children": [
+                {
+                  "type": "field",
+                  "id": "secrets",
+                  "fieldType": "richtext",
+                  "binding": "data.secrets.hidden",
+                  "label": "Secrets & Hidden Information",
+                  "options": {
+                    "multiline": true,
+                    "placeholder": "What secrets does this NPC hide? Hidden identities, past crimes, forbidden knowledge..."
+                  }
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "id": "knowledge-section",
+              "title": "What They Know",
+              "collapsible": true,
+              "defaultCollapsed": false,
+              "children": [
+                {
+                  "type": "field",
+                  "id": "knowledge",
+                  "fieldType": "richtext",
+                  "binding": "data.secrets.knowledge",
+                  "label": "Information & Knowledge",
+                  "options": {
+                    "multiline": true,
+                    "placeholder": "What does this NPC know that could help or hinder the party? Rumors, facts, observations..."
+                  }
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "id": "plot-hooks-section",
+              "title": "Plot Hooks",
+              "collapsible": true,
+              "defaultCollapsed": false,
+              "children": [
+                {
+                  "type": "repeater",
+                  "id": "plot-hooks-repeater",
+                  "binding": "data.secrets.plotHooks",
+                  "addLabel": "Add Plot Hook",
+                  "emptyMessage": "No plot hooks defined",
+                  "allowReorder": true,
+                  "allowDelete": true,
+                  "itemTemplate": [
+                    {
+                      "type": "field",
+                      "id": "hook-title",
+                      "fieldType": "text",
+                      "binding": "title",
+                      "label": "Hook Title",
+                      "options": {
+                        "placeholder": "The Missing Shipment"
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "hook-description",
+                      "fieldType": "textarea",
+                      "binding": "description",
+                      "label": "Description",
+                      "options": {
+                        "multiline": true,
+                        "placeholder": "Quest or story thread this NPC can provide"
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "hook-trigger",
+                      "fieldType": "text",
+                      "binding": "trigger",
+                      "label": "Trigger Condition",
+                      "options": {
+                        "placeholder": "After party completes quest X, if Persuasion DC 15"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "id": "motivations-section",
+              "title": "True Motivations",
+              "collapsible": true,
+              "defaultCollapsed": false,
+              "children": [
+                {
+                  "type": "field",
+                  "id": "motivations",
+                  "fieldType": "richtext",
+                  "binding": "data.secrets.motivations",
+                  "label": "Hidden Motivations & Goals",
+                  "options": {
+                    "multiline": true,
+                    "placeholder": "What does this NPC really want? What drives their actions behind the scenes?"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "notes-tab",
+          "label": "Notes",
+          "children": [
+            {
+              "type": "section",
+              "id": "backstory-section",
+              "title": "Backstory",
+              "collapsible": true,
+              "defaultCollapsed": false,
+              "children": [
+                {
+                  "type": "field",
+                  "id": "backstory",
+                  "fieldType": "richtext",
+                  "binding": "data.backstory",
+                  "label": "Background & History",
+                  "options": {
+                    "multiline": true,
+                    "placeholder": "Where did this NPC come from? What shaped them into who they are today?"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "id": "general-notes-section",
+              "title": "GM Notes",
+              "collapsible": true,
+              "defaultCollapsed": false,
+              "children": [
+                {
+                  "type": "field",
+                  "id": "gm-notes",
+                  "fieldType": "richtext",
+                  "binding": "data.notes",
+                  "label": "General Notes",
+                  "options": {
+                    "multiline": true,
+                    "placeholder": "Session notes, interaction history, changes to NPC over campaign..."
+                  }
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "id": "inventory-section",
+              "title": "Possessions & Inventory",
+              "collapsible": true,
+              "defaultCollapsed": true,
+              "children": [
+                {
+                  "type": "repeater",
+                  "id": "inventory-repeater",
+                  "binding": "data.inventory",
+                  "addLabel": "Add Item",
+                  "emptyMessage": "No items listed",
+                  "allowReorder": true,
+                  "allowDelete": true,
+                  "itemTemplate": [
+                    {
+                      "type": "grid",
+                      "id": "item-grid",
+                      "columns": "2fr 1fr",
+                      "gap": "0.5rem",
+                      "children": [
+                        {
+                          "type": "field",
+                          "id": "item-name",
+                          "fieldType": "text",
+                          "binding": "name",
+                          "label": "Item",
+                          "options": {
+                            "placeholder": "Gold locket, Masterwork tools"
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "item-quantity",
+                          "fieldType": "number",
+                          "binding": "quantity",
+                          "label": "Quantity",
+                          "options": {
+                            "min": 1,
+                            "step": 1
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "item-notes",
+                          "fieldType": "textarea",
+                          "binding": "notes",
+                          "label": "Notes",
+                          "options": {
+                            "multiline": true,
+                            "placeholder": "Significance or details about this item"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "fragments": [],
+  "styles": {
+    "theme": "default",
+    "variables": {
+      "--npc-header-bg": "#e8f4f8",
+      "--gm-warning-bg": "#fff3cd",
+      "--gm-warning-border": "#ffc107"
+    },
+    "customCSS": ".gm-warning { background: var(--gm-warning-bg); border-left: 4px solid var(--gm-warning-border); padding: 1rem; margin-bottom: 1rem; font-weight: bold; }"
+  },
+  "computedFields": [
+    {
+      "id": "str-mod-calc",
+      "name": "Strength Modifier",
+      "description": "Strength ability modifier",
+      "formula": "Math.floor((@abilities.strength.value - 10) / 2)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.strength.value"]
+    },
+    {
+      "id": "dex-mod-calc",
+      "name": "Dexterity Modifier",
+      "description": "Dexterity ability modifier",
+      "formula": "Math.floor((@abilities.dexterity.value - 10) / 2)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.dexterity.value"]
+    },
+    {
+      "id": "con-mod-calc",
+      "name": "Constitution Modifier",
+      "description": "Constitution ability modifier",
+      "formula": "Math.floor((@abilities.constitution.value - 10) / 2)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.constitution.value"]
+    },
+    {
+      "id": "int-mod-calc",
+      "name": "Intelligence Modifier",
+      "description": "Intelligence ability modifier",
+      "formula": "Math.floor((@abilities.intelligence.value - 10) / 2)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.intelligence.value"]
+    },
+    {
+      "id": "wis-mod-calc",
+      "name": "Wisdom Modifier",
+      "description": "Wisdom ability modifier",
+      "formula": "Math.floor((@abilities.wisdom.value - 10) / 2)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.wisdom.value"]
+    },
+    {
+      "id": "cha-mod-calc",
+      "name": "Charisma Modifier",
+      "description": "Charisma ability modifier",
+      "formula": "Math.floor((@abilities.charisma.value - 10) / 2)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.charisma.value"]
+    }
+  ]
+}

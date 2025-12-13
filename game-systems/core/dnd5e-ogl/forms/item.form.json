@@ -1,8 +1,8 @@
 {
   "name": "D&D 5e Item Sheet",
-  "description": "Default item sheet for D&D 5th Edition weapons, armor, and equipment",
+  "description": "Comprehensive item sheet for D&D 5th Edition weapons, armor, equipment, and consumables with type-specific properties",
   "entityType": "item",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "layout": [
     {
       "type": "section",
@@ -37,13 +37,19 @@
                 "options": [
                   { "value": "weapon", "label": "Weapon" },
                   { "value": "armor", "label": "Armor" },
+                  { "value": "shield", "label": "Shield" },
                   { "value": "potion", "label": "Potion" },
                   { "value": "scroll", "label": "Scroll" },
                   { "value": "wand", "label": "Wand" },
+                  { "value": "staff", "label": "Staff" },
+                  { "value": "rod", "label": "Rod" },
                   { "value": "ring", "label": "Ring" },
+                  { "value": "amulet", "label": "Amulet" },
+                  { "value": "tool", "label": "Tool" },
                   { "value": "equipment", "label": "Equipment" },
                   { "value": "consumable", "label": "Consumable" },
-                  { "value": "treasure", "label": "Treasure" }
+                  { "value": "treasure", "label": "Treasure" },
+                  { "value": "container", "label": "Container" }
                 ]
               }
             }
@@ -78,56 +84,895 @@
           "label": "Properties",
           "children": [
             {
-              "type": "grid",
-              "id": "properties-grid",
-              "columns": 2,
-              "gap": "1rem",
+              "type": "section",
+              "id": "basic-properties",
+              "title": "Basic Properties",
+              "collapsible": false,
+              "children": [
+                {
+                  "type": "grid",
+                  "id": "properties-grid",
+                  "columns": 2,
+                  "gap": "1rem",
+                  "children": [
+                    {
+                      "type": "field",
+                      "id": "item-rarity",
+                      "fieldType": "select",
+                      "binding": "data.rarity",
+                      "label": "Rarity",
+                      "options": {
+                        "options": [
+                          { "value": "common", "label": "Common" },
+                          { "value": "uncommon", "label": "Uncommon" },
+                          { "value": "rare", "label": "Rare" },
+                          { "value": "very-rare", "label": "Very Rare" },
+                          { "value": "legendary", "label": "Legendary" },
+                          { "value": "artifact", "label": "Artifact" }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "item-attunement",
+                      "fieldType": "checkbox",
+                      "binding": "data.requiresAttunement",
+                      "label": "Requires Attunement"
+                    },
+                    {
+                      "type": "field",
+                      "id": "item-weight",
+                      "fieldType": "number",
+                      "binding": "data.weight",
+                      "label": "Weight (lb)",
+                      "options": {
+                        "min": 0,
+                        "step": 0.1
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "item-value",
+                      "fieldType": "number",
+                      "binding": "data.value",
+                      "label": "Value (gp)",
+                      "options": {
+                        "min": 0,
+                        "step": 0.01
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "item-quantity",
+                      "fieldType": "number",
+                      "binding": "data.quantity",
+                      "label": "Quantity",
+                      "options": {
+                        "min": 1,
+                        "step": 1
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "item-equipped",
+                      "fieldType": "checkbox",
+                      "binding": "data.equipped",
+                      "label": "Equipped"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "conditional",
+              "id": "weapon-properties-conditional",
+              "condition": {
+                "type": "simple",
+                "field": "data.type",
+                "operator": "equals",
+                "value": "weapon"
+              },
+              "then": [
+                {
+                  "type": "section",
+                  "id": "weapon-properties",
+                  "title": "Weapon Properties",
+                  "collapsible": false,
+                  "children": [
+                    {
+                      "type": "grid",
+                      "id": "weapon-basic-grid",
+                      "columns": 2,
+                      "gap": "1rem",
+                      "children": [
+                        {
+                          "type": "field",
+                          "id": "weapon-category",
+                          "fieldType": "select",
+                          "binding": "data.weapon.category",
+                          "label": "Weapon Category",
+                          "options": {
+                            "options": [
+                              { "value": "simple", "label": "Simple" },
+                              { "value": "martial", "label": "Martial" }
+                            ]
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "weapon-range-type",
+                          "fieldType": "select",
+                          "binding": "data.weapon.rangeType",
+                          "label": "Range Type",
+                          "options": {
+                            "options": [
+                              { "value": "melee", "label": "Melee" },
+                              { "value": "ranged", "label": "Ranged" }
+                            ]
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "weapon-attack-bonus",
+                          "fieldType": "number",
+                          "binding": "data.weapon.attackBonus",
+                          "label": "Attack Bonus",
+                          "options": {
+                            "placeholder": "0",
+                            "step": 1
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "weapon-proficient",
+                          "fieldType": "checkbox",
+                          "binding": "data.weapon.proficient",
+                          "label": "Proficient"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "divider",
+                      "id": "weapon-divider-1",
+                      "orientation": "horizontal"
+                    },
+                    {
+                      "type": "grid",
+                      "id": "weapon-damage-grid",
+                      "columns": 3,
+                      "gap": "1rem",
+                      "children": [
+                        {
+                          "type": "field",
+                          "id": "weapon-damage-dice",
+                          "fieldType": "text",
+                          "binding": "data.weapon.damage.dice",
+                          "label": "Damage Dice",
+                          "options": {
+                            "placeholder": "1d8, 2d6, etc."
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "weapon-damage-type",
+                          "fieldType": "select",
+                          "binding": "data.weapon.damage.type",
+                          "label": "Damage Type",
+                          "options": {
+                            "options": [
+                              { "value": "slashing", "label": "Slashing" },
+                              { "value": "piercing", "label": "Piercing" },
+                              { "value": "bludgeoning", "label": "Bludgeoning" },
+                              { "value": "acid", "label": "Acid" },
+                              { "value": "cold", "label": "Cold" },
+                              { "value": "fire", "label": "Fire" },
+                              { "value": "force", "label": "Force" },
+                              { "value": "lightning", "label": "Lightning" },
+                              { "value": "necrotic", "label": "Necrotic" },
+                              { "value": "poison", "label": "Poison" },
+                              { "value": "psychic", "label": "Psychic" },
+                              { "value": "radiant", "label": "Radiant" },
+                              { "value": "thunder", "label": "Thunder" }
+                            ]
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "weapon-damage-bonus",
+                          "fieldType": "number",
+                          "binding": "data.weapon.damage.bonus",
+                          "label": "Damage Bonus",
+                          "options": {
+                            "placeholder": "0",
+                            "step": 1
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "divider",
+                      "id": "weapon-divider-2",
+                      "orientation": "horizontal"
+                    },
+                    {
+                      "type": "grid",
+                      "id": "weapon-range-grid",
+                      "columns": 2,
+                      "gap": "1rem",
+                      "children": [
+                        {
+                          "type": "field",
+                          "id": "weapon-range-normal",
+                          "fieldType": "number",
+                          "binding": "data.weapon.range.normal",
+                          "label": "Normal Range (ft)",
+                          "options": {
+                            "min": 0,
+                            "step": 5,
+                            "placeholder": "5 for melee, 80 for shortbow"
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "weapon-range-long",
+                          "fieldType": "number",
+                          "binding": "data.weapon.range.long",
+                          "label": "Long Range (ft)",
+                          "options": {
+                            "min": 0,
+                            "step": 5,
+                            "placeholder": "320 for shortbow"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "divider",
+                      "id": "weapon-divider-3",
+                      "orientation": "horizontal"
+                    },
+                    {
+                      "type": "field",
+                      "id": "weapon-properties",
+                      "fieldType": "tags",
+                      "binding": "data.weapon.properties",
+                      "label": "Weapon Properties",
+                      "options": {
+                        "allowCustom": true,
+                        "suggestions": [
+                          "Ammunition",
+                          "Finesse",
+                          "Heavy",
+                          "Light",
+                          "Loading",
+                          "Reach",
+                          "Thrown",
+                          "Two-Handed",
+                          "Versatile",
+                          "Special",
+                          "Silvered",
+                          "Adamantine"
+                        ]
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "weapon-versatile-damage",
+                      "fieldType": "text",
+                      "binding": "data.weapon.versatileDamage",
+                      "label": "Versatile Damage (if applicable)",
+                      "options": {
+                        "placeholder": "1d10"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "conditional",
+              "id": "armor-properties-conditional",
+              "condition": {
+                "type": "simple",
+                "field": "data.type",
+                "operator": "equals",
+                "value": "armor"
+              },
+              "then": [
+                {
+                  "type": "section",
+                  "id": "armor-properties",
+                  "title": "Armor Properties",
+                  "collapsible": false,
+                  "children": [
+                    {
+                      "type": "grid",
+                      "id": "armor-grid",
+                      "columns": 2,
+                      "gap": "1rem",
+                      "children": [
+                        {
+                          "type": "field",
+                          "id": "armor-type",
+                          "fieldType": "select",
+                          "binding": "data.armor.type",
+                          "label": "Armor Type",
+                          "options": {
+                            "options": [
+                              { "value": "light", "label": "Light Armor" },
+                              { "value": "medium", "label": "Medium Armor" },
+                              { "value": "heavy", "label": "Heavy Armor" }
+                            ]
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "armor-base-ac",
+                          "fieldType": "number",
+                          "binding": "data.armor.baseAC",
+                          "label": "Base Armor Class",
+                          "options": {
+                            "min": 10,
+                            "max": 30,
+                            "step": 1,
+                            "placeholder": "11 for leather, 18 for plate"
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "armor-dex-bonus",
+                          "fieldType": "select",
+                          "binding": "data.armor.dexBonus",
+                          "label": "Dexterity Bonus",
+                          "options": {
+                            "options": [
+                              { "value": "full", "label": "Full DEX Modifier (Light)" },
+                              { "value": "max2", "label": "Max +2 DEX (Medium)" },
+                              { "value": "none", "label": "No DEX Bonus (Heavy)" }
+                            ]
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "armor-strength-req",
+                          "fieldType": "number",
+                          "binding": "data.armor.strengthRequirement",
+                          "label": "Strength Requirement",
+                          "options": {
+                            "min": 0,
+                            "max": 20,
+                            "step": 1,
+                            "placeholder": "13 for ring mail, 15 for plate"
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "armor-stealth-disadvantage",
+                          "fieldType": "checkbox",
+                          "binding": "data.armor.stealthDisadvantage",
+                          "label": "Stealth Disadvantage"
+                        },
+                        {
+                          "type": "field",
+                          "id": "armor-ac-bonus",
+                          "fieldType": "number",
+                          "binding": "data.armor.acBonus",
+                          "label": "AC Bonus (magical)",
+                          "options": {
+                            "min": 0,
+                            "max": 3,
+                            "step": 1,
+                            "placeholder": "+1, +2, +3"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "conditional",
+              "id": "shield-properties-conditional",
+              "condition": {
+                "type": "simple",
+                "field": "data.type",
+                "operator": "equals",
+                "value": "shield"
+              },
+              "then": [
+                {
+                  "type": "section",
+                  "id": "shield-properties",
+                  "title": "Shield Properties",
+                  "collapsible": false,
+                  "children": [
+                    {
+                      "type": "grid",
+                      "id": "shield-grid",
+                      "columns": 2,
+                      "gap": "1rem",
+                      "children": [
+                        {
+                          "type": "field",
+                          "id": "shield-ac-bonus",
+                          "fieldType": "number",
+                          "binding": "data.shield.acBonus",
+                          "label": "AC Bonus",
+                          "options": {
+                            "min": 0,
+                            "max": 5,
+                            "step": 1,
+                            "placeholder": "2 for normal shield"
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "shield-magical-bonus",
+                          "fieldType": "number",
+                          "binding": "data.shield.magicalBonus",
+                          "label": "Magical Bonus",
+                          "options": {
+                            "min": 0,
+                            "max": 3,
+                            "step": 1,
+                            "placeholder": "+1, +2, +3"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "conditional",
+              "id": "consumable-properties-conditional",
+              "condition": {
+                "type": "or",
+                "conditions": [
+                  {
+                    "type": "simple",
+                    "field": "data.type",
+                    "operator": "equals",
+                    "value": "consumable"
+                  },
+                  {
+                    "type": "simple",
+                    "field": "data.type",
+                    "operator": "equals",
+                    "value": "potion"
+                  },
+                  {
+                    "type": "simple",
+                    "field": "data.type",
+                    "operator": "equals",
+                    "value": "scroll"
+                  }
+                ]
+              },
+              "then": [
+                {
+                  "type": "section",
+                  "id": "consumable-properties",
+                  "title": "Consumable Properties",
+                  "collapsible": false,
+                  "children": [
+                    {
+                      "type": "grid",
+                      "id": "consumable-grid",
+                      "columns": 2,
+                      "gap": "1rem",
+                      "children": [
+                        {
+                          "type": "field",
+                          "id": "consumable-charges",
+                          "fieldType": "resource",
+                          "binding": "data.consumable.charges",
+                          "label": "Charges",
+                          "options": {
+                            "showMax": true,
+                            "showBar": true,
+                            "barColor": "#28a745"
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "consumable-recovery",
+                          "fieldType": "select",
+                          "binding": "data.consumable.recovery",
+                          "label": "Recovery",
+                          "options": {
+                            "options": [
+                              { "value": "none", "label": "No Recovery (Single Use)" },
+                              { "value": "short-rest", "label": "Short Rest" },
+                              { "value": "long-rest", "label": "Long Rest" },
+                              { "value": "dawn", "label": "Daily at Dawn" },
+                              { "value": "week", "label": "Weekly" }
+                            ]
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "consumable-charges-per-recovery",
+                          "fieldType": "text",
+                          "binding": "data.consumable.chargesPerRecovery",
+                          "label": "Charges Recovered",
+                          "options": {
+                            "placeholder": "1d3, all, half, etc."
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "consumable-destroyed-on-use",
+                          "fieldType": "checkbox",
+                          "binding": "data.consumable.destroyedOnUse",
+                          "label": "Destroyed When Used"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "divider",
+                      "id": "consumable-divider",
+                      "orientation": "horizontal"
+                    },
+                    {
+                      "type": "field",
+                      "id": "consumable-usage-effect",
+                      "fieldType": "richtext",
+                      "binding": "data.consumable.usageEffect",
+                      "label": "Usage Effect",
+                      "options": {
+                        "multiline": true,
+                        "placeholder": "Describe what happens when consumed..."
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "conditional",
+              "id": "tool-properties-conditional",
+              "condition": {
+                "type": "simple",
+                "field": "data.type",
+                "operator": "equals",
+                "value": "tool"
+              },
+              "then": [
+                {
+                  "type": "section",
+                  "id": "tool-properties",
+                  "title": "Tool Properties",
+                  "collapsible": false,
+                  "children": [
+                    {
+                      "type": "grid",
+                      "id": "tool-grid",
+                      "columns": 2,
+                      "gap": "1rem",
+                      "children": [
+                        {
+                          "type": "field",
+                          "id": "tool-proficiency-type",
+                          "fieldType": "select",
+                          "binding": "data.tool.proficiencyType",
+                          "label": "Tool Category",
+                          "options": {
+                            "options": [
+                              { "value": "artisan", "label": "Artisan's Tools" },
+                              { "value": "gaming", "label": "Gaming Set" },
+                              { "value": "musical", "label": "Musical Instrument" },
+                              { "value": "thieves", "label": "Thieves' Tools" },
+                              { "value": "vehicle", "label": "Vehicle" },
+                              { "value": "other", "label": "Other" }
+                            ]
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "tool-proficient",
+                          "fieldType": "checkbox",
+                          "binding": "data.tool.proficient",
+                          "label": "Proficient"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "field",
+                      "id": "tool-associated-skills",
+                      "fieldType": "tags",
+                      "binding": "data.tool.associatedSkills",
+                      "label": "Associated Skills",
+                      "options": {
+                        "allowCustom": true,
+                        "suggestions": [
+                          "Acrobatics",
+                          "Animal Handling",
+                          "Arcana",
+                          "Athletics",
+                          "Deception",
+                          "History",
+                          "Insight",
+                          "Intimidation",
+                          "Investigation",
+                          "Medicine",
+                          "Nature",
+                          "Perception",
+                          "Performance",
+                          "Persuasion",
+                          "Religion",
+                          "Sleight of Hand",
+                          "Stealth",
+                          "Survival"
+                        ]
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "tool-usage-notes",
+                      "fieldType": "textarea",
+                      "binding": "data.tool.usageNotes",
+                      "label": "Usage Notes",
+                      "options": {
+                        "multiline": true,
+                        "placeholder": "Describe how this tool is used and what checks it enables..."
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "conditional",
+              "id": "container-properties-conditional",
+              "condition": {
+                "type": "simple",
+                "field": "data.type",
+                "operator": "equals",
+                "value": "container"
+              },
+              "then": [
+                {
+                  "type": "section",
+                  "id": "container-properties",
+                  "title": "Container Properties",
+                  "collapsible": false,
+                  "children": [
+                    {
+                      "type": "grid",
+                      "id": "container-grid",
+                      "columns": 2,
+                      "gap": "1rem",
+                      "children": [
+                        {
+                          "type": "field",
+                          "id": "container-capacity",
+                          "fieldType": "number",
+                          "binding": "data.container.capacity",
+                          "label": "Capacity (cubic feet)",
+                          "options": {
+                            "min": 0,
+                            "step": 0.1,
+                            "placeholder": "1 for backpack, 12 for chest"
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "container-weight-capacity",
+                          "fieldType": "number",
+                          "binding": "data.container.weightCapacity",
+                          "label": "Weight Capacity (lb)",
+                          "options": {
+                            "min": 0,
+                            "step": 1,
+                            "placeholder": "30 for backpack"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "magical-properties",
+          "label": "Magical Properties",
+          "children": [
+            {
+              "type": "section",
+              "id": "magic-section",
+              "title": "Magical Item Properties",
+              "collapsible": false,
               "children": [
                 {
                   "type": "field",
-                  "id": "item-rarity",
-                  "fieldType": "select",
-                  "binding": "data.rarity",
-                  "label": "Rarity",
-                  "options": {
-                    "options": [
-                      { "value": "common", "label": "Common" },
-                      { "value": "uncommon", "label": "Uncommon" },
-                      { "value": "rare", "label": "Rare" },
-                      { "value": "very-rare", "label": "Very Rare" },
-                      { "value": "legendary", "label": "Legendary" },
-                      { "value": "artifact", "label": "Artifact" }
-                    ]
-                  }
-                },
-                {
-                  "type": "field",
-                  "id": "item-attunement",
+                  "id": "is-magical",
                   "fieldType": "checkbox",
-                  "binding": "data.requiresAttunement",
-                  "label": "Requires Attunement"
+                  "binding": "data.magical.isMagical",
+                  "label": "This is a Magical Item"
                 },
                 {
+                  "type": "conditional",
+                  "id": "magical-conditional",
+                  "condition": {
+                    "type": "simple",
+                    "field": "data.magical.isMagical",
+                    "operator": "equals",
+                    "value": true
+                  },
+                  "then": [
+                    {
+                      "type": "grid",
+                      "id": "magical-grid",
+                      "columns": 2,
+                      "gap": "1rem",
+                      "children": [
+                        {
+                          "type": "field",
+                          "id": "magical-bonus",
+                          "fieldType": "number",
+                          "binding": "data.magical.bonus",
+                          "label": "Magical Bonus",
+                          "options": {
+                            "min": 0,
+                            "max": 3,
+                            "step": 1,
+                            "placeholder": "+1, +2, +3"
+                          }
+                        },
+                        {
+                          "type": "field",
+                          "id": "magical-cursed",
+                          "fieldType": "checkbox",
+                          "binding": "data.magical.cursed",
+                          "label": "Cursed"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "divider",
+                      "id": "magical-divider",
+                      "orientation": "horizontal"
+                    },
+                    {
+                      "type": "section",
+                      "id": "magical-abilities",
+                      "title": "Magical Abilities",
+                      "collapsible": true,
+                      "defaultCollapsed": false,
+                      "children": [
+                        {
+                          "type": "repeater",
+                          "id": "abilities-repeater",
+                          "binding": "data.magical.abilities",
+                          "addLabel": "Add Magical Ability",
+                          "emptyMessage": "No magical abilities defined",
+                          "allowReorder": true,
+                          "allowDelete": true,
+                          "itemTemplate": [
+                            {
+                              "type": "field",
+                              "id": "ability-name",
+                              "fieldType": "text",
+                              "binding": "name",
+                              "label": "Ability Name",
+                              "required": true,
+                              "options": {
+                                "placeholder": "Flame Tongue, Ring of Protection, etc."
+                              }
+                            },
+                            {
+                              "type": "grid",
+                              "id": "ability-grid",
+                              "columns": 2,
+                              "gap": "0.5rem",
+                              "children": [
+                                {
+                                  "type": "field",
+                                  "id": "ability-activation",
+                                  "fieldType": "select",
+                                  "binding": "activation",
+                                  "label": "Activation",
+                                  "options": {
+                                    "options": [
+                                      { "value": "passive", "label": "Passive" },
+                                      { "value": "action", "label": "Action" },
+                                      { "value": "bonus-action", "label": "Bonus Action" },
+                                      { "value": "reaction", "label": "Reaction" },
+                                      { "value": "minute", "label": "1 Minute" },
+                                      { "value": "hour", "label": "1 Hour" }
+                                    ]
+                                  }
+                                },
+                                {
+                                  "type": "field",
+                                  "id": "ability-uses",
+                                  "fieldType": "resource",
+                                  "binding": "uses",
+                                  "label": "Uses per Day",
+                                  "options": {
+                                    "showMax": true,
+                                    "showBar": true,
+                                    "barColor": "#6c63ff"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "field",
+                              "id": "ability-description",
+                              "fieldType": "richtext",
+                              "binding": "description",
+                              "label": "Description",
+                              "options": {
+                                "multiline": true,
+                                "placeholder": "Describe the magical ability and its effects..."
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "notes",
+          "label": "Notes",
+          "children": [
+            {
+              "type": "section",
+              "id": "notes-section",
+              "title": "Additional Notes",
+              "collapsible": false,
+              "children": [
+                {
                   "type": "field",
-                  "id": "item-weight",
-                  "fieldType": "number",
-                  "binding": "data.weight",
-                  "label": "Weight (lb)",
+                  "id": "item-notes",
+                  "fieldType": "richtext",
+                  "binding": "data.notes",
+                  "label": "Notes",
                   "options": {
-                    "min": 0,
-                    "step": 0.1
+                    "multiline": true,
+                    "placeholder": "Additional notes, lore, special instructions, etc."
                   }
                 },
                 {
-                  "type": "field",
-                  "id": "item-value",
-                  "fieldType": "number",
-                  "binding": "data.value",
-                  "label": "Value (gp)",
-                  "options": {
-                    "min": 0,
-                    "step": 0.01
-                  }
+                  "type": "divider",
+                  "id": "notes-divider",
+                  "orientation": "horizontal"
+                },
+                {
+                  "type": "grid",
+                  "id": "metadata-grid",
+                  "columns": 2,
+                  "gap": "1rem",
+                  "children": [
+                    {
+                      "type": "field",
+                      "id": "item-source",
+                      "fieldType": "text",
+                      "binding": "data.source",
+                      "label": "Source",
+                      "options": {
+                        "placeholder": "PHB, DMG, XGE, etc."
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "item-identified",
+                      "fieldType": "checkbox",
+                      "binding": "data.identified",
+                      "label": "Identified"
+                    }
+                  ]
                 }
               ]
             }
@@ -140,5 +985,30 @@
   "styles": {
     "theme": "default"
   },
-  "computedFields": []
+  "computedFields": [
+    {
+      "id": "total-ac",
+      "name": "Total Armor Class",
+      "description": "Calculated total AC for armor including magical bonuses",
+      "formula": "(@armor.baseAC || 0) + (@armor.acBonus || 0)",
+      "resultType": "number",
+      "dependencies": ["data.armor.baseAC", "data.armor.acBonus"]
+    },
+    {
+      "id": "total-attack-bonus",
+      "name": "Total Attack Bonus",
+      "description": "Calculated total attack bonus for weapons including magical bonuses",
+      "formula": "(@weapon.attackBonus || 0) + (@magical.bonus || 0)",
+      "resultType": "number",
+      "dependencies": ["data.weapon.attackBonus", "data.magical.bonus"]
+    },
+    {
+      "id": "total-damage-bonus",
+      "name": "Total Damage Bonus",
+      "description": "Calculated total damage bonus for weapons including magical bonuses",
+      "formula": "(@weapon.damage.bonus || 0) + (@magical.bonus || 0)",
+      "resultType": "number",
+      "dependencies": ["data.weapon.damage.bonus", "data.magical.bonus"]
+    }
+  ]
 }

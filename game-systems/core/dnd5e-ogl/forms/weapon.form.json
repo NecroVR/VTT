@@ -1,0 +1,643 @@
+{
+  "name": "D&D 5e Weapon Card",
+  "description": "Weapon card for D&D 5th Edition including mundane and magical weapons",
+  "entityType": "weapon",
+  "version": "1.0.0",
+  "layout": [
+    {
+      "type": "section",
+      "id": "weapon-header",
+      "collapsible": false,
+      "className": "weapon-header",
+      "children": [
+        {
+          "type": "field",
+          "id": "weapon-name",
+          "fieldType": "text",
+          "binding": "name",
+          "label": "Weapon Name",
+          "required": true,
+          "options": {
+            "placeholder": "Longsword, Flametongue, etc."
+          },
+          "className": "weapon-name"
+        },
+        {
+          "type": "grid",
+          "id": "weapon-type-grid",
+          "columns": 2,
+          "gap": "1rem",
+          "children": [
+            {
+              "type": "field",
+              "id": "weapon-category",
+              "fieldType": "select",
+              "binding": "data.category",
+              "label": "Weapon Category",
+              "required": true,
+              "options": {
+                "options": [
+                  { "value": "simple-melee", "label": "Simple Melee" },
+                  { "value": "simple-ranged", "label": "Simple Ranged" },
+                  { "value": "martial-melee", "label": "Martial Melee" },
+                  { "value": "martial-ranged", "label": "Martial Ranged" }
+                ]
+              }
+            },
+            {
+              "type": "field",
+              "id": "weapon-rarity",
+              "fieldType": "select",
+              "binding": "data.rarity",
+              "label": "Rarity",
+              "required": true,
+              "options": {
+                "options": [
+                  { "value": "common", "label": "Common" },
+                  { "value": "uncommon", "label": "Uncommon" },
+                  { "value": "rare", "label": "Rare" },
+                  { "value": "very-rare", "label": "Very Rare" },
+                  { "value": "legendary", "label": "Legendary" },
+                  { "value": "artifact", "label": "Artifact" }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "divider",
+          "id": "header-divider",
+          "orientation": "horizontal"
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "combat-stats",
+      "title": "Combat Statistics",
+      "collapsible": false,
+      "className": "weapon-combat-stats",
+      "children": [
+        {
+          "type": "grid",
+          "id": "damage-grid",
+          "columns": 3,
+          "gap": "1rem",
+          "children": [
+            {
+              "type": "field",
+              "id": "damage-dice",
+              "fieldType": "text",
+              "binding": "data.damage.dice",
+              "label": "Damage Dice",
+              "required": true,
+              "options": {
+                "placeholder": "1d8, 2d6, etc."
+              }
+            },
+            {
+              "type": "field",
+              "id": "damage-type",
+              "fieldType": "select",
+              "binding": "data.damage.type",
+              "label": "Damage Type",
+              "required": true,
+              "options": {
+                "options": [
+                  { "value": "slashing", "label": "Slashing" },
+                  { "value": "piercing", "label": "Piercing" },
+                  { "value": "bludgeoning", "label": "Bludgeoning" },
+                  { "value": "acid", "label": "Acid" },
+                  { "value": "cold", "label": "Cold" },
+                  { "value": "fire", "label": "Fire" },
+                  { "value": "force", "label": "Force" },
+                  { "value": "lightning", "label": "Lightning" },
+                  { "value": "necrotic", "label": "Necrotic" },
+                  { "value": "poison", "label": "Poison" },
+                  { "value": "psychic", "label": "Psychic" },
+                  { "value": "radiant", "label": "Radiant" },
+                  { "value": "thunder", "label": "Thunder" }
+                ]
+              }
+            },
+            {
+              "type": "field",
+              "id": "attack-bonus",
+              "fieldType": "number",
+              "binding": "data.attackBonus",
+              "label": "Attack Bonus",
+              "options": {
+                "min": -5,
+                "max": 20,
+                "step": 1,
+                "placeholder": "+0"
+              }
+            }
+          ]
+        },
+        {
+          "type": "conditional",
+          "id": "range-conditional",
+          "condition": {
+            "type": "or",
+            "conditions": [
+              {
+                "type": "simple",
+                "field": "data.category",
+                "operator": "equals",
+                "value": "simple-ranged"
+              },
+              {
+                "type": "simple",
+                "field": "data.category",
+                "operator": "equals",
+                "value": "martial-ranged"
+              }
+            ]
+          },
+          "then": [
+            {
+              "type": "grid",
+              "id": "range-grid",
+              "columns": 2,
+              "gap": "1rem",
+              "children": [
+                {
+                  "type": "field",
+                  "id": "range-normal",
+                  "fieldType": "number",
+                  "binding": "data.range.normal",
+                  "label": "Normal Range (ft)",
+                  "options": {
+                    "min": 0,
+                    "step": 5,
+                    "placeholder": "80"
+                  }
+                },
+                {
+                  "type": "field",
+                  "id": "range-long",
+                  "fieldType": "number",
+                  "binding": "data.range.long",
+                  "label": "Long Range (ft)",
+                  "options": {
+                    "min": 0,
+                    "step": 5,
+                    "placeholder": "320"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "divider",
+          "id": "combat-divider",
+          "orientation": "horizontal"
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "weapon-properties",
+      "title": "Weapon Properties",
+      "collapsible": true,
+      "defaultCollapsed": false,
+      "children": [
+        {
+          "type": "grid",
+          "id": "properties-grid",
+          "columns": 3,
+          "gap": "0.5rem",
+          "children": [
+            {
+              "type": "field",
+              "id": "property-ammunition",
+              "fieldType": "checkbox",
+              "binding": "data.properties.ammunition",
+              "label": "Ammunition"
+            },
+            {
+              "type": "field",
+              "id": "property-finesse",
+              "fieldType": "checkbox",
+              "binding": "data.properties.finesse",
+              "label": "Finesse"
+            },
+            {
+              "type": "field",
+              "id": "property-heavy",
+              "fieldType": "checkbox",
+              "binding": "data.properties.heavy",
+              "label": "Heavy"
+            },
+            {
+              "type": "field",
+              "id": "property-light",
+              "fieldType": "checkbox",
+              "binding": "data.properties.light",
+              "label": "Light"
+            },
+            {
+              "type": "field",
+              "id": "property-loading",
+              "fieldType": "checkbox",
+              "binding": "data.properties.loading",
+              "label": "Loading"
+            },
+            {
+              "type": "field",
+              "id": "property-reach",
+              "fieldType": "checkbox",
+              "binding": "data.properties.reach",
+              "label": "Reach"
+            },
+            {
+              "type": "field",
+              "id": "property-special",
+              "fieldType": "checkbox",
+              "binding": "data.properties.special",
+              "label": "Special"
+            },
+            {
+              "type": "field",
+              "id": "property-thrown",
+              "fieldType": "checkbox",
+              "binding": "data.properties.thrown",
+              "label": "Thrown"
+            },
+            {
+              "type": "field",
+              "id": "property-two-handed",
+              "fieldType": "checkbox",
+              "binding": "data.properties.twoHanded",
+              "label": "Two-Handed"
+            },
+            {
+              "type": "field",
+              "id": "property-versatile",
+              "fieldType": "checkbox",
+              "binding": "data.properties.versatile",
+              "label": "Versatile"
+            }
+          ]
+        },
+        {
+          "type": "conditional",
+          "id": "versatile-conditional",
+          "condition": {
+            "type": "simple",
+            "field": "data.properties.versatile",
+            "operator": "equals",
+            "value": true
+          },
+          "then": [
+            {
+              "type": "field",
+              "id": "versatile-damage",
+              "fieldType": "text",
+              "binding": "data.versatileDamage",
+              "label": "Versatile Damage (Two-Handed)",
+              "options": {
+                "placeholder": "1d10, 2d6, etc."
+              }
+            }
+          ]
+        },
+        {
+          "type": "conditional",
+          "id": "thrown-conditional",
+          "condition": {
+            "type": "simple",
+            "field": "data.properties.thrown",
+            "operator": "equals",
+            "value": true
+          },
+          "then": [
+            {
+              "type": "grid",
+              "id": "thrown-range-grid",
+              "columns": 2,
+              "gap": "1rem",
+              "children": [
+                {
+                  "type": "field",
+                  "id": "thrown-range-normal",
+                  "fieldType": "number",
+                  "binding": "data.thrownRange.normal",
+                  "label": "Thrown Normal Range (ft)",
+                  "options": {
+                    "min": 0,
+                    "step": 5,
+                    "placeholder": "20"
+                  }
+                },
+                {
+                  "type": "field",
+                  "id": "thrown-range-long",
+                  "fieldType": "number",
+                  "binding": "data.thrownRange.long",
+                  "label": "Thrown Long Range (ft)",
+                  "options": {
+                    "min": 0,
+                    "step": 5,
+                    "placeholder": "60"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "physical-properties",
+      "title": "Physical Properties",
+      "collapsible": true,
+      "defaultCollapsed": false,
+      "children": [
+        {
+          "type": "grid",
+          "id": "physical-grid",
+          "columns": 2,
+          "gap": "1rem",
+          "children": [
+            {
+              "type": "field",
+              "id": "weapon-weight",
+              "fieldType": "number",
+              "binding": "data.weight",
+              "label": "Weight (lb)",
+              "options": {
+                "min": 0,
+                "step": 0.1,
+                "placeholder": "3"
+              }
+            },
+            {
+              "type": "field",
+              "id": "weapon-cost",
+              "fieldType": "number",
+              "binding": "data.cost",
+              "label": "Cost (gp)",
+              "options": {
+                "min": 0,
+                "step": 0.1,
+                "placeholder": "15"
+              }
+            }
+          ]
+        },
+        {
+          "type": "field",
+          "id": "requires-attunement",
+          "fieldType": "checkbox",
+          "binding": "data.requiresAttunement",
+          "label": "Requires Attunement"
+        },
+        {
+          "type": "conditional",
+          "id": "attunement-conditional",
+          "condition": {
+            "type": "simple",
+            "field": "data.requiresAttunement",
+            "operator": "equals",
+            "value": true
+          },
+          "then": [
+            {
+              "type": "field",
+              "id": "attunement-requirements",
+              "fieldType": "text",
+              "binding": "data.attunementRequirements",
+              "label": "Attunement Requirements",
+              "options": {
+                "placeholder": "By a spellcaster, by a paladin, etc."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "description-section",
+      "title": "Description",
+      "collapsible": true,
+      "defaultCollapsed": false,
+      "children": [
+        {
+          "type": "field",
+          "id": "weapon-description",
+          "fieldType": "richtext",
+          "binding": "data.description",
+          "label": "Weapon Description",
+          "options": {
+            "multiline": true,
+            "placeholder": "Enter the weapon's appearance, history, or general description...",
+            "showPreview": true
+          }
+        },
+        {
+          "type": "conditional",
+          "id": "special-properties-conditional",
+          "condition": {
+            "type": "simple",
+            "field": "data.properties.special",
+            "operator": "equals",
+            "value": true
+          },
+          "then": [
+            {
+              "type": "field",
+              "id": "special-properties-description",
+              "fieldType": "richtext",
+              "binding": "data.specialPropertiesDescription",
+              "label": "Special Properties",
+              "options": {
+                "multiline": true,
+                "placeholder": "Describe the special properties of this weapon...",
+                "showPreview": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "conditional",
+      "id": "magic-properties-conditional",
+      "condition": {
+        "type": "simple",
+        "field": "data.rarity",
+        "operator": "not_equals",
+        "value": "common"
+      },
+      "then": [
+        {
+          "type": "section",
+          "id": "magic-properties",
+          "title": "Magic Properties",
+          "collapsible": true,
+          "defaultCollapsed": false,
+          "children": [
+            {
+              "type": "field",
+              "id": "magic-bonus",
+              "fieldType": "number",
+              "binding": "data.magicBonus",
+              "label": "Magic Bonus (to attack and damage)",
+              "options": {
+                "min": 0,
+                "max": 3,
+                "step": 1,
+                "placeholder": "+1"
+              }
+            },
+            {
+              "type": "field",
+              "id": "magic-effects",
+              "fieldType": "richtext",
+              "binding": "data.magicEffects",
+              "label": "Additional Magical Effects",
+              "options": {
+                "multiline": true,
+                "placeholder": "Describe any additional magical effects, abilities, or properties...",
+                "showPreview": true
+              }
+            },
+            {
+              "type": "field",
+              "id": "has-charges",
+              "fieldType": "checkbox",
+              "binding": "data.hasCharges",
+              "label": "Has Charges"
+            },
+            {
+              "type": "conditional",
+              "id": "charges-conditional",
+              "condition": {
+                "type": "simple",
+                "field": "data.hasCharges",
+                "operator": "equals",
+                "value": true
+              },
+              "then": [
+                {
+                  "type": "grid",
+                  "id": "charges-grid",
+                  "columns": 2,
+                  "gap": "1rem",
+                  "children": [
+                    {
+                      "type": "field",
+                      "id": "max-charges",
+                      "fieldType": "number",
+                      "binding": "data.charges.max",
+                      "label": "Maximum Charges",
+                      "options": {
+                        "min": 1,
+                        "max": 50,
+                        "step": 1,
+                        "placeholder": "7"
+                      }
+                    },
+                    {
+                      "type": "field",
+                      "id": "current-charges",
+                      "fieldType": "number",
+                      "binding": "data.charges.current",
+                      "label": "Current Charges",
+                      "options": {
+                        "min": 0,
+                        "max": 50,
+                        "step": 1,
+                        "placeholder": "7"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "field",
+                  "id": "charges-recharge",
+                  "fieldType": "text",
+                  "binding": "data.charges.recharge",
+                  "label": "Recharge Information",
+                  "options": {
+                    "placeholder": "Regains 1d6+1 charges daily at dawn"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "additional-notes",
+      "title": "Additional Notes",
+      "collapsible": true,
+      "defaultCollapsed": true,
+      "children": [
+        {
+          "type": "field",
+          "id": "notes",
+          "fieldType": "richtext",
+          "binding": "data.notes",
+          "label": "Notes",
+          "options": {
+            "multiline": true,
+            "placeholder": "Additional DM notes, lore, special considerations, etc.",
+            "showPreview": true
+          }
+        }
+      ]
+    }
+  ],
+  "fragments": [],
+  "styles": {
+    "theme": "default",
+    "variables": {
+      "--weapon-header-bg": "#e8f4f8",
+      "--weapon-divider-color": "#4a5568",
+      "--weapon-section-border": "#cbd5e0"
+    },
+    "customCSS": ".weapon-header { background: var(--weapon-header-bg); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; } .weapon-name { font-size: 1.5rem; font-weight: bold; } .weapon-combat-stats { border-left: 3px solid var(--weapon-section-border); padding-left: 1rem; }"
+  },
+  "computedFields": [
+    {
+      "id": "total-attack-bonus",
+      "name": "Total Attack Bonus",
+      "description": "Combined attack bonus including magic bonus",
+      "formula": "(@attackBonus || 0) + (@magicBonus || 0)",
+      "resultType": "number",
+      "dependencies": ["data.attackBonus", "data.magicBonus"]
+    },
+    {
+      "id": "total-damage-bonus",
+      "name": "Total Damage Bonus",
+      "description": "Magic bonus to damage",
+      "formula": "@magicBonus || 0",
+      "resultType": "number",
+      "dependencies": ["data.magicBonus"]
+    },
+    {
+      "id": "is-magical",
+      "name": "Is Magical Weapon",
+      "description": "Whether this is a magical weapon",
+      "formula": "@rarity !== 'common'",
+      "resultType": "boolean",
+      "dependencies": ["data.rarity"]
+    },
+    {
+      "id": "is-ranged",
+      "name": "Is Ranged Weapon",
+      "description": "Whether this is a ranged weapon",
+      "formula": "@category === 'simple-ranged' || @category === 'martial-ranged'",
+      "resultType": "boolean",
+      "dependencies": ["data.category"]
+    }
+  ]
+}
