@@ -40,6 +40,7 @@ export type FormFieldType =
   | 'richtext'    // Rich text editor
   | 'color'       // Color picker
   | 'image'       // Image upload/URL
+  | 'file'        // File upload with drag-and-drop
   | 'date';       // Date picker
 
 /**
@@ -88,6 +89,11 @@ export interface FormFieldTypeOptions {
 
   // Rich text field options
   showPreview?: boolean;    // Show markdown preview toggle
+
+  // File upload field options
+  multiple?: boolean;       // Allow multiple files
+  preview?: boolean;        // Show preview for images
+  uploadEndpoint?: string;  // API endpoint for upload (optional, defaults to base64)
 
   // Color field options
   presets?: string[];       // Preset color palette (hex values)

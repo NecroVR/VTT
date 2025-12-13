@@ -19,6 +19,9 @@
   let helpText = $derived(localeResolver.resolve(node.helpText));
   let placeholder = $derived(localeResolver.resolve(node.options?.placeholder));
 
+  // Multiselect search query state
+  let searchQuery = $state('');
+
   // Resolve binding path (handle {{index}} for repeaters)
   let resolvedBinding = $derived.by(() => {
     let path = node.binding;
@@ -101,6 +104,18 @@
           {#each (value as string[] ?? []) as tag}
             <span class="tag-badge">{tag}</span>
           {/each}
+        </div>
+      {:else if node.fieldType === 'multiselect'}
+        <div class="multiselect-view">
+          {#each (value as string[] ?? []) as selectedValue}
+            {@const option = node.options?.options?.find(o => o.value === selectedValue)}
+            {#if option}
+              <span class="multiselect-badge">{localeResolver.resolve(option.label)}</span>
+            {/if}
+          {/each}
+          {#if !(value as string[] ?? []).length}
+            <span class="text-gray-400">None selected</span>
+          {/if}
         </div>
       {:else if node.fieldType === 'color'}
         <div class="color-view">
@@ -317,7 +332,68 @@
           {/if}
         {/if}
       </div>
-    {:else if node.fieldType === 'reference'}
+    {:else if node.fieldType === 'multiselect'}
+      <div class="multiselect-container">
+        {#if (value as string[] ?? []).length > 0}
+          <div class="multiselect-selected-chips">
+            {#each (value as string[] ?? []) as selectedValue}
+              {@const option = node.options?.options?.find(o => o.value === selectedValue)}
+              {#if option}
+                <span class="multiselect-chip">
+                  {localeResolver.resolve(option.label)}
+                  {#if !node.readonly}
+                    <button
+                      type="button"
+                      class="multiselect-chip-remove"
+                      onclick={() => {
+                        const selected = [...(value as string[] ?? [])];
+                        const index = selected.indexOf(selectedValue);
+                        if (index > -1) {
+                          selected.splice(index, 1);
+                          handleChange(selected);
+                        }
+                      }}
+                      aria-label="Remove {localeResolver.resolve(option.label)}"
+                    >×</button>
+                  {/if}
+                </span>
+              {/if}
+            {/each}
+          </div>
+        {/if}
+        {#if !node.readonly}
+          <div class="multiselect-dropdown">
+            {#if node.options?.searchable}
+              <input
+                type="text"
+                class="multiselect-search field-input"
+                placeholder={placeholder ?? 'Search...'}
+                bind:value={searchQuery}
+                aria-label="Search options"
+              />
+            {/if}
+            <div class="multiselect-options" role="listbox" aria-multiselectable="true">
+              {#if node.options?.options}
+                {@const filteredOptions = node.options.searchable && searchQuery ? node.options.options.filter(opt => localeResolver.resolve(opt.label).toLowerCase().includes(searchQuery.toLowerCase())) : node.options.options}
+                {@const groupedOptions = filteredOptions.reduce((acc, opt) => { const group = opt.group ?? ''; if (!acc[group]) acc[group] = []; acc[group].push(opt); return acc; }, {} as Record<string, typeof filteredOptions>)}
+                {#each Object.entries(groupedOptions) as [group, opts]}
+                  {#if group}<div class="multiselect-group-header">{group}</div>{/if}
+                  {#each opts as option}
+                    {@const isSelected = (value as string[] ?? []).includes(option.value)}
+                    {@const isDisabled = !isSelected && node.options?.max && (value as string[] ?? []).length >= node.options.max}
+                    <label class="multiselect-option" class:selected={isSelected} class:disabled={isDisabled} role="option" aria-selected={isSelected}>
+                      <input type="checkbox" checked={isSelected} disabled={isDisabled} onchange={() => { const selected = [...(value as string[] ?? [])]; const index = selected.indexOf(option.value); if (index > -1) { selected.splice(index, 1); } else if (!isDisabled) { selected.push(option.value); } handleChange(selected); }} />
+                      <span class="multiselect-option-label">{localeResolver.resolve(option.label)}</span>
+                    </label>
+                  {/each}
+                {/each}
+                {#if filteredOptions.length === 0}<div class="multiselect-no-options">No options found</div>{/if}
+              {/if}
+            </div>
+          </div>
+        {/if}
+      </div>
+
       <input
         type="text"
         class="field-input"
@@ -720,4 +796,24 @@
   .richtext-view {
     padding: 0.5rem 0;
   }
+
+  /* Multiselect field styles */
+  .multiselect-container { display: flex; flex-direction: column; gap: 0.5rem; }
+  .multiselect-view { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+  .multiselect-selected-chips { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-bottom: 0.5rem; }
+  .multiselect-chip, .multiselect-badge { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.5rem; background: var(--primary-color, #007bff); color: white; border-radius: 4px; font-size: 0.875rem; }
+  .multiselect-chip-remove { background: none; border: none; color: white; cursor: pointer; padding: 0; font-size: 1rem; line-height: 1; margin-left: 0.25rem; }
+  .multiselect-chip-remove:hover { color: #ff0000; }
+  .multiselect-dropdown { border: 1px solid var(--border-color, #ccc); border-radius: 4px; overflow: hidden; }
+  .multiselect-search { border: none; border-bottom: 1px solid var(--border-color, #ccc); border-radius: 0; }
+  .multiselect-options { max-height: 300px; overflow-y: auto; padding: 0.25rem 0; }
+  .multiselect-group-header { padding: 0.5rem 0.75rem; font-size: 0.75rem; font-weight: 600; color: var(--muted-color, #666); background: var(--bg-muted, #f5f5f5); text-transform: uppercase; letter-spacing: 0.5px; }
+  .multiselect-option { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; cursor: pointer; transition: background 0.2s; }
+  .multiselect-option:hover:not(.disabled) { background: var(--hover-bg, #f0f0f0); }
+  .multiselect-option.selected { background: var(--selected-bg, #e7f3ff); }
+  .multiselect-option.disabled { opacity: 0.5; cursor: not-allowed; }
+  .multiselect-option input[type="checkbox"] { margin: 0; cursor: pointer; }
+  .multiselect-option.disabled input[type="checkbox"] { cursor: not-allowed; }
+  .multiselect-option-label { flex: 1; font-size: 0.875rem; }
+  .multiselect-no-options { padding: 1rem; text-align: center; color: var(--muted-color, #666); font-size: 0.875rem; }
 </style>
