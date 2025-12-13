@@ -1,0 +1,38 @@
+{
+  "name": "Simple Test Form",
+  "description": "Minimal test form without computed fields",
+  "entityType": "actor",
+  "version": "1.0.0",
+  "layout": [
+    {
+      "type": "section",
+      "id": "basic-info",
+      "title": "Basic Information",
+      "collapsible": false,
+      "children": [
+        {
+          "type": "field",
+          "id": "char-name",
+          "fieldType": "text",
+          "binding": "name",
+          "label": "Character Name",
+          "required": true
+        },
+        {
+          "type": "field",
+          "id": "char-class",
+          "fieldType": "text",
+          "binding": "class",
+          "label": "Class"
+        },
+        {
+          "type": "field",
+          "id": "char-level",
+          "fieldType": "number",
+          "binding": "level",
+          "label": "Level"
+        }
+      ]
+    }
+  ]
+}
