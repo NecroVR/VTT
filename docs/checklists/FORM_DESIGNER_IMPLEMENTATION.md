@@ -473,10 +473,21 @@ This checklist tracks the implementation of the Form Designer System across mult
 ## Phase 6: Polish & Optimization
 
 ### 6.1 Undo/Redo System
-- [ ] Implement command pattern for all designer operations
-- [ ] Create undo stack with configurable depth
-- [ ] Add keyboard shortcuts (Ctrl+Z, Ctrl+Y)
-- [ ] Show undo/redo history panel
+- [x] Implement command pattern for all designer operations
+  - Note: Using snapshot-based approach with full FormDefinition copies
+- [x] Create undo stack with configurable depth
+  - Default depth: 50 operations
+  - Automatically enforced in pushToUndo
+- [x] Add keyboard shortcuts (Ctrl+Z, Ctrl+Y)
+  - Ctrl/Cmd + Z for undo
+  - Ctrl/Cmd + Y or Ctrl/Cmd + Shift + Z for redo
+  - Only active in design mode
+- [x] Show undo/redo history panel
+  - UndoHistoryPanel component created
+  - Shows timeline with past/current/future states
+  - Click to navigate to any point in history
+  - Clear history button
+- [x] Create documentation (docs/guides/form-designer/undo-redo.md)
 
 ### 6.2 Copy/Paste
 - [ ] Implement node serialization for clipboard
