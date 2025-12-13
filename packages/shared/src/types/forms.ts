@@ -30,6 +30,7 @@ export type FormFieldType =
   | 'number'      // Numeric input
   | 'checkbox'    // Boolean checkbox
   | 'select'      // Dropdown selection
+  | 'multiselect' // Multi-select dropdown
   | 'textarea'    // Multi-line text
   | 'dice'        // Dice roller (e.g., "1d20+5")
   | 'resource'    // Resource bar (current/max)
@@ -47,8 +48,11 @@ export type FormFieldType =
  * Type-specific options for form field configuration
  */
 export interface FormFieldTypeOptions {
-  // Select field options
-  options?: { value: string; label: LocalizedString }[];
+  // Select and multiselect field options
+  options?: { value: string; label: LocalizedString; group?: string }[];
+
+  // Multiselect field options
+  searchable?: boolean;     // Enable search/filter for multiselect
 
   // Numeric constraints (number, slider, rating)
   min?: number;
