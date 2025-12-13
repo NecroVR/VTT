@@ -432,93 +432,36 @@ This checklist tracks the implementation of the Form Designer System across mult
 
 ## Phase 5: Marketplace Integration
 
+> **STATUS: SKIPPED**
+>
+> This phase has been deferred. Marketplace and payment-related features will be implemented later in the project lifecycle. The form designer will function without marketplace integration - forms can be created, edited, and used within campaigns without licensing or payment features.
+
+<!--
 ### 5.1 Marketplace API
 - [ ] Create `apps/server/src/routes/api/v1/marketplace.ts`
-  - [ ] `GET /api/v1/marketplace/forms` - List marketplace forms
-  - [ ] `GET /api/v1/marketplace/forms/:formId` - Get form details
-  - [ ] `POST /api/v1/forms/:formId/publish` - Publish to marketplace
-  - [ ] `POST /api/v1/forms/:formId/unpublish` - Remove from marketplace
 - [ ] Create licensing endpoints
-  - [ ] `POST /api/v1/marketplace/forms/:formId/license` - License form
-  - [ ] `GET /api/v1/users/me/form-licenses` - Get user's licenses
-  - [ ] `DELETE /api/v1/form-licenses/:licenseId` - Revoke license
 - [ ] Add marketplace search and filtering
-  - [ ] Filter by game system
-  - [ ] Filter by entity type
-  - [ ] Filter by license type (free/paid)
-  - [ ] Sort by popularity, date, rating
 
 ### 5.2 Marketplace UI
-- [ ] Create `apps/web/src/routes/marketplace/forms/+page.svelte`
-  - [ ] Form listing with filters
-  - [ ] Search functionality
-  - [ ] Form preview cards
-- [ ] Create `apps/web/src/routes/marketplace/forms/[formId]/+page.svelte`
-  - [ ] Form detail view
-  - [ ] Screenshots/preview
-  - [ ] Creator info
-  - [ ] License/purchase button
-  - [ ] Reviews/ratings (if implementing)
-- [ ] Create `apps/web/src/lib/components/marketplace/FormCard.svelte`
-  - [ ] Thumbnail
-  - [ ] Name, creator, price
-  - [ ] Quick license button
+- [ ] Create marketplace routes and components
 
 ### 5.3 Publishing Workflow
-- [ ] Create `apps/web/src/lib/components/forms/PublishDialog.svelte`
-  - [ ] Visibility selection (public, marketplace)
-  - [ ] License type selection
-  - [ ] Price input (for paid)
-  - [ ] Terms acceptance
-- [ ] Implement form validation for publishing
-  - [ ] Required fields check
-  - [ ] Preview/screenshot requirement
-  - [ ] Description minimum length
-- [ ] Create unpublish confirmation dialog
+- [ ] Create publishing dialog and validation
 
 ### 5.4 License Management
-- [ ] Create `apps/web/src/routes/account/licenses/+page.svelte`
-  - [ ] List licensed forms
-  - [ ] Filter by game system
-  - [ ] Show license status (active, expired)
-  - [ ] Access licensed form
-- [ ] Implement license verification
-  - [ ] Check license before form access
-  - [ ] Handle expired subscriptions
-  - [ ] Grace period handling
+- [ ] Create license management UI and verification
 
 ### 5.5 Campaign Form Assignment
-- [ ] Create `apps/web/src/lib/components/campaign/FormManagement.svelte`
-  - [ ] List available forms (owned + licensed + defaults)
-  - [ ] Assign form to entity type
-  - [ ] Priority ordering for multiple forms
-  - [ ] Preview assigned form
-- [ ] Implement form resolution logic
-  - [ ] Check campaign assignments first
-  - [ ] Fall back to game system defaults
-  - [ ] Verify license is valid
+- [ ] Create form assignment UI and resolution logic
 
-### 5.6 Payment Integration (Placeholder)
-- [ ] Define payment provider interface
-- [ ] Create payment webhook handlers
-- [ ] Implement purchase flow skeleton
-- [ ] Add payment status to license records
-- [ ] Document payment integration requirements
+### 5.6 Payment Integration
+- [ ] Payment provider integration (deferred)
 
 ### 5.7 Testing
-- [ ] Test marketplace listing and search
-- [ ] Test publishing workflow
-- [ ] Test license creation and verification
-- [ ] Test campaign form assignment
-- [ ] Test license expiration handling
-- [ ] Test cross-campaign form access
+- [ ] Marketplace-specific tests
+-->
 
-**Phase 5 Completion Criteria**:
-- [ ] Forms can be published to marketplace
-- [ ] Users can browse and license forms
-- [ ] Licensed forms work across campaigns
-- [ ] License verification prevents unauthorized access
-- [ ] Campaign form assignment works correctly
+**Phase 5 Completion Criteria**: SKIPPED - To be revisited later
 
 ---
 
@@ -653,6 +596,7 @@ _None_
 | 2025-12-12 | GM-only form designer | Premium feature positioning |
 | 2025-12-12 | Desktop/tablet focus | Avoid mobile complexity initially |
 | 2025-12-12 | Localization infrastructure only | Future-proof without immediate work |
+| 2025-12-12 | Skip Phase 5 (Marketplace) | Marketplace/payment features deferred to later in project |
 
 ### Open Questions
 
@@ -668,10 +612,10 @@ _None currently - see proposal for resolved decisions_
 | Phase 2: Layout System | Complete | 2025-12-12 | 2025-12-12 |
 | Phase 3: Form Designer UI | In Progress | 2025-12-12 | |
 | Phase 4: Advanced Features | Not Started | | |
-| Phase 5: Marketplace | Not Started | | |
+| Phase 5: Marketplace | **SKIPPED** | - | - |
 | Phase 6: Polish | Not Started | | |
 | Default Forms | In Progress | 2025-12-12 | |
 
 **Phase 3 Progress**: Core UI complete (3.1-3.4, 3.7). Remaining: Binding picker (3.5), Condition builder (3.6), Fragment library (3.8), Preview panel (3.9), JSON view (3.10), Testing (3.11)
 
-**Overall Progress**: ~50%
+**Overall Progress**: ~50% (excluding skipped Phase 5)
