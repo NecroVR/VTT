@@ -328,6 +328,7 @@ All field components share these common properties:
 
 #### Binding
 - **Property Path** - The data property this field is bound to (e.g., "name", "attributes.strength.value")
+  - Type manually or click the 📋 button to use the Property Binding Picker
 - **Placeholder** - Hint text shown when field is empty
 
 #### Validation
@@ -363,12 +364,57 @@ All field components share these common properties:
 - **Allow Delete** - Show delete button on each item
 
 #### Conditional Properties
-- **Condition** - Simple condition for showing/hiding content
-  - **Field** - Property path to check
-  - **Operator** - Comparison: equals, notEquals, contains, greaterThan, lessThan, isEmpty, isNotEmpty, etc.
-  - **Value** - Value to compare against (hidden for isEmpty/isNotEmpty)
 
-**Note**: Complex conditions with AND/OR logic will be available in a future update.
+The Condition Builder allows you to control when a component is visible based on entity data.
+
+**Simple Mode:**
+- **Field** - Property path to check (e.g., "class", "level", "attributes.strength.value")
+- **Operator** - Comparison to perform:
+  - `equals` - Field equals the specified value
+  - `does not equal` - Field does not equal the value
+  - `contains` - Field contains the value (for strings)
+  - `is empty` - Field is empty/null/undefined
+  - `is not empty` - Field has a value
+  - `is greater than` - Field is greater than the value (for numbers)
+  - `is less than` - Field is less than the value (for numbers)
+  - `is greater than or equal to` - Field >= value
+  - `is less than or equal to` - Field <= value
+- **Value** - Value to compare against (not shown for isEmpty/isNotEmpty operators)
+
+**Compound Mode:**
+- **Combine conditions with** - Choose AND or OR:
+  - `AND` - All conditions must be true
+  - `OR` - Any condition can be true
+- **Conditions List** - Add multiple conditions:
+  - Click "+ Add Condition" to add a new condition
+  - Each condition has Field, Operator, and Value (same as Simple mode)
+  - Click the X button to remove a condition
+  - Minimum of 1 condition required
+
+**Preview:**
+The condition builder shows a plain English preview of your condition at the bottom:
+- Simple: "Show when class equals wizard"
+- Compound: "Show when level is greater than 5 AND class equals wizard"
+
+**Example Use Cases:**
+
+*Show wizard-specific fields only for wizards:*
+- Mode: Simple
+- Field: "class"
+- Operator: equals
+- Value: "wizard"
+
+*Show advanced features for high-level characters:*
+- Mode: Compound
+- Operator: AND
+- Condition 1: level is greater than 10
+- Condition 2: experience is greater than 50000
+
+*Show equipment section if character has items or gold:*
+- Mode: Compound
+- Operator: OR
+- Condition 1: inventory is not empty
+- Condition 2: gold is greater than 0
 
 #### Fragment Reference Properties
 - **Fragment ID** - ID of the reusable fragment to insert
@@ -690,6 +736,47 @@ When setting property paths for fields:
 - Be consistent across your forms
 - Document complex bindings in help text
 
+### Using the Property Binding Picker
+
+The Property Binding Picker helps you visually browse and select entity properties instead of typing paths manually.
+
+**Accessing the Picker:**
+1. Select a field or repeater component
+2. In the Property Editor, find the "Property Path" or "Array Property" field
+3. Click the 📋 button next to the input field
+4. The binding picker modal will open
+
+**Browsing Properties:**
+- Properties are displayed as a hierarchical tree
+- Click the ▶ arrow to expand nested objects
+- Click the ▼ arrow to collapse them
+- Each property shows:
+  - Type icon (📝 string, 🔢 number, ☑️ boolean, 📋 array, 📦 object)
+  - Property name
+  - Computed badge (ƒ) for calculated fields
+  - Property type label
+
+**Searching:**
+- Type in the search box at the top to filter properties
+- Search matches property names and paths
+- Parent nodes automatically expand to show matches
+- Clear the search to see all properties again
+
+**Selecting a Property:**
+1. Click on a property in the tree (leaf nodes only)
+2. The property will be highlighted in blue
+3. Click "Select" to use this property
+4. The property path will be filled in automatically
+
+**For Repeater Components:**
+- The picker will only show array properties when opened from a repeater
+- This ensures you can only bind to valid array data
+
+**Tips:**
+- Hover over a property to see its full path and description
+- You can still type paths manually if you prefer
+- The picker shows the current binding highlighted when opened
+
 ### Keep It Simple
 
 Don't overcomplicate your forms:
@@ -904,6 +991,108 @@ Before deploying your form:
 
 ---
 
+## JSON Editor
+
+The Form Designer includes a JSON editor for advanced users who want direct access to the form definition structure. This is useful for precise control, debugging, and understanding how forms work under the hood.
+
+### Accessing the JSON Editor
+
+When in Design mode:
+1. Look for the **JSON** button in the toolbar (next to Preview)
+2. Click **JSON** to switch from visual canvas to JSON view
+3. Click **Canvas** to switch back to the visual editor
+
+**Note**: The JSON button is only available in Design mode, not Preview mode.
+
+### JSON Editor Features
+
+The JSON editor provides:
+- **Syntax highlighting** with line numbers for easy reading
+- **Format/Prettify** button to clean up indentation
+- **Validate** button to check JSON structure
+- **Auto-sync** mode for real-time updates
+- **Apply** button to sync changes to visual editor
+- **Validation errors** with detailed messages
+
+### Basic Workflow
+
+1. **Switch to JSON view** - Click the JSON button
+2. **Edit the JSON** - Make changes in the text editor
+3. **Validate** (optional) - Check for errors
+4. **Apply changes** - Sync to the visual editor
+5. **Switch back** - Return to Canvas view
+
+### Using Auto-sync Mode
+
+Enable the **Auto-sync** checkbox for real-time updates:
+- Valid JSON changes apply automatically
+- Invalid JSON shows errors without breaking the form
+- Great for quick tweaks
+- Disable for complex multi-step edits
+
+### Common Use Cases
+
+**Copying Components**
+1. Copy a component's JSON object
+2. Paste it where needed
+3. Change the `id` to a unique value
+4. Apply changes
+
+**Bulk Property Changes**
+Use Find & Replace to update multiple components:
+- Find: `"required": false`
+- Replace: `"required": true`
+
+**Fine-tuning Layouts**
+Direct JSON editing for precise grid/flex configurations:
+```json
+{
+  "type": "grid",
+  "columns": "200px 1fr 1fr 100px",
+  "gap": "1rem"
+}
+```
+
+**Learning Form Structure**
+View the JSON to understand how components are structured and learn the form definition schema.
+
+### When to Use JSON vs Visual Editor
+
+**Use JSON editor:**
+- Copying sections between forms
+- Bulk property changes
+- Fine-tuning complex configurations
+- Debugging form structure
+- Advanced users comfortable with JSON
+
+**Use visual editor:**
+- Adding new components
+- Drag-and-drop reordering
+- Learning the form designer
+- Simple property changes
+- Visualizing layout
+
+### Validation and Errors
+
+The editor validates:
+- **JSON syntax** - Missing commas, brackets, quotes
+- **Required fields** - id, name, layout must be present
+- **Node structure** - Each node must have id and type
+- **Data types** - Arrays, strings, objects must be correct
+
+Error messages show exactly what's wrong and where.
+
+### Tips for JSON Editing
+
+1. **Format first** - Click Format for readable indentation
+2. **Validate often** - Catch errors early
+3. **Backup before major changes** - Copy JSON to clipboard first
+4. **Keep IDs unique** - Every component needs a unique id
+5. **Use Auto-sync for simple edits** - Enable for quick tweaks
+6. **Disable Auto-sync for complex changes** - Make all edits, then apply
+
+---
+
 ## Keyboard Shortcuts
 
 **Currently Available:**
@@ -980,15 +1169,13 @@ Create common fragments once and reuse them:
 
 The Form Designer is actively being developed. Upcoming features include:
 
-- **Property Binding Picker** - Visual tool for selecting data properties
-- **Advanced Condition Builder** - Complex conditions with AND/OR logic
 - **Fragment Library** - Browse and manage reusable fragments
-- **JSON View** - Edit form definition as JSON for advanced users
 - **Template Gallery** - Start from pre-built form templates
 - **Drag-to-reorder** on canvas - Drag components directly on the canvas
 - **Keyboard shortcuts** - Faster editing with keyboard
 - **Form validation preview** - Test required fields and validation
 - **Import/Export** - Share forms between campaigns
+- **Game system schemas** - Support for multiple game systems beyond D&D 5e
 
 Stay tuned for updates!
 
