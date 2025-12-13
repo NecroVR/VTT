@@ -375,6 +375,7 @@
       {/each}
     </div>
   {/if}
+  {/if}
 
   <!-- Templates Tab -->
   {#if activeTab === 'templates'}
