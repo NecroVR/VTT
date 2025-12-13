@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { FieldNode } from '@vtt/shared';
   import { localeResolver } from '$lib/services/localization';
+  import { sanitizeStyles } from '$lib/utils/cssSanitizer';
+  import DOMPurify from 'isomorphic-dompurify';
 
   interface Props {
     node: FieldNode;
@@ -42,6 +44,26 @@
   function handleChange(newValue: unknown) {
     onChange(resolvedBinding, newValue);
   }
+
+  // Sanitize HTML content to prevent XSS attacks in rich text fields
+  function sanitizeHtml(html: string): string {
+    return DOMPurify.sanitize(html, {
+      ALLOWED_TAGS: [
+        'p', 'br', 'strong', 'em', 'u', 'b', 'i', 's', 'del', 'ins',
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        'ul', 'ol', 'li',
+        'a', 'span', 'div',
+        'blockquote', 'code', 'pre',
+        'table', 'thead', 'tbody', 'tr', 'th', 'td',
+        'hr', 'sup', 'sub'
+      ],
+      ALLOWED_ATTR: ['href', 'title', 'class', 'id', 'style'],
+      ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+      ALLOW_DATA_ATTR: false,
+      FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'link', 'style'],
+      FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur']
+    });
+  }
 </script>
 
 <div class="field-wrapper" class:required={node.required}>
@@ -82,7 +104,7 @@
         </div>
       {:else if node.fieldType === 'color'}
         <div class="color-view">
-          <span class="color-swatch" style="background-color: {value ?? '#000000'}"></span>
+          <span class="color-swatch" style={sanitizeStyles({ 'background-color': value ?? '#000000' })}></span>
           <span class="color-value">{value ?? '#000000'}</span>
         </div>
       {:else if node.fieldType === 'image'}
@@ -92,7 +114,7 @@
           <span class="text-gray-400">No image</span>
         {/if}
       {:else if node.fieldType === 'richtext'}
-        <div class="richtext-view">{@html value ?? ''}</div>
+        <div class="richtext-view">{@html sanitizeHtml(String(value ?? ''))}</div>
       {:else}
         {value ?? '-'}
       {/if}
@@ -202,10 +224,15 @@
           />
         {/if}
         {#if node.options?.showBar && node.options?.showMax}
+          {@const barWidth = Math.min(100, ((value as {current?: number})?.current ?? 0) / ((value as {max?: number})?.max ?? 1) * 100)}
+          {@const barStyles = {
+            width: `${barWidth}%`,
+            'background-color': node.options?.barColor ?? '#4CAF50'
+          }}
           <div class="resource-bar">
             <div
               class="resource-bar-fill"
-              style="width: {Math.min(100, ((value as {current?: number})?.current ?? 0) / ((value as {max?: number})?.max ?? 1) * 100)}%; background-color: {node.options?.barColor ?? '#4CAF50'}"
+              style={sanitizeStyles(barStyles)}
             ></div>
           </div>
         {/if}
@@ -311,7 +338,7 @@
         {#if node.options?.showPreview && value}
           <div class="richtext-preview">
             <div class="richtext-preview-label">Preview:</div>
-            <div class="richtext-content">{@html value}</div>
+            <div class="richtext-content">{@html sanitizeHtml(String(value))}</div>
           </div>
         {/if}
       </div>
@@ -338,7 +365,7 @@
               <button
                 type="button"
                 class="color-preset"
-                style="background-color: {preset}"
+                style={sanitizeStyles({ 'background-color': preset })}
                 disabled={node.readonly}
                 onclick={() => handleChange(preset)}
                 title={preset}

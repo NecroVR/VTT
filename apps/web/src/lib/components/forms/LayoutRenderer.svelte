@@ -1,8 +1,10 @@
 <script lang="ts">
   import type { LayoutNode, FormFragment, FormComputedField, VisibilityCondition } from '@vtt/shared';
   import { localeResolver } from '$lib/services/localization';
+  import { sanitizeStyles } from '$lib/utils/cssSanitizer';
   import FieldRenderer from './FieldRenderer.svelte';
   import ComputedRenderer from './ComputedRenderer.svelte';
+  import DOMPurify from 'isomorphic-dompurify';
 
   interface Props {
     node: LayoutNode;
@@ -195,6 +197,26 @@
     });
   }
 
+  // Sanitize HTML content to prevent XSS attacks
+  function sanitizeHtml(html: string): string {
+    return DOMPurify.sanitize(html, {
+      ALLOWED_TAGS: [
+        'p', 'br', 'strong', 'em', 'u', 'b', 'i', 's', 'del', 'ins',
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        'ul', 'ol', 'li',
+        'a', 'span', 'div',
+        'blockquote', 'code', 'pre',
+        'table', 'thead', 'tbody', 'tr', 'th', 'td',
+        'hr', 'sup', 'sub'
+      ],
+      ALLOWED_ATTR: ['href', 'title', 'class', 'id', 'style'],
+      ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+      ALLOW_DATA_ATTR: false,
+      FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'link', 'style'],
+      FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur']
+    });
+  }
+
   // Icon mapping for simple emoji-based icons
   const iconMap: Record<string, string> = {
     sword: '⚔️',
@@ -240,7 +262,7 @@
       class="layout-container"
       class:group={node.type === 'group'}
       class:has-border={node.type === 'group' && node.border}
-      style={node.style ? Object.entries(node.style).map(([k, v]) => `${k}: ${v}`).join(';') : ''}
+      style={sanitizeStyles(node.style)}
     >
       {#if node.type === 'group' && node.title}
         <div class="group-title">{localeResolver.resolve(node.title)}</div>
@@ -258,14 +280,15 @@
       {/each}
     </div>
   {:else if node.type === 'grid'}
+    {@const gridStyles = {
+      display: 'grid',
+      'grid-template-columns': typeof node.columns === 'number' ? `repeat(${node.columns}, 1fr)` : node.columns,
+      gap: node.gap || '0.5rem',
+      ...node.style
+    }}
     <div
       class="layout-grid"
-      style="
-        display: grid;
-        grid-template-columns: {typeof node.columns === 'number' ? `repeat(${node.columns}, 1fr)` : node.columns};
-        gap: {node.gap || '0.5rem'};
-        {node.style ? Object.entries(node.style).map(([k, v]) => `${k}: ${v}`).join(';') : ''}
-      "
+      style={sanitizeStyles(gridStyles)}
     >
       {#each node.children as child}
         <svelte:self
@@ -304,14 +327,15 @@
       {/each}
     </div>
   {:else if node.type === 'columns'}
+    {@const columnStyles = {
+      display: 'grid',
+      'grid-template-columns': node.widths.join(' '),
+      gap: node.gap || '1rem',
+      ...node.style
+    }}
     <div
       class="layout-columns"
-      style="
-        display: grid;
-        grid-template-columns: {node.widths.join(' ')};
-        gap: {node.gap || '1rem'};
-        {node.style ? Object.entries(node.style).map(([k, v]) => `${k}: ${v}`).join(';') : ''}
-      "
+      style={sanitizeStyles(columnStyles)}
     >
       {#each node.children as child}
         <svelte:self
@@ -396,25 +420,28 @@
   {:else if node.type === 'static'}
     {@const resolvedContent = localeResolver.resolve(node.content)}
     {@const interpolated = interpolateContent(resolvedContent)}
+    {@const sanitizedHtml = sanitizeHtml(interpolated)}
     <div
       class="layout-static static-{node.contentType || 'text'}"
-      style={node.style ? Object.entries(node.style).map(([k, v]) => `${k}: ${v}`).join(';') : ''}
+      style={sanitizeStyles(node.style)}
     >
       {#if node.contentType === 'html'}
-        {@html interpolated}
+        {@html sanitizedHtml}
       {:else if node.contentType === 'image'}
+        {@const imageStyles = {
+          ...(node.width ? { width: node.width } : {}),
+          ...(node.height ? { height: node.height } : {})
+        }}
         <img
           src={interpolated}
           alt={node.alt || ''}
-          style="
-            {node.width ? `width: ${node.width};` : ''}
-            {node.height ? `height: ${node.height};` : ''}
-          "
+          style={sanitizeStyles(imageStyles)}
         />
       {:else if node.contentType === 'icon'}
+        {@const iconStyles = node.size ? { 'font-size': node.size } : {}}
         <span
           class="static-icon-content"
-          style={node.size ? `font-size: ${node.size};` : ''}
+          style={sanitizeStyles(iconStyles)}
         >
           {getIcon(interpolated)}
         </span>
