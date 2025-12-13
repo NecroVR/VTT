@@ -100,8 +100,8 @@ All imported content becomes bound to the GM's campaigns - players cannot take c
 |-------|------|------|--------|----------|
 | 1 | Shared | Foundation & Database Schema | COMPLETE | 8/8 |
 | 2 | Shared | Server Import Infrastructure | COMPLETE | 4/4 |
-| 3 | A | Foundry VTT Parser | IN PROGRESS | 7/8 |
-| 4 | A | Foundry Import UI | NOT STARTED | 0/7 |
+| 3 | A | Foundry VTT Parser | COMPLETE | 8/8 |
+| 4 | A | Foundry Import UI | COMPLETE | 7/7 |
 | 5 | B | D&D Beyond Browser Extension | NOT STARTED | 0/12 |
 | 6 | B | D&D Beyond Parsers | NOT STARTED | 0/9 |
 | 7 | B | D&D Beyond Import UI | NOT STARTED | 0/7 |
