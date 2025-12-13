@@ -3,6 +3,8 @@
   import { localeResolver } from '$lib/services/localization';
   import { sanitizeStyles } from '$lib/utils/cssSanitizer';
   import DOMPurify from 'isomorphic-dompurify';
+  import CodeEditor from './CodeEditor.svelte';
+  import RichTextEditor from './RichTextEditor.svelte';
 
   interface Props {
     node: FieldNode;
@@ -265,6 +267,14 @@
         </div>
       {:else if node.fieldType === 'richtext'}
         <div class="richtext-view">{@html sanitizeHtml(String(value ?? ''))}</div>
+      {:else if node.fieldType === 'code'}
+        <CodeEditor
+          value={String(value ?? '')}
+          language={node.options?.language ?? 'javascript'}
+          lineNumbers={node.options?.lineNumbers ?? true}
+          theme={node.options?.theme ?? 'light'}
+          readonly={true}
+        />
       {:else}
         {value ?? '-'}
       {/if}
@@ -579,21 +589,25 @@
         oninput={(e) => handleChange(e.currentTarget.value)}
       />
     {:else if node.fieldType === 'richtext'}
-      <div class="richtext-editor">
-        <textarea
-          class="field-input field-textarea richtext-textarea"
-          value={value ?? ''}
-          readonly={node.readonly}
-          placeholder="Enter markdown..."
-          oninput={(e) => handleChange(e.currentTarget.value)}
-        ></textarea>
-        {#if node.options?.showPreview && value}
-          <div class="richtext-preview">
-            <div class="richtext-preview-label">Preview:</div>
-            <div class="richtext-content">{@html sanitizeHtml(String(value))}</div>
-          </div>
-        {/if}
-      </div>
+      <RichTextEditor
+        value={String(value ?? '')}
+        readonly={node.readonly}
+        placeholder={placeholder ?? 'Enter text...'}
+        onChange={handleChange}
+        ariaLabel={label ?? 'Rich text field'}
+        ariaRequired={node.required}
+        ariaDescribedby={helpText ? `help-${node.id}` : undefined}
+      />
+    {:else if node.fieldType === 'code'}
+      <CodeEditor
+        value={String(value ?? '')}
+        language={node.options?.language ?? 'javascript'}
+        lineNumbers={node.options?.lineNumbers ?? true}
+        theme={node.options?.theme ?? 'light'}
+        readonly={node.readonly ?? false}
+        placeholder={placeholder}
+        onChange={(newValue) => handleChange(newValue)}
+      />
     {:else if node.fieldType === 'color'}
       <div class="color-picker">
         <input
@@ -1060,34 +1074,6 @@
   }
 
   /* Rich text field styles */
-  .richtext-editor {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .richtext-textarea {
-    min-height: 120px;
-  }
-
-  .richtext-preview {
-    padding: 0.5rem;
-    border: 1px solid var(--border-color, #ccc);
-    border-radius: 4px;
-    background: var(--bg-muted, #f9f9f9);
-  }
-
-  .richtext-preview-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--muted-color, #666);
-    margin-bottom: 0.25rem;
-  }
-
-  .richtext-content {
-    font-size: 0.875rem;
-  }
-
   .richtext-view {
     padding: 0.5rem 0;
   }

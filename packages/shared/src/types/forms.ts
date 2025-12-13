@@ -40,6 +40,7 @@ export type FormFieldType =
   | 'tags'        // Tag list input
   | 'reference'   // Reference to another entity
   | 'richtext'    // Rich text editor
+  | 'code'        // Code editor with syntax highlighting
   | 'color'       // Color picker
   | 'image'       // Image upload/URL
   | 'file'        // File upload with drag-and-drop
@@ -97,6 +98,11 @@ export interface FormFieldTypeOptions {
 
   // Rich text field options
   showPreview?: boolean;    // Show markdown preview toggle
+
+  // Code editor field options
+  language?: string;        // Language mode (javascript, json, html, css, markdown, etc.)
+  lineNumbers?: boolean;    // Show line numbers (default: true)
+  theme?: 'light' | 'dark'; // Editor theme
 
   // File upload field options
   multiple?: boolean;       // Allow multiple files
