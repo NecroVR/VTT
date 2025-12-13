@@ -1,0 +1,30 @@
+{
+  "_id": "spell456",
+  "name": "Fireball",
+  "type": "spell",
+  "img": "icons/magic/fire/fireball.webp",
+  "system": {
+    "level": 3,
+    "school": "evo",
+    "activation": { "type": "action", "cost": 1 },
+    "range": { "value": 150, "units": "ft" },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": true,
+      "concentration": false,
+      "ritual": false
+    },
+    "duration": { "value": null, "units": "inst" },
+    "damage": { "parts": [["8d6", "fire"]] },
+    "save": { "ability": "dex", "dc": null, "scaling": "spell" },
+    "description": {
+      "value": "<p>A bright streak flashes from your pointing finger to a point you choose within range and then blossoms with a low roar into an explosion of flame.</p>"
+    },
+    "materials": { "value": "A tiny ball of bat guano and sulfur" },
+    "source": {
+      "book": "Player's Handbook",
+      "custom": ""
+    }
+  }
+}

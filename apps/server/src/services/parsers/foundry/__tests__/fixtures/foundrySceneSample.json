@@ -1,0 +1,84 @@
+{
+  "_id": "scene789",
+  "name": "The Rusty Dragon Tavern",
+  "type": "scene",
+  "img": "scenes/tavern-thumb.webp",
+  "navigation": true,
+  "width": 4000,
+  "height": 3000,
+  "background": {
+    "src": "scenes/tavern-interior.webp"
+  },
+  "grid": {
+    "size": 100,
+    "type": 1,
+    "distance": 5,
+    "units": "ft"
+  },
+  "walls": [
+    {
+      "_id": "wall001",
+      "c": [0, 0, 0, 1000],
+      "move": 20,
+      "sight": 20,
+      "sound": 20,
+      "dir": 0,
+      "door": 0,
+      "ds": 0
+    },
+    {
+      "_id": "wall002",
+      "c": [0, 1000, 1000, 1000],
+      "move": 20,
+      "sight": 20,
+      "sound": 20,
+      "dir": 0,
+      "door": 1,
+      "ds": 1
+    }
+  ],
+  "lights": [
+    {
+      "_id": "light001",
+      "x": 500,
+      "y": 500,
+      "rotation": 0,
+      "config": {
+        "bright": 20,
+        "dim": 40,
+        "angle": 360,
+        "color": "#ff9329",
+        "alpha": 0.5,
+        "animation": {
+          "type": "torch",
+          "speed": 5,
+          "intensity": 5
+        }
+      }
+    }
+  ],
+  "tokens": [
+    {
+      "_id": "token001",
+      "name": "Thorin Ironforge",
+      "x": 1000,
+      "y": 1500,
+      "width": 1,
+      "height": 1,
+      "rotation": 0,
+      "texture": {
+        "src": "tokens/heroes/dwarf-fighter.webp"
+      },
+      "actorId": "ABC123xyz",
+      "hidden": false,
+      "locked": false,
+      "elevation": 0,
+      "disposition": 1
+    }
+  ],
+  "flags": {
+    "core": {
+      "notes": "The Rusty Dragon is a popular tavern in Sandpoint, known for its excellent curried salmon."
+    }
+  }
+}

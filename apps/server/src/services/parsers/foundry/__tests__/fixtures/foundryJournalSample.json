@@ -1,0 +1,36 @@
+{
+  "_id": "journal456",
+  "name": "The Legend of the Runelords",
+  "type": "journal",
+  "img": "journal/runelords-cover.webp",
+  "pages": [
+    {
+      "_id": "page001",
+      "name": "Introduction",
+      "type": "text",
+      "text": {
+        "content": "<h1>The Rise of the Runelords</h1><p>Ten thousand years ago, the empire of Thassilon ruled the lands of Varisia. The empire was divided into seven nations, each ruled by a Runelord who wielded immense magical power.</p><p>The Runelords were masters of sin magic, drawing power from the seven deadly sins: wrath, greed, sloth, pride, envy, lust, and gluttony.</p>",
+        "format": 1
+      },
+      "sort": 100
+    },
+    {
+      "_id": "page002",
+      "name": "The Runelords",
+      "type": "text",
+      "text": {
+        "content": "<h2>The Seven Runelords</h2><ul><li><strong>Alaznist</strong> - Runelord of Wrath</li><li><strong>Karzoug</strong> - Runelord of Greed</li><li><strong>Krune</strong> - Runelord of Sloth</li><li><strong>Xanderghul</strong> - Runelord of Pride</li><li><strong>Belimarius</strong> - Runelord of Envy</li><li><strong>Sorshen</strong> - Runelord of Lust</li><li><strong>Zutha</strong> - Runelord of Gluttony</li></ul>",
+        "format": 1
+      },
+      "sort": 200
+    },
+    {
+      "_id": "page003",
+      "name": "Map of Thassilon",
+      "type": "image",
+      "src": "journal/thassilon-map.webp",
+      "sort": 300
+    }
+  ],
+  "flags": {}
+}

@@ -2,6 +2,8 @@ import 'dotenv/config';
 import { buildApp } from './app.js';
 import { loadEnvConfig } from './config/env.js';
 import { gameSystemLoader } from './services/gameSystemLoader.js';
+import { importService } from './services/importService.js';
+import { registerFoundryParsers } from './services/parsers/foundry/index.js';
 
 /**
  * Application entry point
@@ -20,6 +22,11 @@ async function main() {
     await gameSystemLoader.loadAllSystems();
     const systems = gameSystemLoader.getAllSystems();
     app.log.info(`Loaded ${systems.length} game system(s)`);
+
+    // Register content import parsers
+    app.log.info('Registering content import parsers...');
+    registerFoundryParsers(importService);
+    app.log.info('Content import parsers registered');
 
     // Start server
     await app.listen({

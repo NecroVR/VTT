@@ -100,7 +100,7 @@ All imported content becomes bound to the GM's campaigns - players cannot take c
 |-------|------|------|--------|----------|
 | 1 | Shared | Foundation & Database Schema | COMPLETE | 8/8 |
 | 2 | Shared | Server Import Infrastructure | COMPLETE | 4/4 |
-| 3 | A | Foundry VTT Parser | NOT STARTED | 0/10 |
+| 3 | A | Foundry VTT Parser | IN PROGRESS | 7/8 |
 | 4 | A | Foundry Import UI | NOT STARTED | 0/7 |
 | 5 | B | D&D Beyond Browser Extension | NOT STARTED | 0/12 |
 | 6 | B | D&D Beyond Parsers | NOT STARTED | 0/9 |
@@ -941,13 +941,13 @@ Create parsers that transform Foundry VTT export data into our VTT format.
 
 ### Tasks
 
-- [ ] 3.1 Create Foundry actor parser (`apps/server/src/services/parsers/foundry/actorParser.ts`)
-- [ ] 3.2 Create Foundry item parser (`apps/server/src/services/parsers/foundry/itemParser.ts`)
-- [ ] 3.3 Create Foundry scene parser (`apps/server/src/services/parsers/foundry/sceneParser.ts`)
-- [ ] 3.4 Create Foundry journal parser (`apps/server/src/services/parsers/foundry/journalParser.ts`)
-- [ ] 3.5 Handle D&D 5e system-specific data structures
-- [ ] 3.6 Register parsers with import service
-- [ ] 3.7 Write unit tests with sample Foundry export data
+- [x] 3.1 Create Foundry actor parser (`apps/server/src/services/parsers/foundry/actorParser.ts`) (2025-12-13)
+- [x] 3.2 Create Foundry item parser (`apps/server/src/services/parsers/foundry/itemParser.ts`) (2025-12-13)
+- [x] 3.3 Create Foundry scene parser (`apps/server/src/services/parsers/foundry/sceneParser.ts`) (2025-12-13)
+- [x] 3.4 Create Foundry journal parser (`apps/server/src/services/parsers/foundry/journalParser.ts`) (2025-12-13)
+- [x] 3.5 Handle D&D 5e system-specific data structures (2025-12-13)
+- [x] 3.6 Register parsers with import service (2025-12-13)
+- [x] 3.7 Write unit tests with sample Foundry export data (2025-12-13)
 - [ ] 3.8 Commit and deploy to Docker
 
 ### Detailed Specifications

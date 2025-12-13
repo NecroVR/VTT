@@ -1,0 +1,88 @@
+{
+  "_id": "ABC123xyz",
+  "name": "Thorin Ironforge",
+  "type": "character",
+  "img": "tokens/heroes/dwarf-fighter.webp",
+  "system": {
+    "abilities": {
+      "str": { "value": 16, "proficient": 1, "mod": 3, "save": 6 },
+      "dex": { "value": 14, "proficient": 0, "mod": 2, "save": 2 },
+      "con": { "value": 15, "proficient": 1, "mod": 2, "save": 5 },
+      "int": { "value": 10, "proficient": 0, "mod": 0, "save": 0 },
+      "wis": { "value": 12, "proficient": 0, "mod": 1, "save": 1 },
+      "cha": { "value": 8, "proficient": 0, "mod": -1, "save": -1 }
+    },
+    "attributes": {
+      "ac": { "value": 18 },
+      "hp": { "value": 45, "max": 45, "temp": 0 },
+      "movement": { "walk": 25, "fly": 0, "swim": 25, "climb": 25, "burrow": 0 },
+      "prof": 3,
+      "spellcasting": null
+    },
+    "details": {
+      "race": "Mountain Dwarf",
+      "background": "Soldier",
+      "level": 5,
+      "alignment": "Lawful Good",
+      "xp": { "value": 6500 },
+      "biography": {
+        "value": "<p>Thorin Ironforge is a stalwart defender of his clan, known for his unwavering courage and tactical prowess in battle.</p>"
+      }
+    },
+    "skills": {
+      "athletics": { "value": 2, "total": 8 },
+      "perception": { "value": 1, "total": 4 },
+      "intimidation": { "value": 1, "total": 2 },
+      "survival": { "value": 1, "total": 4 }
+    },
+    "currency": {
+      "pp": 0,
+      "gp": 125,
+      "ep": 0,
+      "sp": 10,
+      "cp": 5
+    }
+  },
+  "items": [
+    {
+      "_id": "item123",
+      "name": "Battleaxe",
+      "type": "weapon",
+      "img": "icons/weapons/axes/axe-battle-worn.webp",
+      "system": {
+        "damage": { "parts": [["1d8", "slashing"]], "versatile": "1d10" },
+        "weaponType": "martialM",
+        "properties": { "ver": true },
+        "equipped": true,
+        "quantity": 1,
+        "weight": 4,
+        "price": { "value": 10, "denomination": "gp" },
+        "rarity": "common"
+      }
+    },
+    {
+      "_id": "class456",
+      "name": "Fighter",
+      "type": "class",
+      "system": {
+        "levels": 5,
+        "hitDice": "d10",
+        "subclass": "Battle Master"
+      }
+    },
+    {
+      "_id": "feat789",
+      "name": "Great Weapon Master",
+      "type": "feat",
+      "system": {
+        "description": {
+          "value": "<p>You've learned to put the weight of a weapon to your advantage.</p>"
+        },
+        "source": {
+          "book": "Player's Handbook",
+          "custom": ""
+        }
+      }
+    }
+  ]
+}
