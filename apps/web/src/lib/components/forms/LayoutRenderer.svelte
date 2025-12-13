@@ -651,6 +651,37 @@
       {entity}
       {computedFields}
     />
+  {:else if node.type === 'fieldGroup'}
+    {@const layoutClass = node.layout || 'stacked'}
+    {@const labelWidthStyle = node.layout === 'inline' && node.labelWidth ? { '--label-width': node.labelWidth } : {}}
+    <div
+      class="form-group {layoutClass}"
+      class:required={node.required}
+      style={sanitizeStyles({ ...labelWidthStyle, ...node.style })}
+    >
+      {#if node.label}
+        <label class="form-label" class:required={node.required}>
+          {localeResolver.resolve(node.label)}
+          {#if node.required}<span class="required-indicator" aria-label="required">*</span>{/if}
+        </label>
+      {/if}
+      <div class="form-field-container">
+        {#each node.children as child}
+          <svelte:self
+            node={child}
+            {entity}
+            {mode}
+            {fragments}
+            {computedFields}
+            {onChange}
+            {repeaterContext}
+          />
+        {/each}
+      </div>
+      {#if node.helpText}
+        <div class="form-help">{localeResolver.resolve(node.helpText)}</div>
+      {/if}
+    </div>
   {:else}
     <!-- Unknown node type -->
     <div class="unknown-node">Unknown node type: {(node as unknown as {type: string}).type}</div>
@@ -835,4 +866,66 @@
     padding: 0.5rem;
     border-radius: 4px;
   }
+
+  /* Form group styles */
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .form-group.stacked {
+    flex-direction: column;
+  }
+
+  .form-group.inline {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .form-group.inline .form-label {
+    width: var(--label-width, 120px);
+    flex-shrink: 0;
+  }
+
+  .form-group.inline .form-field-container {
+    flex: 1;
+  }
+
+  .form-group.slim {
+    margin-bottom: 0.5rem;
+    gap: 0.125rem;
+  }
+
+  .form-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-color, #333);
+  }
+
+  .form-label.required {
+    font-weight: 600;
+  }
+
+  .form-label .required-indicator {
+    color: var(--danger-color, #c00);
+    margin-left: 0.125rem;
+  }
+
+  .form-field-container {
+    display: contents;
+  }
+
+  .form-help {
+    font-size: 0.75rem;
+    color: var(--muted-color, #666);
+    line-height: 1.4;
+  }
+
+  .form-group.required .form-label::after {
+    content: '';
+  }
+
 </style>

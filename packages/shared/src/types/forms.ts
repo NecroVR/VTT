@@ -339,6 +339,19 @@ export interface ComputedNode extends BaseLayoutNode {
 }
 
 /**
+ * Field group node - standardizes label+input+help pattern
+ */
+export interface FieldGroupNode extends BaseLayoutNode {
+  type: 'fieldGroup';
+  layout?: 'stacked' | 'inline' | 'slim';  // default: 'stacked'
+  label?: LocalizedString;
+  helpText?: LocalizedString;
+  required?: boolean;
+  labelWidth?: string;                  // for inline layout, e.g., '120px' or '30%'
+  children: LayoutNode[];               // Should contain field nodes
+}
+
+/**
  * Union of all layout node types
  */
 export type LayoutNode =
@@ -357,7 +370,8 @@ export type LayoutNode =
   | SpacerNode
   | DividerNode
   | FragmentRefNode
-  | ComputedNode;
+  | ComputedNode
+  | FieldGroupNode;
 
 // ============================================================================
 // Fragments - Reusable Layout Pieces
