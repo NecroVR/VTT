@@ -1,6 +1,7 @@
 <script lang="ts">
-  import type { FieldNode, FormFieldType } from '@vtt/shared';
+  import type { FieldNode, FormFieldType, LocalizedString } from '@vtt/shared';
   import BindingPicker from '../BindingPicker.svelte';
+  import LocaleKeyPicker from '../LocaleKeyPicker.svelte';
 
   interface Props {
     node: FieldNode;
@@ -36,7 +37,10 @@
   $effect(() => {
     if (node.options?.options) {
       optionsText = node.options.options
-        .map(opt => `${opt.value}:${opt.label}`)
+        .map(opt => {
+          const label = typeof opt.label === 'string' ? opt.label : (opt.label.literal || opt.label.localeKey || '');
+          return `${opt.value}:${label}`;
+        })
         .join('\n');
     }
   });
@@ -51,7 +55,10 @@
       .filter(line => line.trim())
       .map(line => {
         const [value, label] = line.split(':').map(s => s.trim());
-        return { value: value || '', label: label || value || '' };
+        return {
+          value: value || '',
+          label: { literal: label || value || '' } as LocalizedString
+        };
       });
 
     onUpdate({
@@ -60,6 +67,11 @@
         options
       }
     });
+  }
+
+  // Generate locale key prefix based on node ID
+  function getLocaleKeyPrefix(property: string): string {
+    return `form.{formName}.${node.id}.${property}`;
   }
 </script>
 
@@ -82,25 +94,21 @@
         </select>
       </label>
 
-      <label>
-        <span>Label</span>
-        <input
-          type="text"
-          value={node.label || ''}
-          oninput={(e) => onUpdate({ label: (e.target as HTMLInputElement).value })}
-          placeholder="Field Label"
-        />
-      </label>
+      <LocaleKeyPicker
+        bind:value={node.label}
+        label="Label"
+        placeholder="Field Label"
+        suggestedPrefix={getLocaleKeyPrefix('label')}
+        onchange={(value) => onUpdate({ label: value })}
+      />
 
-      <label>
-        <span>Help Text</span>
-        <input
-          type="text"
-          value={node.helpText || ''}
-          oninput={(e) => onUpdate({ helpText: (e.target as HTMLInputElement).value })}
-          placeholder="Helpful description"
-        />
-      </label>
+      <LocaleKeyPicker
+        bind:value={node.helpText}
+        label="Help Text"
+        placeholder="Helpful description"
+        suggestedPrefix={getLocaleKeyPrefix('helpText')}
+        onchange={(value) => onUpdate({ helpText: value })}
+      />
     </div>
   </div>
 
@@ -126,17 +134,15 @@
       </label>
 
       {#if node.fieldType === 'text' || node.fieldType === 'textarea'}
-        <label>
-          <span>Placeholder</span>
-          <input
-            type="text"
-            value={node.options?.placeholder || ''}
-            oninput={(e) => onUpdate({
-              options: { ...node.options, placeholder: (e.target as HTMLInputElement).value }
-            })}
-            placeholder="Enter value..."
-          />
-        </label>
+        <LocaleKeyPicker
+          value={node.options?.placeholder}
+          label="Placeholder"
+          placeholder="Enter value..."
+          suggestedPrefix={getLocaleKeyPrefix('placeholder')}
+          onchange={(value) => onUpdate({
+            options: { ...node.options, placeholder: value }
+          })}
+        />
       {/if}
 
       {#if node.fieldType === 'select' && node.options}
@@ -151,7 +157,7 @@
         </label>
       {/if}
 
-      {#if node.fieldType === 'number' || node.fieldType === 'slider'}
+      {#if node.fieldType === 'number' || node.fieldType === 'slider' || node.fieldType === 'rating'}
         <div class="inline-fields">
           <label>
             <span>Min</span>
@@ -173,17 +179,223 @@
               })}
             />
           </label>
+          {#if node.fieldType !== 'rating'}
+            <label>
+              <span>Step</span>
+              <input
+                type="number"
+                value={node.options?.step ?? ''}
+                oninput={(e) => onUpdate({
+                  options: { ...node.options, step: parseFloat((e.target as HTMLInputElement).value) }
+                })}
+              />
+            </label>
+          {/if}
+        </div>
+      {/if}
+
+      {#if node.fieldType === 'resource'}
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            checked={node.options?.showMax ?? true}
+            onchange={(e) => onUpdate({
+              options: { ...node.options, showMax: (e.target as HTMLInputElement).checked }
+            })}
+          />
+          <span>Show Max Value</span>
+        </label>
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            checked={node.options?.showBar ?? false}
+            onchange={(e) => onUpdate({
+              options: { ...node.options, showBar: (e.target as HTMLInputElement).checked }
+            })}
+          />
+          <span>Show Progress Bar</span>
+        </label>
+        {#if node.options?.showBar}
           <label>
-            <span>Step</span>
+            <span>Bar Color</span>
             <input
-              type="number"
-              value={node.options?.step ?? ''}
+              type="color"
+              value={node.options?.barColor ?? '#4CAF50'}
               oninput={(e) => onUpdate({
-                options: { ...node.options, step: parseFloat((e.target as HTMLInputElement).value) }
+                options: { ...node.options, barColor: (e.target as HTMLInputElement).value }
               })}
             />
           </label>
-        </div>
+        {/if}
+      {/if}
+
+      {#if node.fieldType === 'rating'}
+        <label>
+          <span>Icon Style</span>
+          <select
+            value={node.options?.iconStyle ?? 'stars'}
+            onchange={(e) => onUpdate({
+              options: { ...node.options, iconStyle: (e.target as HTMLSelectElement).value as 'stars' | 'circles' | 'pips' }
+            })}
+          >
+            <option value="stars">Stars</option>
+            <option value="circles">Circles</option>
+            <option value="pips">Pips</option>
+          </select>
+        </label>
+      {/if}
+
+      {#if node.fieldType === 'slider'}
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            checked={node.options?.showValue ?? true}
+            onchange={(e) => onUpdate({
+              options: { ...node.options, showValue: (e.target as HTMLInputElement).checked }
+            })}
+          />
+          <span>Show Value Label</span>
+        </label>
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            checked={node.options?.showTicks ?? false}
+            onchange={(e) => onUpdate({
+              options: { ...node.options, showTicks: (e.target as HTMLInputElement).checked }
+            })}
+          />
+          <span>Show Tick Marks</span>
+        </label>
+      {/if}
+
+      {#if node.fieldType === 'tags'}
+        <label>
+          <span>Suggestions (one per line)</span>
+          <textarea
+            value={node.options?.suggestions?.join('\n') ?? ''}
+            oninput={(e) => onUpdate({
+              options: {
+                ...node.options,
+                suggestions: (e.target as HTMLTextAreaElement).value.split('\n').filter(s => s.trim())
+              }
+            })}
+            placeholder="suggestion1&#10;suggestion2&#10;suggestion3"
+            rows="4"
+          ></textarea>
+        </label>
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            checked={node.options?.allowCustom ?? true}
+            onchange={(e) => onUpdate({
+              options: { ...node.options, allowCustom: (e.target as HTMLInputElement).checked }
+            })}
+          />
+          <span>Allow Custom Tags</span>
+        </label>
+      {/if}
+
+      {#if node.fieldType === 'reference'}
+        <label>
+          <span>Entity Type</span>
+          <input
+            type="text"
+            value={node.options?.entityType ?? ''}
+            oninput={(e) => onUpdate({
+              options: { ...node.options, entityType: (e.target as HTMLInputElement).value }
+            })}
+            placeholder="actor, item, etc."
+          />
+        </label>
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            checked={node.options?.allowCreate ?? false}
+            onchange={(e) => onUpdate({
+              options: { ...node.options, allowCreate: (e.target as HTMLInputElement).checked }
+            })}
+          />
+          <span>Allow Creating New Entity</span>
+        </label>
+      {/if}
+
+      {#if node.fieldType === 'richtext'}
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            checked={node.options?.showPreview ?? true}
+            onchange={(e) => onUpdate({
+              options: { ...node.options, showPreview: (e.target as HTMLInputElement).checked }
+            })}
+          />
+          <span>Show Preview</span>
+        </label>
+      {/if}
+
+      {#if node.fieldType === 'color'}
+        <label>
+          <span>Preset Colors (comma-separated hex values)</span>
+          <input
+            type="text"
+            value={node.options?.presets?.join(', ') ?? ''}
+            oninput={(e) => onUpdate({
+              options: {
+                ...node.options,
+                presets: (e.target as HTMLInputElement).value.split(',').map(s => s.trim()).filter(s => s)
+              }
+            })}
+            placeholder="#FF0000, #00FF00, #0000FF"
+          />
+        </label>
+      {/if}
+
+      {#if node.fieldType === 'image'}
+        <label>
+          <span>Accepted File Types</span>
+          <input
+            type="text"
+            value={node.options?.accept ?? ''}
+            oninput={(e) => onUpdate({
+              options: { ...node.options, accept: (e.target as HTMLInputElement).value }
+            })}
+            placeholder="image/*"
+          />
+        </label>
+        <label>
+          <span>Max File Size (bytes)</span>
+          <input
+            type="number"
+            value={node.options?.maxSize ?? ''}
+            oninput={(e) => onUpdate({
+              options: { ...node.options, maxSize: parseInt((e.target as HTMLInputElement).value) }
+            })}
+            placeholder="5242880"
+          />
+        </label>
+      {/if}
+
+      {#if node.fieldType === 'date'}
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            checked={node.options?.includeTime ?? false}
+            onchange={(e) => onUpdate({
+              options: { ...node.options, includeTime: (e.target as HTMLInputElement).checked }
+            })}
+          />
+          <span>Include Time</span>
+        </label>
+        <label>
+          <span>Date Format</span>
+          <input
+            type="text"
+            value={node.options?.format ?? ''}
+            oninput={(e) => onUpdate({
+              options: { ...node.options, format: (e.target as HTMLInputElement).value }
+            })}
+            placeholder="YYYY-MM-DD"
+          />
+        </label>
       {/if}
     </div>
   </div>
