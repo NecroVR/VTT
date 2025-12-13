@@ -38,6 +38,14 @@
     goto('/campaigns');
   }
 
+  function viewForms() {
+    if (!$authStore.user) {
+      goto('/login');
+      return;
+    }
+    goto('/forms');
+  }
+
   function handleLogin() {
     goto('/login');
   }
@@ -93,6 +101,12 @@
           on:keydown={(e) => e.key === 'Enter' && joinCampaign()}
         />
         <button class="btn" on:click={joinCampaign} disabled={!campaignId.trim()}>Join Campaign</button>
+      </div>
+
+      <div class="card">
+        <h2>Manage Forms</h2>
+        <p>Create and manage character sheets and entity forms</p>
+        <button class="btn" on:click={viewForms}>View Forms</button>
       </div>
     </div>
   </div>
