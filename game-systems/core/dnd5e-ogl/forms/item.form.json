@@ -2,7 +2,7 @@
   "name": "D&D 5e Item Sheet",
   "description": "Comprehensive item sheet for D&D 5th Edition weapons, armor, equipment, and consumables with type-specific properties",
   "entityType": "item",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "layout": [
     {
       "type": "section",

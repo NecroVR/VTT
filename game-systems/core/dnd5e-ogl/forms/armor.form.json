@@ -2,7 +2,7 @@
   "name": "D&D 5e Armor Card",
   "description": "Comprehensive armor sheet for D&D 5th Edition armor and shields",
   "entityType": "armor",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "layout": [
     {
       "type": "section",
@@ -558,7 +558,7 @@
       "binding": "data.totalAC",
       "formula": {
         "type": "expression",
-        "expression": "(data.armorType === 'shield' ? 0 : (data.baseAC || 0)) + (data.magicACBonus || 0)"
+        "expression": "if(data.armorType === 'shield', 0, (data.baseAC || 0)) + (data.magicACBonus || 0)"
       },
       "dependencies": [
         "data.armorType",

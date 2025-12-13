@@ -2,7 +2,7 @@
   "name": "D&D 5e Consumable",
   "description": "Consumable items for D&D 5th Edition including potions, scrolls, wands, and other limited-use items",
   "entityType": "consumable",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "layout": [
     {
       "type": "section",

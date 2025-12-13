@@ -2,7 +2,7 @@
   "name": "D&D 5e Complete Character Sheet",
   "description": "Comprehensive character sheet for D&D 5th Edition with all core features",
   "entityType": "actor",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "layout": [
     {
       "type": "section",
@@ -1889,7 +1889,7 @@
       "id": "str-save-calc",
       "name": "Strength Save",
       "description": "Strength saving throw bonus",
-      "formula": "floor((data.abilities.strength.value - 10) / 2) + (data.saves.strength.proficient ? floor(((data.level - 1) / 4) + 2) : 0)",
+      "formula": "floor((data.abilities.strength.value - 10) / 2) + if(data.saves.strength.proficient, floor(((data.level - 1) / 4) + 2), 0)",
       "resultType": "number",
       "dependencies": ["data.abilities.strength.value", "data.saves.strength.proficient", "data.level"]
     },
@@ -1897,7 +1897,7 @@
       "id": "dex-save-calc",
       "name": "Dexterity Save",
       "description": "Dexterity saving throw bonus",
-      "formula": "floor((data.abilities.dexterity.value - 10) / 2) + (data.saves.dexterity.proficient ? floor(((data.level - 1) / 4) + 2) : 0)",
+      "formula": "floor((data.abilities.dexterity.value - 10) / 2) + if(data.saves.dexterity.proficient, floor(((data.level - 1) / 4) + 2), 0)",
       "resultType": "number",
       "dependencies": ["data.abilities.dexterity.value", "data.saves.dexterity.proficient", "data.level"]
     },
@@ -1905,7 +1905,7 @@
       "id": "con-save-calc",
       "name": "Constitution Save",
       "description": "Constitution saving throw bonus",
-      "formula": "floor((data.abilities.constitution.value - 10) / 2) + (data.saves.constitution.proficient ? floor(((data.level - 1) / 4) + 2) : 0)",
+      "formula": "floor((data.abilities.constitution.value - 10) / 2) + if(data.saves.constitution.proficient, floor(((data.level - 1) / 4) + 2), 0)",
       "resultType": "number",
       "dependencies": ["data.abilities.constitution.value", "data.saves.constitution.proficient", "data.level"]
     },
@@ -1913,7 +1913,7 @@
       "id": "int-save-calc",
       "name": "Intelligence Save",
       "description": "Intelligence saving throw bonus",
-      "formula": "floor((data.abilities.intelligence.value - 10) / 2) + (data.saves.intelligence.proficient ? floor(((data.level - 1) / 4) + 2) : 0)",
+      "formula": "floor((data.abilities.intelligence.value - 10) / 2) + if(data.saves.intelligence.proficient, floor(((data.level - 1) / 4) + 2), 0)",
       "resultType": "number",
       "dependencies": ["data.abilities.intelligence.value", "data.saves.intelligence.proficient", "data.level"]
     },
@@ -1921,7 +1921,7 @@
       "id": "wis-save-calc",
       "name": "Wisdom Save",
       "description": "Wisdom saving throw bonus",
-      "formula": "floor((data.abilities.wisdom.value - 10) / 2) + (data.saves.wisdom.proficient ? floor(((data.level - 1) / 4) + 2) : 0)",
+      "formula": "floor((data.abilities.wisdom.value - 10) / 2) + if(data.saves.wisdom.proficient, floor(((data.level - 1) / 4) + 2), 0)",
       "resultType": "number",
       "dependencies": ["data.abilities.wisdom.value", "data.saves.wisdom.proficient", "data.level"]
     },
@@ -1929,7 +1929,7 @@
       "id": "cha-save-calc",
       "name": "Charisma Save",
       "description": "Charisma saving throw bonus",
-      "formula": "floor((data.abilities.charisma.value - 10) / 2) + (data.saves.charisma.proficient ? floor(((data.level - 1) / 4) + 2) : 0)",
+      "formula": "floor((data.abilities.charisma.value - 10) / 2) + if(data.saves.charisma.proficient, floor(((data.level - 1) / 4) + 2), 0)",
       "resultType": "number",
       "dependencies": ["data.abilities.charisma.value", "data.saves.charisma.proficient", "data.level"]
     },
@@ -1937,7 +1937,7 @@
       "id": "acrobatics-calc",
       "name": "Acrobatics",
       "description": "Acrobatics skill bonus",
-      "formula": "floor((data.abilities.dexterity.value - 10) / 2) + (data.skills.acrobatics.proficient ? floor(((data.level - 1) / 4) + 2) : 0)",
+      "formula": "floor((data.abilities.dexterity.value - 10) / 2) + if(data.skills.acrobatics.proficient, floor(((data.level - 1) / 4) + 2), 0)",
       "resultType": "number",
       "dependencies": ["data.abilities.dexterity.value", "data.skills.acrobatics.proficient", "data.level"]
     },
@@ -1945,7 +1945,7 @@
       "id": "animal-handling-calc",
       "name": "Animal Handling",
       "description": "Animal Handling skill bonus",
-      "formula": "floor((data.abilities.wisdom.value - 10) / 2) + (data.skills.animalHandling.proficient ? floor(((data.level - 1) / 4) + 2) : 0)",
+      "formula": "floor((data.abilities.wisdom.value - 10) / 2) + if(data.skills.animalHandling.proficient, floor(((data.level - 1) / 4) + 2), 0)",
       "resultType": "number",
       "dependencies": ["data.abilities.wisdom.value", "data.skills.animalHandling.proficient", "data.level"]
     },
@@ -1953,7 +1953,7 @@
       "id": "arcana-calc",
       "name": "Arcana",
       "description": "Arcana skill bonus",
-      "formula": "floor((data.abilities.intelligence.value - 10) / 2) + (data.skills.arcana.proficient ? floor(((data.level - 1) / 4) + 2) : 0)",
+      "formula": "floor((data.abilities.intelligence.value - 10) / 2) + if(data.skills.arcana.proficient, floor(((data.level - 1) / 4) + 2), 0)",
       "resultType": "number",
       "dependencies": ["data.abilities.intelligence.value", "data.skills.arcana.proficient", "data.level"]
     },
@@ -1961,7 +1961,7 @@
       "id": "athletics-calc",
       "name": "Athletics",
       "description": "Athletics skill bonus",
-      "formula": "floor((data.abilities.strength.value - 10) / 2) + (data.skills.athletics.proficient ? floor(((data.level - 1) / 4) + 2) : 0)",
+      "formula": "floor((data.abilities.strength.value - 10) / 2) + if(data.skills.athletics.proficient, floor(((data.level - 1) / 4) + 2), 0)",
       "resultType": "number",
       "dependencies": ["data.abilities.strength.value", "data.skills.athletics.proficient", "data.level"]
     },
@@ -1969,7 +1969,7 @@
       "id": "deception-calc",
       "name": "Deception",
       "description": "Deception skill bonus",
-      "formula": "floor((data.abilities.charisma.value - 10) / 2) + (data.skills.deception.proficient ? floor(((data.level - 1) / 4) + 2) : 0)",
+      "formula": "floor((data.abilities.charisma.value - 10) / 2) + if(data.skills.deception.proficient, floor(((data.level - 1) / 4) + 2), 0)",
       "resultType": "number",
       "dependencies": ["data.abilities.charisma.value", "data.skills.deception.proficient", "data.level"]
     },
@@ -1977,7 +1977,7 @@
       "id": "history-calc",
       "name": "History",
       "description": "History skill bonus",
-      "formula": "floor((data.abilities.intelligence.value - 10) / 2) + (data.skills.history.proficient ? floor(((data.level - 1) / 4) + 2) : 0)",
+      "formula": "floor((data.abilities.intelligence.value - 10) / 2) + if(data.skills.history.proficient, floor(((data.level - 1) / 4) + 2), 0)",
       "resultType": "number",
       "dependencies": ["data.abilities.intelligence.value", "data.skills.history.proficient", "data.level"]
     },
@@ -1985,7 +1985,7 @@
       "id": "insight-calc",
       "name": "Insight",
       "description": "Insight skill bonus",
-      "formula": "floor((data.abilities.wisdom.value - 10) / 2) + (data.skills.insight.proficient ? floor(((data.level - 1) / 4) + 2) : 0)",
+      "formula": "floor((data.abilities.wisdom.value - 10) / 2) + if(data.skills.insight.proficient, floor(((data.level - 1) / 4) + 2), 0)",
       "resultType": "number",
       "dependencies": ["data.abilities.wisdom.value", "data.skills.insight.proficient", "data.level"]
     },
@@ -1993,7 +1993,7 @@
       "id": "intimidation-calc",
       "name": "Intimidation",
       "description": "Intimidation skill bonus",
-      "formula": "floor((data.abilities.charisma.value - 10) / 2) + (data.skills.intimidation.proficient ? floor(((data.level - 1) / 4) + 2) : 0)",
+      "formula": "floor((data.abilities.charisma.value - 10) / 2) + if(data.skills.intimidation.proficient, floor(((data.level - 1) / 4) + 2), 0)",
       "resultType": "number",
       "dependencies": ["data.abilities.charisma.value", "data.skills.intimidation.proficient", "data.level"]
     },
@@ -2001,7 +2001,7 @@
       "id": "investigation-calc",
       "name": "Investigation",
       "description": "Investigation skill bonus",
-      "formula": "floor((data.abilities.intelligence.value - 10) / 2) + (data.skills.investigation.proficient ? floor(((data.level - 1) / 4) + 2) : 0)",
+      "formula": "floor((data.abilities.intelligence.value - 10) / 2) + if(data.skills.investigation.proficient, floor(((data.level - 1) / 4) + 2), 0)",
       "resultType": "number",
       "dependencies": ["data.abilities.intelligence.value", "data.skills.investigation.proficient", "data.level"]
     },
@@ -2009,7 +2009,7 @@
       "id": "medicine-calc",
       "name": "Medicine",
       "description": "Medicine skill bonus",
-      "formula": "floor((data.abilities.wisdom.value - 10) / 2) + (data.skills.medicine.proficient ? floor(((data.level - 1) / 4) + 2) : 0)",
+      "formula": "floor((data.abilities.wisdom.value - 10) / 2) + if(data.skills.medicine.proficient, floor(((data.level - 1) / 4) + 2), 0)",
       "resultType": "number",
       "dependencies": ["data.abilities.wisdom.value", "data.skills.medicine.proficient", "data.level"]
     },
@@ -2017,7 +2017,7 @@
       "id": "nature-calc",
       "name": "Nature",
       "description": "Nature skill bonus",
-      "formula": "floor((data.abilities.intelligence.value - 10) / 2) + (data.skills.nature.proficient ? floor(((data.level - 1) / 4) + 2) : 0)",
+      "formula": "floor((data.abilities.intelligence.value - 10) / 2) + if(data.skills.nature.proficient, floor(((data.level - 1) / 4) + 2), 0)",
       "resultType": "number",
       "dependencies": ["data.abilities.intelligence.value", "data.skills.nature.proficient", "data.level"]
     },
@@ -2025,7 +2025,7 @@
       "id": "perception-calc",
       "name": "Perception",
       "description": "Perception skill bonus",
-      "formula": "floor((data.abilities.wisdom.value - 10) / 2) + (data.skills.perception.proficient ? floor(((data.level - 1) / 4) + 2) : 0)",
+      "formula": "floor((data.abilities.wisdom.value - 10) / 2) + if(data.skills.perception.proficient, floor(((data.level - 1) / 4) + 2), 0)",
       "resultType": "number",
       "dependencies": ["data.abilities.wisdom.value", "data.skills.perception.proficient", "data.level"]
     },
@@ -2033,7 +2033,7 @@
       "id": "performance-calc",
       "name": "Performance",
       "description": "Performance skill bonus",
-      "formula": "floor((data.abilities.charisma.value - 10) / 2) + (data.skills.performance.proficient ? floor(((data.level - 1) / 4) + 2) : 0)",
+      "formula": "floor((data.abilities.charisma.value - 10) / 2) + if(data.skills.performance.proficient, floor(((data.level - 1) / 4) + 2), 0)",
       "resultType": "number",
       "dependencies": ["data.abilities.charisma.value", "data.skills.performance.proficient", "data.level"]
     },
@@ -2041,7 +2041,7 @@
       "id": "persuasion-calc",
       "name": "Persuasion",
       "description": "Persuasion skill bonus",
-      "formula": "floor((data.abilities.charisma.value - 10) / 2) + (data.skills.persuasion.proficient ? floor(((data.level - 1) / 4) + 2) : 0)",
+      "formula": "floor((data.abilities.charisma.value - 10) / 2) + if(data.skills.persuasion.proficient, floor(((data.level - 1) / 4) + 2), 0)",
       "resultType": "number",
       "dependencies": ["data.abilities.charisma.value", "data.skills.persuasion.proficient", "data.level"]
     },
@@ -2049,7 +2049,7 @@
       "id": "religion-calc",
       "name": "Religion",
       "description": "Religion skill bonus",
-      "formula": "floor((data.abilities.intelligence.value - 10) / 2) + (data.skills.religion.proficient ? floor(((data.level - 1) / 4) + 2) : 0)",
+      "formula": "floor((data.abilities.intelligence.value - 10) / 2) + if(data.skills.religion.proficient, floor(((data.level - 1) / 4) + 2), 0)",
       "resultType": "number",
       "dependencies": ["data.abilities.intelligence.value", "data.skills.religion.proficient", "data.level"]
     },
@@ -2057,7 +2057,7 @@
       "id": "sleight-of-hand-calc",
       "name": "Sleight of Hand",
       "description": "Sleight of Hand skill bonus",
-      "formula": "floor((data.abilities.dexterity.value - 10) / 2) + (data.skills.sleightOfHand.proficient ? floor(((data.level - 1) / 4) + 2) : 0)",
+      "formula": "floor((data.abilities.dexterity.value - 10) / 2) + if(data.skills.sleightOfHand.proficient, floor(((data.level - 1) / 4) + 2), 0)",
       "resultType": "number",
       "dependencies": ["data.abilities.dexterity.value", "data.skills.sleightOfHand.proficient", "data.level"]
     },
@@ -2065,7 +2065,7 @@
       "id": "stealth-calc",
       "name": "Stealth",
       "description": "Stealth skill bonus",
-      "formula": "floor((data.abilities.dexterity.value - 10) / 2) + (data.skills.stealth.proficient ? floor(((data.level - 1) / 4) + 2) : 0)",
+      "formula": "floor((data.abilities.dexterity.value - 10) / 2) + if(data.skills.stealth.proficient, floor(((data.level - 1) / 4) + 2), 0)",
       "resultType": "number",
       "dependencies": ["data.abilities.dexterity.value", "data.skills.stealth.proficient", "data.level"]
     },
@@ -2073,7 +2073,7 @@
       "id": "survival-calc",
       "name": "Survival",
       "description": "Survival skill bonus",
-      "formula": "floor((data.abilities.wisdom.value - 10) / 2) + (data.skills.survival.proficient ? floor(((data.level - 1) / 4) + 2) : 0)",
+      "formula": "floor((data.abilities.wisdom.value - 10) / 2) + if(data.skills.survival.proficient, floor(((data.level - 1) / 4) + 2), 0)",
       "resultType": "number",
       "dependencies": ["data.abilities.wisdom.value", "data.skills.survival.proficient", "data.level"]
     },
@@ -2081,7 +2081,7 @@
       "id": "passive-perception-calc",
       "name": "Passive Perception",
       "description": "Passive Perception score",
-      "formula": "10 + floor((data.abilities.wisdom.value - 10) / 2) + (data.skills.perception.proficient ? floor(((data.level - 1) / 4) + 2) : 0)",
+      "formula": "10 + floor((data.abilities.wisdom.value - 10) / 2) + if(data.skills.perception.proficient, floor(((data.level - 1) / 4) + 2), 0)",
       "resultType": "number",
       "dependencies": ["data.abilities.wisdom.value", "data.skills.perception.proficient", "data.level"]
     },
@@ -2089,7 +2089,7 @@
       "id": "spell-save-dc-calc",
       "name": "Spell Save DC",
       "description": "Spell save DC based on spellcasting ability",
-      "formula": "8 + floor(((data.level - 1) / 4) + 2) + (data.spellcasting.ability === 'intelligence' ? floor((data.abilities.intelligence.value - 10) / 2) : data.spellcasting.ability === 'wisdom' ? floor((data.abilities.wisdom.value - 10) / 2) : floor((data.abilities.charisma.value - 10) / 2))",
+      "formula": "8 + floor(((data.level - 1) / 4) + 2) + if(data.spellcasting.ability === 'intelligence', floor((data.abilities.intelligence.value - 10) / 2), if(data.spellcasting.ability === 'wisdom', floor((data.abilities.wisdom.value - 10) / 2), floor((data.abilities.charisma.value - 10) / 2)))",
       "resultType": "number",
       "dependencies": ["data.level", "data.spellcasting.ability", "data.abilities.intelligence.value", "data.abilities.wisdom.value", "data.abilities.charisma.value"]
     }

@@ -2,7 +2,7 @@
   "name": "D&D 5e NPC Sheet",
   "description": "Roleplay-focused NPC sheet for D&D 5th Edition - more detailed than monsters, optimized for social encounters",
   "entityType": "actor",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "layout": [
     {
       "type": "section",

@@ -2,7 +2,7 @@
   "name": "D&D 5e Monster Stat Block",
   "description": "Default monster and NPC stat block for D&D 5th Edition following official stat block format",
   "entityType": "monster",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "layout": [
     {
       "type": "section",

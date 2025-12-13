@@ -2,7 +2,7 @@
   "name": "D&D 5e Weapon Card",
   "description": "Weapon card for D&D 5th Edition including mundane and magical weapons",
   "entityType": "weapon",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "layout": [
     {
       "type": "section",
