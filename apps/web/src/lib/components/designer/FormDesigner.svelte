@@ -229,20 +229,11 @@
         <div class="panel-header">
           <h3>Properties</h3>
         </div>
-        <div class="panel-content">
-          <div class="placeholder">
-            <p>Node Properties</p>
-            <p class="placeholder-note">(To be implemented in Phase 3.4)</p>
-            {#if store.selectedNodeId}
-              <p class="placeholder-info">
-                Selected: {store.selectedNodeId}
-              </p>
-            {:else}
-              <p class="placeholder-info">
-                No node selected
-              </p>
-            {/if}
-          </div>
+        <div class="panel-content properties-panel">
+          <PropertyEditor
+            node={_selectedNode}
+            onUpdate={handleUpdateNode}
+          />
         </div>
       </div>
     </div>
@@ -413,6 +404,10 @@
   }
 
   .panel-content.canvas-panel {
+    padding: 0;
+  }
+
+  .panel-content.properties-panel {
     padding: 0;
   }
 

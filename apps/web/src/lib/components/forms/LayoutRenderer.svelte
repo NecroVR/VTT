@@ -14,6 +14,19 @@
 
   let { node, entity, mode, fragments, computedFields, onChange, repeaterContext }: Props = $props();
 
+  // State management for collapsible sections and tabs
+  let sectionCollapsed = $state<boolean>(false);
+  let activeTabId = $state<string | undefined>(undefined);
+
+  // Initialize state based on node type
+  $effect(() => {
+    if (node.type === 'section') {
+      sectionCollapsed = node.defaultCollapsed || false;
+    } else if (node.type === 'tabs') {
+      activeTabId = node.defaultTab || node.tabs[0]?.id;
+    }
+  });
+
   // Check visibility condition
   function evaluateCondition(condition: VisibilityCondition | undefined): boolean {
     if (!condition) return true;
@@ -268,22 +281,21 @@
       {/each}
     </div>
   {:else if node.type === 'section'}
-    {@const isCollapsed = $state(node.defaultCollapsed || false)}
     <div class="layout-section">
       <div
         class="section-header"
         class:collapsible={node.collapsible}
-        onclick={() => { if (node.collapsible) isCollapsed = !isCollapsed; }}
+        onclick={() => { if (node.collapsible) sectionCollapsed = !sectionCollapsed; }}
       >
         {#if node.icon}
           <span class="section-icon">{node.icon}</span>
         {/if}
         <span class="section-title">{node.title}</span>
         {#if node.collapsible}
-          <span class="collapse-indicator">{isCollapsed ? '▶' : '▼'}</span>
+          <span class="collapse-indicator">{sectionCollapsed ? '▶' : '▼'}</span>
         {/if}
       </div>
-      {#if !isCollapsed}
+      {#if !sectionCollapsed}
         <div class="section-content">
           {#each node.children as child}
             <svelte:self
@@ -300,14 +312,13 @@
       {/if}
     </div>
   {:else if node.type === 'tabs'}
-    {@const activeTab = $state(node.defaultTab || node.tabs[0]?.id)}
-    <div class="layout-tabs" class:tabs-{node.position || 'top'}>
+    <div class="layout-tabs tabs-{node.position || 'top'}">
       <div class="tab-bar">
         {#each node.tabs as tab}
           <button
             class="tab-button"
-            class:active={activeTab === tab.id}
-            onclick={() => { activeTab = tab.id; }}
+            class:active={activeTabId === tab.id}
+            onclick={() => { activeTabId = tab.id; }}
           >
             {#if tab.icon}
               <span class="tab-icon">{tab.icon}</span>
@@ -318,7 +329,7 @@
       </div>
       <div class="tab-content">
         {#each node.tabs as tab}
-          {#if activeTab === tab.id}
+          {#if activeTabId === tab.id}
             {#each tab.children as child}
               <svelte:self
                 node={child}
@@ -337,8 +348,7 @@
   {:else if node.type === 'static'}
     {@const interpolated = interpolateContent(node.content)}
     <div
-      class="layout-static"
-      class:static-{node.contentType || 'text'}
+      class="layout-static static-{node.contentType || 'text'}"
       style={node.style ? Object.entries(node.style).map(([k, v]) => `${k}: ${v}`).join(';') : ''}
     >
       {#if node.contentType === 'html'}
