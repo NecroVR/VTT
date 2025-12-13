@@ -1,0 +1,331 @@
+# Default Forms Guide
+
+This guide documents the default forms provided with the VTT system for various game systems.
+
+## D&D 5e OGL Forms
+
+The following default forms are provided for the D&D 5th Edition Open Game License system:
+
+### Character/Actor Sheet (`actor.form.json`)
+
+**Location**: `game-systems/core/dnd5e-ogl/forms/actor.form.json`
+
+**Purpose**: Default character and NPC sheet for D&D 5th Edition.
+
+**Key Features**:
+- Character information (name, class, race, level)
+- Ability scores (Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma)
+- Hit points tracking
+- Tabbed interface for inventory, spells, and notes
+
+**Entity Type**: `actor`
+
+### Item Sheet (`item.form.json`)
+
+**Location**: `game-systems/core/dnd5e-ogl/forms/item.form.json`
+
+**Purpose**: Default item sheet for D&D 5th Edition weapons, armor, and equipment.
+
+**Key Features**:
+- Item name and type selection (weapon, armor, potion, scroll, wand, ring, equipment, consumable, treasure)
+- Rich text description
+- Properties grid (rarity, attunement requirement, weight, value)
+- Tabbed interface for description and properties
+
+**Entity Type**: `item`
+
+### Spell Card (`spell.form.json`)
+
+**Location**: `game-systems/core/dnd5e-ogl/forms/spell.form.json`
+
+**Purpose**: Default spell card for D&D 5th Edition spells.
+
+**Key Features**:
+- **Header Section**:
+  - Spell name (required)
+  - Level selection (Cantrip through 9th level)
+  - School of magic (Abjuration, Conjuration, Divination, Enchantment, Evocation, Illusion, Necromancy, Transmutation)
+  - Ritual and Concentration checkboxes
+
+- **Casting Information Grid**:
+  - Casting Time (text field)
+  - Range (text field)
+  - Components (V, S, M checkboxes with conditional material description)
+  - Duration (text field)
+
+- **Description Section**:
+  - Rich text editor for spell description with preview toggle
+
+- **At Higher Levels Section** (Conditional):
+  - Only appears when "Has Higher Level Scaling" is checked
+  - Rich text editor for higher level effects
+
+- **Additional Information Section**:
+  - Has Higher Level Scaling checkbox (controls visibility of "At Higher Levels" section)
+  - Classes tag list (with suggestions for all D&D 5e classes)
+  - Source book reference
+
+**Entity Type**: `spell`
+
+**Data Bindings**:
+- `name` - Spell name
+- `data.level` - Spell level (0-9, where 0 = Cantrip)
+- `data.school` - School of magic
+- `data.ritual` - Ritual spell flag
+- `data.concentration` - Concentration requirement flag
+- `data.castingTime` - Casting time text
+- `data.range` - Range text
+- `data.components.verbal` - Verbal component flag
+- `data.components.somatic` - Somatic component flag
+- `data.components.material` - Material component flag
+- `data.components.materialDescription` - Material component description
+- `data.duration` - Duration text
+- `data.description` - Main spell description (rich text)
+- `data.hasHigherLevels` - Flag to show higher levels section
+- `data.atHigherLevels` - Higher level scaling description (rich text)
+- `data.classes` - Array of class names
+- `data.source` - Source book reference
+
+### Monster Stat Block (`monster.form.json`)
+
+**Location**: `game-systems/core/dnd5e-ogl/forms/monster.form.json`
+
+**Purpose**: Default monster and NPC stat block for D&D 5th Edition following official stat block format.
+
+**Key Features**:
+- **Header Section**:
+  - Monster name (required)
+  - Size dropdown (Tiny, Small, Medium, Large, Huge, Gargantuan)
+  - Creature type (text field for dragon, humanoid, undead, etc.)
+  - Alignment (text field)
+
+- **Basic Stats**:
+  - Armor Class (number + armor type description)
+  - Hit Points (value + dice formula like "11d10+33")
+  - Speed (walk, fly, swim, burrow, climb in feet)
+
+- **Ability Scores**:
+  - Six ability scores in a grid (STR, DEX, CON, INT, WIS, CHA)
+  - Values from 1-30
+
+- **Proficiencies**:
+  - Saving Throws (text field for formatted saves)
+  - Skills (text field for formatted skills)
+
+- **Resistances and Immunities**:
+  - Damage Vulnerabilities (tag field)
+  - Damage Resistances (tag field)
+  - Damage Immunities (tag field)
+  - Condition Immunities (tag field)
+
+- **Senses and Languages**:
+  - Senses (darkvision, passive Perception, etc.)
+  - Languages (text field)
+
+- **Challenge Rating**:
+  - Challenge Rating dropdown (0, 1/8, 1/4, 1/2, 1-30)
+  - Experience Points (number field)
+
+- **Special Traits** (Repeater):
+  - Trait name and description
+  - Supports reordering and deletion
+
+- **Actions** (Repeater):
+  - Action name and description
+  - Attack bonus, damage dice, and damage type fields
+  - Supports reordering and deletion
+
+- **Reactions** (Conditional):
+  - Only shown when "Has Reactions" is checked
+  - Repeater for reaction name and description
+
+- **Legendary Actions** (Conditional):
+  - Only shown when "Has Legendary Actions" is checked
+  - Legendary actions per round counter
+  - Legendary actions description
+  - Repeater for legendary actions with name, cost, and description
+
+- **Lair Actions** (Conditional):
+  - Only shown when "Has Lair Actions" is checked
+  - Lair actions description
+  - Repeater for lair action name and description
+
+- **Additional Notes**:
+  - Rich text editor for GM notes, lore, regional effects
+
+**Entity Type**: `monster`
+
+**Data Bindings**:
+- `name` - Monster name
+- `data.size` - Size category
+- `data.type` - Creature type
+- `data.alignment` - Alignment
+- `data.armorClass.value` - AC value
+- `data.armorClass.type` - Armor type description
+- `data.hitPoints.value` - Hit point total
+- `data.hitPoints.formula` - Hit dice formula
+- `data.speed.walk` - Walking speed
+- `data.speed.fly` - Flying speed
+- `data.speed.swim` - Swimming speed
+- `data.speed.burrow` - Burrowing speed
+- `data.speed.climb` - Climbing speed
+- `data.abilities.strength` - Strength score
+- `data.abilities.dexterity` - Dexterity score
+- `data.abilities.constitution` - Constitution score
+- `data.abilities.intelligence` - Intelligence score
+- `data.abilities.wisdom` - Wisdom score
+- `data.abilities.charisma` - Charisma score
+- `data.savingThrows` - Saving throws text
+- `data.skills` - Skills text
+- `data.damageVulnerabilities` - Damage vulnerabilities array
+- `data.damageResistances` - Damage resistances array
+- `data.damageImmunities` - Damage immunities array
+- `data.conditionImmunities` - Condition immunities array
+- `data.senses` - Senses text
+- `data.languages` - Languages text
+- `data.challengeRating` - Challenge rating value
+- `data.experiencePoints` - XP value
+- `data.traits` - Special traits array (name, description)
+- `data.actions` - Actions array (name, description, attackBonus, damageDice, damageType)
+- `data.hasReactions` - Has reactions flag
+- `data.reactions` - Reactions array (name, description)
+- `data.hasLegendaryActions` - Has legendary actions flag
+- `data.legendaryActionsPerRound` - Number of legendary actions
+- `data.legendaryActionsDescription` - Legendary actions description
+- `data.legendaryActions` - Legendary actions array (name, cost, description)
+- `data.hasLairActions` - Has lair actions flag
+- `data.lairActionsDescription` - Lair actions description
+- `data.lairActions` - Lair actions array (name, description)
+- `data.notes` - Additional notes (rich text)
+
+**Computed Fields**:
+- Ability modifiers for all six abilities (automatically calculated from ability scores)
+
+**Styling**:
+- Uses "parchment" theme for authentic D&D look
+- Custom CSS for monster stat block formatting
+- Custom CSS variables for colors and borders
+
+## Form Schema Patterns
+
+### Common Patterns in Default Forms
+
+#### 1. Required Fields
+Fields that are essential to the entity should be marked with `"required": true`:
+```json
+{
+  "type": "field",
+  "id": "spell-name",
+  "fieldType": "text",
+  "binding": "name",
+  "label": "Spell Name",
+  "required": true
+}
+```
+
+#### 2. Conditional Sections
+Use conditional nodes to show/hide sections based on field values:
+```json
+{
+  "type": "conditional",
+  "id": "higher-levels-conditional",
+  "condition": {
+    "type": "simple",
+    "field": "data.hasHigherLevels",
+    "operator": "equals",
+    "value": true
+  },
+  "then": [
+    {
+      "type": "section",
+      "id": "higher-levels-section",
+      "title": "At Higher Levels",
+      "children": [...]
+    }
+  ]
+}
+```
+
+#### 3. Grid Layouts
+Use grid layouts for organized field presentation:
+```json
+{
+  "type": "grid",
+  "id": "casting-grid",
+  "columns": 2,
+  "gap": "1rem",
+  "children": [...]
+}
+```
+
+#### 4. Tag Fields with Suggestions
+Provide suggestions while allowing custom values:
+```json
+{
+  "type": "field",
+  "id": "spell-classes",
+  "fieldType": "tags",
+  "binding": "data.classes",
+  "label": "Classes",
+  "options": {
+    "suggestions": ["Bard", "Cleric", "Druid", ...],
+    "allowCustom": true
+  }
+}
+```
+
+#### 5. Rich Text with Preview
+Enable preview toggle for markdown content:
+```json
+{
+  "type": "field",
+  "id": "description-field",
+  "fieldType": "richtext",
+  "binding": "data.description",
+  "label": "Spell Description",
+  "options": {
+    "multiline": true,
+    "showPreview": true
+  }
+}
+```
+
+## Creating Custom Forms
+
+To create a custom form based on these defaults:
+
+1. **Copy the default form** as a starting point
+2. **Modify the layout** to match your needs
+3. **Update bindings** to match your data structure
+4. **Adjust field types** as needed
+5. **Add or remove sections** to suit your requirements
+6. **Test thoroughly** with sample data
+
+## Form Validation
+
+All forms should:
+- Have valid JSON syntax
+- Include required metadata (name, description, entityType, version)
+- Use valid field types from the schema
+- Have unique node IDs
+- Use correct binding paths
+- Include appropriate labels and help text
+
+## Best Practices
+
+1. **Keep forms focused**: Each form should represent one entity type
+2. **Use sections**: Group related fields together
+3. **Provide placeholders**: Help users understand expected input
+4. **Use appropriate field types**: Match the data type to the field type
+5. **Add help text**: Explain complex fields
+6. **Test with real data**: Ensure bindings work correctly
+7. **Consider mobile**: Keep layouts responsive
+8. **Accessibility**: Include labels and ARIA attributes
+
+## Version History
+
+- **1.0.0** (2025-12-12): Initial default forms for D&D 5e
+  - Actor/Character sheet
+  - Item sheet
+  - Spell card
+  - Monster stat block

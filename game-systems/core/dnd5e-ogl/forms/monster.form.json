@@ -1,0 +1,956 @@
+{
+  "name": "D&D 5e Monster Stat Block",
+  "description": "Default monster and NPC stat block for D&D 5th Edition following official stat block format",
+  "entityType": "monster",
+  "version": "1.0.0",
+  "layout": [
+    {
+      "type": "section",
+      "id": "monster-header",
+      "collapsible": false,
+      "className": "monster-header",
+      "children": [
+        {
+          "type": "field",
+          "id": "monster-name",
+          "fieldType": "text",
+          "binding": "name",
+          "label": "Monster Name",
+          "required": true,
+          "options": {
+            "placeholder": "Ancient Red Dragon"
+          },
+          "className": "monster-name"
+        },
+        {
+          "type": "grid",
+          "id": "monster-type-grid",
+          "columns": 3,
+          "gap": "0.5rem",
+          "children": [
+            {
+              "type": "field",
+              "id": "monster-size",
+              "fieldType": "select",
+              "binding": "data.size",
+              "label": "Size",
+              "options": {
+                "options": [
+                  { "value": "tiny", "label": "Tiny" },
+                  { "value": "small", "label": "Small" },
+                  { "value": "medium", "label": "Medium" },
+                  { "value": "large", "label": "Large" },
+                  { "value": "huge", "label": "Huge" },
+                  { "value": "gargantuan", "label": "Gargantuan" }
+                ]
+              }
+            },
+            {
+              "type": "field",
+              "id": "monster-type",
+              "fieldType": "text",
+              "binding": "data.type",
+              "label": "Type",
+              "options": {
+                "placeholder": "dragon, humanoid, undead, etc."
+              }
+            },
+            {
+              "type": "field",
+              "id": "monster-alignment",
+              "fieldType": "text",
+              "binding": "data.alignment",
+              "label": "Alignment",
+              "options": {
+                "placeholder": "chaotic evil"
+              }
+            }
+          ]
+        },
+        {
+          "type": "divider",
+          "id": "header-divider",
+          "orientation": "horizontal"
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "basic-stats",
+      "collapsible": false,
+      "className": "monster-stats",
+      "children": [
+        {
+          "type": "grid",
+          "id": "ac-hp-speed-grid",
+          "columns": 3,
+          "gap": "1rem",
+          "children": [
+            {
+              "type": "container",
+              "id": "ac-container",
+              "children": [
+                {
+                  "type": "field",
+                  "id": "armor-class",
+                  "fieldType": "number",
+                  "binding": "data.armorClass.value",
+                  "label": "Armor Class",
+                  "options": {
+                    "min": 1,
+                    "max": 30
+                  }
+                },
+                {
+                  "type": "field",
+                  "id": "armor-type",
+                  "fieldType": "text",
+                  "binding": "data.armorClass.type",
+                  "label": "Armor Type",
+                  "options": {
+                    "placeholder": "natural armor"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "container",
+              "id": "hp-container",
+              "children": [
+                {
+                  "type": "field",
+                  "id": "hit-points",
+                  "fieldType": "number",
+                  "binding": "data.hitPoints.value",
+                  "label": "Hit Points",
+                  "options": {
+                    "min": 1
+                  }
+                },
+                {
+                  "type": "field",
+                  "id": "hit-dice",
+                  "fieldType": "text",
+                  "binding": "data.hitPoints.formula",
+                  "label": "Hit Dice",
+                  "options": {
+                    "placeholder": "11d10+33"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "container",
+              "id": "speed-container",
+              "children": [
+                {
+                  "type": "field",
+                  "id": "speed-walk",
+                  "fieldType": "number",
+                  "binding": "data.speed.walk",
+                  "label": "Walk Speed (ft)",
+                  "options": {
+                    "min": 0,
+                    "step": 5
+                  }
+                },
+                {
+                  "type": "field",
+                  "id": "speed-fly",
+                  "fieldType": "number",
+                  "binding": "data.speed.fly",
+                  "label": "Fly Speed (ft)",
+                  "options": {
+                    "min": 0,
+                    "step": 5
+                  }
+                },
+                {
+                  "type": "field",
+                  "id": "speed-swim",
+                  "fieldType": "number",
+                  "binding": "data.speed.swim",
+                  "label": "Swim Speed (ft)",
+                  "options": {
+                    "min": 0,
+                    "step": 5
+                  }
+                },
+                {
+                  "type": "field",
+                  "id": "speed-burrow",
+                  "fieldType": "number",
+                  "binding": "data.speed.burrow",
+                  "label": "Burrow Speed (ft)",
+                  "options": {
+                    "min": 0,
+                    "step": 5
+                  }
+                },
+                {
+                  "type": "field",
+                  "id": "speed-climb",
+                  "fieldType": "number",
+                  "binding": "data.speed.climb",
+                  "label": "Climb Speed (ft)",
+                  "options": {
+                    "min": 0,
+                    "step": 5
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "divider",
+          "id": "stats-divider",
+          "orientation": "horizontal"
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "ability-scores",
+      "title": "Ability Scores",
+      "collapsible": false,
+      "className": "monster-abilities",
+      "children": [
+        {
+          "type": "grid",
+          "id": "abilities-grid",
+          "columns": 6,
+          "gap": "0.5rem",
+          "children": [
+            {
+              "type": "field",
+              "id": "strength",
+              "fieldType": "number",
+              "binding": "data.abilities.strength",
+              "label": "STR",
+              "options": {
+                "min": 1,
+                "max": 30
+              }
+            },
+            {
+              "type": "field",
+              "id": "dexterity",
+              "fieldType": "number",
+              "binding": "data.abilities.dexterity",
+              "label": "DEX",
+              "options": {
+                "min": 1,
+                "max": 30
+              }
+            },
+            {
+              "type": "field",
+              "id": "constitution",
+              "fieldType": "number",
+              "binding": "data.abilities.constitution",
+              "label": "CON",
+              "options": {
+                "min": 1,
+                "max": 30
+              }
+            },
+            {
+              "type": "field",
+              "id": "intelligence",
+              "fieldType": "number",
+              "binding": "data.abilities.intelligence",
+              "label": "INT",
+              "options": {
+                "min": 1,
+                "max": 30
+              }
+            },
+            {
+              "type": "field",
+              "id": "wisdom",
+              "fieldType": "number",
+              "binding": "data.abilities.wisdom",
+              "label": "WIS",
+              "options": {
+                "min": 1,
+                "max": 30
+              }
+            },
+            {
+              "type": "field",
+              "id": "charisma",
+              "fieldType": "number",
+              "binding": "data.abilities.charisma",
+              "label": "CHA",
+              "options": {
+                "min": 1,
+                "max": 30
+              }
+            }
+          ]
+        },
+        {
+          "type": "divider",
+          "id": "abilities-divider",
+          "orientation": "horizontal"
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "proficiencies",
+      "collapsible": true,
+      "defaultCollapsed": false,
+      "children": [
+        {
+          "type": "field",
+          "id": "saving-throws",
+          "fieldType": "text",
+          "binding": "data.savingThrows",
+          "label": "Saving Throws",
+          "options": {
+            "placeholder": "Dex +6, Con +13, Wis +7, Cha +11"
+          }
+        },
+        {
+          "type": "field",
+          "id": "skills",
+          "fieldType": "text",
+          "binding": "data.skills",
+          "label": "Skills",
+          "options": {
+            "placeholder": "Perception +13, Stealth +6"
+          }
+        },
+        {
+          "type": "divider",
+          "id": "prof-divider",
+          "orientation": "horizontal"
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "resistances",
+      "collapsible": true,
+      "defaultCollapsed": false,
+      "children": [
+        {
+          "type": "field",
+          "id": "damage-vulnerabilities",
+          "fieldType": "tags",
+          "binding": "data.damageVulnerabilities",
+          "label": "Damage Vulnerabilities",
+          "options": {
+            "allowCustom": true,
+            "suggestions": ["acid", "bludgeoning", "cold", "fire", "force", "lightning", "necrotic", "piercing", "poison", "psychic", "radiant", "slashing", "thunder"]
+          }
+        },
+        {
+          "type": "field",
+          "id": "damage-resistances",
+          "fieldType": "tags",
+          "binding": "data.damageResistances",
+          "label": "Damage Resistances",
+          "options": {
+            "allowCustom": true,
+            "suggestions": ["acid", "bludgeoning", "cold", "fire", "force", "lightning", "necrotic", "piercing", "poison", "psychic", "radiant", "slashing", "thunder", "nonmagical"]
+          }
+        },
+        {
+          "type": "field",
+          "id": "damage-immunities",
+          "fieldType": "tags",
+          "binding": "data.damageImmunities",
+          "label": "Damage Immunities",
+          "options": {
+            "allowCustom": true,
+            "suggestions": ["acid", "bludgeoning", "cold", "fire", "force", "lightning", "necrotic", "piercing", "poison", "psychic", "radiant", "slashing", "thunder"]
+          }
+        },
+        {
+          "type": "field",
+          "id": "condition-immunities",
+          "fieldType": "tags",
+          "binding": "data.conditionImmunities",
+          "label": "Condition Immunities",
+          "options": {
+            "allowCustom": true,
+            "suggestions": ["blinded", "charmed", "deafened", "exhaustion", "frightened", "grappled", "incapacitated", "invisible", "paralyzed", "petrified", "poisoned", "prone", "restrained", "stunned", "unconscious"]
+          }
+        },
+        {
+          "type": "divider",
+          "id": "resistances-divider",
+          "orientation": "horizontal"
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "senses-languages",
+      "collapsible": true,
+      "defaultCollapsed": false,
+      "children": [
+        {
+          "type": "field",
+          "id": "senses",
+          "fieldType": "text",
+          "binding": "data.senses",
+          "label": "Senses",
+          "options": {
+            "placeholder": "darkvision 120 ft., passive Perception 23"
+          }
+        },
+        {
+          "type": "field",
+          "id": "languages",
+          "fieldType": "text",
+          "binding": "data.languages",
+          "label": "Languages",
+          "options": {
+            "placeholder": "Common, Draconic"
+          }
+        },
+        {
+          "type": "divider",
+          "id": "senses-divider",
+          "orientation": "horizontal"
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "challenge",
+      "collapsible": false,
+      "children": [
+        {
+          "type": "grid",
+          "id": "challenge-grid",
+          "columns": 2,
+          "gap": "1rem",
+          "children": [
+            {
+              "type": "field",
+              "id": "challenge-rating",
+              "fieldType": "select",
+              "binding": "data.challengeRating",
+              "label": "Challenge Rating",
+              "options": {
+                "options": [
+                  { "value": "0", "label": "0" },
+                  { "value": "1/8", "label": "1/8" },
+                  { "value": "1/4", "label": "1/4" },
+                  { "value": "1/2", "label": "1/2" },
+                  { "value": "1", "label": "1" },
+                  { "value": "2", "label": "2" },
+                  { "value": "3", "label": "3" },
+                  { "value": "4", "label": "4" },
+                  { "value": "5", "label": "5" },
+                  { "value": "6", "label": "6" },
+                  { "value": "7", "label": "7" },
+                  { "value": "8", "label": "8" },
+                  { "value": "9", "label": "9" },
+                  { "value": "10", "label": "10" },
+                  { "value": "11", "label": "11" },
+                  { "value": "12", "label": "12" },
+                  { "value": "13", "label": "13" },
+                  { "value": "14", "label": "14" },
+                  { "value": "15", "label": "15" },
+                  { "value": "16", "label": "16" },
+                  { "value": "17", "label": "17" },
+                  { "value": "18", "label": "18" },
+                  { "value": "19", "label": "19" },
+                  { "value": "20", "label": "20" },
+                  { "value": "21", "label": "21" },
+                  { "value": "22", "label": "22" },
+                  { "value": "23", "label": "23" },
+                  { "value": "24", "label": "24" },
+                  { "value": "25", "label": "25" },
+                  { "value": "26", "label": "26" },
+                  { "value": "27", "label": "27" },
+                  { "value": "28", "label": "28" },
+                  { "value": "29", "label": "29" },
+                  { "value": "30", "label": "30" }
+                ]
+              }
+            },
+            {
+              "type": "field",
+              "id": "experience-points",
+              "fieldType": "number",
+              "binding": "data.experiencePoints",
+              "label": "Experience Points",
+              "readonly": false,
+              "options": {
+                "min": 0
+              }
+            }
+          ]
+        },
+        {
+          "type": "divider",
+          "id": "challenge-divider",
+          "orientation": "horizontal"
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "traits",
+      "title": "Special Traits",
+      "collapsible": true,
+      "defaultCollapsed": false,
+      "children": [
+        {
+          "type": "repeater",
+          "id": "traits-repeater",
+          "binding": "data.traits",
+          "addLabel": "Add Trait",
+          "emptyMessage": "No special traits defined",
+          "allowReorder": true,
+          "allowDelete": true,
+          "itemTemplate": [
+            {
+              "type": "field",
+              "id": "trait-name",
+              "fieldType": "text",
+              "binding": "name",
+              "label": "Trait Name",
+              "required": true,
+              "options": {
+                "placeholder": "Amphibious, Legendary Resistance, etc."
+              }
+            },
+            {
+              "type": "field",
+              "id": "trait-description",
+              "fieldType": "textarea",
+              "binding": "description",
+              "label": "Description",
+              "options": {
+                "multiline": true,
+                "placeholder": "Enter trait description..."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "actions",
+      "title": "Actions",
+      "collapsible": true,
+      "defaultCollapsed": false,
+      "children": [
+        {
+          "type": "repeater",
+          "id": "actions-repeater",
+          "binding": "data.actions",
+          "addLabel": "Add Action",
+          "emptyMessage": "No actions defined",
+          "allowReorder": true,
+          "allowDelete": true,
+          "itemTemplate": [
+            {
+              "type": "field",
+              "id": "action-name",
+              "fieldType": "text",
+              "binding": "name",
+              "label": "Action Name",
+              "required": true,
+              "options": {
+                "placeholder": "Multiattack, Bite, Claw, etc."
+              }
+            },
+            {
+              "type": "field",
+              "id": "action-description",
+              "fieldType": "textarea",
+              "binding": "description",
+              "label": "Description",
+              "options": {
+                "multiline": true,
+                "placeholder": "Melee Weapon Attack: +14 to hit, reach 10 ft., one target. Hit: 19 (2d10 + 8) piercing damage."
+              }
+            },
+            {
+              "type": "grid",
+              "id": "action-stats-grid",
+              "columns": 3,
+              "gap": "0.5rem",
+              "children": [
+                {
+                  "type": "field",
+                  "id": "action-attack-bonus",
+                  "fieldType": "number",
+                  "binding": "attackBonus",
+                  "label": "Attack Bonus",
+                  "options": {
+                    "placeholder": "+14"
+                  }
+                },
+                {
+                  "type": "field",
+                  "id": "action-damage-dice",
+                  "fieldType": "text",
+                  "binding": "damageDice",
+                  "label": "Damage Dice",
+                  "options": {
+                    "placeholder": "2d10+8"
+                  }
+                },
+                {
+                  "type": "field",
+                  "id": "action-damage-type",
+                  "fieldType": "text",
+                  "binding": "damageType",
+                  "label": "Damage Type",
+                  "options": {
+                    "placeholder": "piercing"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "conditional",
+      "id": "reactions-conditional",
+      "condition": {
+        "type": "simple",
+        "field": "data.hasReactions",
+        "operator": "equals",
+        "value": true
+      },
+      "then": [
+        {
+          "type": "section",
+          "id": "reactions",
+          "title": "Reactions",
+          "collapsible": true,
+          "defaultCollapsed": false,
+          "children": [
+            {
+              "type": "field",
+              "id": "has-reactions",
+              "fieldType": "checkbox",
+              "binding": "data.hasReactions",
+              "label": "Has Reactions"
+            },
+            {
+              "type": "repeater",
+              "id": "reactions-repeater",
+              "binding": "data.reactions",
+              "addLabel": "Add Reaction",
+              "emptyMessage": "No reactions defined",
+              "allowReorder": true,
+              "allowDelete": true,
+              "itemTemplate": [
+                {
+                  "type": "field",
+                  "id": "reaction-name",
+                  "fieldType": "text",
+                  "binding": "name",
+                  "label": "Reaction Name",
+                  "required": true,
+                  "options": {
+                    "placeholder": "Parry, Shield, etc."
+                  }
+                },
+                {
+                  "type": "field",
+                  "id": "reaction-description",
+                  "fieldType": "textarea",
+                  "binding": "description",
+                  "label": "Description",
+                  "options": {
+                    "multiline": true,
+                    "placeholder": "Enter reaction description..."
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "else": [
+        {
+          "type": "field",
+          "id": "has-reactions-toggle",
+          "fieldType": "checkbox",
+          "binding": "data.hasReactions",
+          "label": "Has Reactions"
+        }
+      ]
+    },
+    {
+      "type": "conditional",
+      "id": "legendary-conditional",
+      "condition": {
+        "type": "simple",
+        "field": "data.hasLegendaryActions",
+        "operator": "equals",
+        "value": true
+      },
+      "then": [
+        {
+          "type": "section",
+          "id": "legendary-actions",
+          "title": "Legendary Actions",
+          "collapsible": true,
+          "defaultCollapsed": false,
+          "children": [
+            {
+              "type": "field",
+              "id": "has-legendary",
+              "fieldType": "checkbox",
+              "binding": "data.hasLegendaryActions",
+              "label": "Has Legendary Actions"
+            },
+            {
+              "type": "field",
+              "id": "legendary-count",
+              "fieldType": "number",
+              "binding": "data.legendaryActionsPerRound",
+              "label": "Legendary Actions Per Round",
+              "options": {
+                "min": 1,
+                "max": 5
+              }
+            },
+            {
+              "type": "field",
+              "id": "legendary-description",
+              "fieldType": "textarea",
+              "binding": "data.legendaryActionsDescription",
+              "label": "Legendary Actions Description",
+              "options": {
+                "multiline": true,
+                "placeholder": "The monster can take 3 legendary actions, choosing from the options below..."
+              }
+            },
+            {
+              "type": "repeater",
+              "id": "legendary-actions-repeater",
+              "binding": "data.legendaryActions",
+              "addLabel": "Add Legendary Action",
+              "emptyMessage": "No legendary actions defined",
+              "allowReorder": true,
+              "allowDelete": true,
+              "itemTemplate": [
+                {
+                  "type": "field",
+                  "id": "legendary-action-name",
+                  "fieldType": "text",
+                  "binding": "name",
+                  "label": "Action Name",
+                  "required": true,
+                  "options": {
+                    "placeholder": "Detect, Tail Attack, Wing Attack, etc."
+                  }
+                },
+                {
+                  "type": "field",
+                  "id": "legendary-action-cost",
+                  "fieldType": "number",
+                  "binding": "cost",
+                  "label": "Action Cost",
+                  "options": {
+                    "min": 1,
+                    "max": 3
+                  }
+                },
+                {
+                  "type": "field",
+                  "id": "legendary-action-description",
+                  "fieldType": "textarea",
+                  "binding": "description",
+                  "label": "Description",
+                  "options": {
+                    "multiline": true,
+                    "placeholder": "Enter legendary action description..."
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "else": [
+        {
+          "type": "field",
+          "id": "has-legendary-toggle",
+          "fieldType": "checkbox",
+          "binding": "data.hasLegendaryActions",
+          "label": "Has Legendary Actions"
+        }
+      ]
+    },
+    {
+      "type": "conditional",
+      "id": "lair-conditional",
+      "condition": {
+        "type": "simple",
+        "field": "data.hasLairActions",
+        "operator": "equals",
+        "value": true
+      },
+      "then": [
+        {
+          "type": "section",
+          "id": "lair-actions",
+          "title": "Lair Actions",
+          "collapsible": true,
+          "defaultCollapsed": false,
+          "children": [
+            {
+              "type": "field",
+              "id": "has-lair",
+              "fieldType": "checkbox",
+              "binding": "data.hasLairActions",
+              "label": "Has Lair Actions"
+            },
+            {
+              "type": "field",
+              "id": "lair-description",
+              "fieldType": "textarea",
+              "binding": "data.lairActionsDescription",
+              "label": "Lair Actions Description",
+              "options": {
+                "multiline": true,
+                "placeholder": "On initiative count 20 (losing initiative ties), the monster takes a lair action..."
+              }
+            },
+            {
+              "type": "repeater",
+              "id": "lair-actions-repeater",
+              "binding": "data.lairActions",
+              "addLabel": "Add Lair Action",
+              "emptyMessage": "No lair actions defined",
+              "allowReorder": true,
+              "allowDelete": true,
+              "itemTemplate": [
+                {
+                  "type": "field",
+                  "id": "lair-action-name",
+                  "fieldType": "text",
+                  "binding": "name",
+                  "label": "Action Name",
+                  "required": true,
+                  "options": {
+                    "placeholder": "Grasping Roots, Volcanic Gas, etc."
+                  }
+                },
+                {
+                  "type": "field",
+                  "id": "lair-action-description",
+                  "fieldType": "textarea",
+                  "binding": "description",
+                  "label": "Description",
+                  "options": {
+                    "multiline": true,
+                    "placeholder": "Enter lair action description..."
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "else": [
+        {
+          "type": "field",
+          "id": "has-lair-toggle",
+          "fieldType": "checkbox",
+          "binding": "data.hasLairActions",
+          "label": "Has Lair Actions"
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "additional-notes",
+      "title": "Additional Notes",
+      "collapsible": true,
+      "defaultCollapsed": true,
+      "children": [
+        {
+          "type": "field",
+          "id": "notes",
+          "fieldType": "richtext",
+          "binding": "data.notes",
+          "label": "Notes",
+          "options": {
+            "multiline": true,
+            "placeholder": "Additional GM notes, lore, regional effects, etc."
+          }
+        }
+      ]
+    }
+  ],
+  "fragments": [],
+  "styles": {
+    "theme": "parchment",
+    "variables": {
+      "--monster-header-bg": "#f0e6d2",
+      "--monster-divider-color": "#8b4513",
+      "--monster-section-border": "#d4af37"
+    },
+    "customCSS": ".monster-header { background: var(--monster-header-bg); padding: 1rem; border-radius: 0.5rem; } .monster-name { font-size: 1.5rem; font-weight: bold; text-transform: uppercase; } .monster-stats { font-family: 'Modesto Condensed', serif; } .monster-abilities { text-align: center; }"
+  },
+  "computedFields": [
+    {
+      "id": "strength-modifier",
+      "name": "Strength Modifier",
+      "description": "Calculated strength modifier",
+      "formula": "floor((@abilities.strength - 10) / 2)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.strength"]
+    },
+    {
+      "id": "dexterity-modifier",
+      "name": "Dexterity Modifier",
+      "description": "Calculated dexterity modifier",
+      "formula": "floor((@abilities.dexterity - 10) / 2)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.dexterity"]
+    },
+    {
+      "id": "constitution-modifier",
+      "name": "Constitution Modifier",
+      "description": "Calculated constitution modifier",
+      "formula": "floor((@abilities.constitution - 10) / 2)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.constitution"]
+    },
+    {
+      "id": "intelligence-modifier",
+      "name": "Intelligence Modifier",
+      "description": "Calculated intelligence modifier",
+      "formula": "floor((@abilities.intelligence - 10) / 2)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.intelligence"]
+    },
+    {
+      "id": "wisdom-modifier",
+      "name": "Wisdom Modifier",
+      "description": "Calculated wisdom modifier",
+      "formula": "floor((@abilities.wisdom - 10) / 2)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.wisdom"]
+    },
+    {
+      "id": "charisma-modifier",
+      "name": "Charisma Modifier",
+      "description": "Calculated charisma modifier",
+      "formula": "floor((@abilities.charisma - 10) / 2)",
+      "resultType": "number",
+      "dependencies": ["data.abilities.charisma"]
+    }
+  ]
+}
