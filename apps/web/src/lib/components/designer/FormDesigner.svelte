@@ -1,10 +1,12 @@
 <script lang="ts">
   import type { FormDefinition } from '@vtt/shared';
-  import { formDesignerStore, canUndo, canRedo, isSaving } from '$lib/stores/formDesigner';
+  import { formDesignerStore, canUndo, canRedo, isSaving, selectedNode } from '$lib/stores/formDesigner';
   import { goto } from '$app/navigation';
   import FormRenderer from '$lib/components/forms/FormRenderer.svelte';
   import ComponentPalette from './ComponentPalette.svelte';
   import DesignerCanvas from './DesignerCanvas.svelte';
+  import TreeView from './TreeView.svelte';
+  import PropertyEditor from './PropertyEditor.svelte';
 
   // Props
   interface Props {
@@ -18,6 +20,7 @@
   let _canUndo = $derived($canUndo);
   let _canRedo = $derived($canRedo);
   let _isSaving = $derived($isSaving);
+  let _selectedNode = $derived($selectedNode);
 
   // Local state
   let formName = $state(formDefinition.name);
@@ -91,6 +94,13 @@
   // Handle node selection
   function handleSelectNode(nodeId: string | null) {
     formDesignerStore.selectNode(nodeId);
+  }
+
+  // Handle node property updates
+  function handleUpdateNode(updates: Partial<typeof store.form.layout[0]>) {
+    if (store.selectedNodeId) {
+      formDesignerStore.updateNode(store.selectedNodeId, updates);
+    }
   }
 </script>
 
@@ -176,13 +186,25 @@
   {:else}
     <!-- Design Mode: Three-panel layout -->
     <div class="designer-layout">
-      <!-- Left Panel: Component Palette -->
+      <!-- Left Panel: Component Palette & Tree View -->
       <div class="panel panel-left">
-        <div class="panel-header">
-          <h3>Components</h3>
+        <div class="palette-section">
+          <div class="panel-header">
+            <h3>Components</h3>
+          </div>
+          <div class="panel-content palette-content">
+            <ComponentPalette />
+          </div>
         </div>
-        <div class="panel-content">
-          <ComponentPalette />
+
+        <div class="tree-section">
+          {#if store.form}
+            <TreeView
+              layout={store.form.layout}
+              selectedNodeId={store.selectedNodeId}
+              onSelectNode={handleSelectNode}
+            />
+          {/if}
         </div>
       </div>
 
@@ -390,9 +412,36 @@
     padding: 1rem;
   }
 
+  .panel-content.canvas-panel {
+    padding: 0;
+  }
+
   /* Left Panel */
   .panel-left {
     grid-column: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .palette-section {
+    flex: 0 0 auto;
+    max-height: 40%;
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid var(--border-color, #ddd);
+    overflow: hidden;
+  }
+
+  .palette-content {
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .tree-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   /* Center Panel */
