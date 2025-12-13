@@ -339,35 +339,44 @@
   }
 </script>
 
-<div class="component-palette">
+<div class="component-palette" role="region" aria-label="Component palette">
   <!-- Search Input -->
   <div class="palette-search">
+    <label for="component-search" class="sr-only">Search components</label>
     <input
-      type="text"
+      id="component-search"
+      type="search"
       placeholder="Search components..."
       bind:value={searchQuery}
       class="search-input"
+      aria-label="Search components"
+      aria-controls="palette-categories"
     />
   </div>
 
   <!-- Component Categories -->
-  <div class="palette-categories">
+  <div id="palette-categories" class="palette-categories" role="list" aria-label="Component categories">
     {#each filteredCategories() as category (category.id)}
-      <div class="category">
+      <div class="category" role="listitem">
         <button
           type="button"
           class="category-header"
           onclick={() => toggleCategory(category.id)}
+          aria-expanded={isCategoryExpanded(category.id)}
+          aria-controls="category-{category.id}"
+          aria-label="Toggle {category.name} category"
         >
-          <span class="category-icon">
+          <span class="category-icon" aria-hidden="true">
             {isCategoryExpanded(category.id) ? '▼' : '▶'}
           </span>
           <span class="category-name">{category.name}</span>
-          <span class="category-count">{category.components.length}</span>
+          <span class="category-count" aria-label="{category.components.length} components">
+            {category.components.length}
+          </span>
         </button>
 
         {#if isCategoryExpanded(category.id)}
-          <div class="category-content">
+          <div class="category-content" id="category-{category.id}" role="group" aria-label="{category.name} components">
             {#each category.components as component (component.type)}
               <PaletteItem
                 type={component.type}
@@ -383,7 +392,7 @@
     {/each}
 
     {#if filteredCategories().length === 0}
-      <div class="no-results">
+      <div class="no-results" role="status" aria-live="polite">
         <p>No components found</p>
         <p class="no-results-hint">Try a different search term</p>
       </div>
@@ -515,5 +524,25 @@
 
   .palette-categories::-webkit-scrollbar-thumb:hover {
     background: var(--scrollbar-thumb-hover, #a8a8a8);
+  }
+
+  /* Screen reader only text */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Focus styles for accessibility */
+  .search-input:focus-visible,
+  .category-header:focus-visible {
+    outline: 2px solid var(--primary-color, #007bff);
+    outline-offset: 2px;
   }
 </style>

@@ -24,6 +24,9 @@
   // Track changes for dirty state
   let isDirty = $state(false);
 
+  // Loading state for save operations
+  let isSaving = $state(false);
+
   // Generate scope class for this form
   const scopeClass = generateFormScopeClass(form.id);
 
@@ -64,9 +67,16 @@
     onChange?.(path, value);
   }
 
-  function handleSave() {
-    onSave?.();
-    isDirty = false;
+  async function handleSave() {
+    if (isSaving) return;
+
+    isSaving = true;
+    try {
+      await onSave?.();
+      isDirty = false;
+    } finally {
+      isSaving = false;
+    }
   }
 </script>
 
@@ -83,8 +93,10 @@
   class:view-mode={mode === 'view'}
   class:edit-mode={mode === 'edit'}
   style={cssVariablesStyle()}
+  role="form"
+  aria-label={form.name}
 >
-  <div class="form-content">
+  <div class="form-content" role="main" aria-label="Form fields">
     {#each form.layout as node}
       <LayoutRenderer
         {node}
@@ -98,14 +110,23 @@
   </div>
 
   {#if mode === 'edit'}
-    <div class="form-actions">
+    <div class="form-actions" role="group" aria-label="Form actions">
       <button
         type="button"
         class="save-btn"
-        disabled={!isDirty}
+        class:loading={isSaving}
+        disabled={!isDirty || isSaving}
         onclick={handleSave}
+        aria-label={isSaving ? 'Saving changes...' : isDirty ? 'Save changes' : 'No changes to save'}
+        aria-live="polite"
+        aria-busy={isSaving}
       >
-        Save
+        {#if isSaving}
+          <span class="spinner" aria-hidden="true"></span>
+          Saving...
+        {:else}
+          Save
+        {/if}
       </button>
     </div>
   {/if}
@@ -154,5 +175,33 @@
   .save-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+
+  .save-btn.loading {
+    position: relative;
+    padding-left: 2.5rem;
+  }
+
+  .spinner {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: translateY(-50%) rotate(360deg); }
+  }
+
+  /* Focus styles for accessibility */
+  .save-btn:focus-visible {
+    outline: 2px solid var(--form-primary-color, #007bff);
+    outline-offset: 2px;
   }
 </style>

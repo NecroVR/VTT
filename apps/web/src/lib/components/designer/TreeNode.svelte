@@ -49,21 +49,26 @@
   }
 </script>
 
-<div class="tree-node" class:selected={isSelected}>
+<div class="tree-node" class:selected={isSelected} data-node-id={node.id}>
   <div
     class="tree-node-content"
     style="padding-left: {depth * 16}px"
     onclick={handleClick}
     ondblclick={handleDoubleClick}
-    role="button"
-    tabindex="0"
+    role="treeitem"
+    aria-selected={isSelected}
+    aria-expanded={_hasChildren ? _isExpanded : undefined}
+    aria-level={depth + 1}
+    aria-label="{nodeInfo.label} - {node.type}"
+    tabindex="-1"
   >
     {#if _hasChildren}
       <button
         class="expand-arrow"
         class:expanded={_isExpanded}
         onclick={handleToggleExpand}
-        aria-label={_isExpanded ? 'Collapse' : 'Expand'}
+        aria-label="{_isExpanded ? 'Collapse' : 'Expand'} {nodeInfo.label}"
+        tabindex="-1"
       >
         ▶
       </button>
@@ -71,12 +76,12 @@
       <span class="expand-spacer"></span>
     {/if}
 
-    <span class="node-icon">{nodeInfo.icon}</span>
+    <span class="node-icon" aria-hidden="true">{nodeInfo.icon}</span>
     <span class="node-label">{nodeInfo.label}</span>
   </div>
 
   {#if _hasChildren && _isExpanded}
-    <div class="tree-node-children">
+    <div class="tree-node-children" role="group">
       {#each children as child (child.id)}
         <svelte:self
           node={child}

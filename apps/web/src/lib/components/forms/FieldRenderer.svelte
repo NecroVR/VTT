@@ -46,9 +46,9 @@
 
 <div class="field-wrapper" class:required={node.required}>
   {#if label}
-    <label class="field-label">
+    <label class="field-label" for="field-{node.id}">
       {label}
-      {#if node.required}<span class="required-indicator">*</span>{/if}
+      {#if node.required}<span class="required-indicator" aria-label="required">*</span>{/if}
     </label>
   {/if}
 
@@ -100,15 +100,20 @@
   {:else}
     {#if node.fieldType === 'text'}
       <input
+        id="field-{node.id}"
         type="text"
         class="field-input"
         value={value ?? ''}
         readonly={node.readonly}
         placeholder={placeholder}
+        aria-label={label ?? 'Text field'}
+        aria-required={node.required}
+        aria-describedby={helpText ? `help-{node.id}` : undefined}
         oninput={(e) => handleChange(e.currentTarget.value)}
       />
     {:else if node.fieldType === 'number'}
       <input
+        id="field-{node.id}"
         type="number"
         class="field-input"
         value={value ?? ''}
@@ -116,29 +121,44 @@
         min={node.options?.min}
         max={node.options?.max}
         step={node.options?.step}
+        aria-label={label ?? 'Number field'}
+        aria-required={node.required}
+        aria-describedby={helpText ? `help-{node.id}` : undefined}
         oninput={(e) => handleChange(parseFloat(e.currentTarget.value) || 0)}
       />
     {:else if node.fieldType === 'textarea'}
       <textarea
+        id="field-{node.id}"
         class="field-input field-textarea"
         value={value ?? ''}
         readonly={node.readonly}
         placeholder={placeholder}
+        aria-label={label ?? 'Text area'}
+        aria-required={node.required}
+        aria-describedby={helpText ? `help-{node.id}` : undefined}
         oninput={(e) => handleChange(e.currentTarget.value)}
       ></textarea>
     {:else if node.fieldType === 'checkbox'}
       <input
+        id="field-{node.id}"
         type="checkbox"
         class="field-checkbox"
         checked={!!value}
         disabled={node.readonly}
+        aria-label={label ?? 'Checkbox'}
+        aria-required={node.required}
+        aria-describedby={helpText ? `help-{node.id}` : undefined}
         onchange={(e) => handleChange(e.currentTarget.checked)}
       />
     {:else if node.fieldType === 'select'}
       <select
+        id="field-{node.id}"
         class="field-input field-select"
         value={value ?? ''}
         disabled={node.readonly}
+        aria-label={label ?? 'Select field'}
+        aria-required={node.required}
+        aria-describedby={helpText ? `help-{node.id}` : undefined}
         onchange={(e) => handleChange(e.currentTarget.value)}
       >
         <option value="">--Select--</option>
@@ -361,7 +381,7 @@
   {/if}
 
   {#if helpText}
-    <div class="field-help">{helpText}</div>
+    <div class="field-help" id="help-{node.id}">{helpText}</div>
   {/if}
 </div>
 

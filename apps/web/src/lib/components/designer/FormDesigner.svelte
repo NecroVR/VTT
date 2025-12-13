@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { FormDefinition, FormFragment } from '@vtt/shared';
-  import { formDesignerStore, canUndo, canRedo, isSaving, selectedNode } from '$lib/stores/formDesigner';
+  import { formDesignerStore, canUndo, canRedo, isSaving, selectedNode, hasClipboard, designerFeedback } from '$lib/stores/formDesigner';
   import { formsStore } from '$lib/stores/forms';
   import { goto } from '$app/navigation';
   import FormRenderer from '$lib/components/forms/FormRenderer.svelte';
@@ -14,6 +14,8 @@
   import FragmentEditor from './FragmentEditor.svelte';
   import StyleEditor from './StyleEditor.svelte';
   import ImportFormModal from './ImportFormModal.svelte';
+  import UndoHistoryPanel from './UndoHistoryPanel.svelte';
+  import SaveAsTemplateDialog from './SaveAsTemplateDialog.svelte';
 
   // Props
   interface Props {
@@ -28,6 +30,8 @@
   let _canRedo = $derived($canRedo);
   let _isSaving = $derived($isSaving);
   let _selectedNode = $derived($selectedNode);
+  let _hasClipboard = $derived($hasClipboard);
+  let _feedback = $derived($designerFeedback);
 
   // Local state
   let formName = $state(formDefinition.name);
@@ -39,6 +43,9 @@
   // Fragment editor state
   let fragmentEditorOpen = $state(false);
   let editingFragment = $state<FormFragment | null>(null);
+
+  // History panel state
+  let historyPanelOpen = $state(false);
 
   // Initialize the store with the form
   $effect(() => {
@@ -178,6 +185,9 @@
   // Import modal state
   let importModalOpen = $state(false);
 
+  // Save as template modal state
+  let saveAsTemplateModalOpen = $state(false);
+
   // Handle export
   async function handleExport() {
     if (!formDefinition.id) return;
@@ -216,38 +226,152 @@
     // Optionally navigate to the imported form or show success message
     console.log('Form imported successfully:', form);
   }
+
+  // Handle save as template
+  function handleSaveAsTemplate() {
+    saveAsTemplateModalOpen = true;
+  }
+
+  // Handle template save
+  async function handleTemplateSave(templateName: string, description: string) {
+    if (!formDefinition.id) return;
+
+    try {
+      await formsStore.saveAsTemplate(formDefinition.id, templateName, description);
+      saveAsTemplateModalOpen = false;
+      // Show success message
+      alert(`Template "${templateName}" saved successfully!`);
+    } catch (err) {
+      saveError = err instanceof Error ? err.message : 'Failed to save template';
+    }
+  }
+
+  // Handle keyboard shortcuts
+  function handleKeydown(event: KeyboardEvent) {
+    // Only handle shortcuts in design mode
+    if (store.mode !== 'design') return;
+
+    // Skip if user is typing in an input field
+    const target = event.target as HTMLElement;
+    const isTyping = target.tagName === 'INPUT' ||
+                     target.tagName === 'TEXTAREA' ||
+                     target.isContentEditable;
+
+    // Check for undo (Ctrl/Cmd + Z)
+    if ((event.ctrlKey || event.metaKey) && event.key === 'z' && !event.shiftKey) {
+      event.preventDefault();
+      if (_canUndo) {
+        handleUndo();
+      }
+      return;
+    }
+
+    // Check for redo (Ctrl/Cmd + Y or Ctrl/Cmd + Shift + Z)
+    if ((event.ctrlKey || event.metaKey) && (event.key === 'y' || (event.key === 'z' && event.shiftKey))) {
+      event.preventDefault();
+      if (_canRedo) {
+        handleRedo();
+      }
+      return;
+    }
+
+    // Don't handle other shortcuts if typing in input
+    if (isTyping) return;
+
+    // Delete key - delete selected node
+    if (event.key === 'Delete' || event.key === 'Backspace') {
+      if (_selectedNode) {
+        event.preventDefault();
+
+        // Check if node has children
+        const hasChildren = formDesignerStore.hasChildren(_selectedNode.id);
+        const nodeName = 'label' in _selectedNode ? _selectedNode.label : _selectedNode.type;
+
+        // Show confirmation if node has children
+        if (hasChildren) {
+          const confirmed = confirm(
+            `Are you sure you want to delete "${nodeName}" and all its children?`
+          );
+          if (!confirmed) return;
+        }
+
+        formDesignerStore.removeNode(_selectedNode.id);
+      }
+      return;
+    }
+
+    // Enter key - focus property editor
+    if (event.key === 'Enter') {
+      if (_selectedNode) {
+        event.preventDefault();
+        // Switch to properties tab
+        rightPanelTab = 'properties';
+
+        // Focus first input in property editor
+        setTimeout(() => {
+          const propertyEditor = document.querySelector('.properties-panel');
+          const firstInput = propertyEditor?.querySelector('input, select, textarea') as HTMLElement;
+          firstInput?.focus();
+        }, 100);
+      }
+      return;
+    }
+
+    // Escape key - deselect node
+    if (event.key === 'Escape') {
+      if (_selectedNode) {
+        event.preventDefault();
+        formDesignerStore.selectNode(null);
+      }
+      return;
+    }
+  }
+
+  // Toggle history panel
+  function toggleHistoryPanel() {
+    historyPanelOpen = !historyPanelOpen;
+  }
+
 </script>
+
+<svelte:window on:keydown={handleKeydown} />
 
 <div class="form-designer">
   <!-- Toolbar -->
-  <div class="toolbar">
+  <div class="toolbar" role="toolbar" aria-label="Form designer toolbar">
     <div class="toolbar-left">
       <button
         type="button"
         class="btn btn-secondary"
         onclick={handleBack}
+        aria-label="Go back to forms list"
       >
         Back
       </button>
     </div>
 
     <div class="toolbar-center">
+      <label for="form-name-input" class="sr-only">Form Name</label>
       <input
+        id="form-name-input"
         type="text"
         class="form-name-input"
         value={formName}
         oninput={handleNameChange}
         placeholder="Form Name"
+        aria-label="Form name"
       />
     </div>
 
-    <div class="toolbar-right">
+    <div class="toolbar-right" role="group" aria-label="Toolbar actions">
       <button
         type="button"
         class="btn btn-icon"
         onclick={handleUndo}
         disabled={!_canUndo}
-        title="Undo"
+        title="Undo last action"
+        aria-label="Undo last action"
+        aria-keyshortcuts="Control+Z"
       >
         ↶
       </button>
@@ -256,7 +380,9 @@
         class="btn btn-icon"
         onclick={handleRedo}
         disabled={!_canRedo}
-        title="Redo"
+        title="Redo last undone action"
+        aria-label="Redo last undone action"
+        aria-keyshortcuts="Control+Y"
       >
         ↷
       </button>
@@ -264,6 +390,8 @@
         type="button"
         class="btn btn-secondary"
         onclick={togglePreview}
+        aria-label={store.mode === 'design' ? 'Switch to preview mode' : 'Switch to design mode'}
+        aria-pressed={store.mode === 'preview'}
       >
         {store.mode === 'design' ? 'Preview' : 'Design'}
       </button>
@@ -273,6 +401,8 @@
           class="btn btn-secondary"
           onclick={toggleViewMode}
           title="Toggle between visual canvas and JSON editor"
+          aria-label="Toggle between visual canvas and JSON editor"
+          aria-pressed={viewMode === 'json'}
         >
           {viewMode === 'canvas' ? 'JSON' : 'Canvas'}
         </button>
@@ -282,6 +412,8 @@
             class="btn btn-secondary"
             onclick={toggleInlinePreview}
             title="Toggle inline preview panel"
+            aria-label="Toggle inline preview panel"
+            aria-pressed={showInlinePreview}
           >
             {showInlinePreview ? 'Hide Preview' : 'Show Preview'}
           </button>
@@ -292,22 +424,34 @@
         class="btn btn-secondary"
         onclick={handleExport}
         title="Export form as JSON"
+        aria-label="Export form as JSON file"
       >
-        <i class="fas fa-download"></i> Export
+        <i class="fas fa-download" aria-hidden="true"></i> Export
       </button>
       <button
         type="button"
         class="btn btn-secondary"
         onclick={handleImport}
         title="Import form from JSON"
+        aria-label="Import form from JSON file"
       >
-        <i class="fas fa-upload"></i> Import
+        <i class="fas fa-upload" aria-hidden="true"></i> Import
+      </button>
+      <button
+        type="button"
+        class="btn btn-secondary"
+        onclick={handleSaveAsTemplate}
+        title="Save this form as a reusable template"
+        aria-label="Save form as template"
+      >
+        <i class="fas fa-bookmark" aria-hidden="true"></i> Save as Template
       </button>
       <button
         type="button"
         class="btn btn-primary"
         onclick={handleSave}
         disabled={!store.isDirty || _isSaving}
+        aria-label={_isSaving ? 'Saving form...' : store.isDirty ? 'Save form changes' : 'No changes to save'}
       >
         {_isSaving ? 'Saving...' : 'Save'}
       </button>
@@ -315,16 +459,16 @@
   </div>
 
   {#if saveError}
-    <div class="error-banner">
+    <div class="error-banner" role="alert" aria-live="assertive">
       {saveError}
-      <button onclick={() => saveError = null}>✕</button>
+      <button onclick={() => saveError = null} aria-label="Dismiss error message">✕</button>
     </div>
   {/if}
 
   <!-- Main Content Area -->
   {#if store.mode === 'preview'}
     <!-- Preview Mode: Show form renderer -->
-    <div class="preview-container">
+    <div class="preview-container" role="main" aria-label="Form preview">
       {#if store.form}
         <FormRenderer
           form={store.form}
@@ -335,7 +479,7 @@
     </div>
   {:else if viewMode === 'json'}
     <!-- JSON Editor View -->
-    <div class="json-view">
+    <div class="json-view" role="main" aria-label="JSON editor">
       <JsonEditor
         form={store.form}
         onApply={handleJsonApply}
@@ -345,7 +489,7 @@
     <!-- Design Mode: Three or Four-panel layout -->
     <div class="designer-layout" class:with-preview={showInlinePreview}>
       <!-- Left Panel: Component Palette & Tree View -->
-      <div class="panel panel-left">
+      <aside class="panel panel-left" aria-label="Component palette and structure">
         <div class="palette-section">
           <div class="panel-header">
             <h3>Components</h3>
@@ -375,10 +519,10 @@
             />
           {/if}
         </div>
-      </div>
+      </aside>
 
       <!-- Center Panel: Canvas -->
-      <div class="panel panel-center">
+      <main class="panel panel-center" aria-label="Form canvas">
         <div class="panel-header">
           <h3>Canvas</h3>
         </div>
@@ -391,11 +535,11 @@
             />
           {/if}
         </div>
-      </div>
+      </main>
 
       <!-- Preview Panel (optional) -->
       {#if showInlinePreview}
-        <div class="panel panel-preview">
+        <aside class="panel panel-preview" aria-label="Live preview">
           <div class="panel-header">
             <h3>Preview</h3>
           </div>
@@ -404,16 +548,20 @@
               <PreviewPanel form={store.form} />
             {/if}
           </div>
-        </div>
+        </aside>
       {/if}
 
       <!-- Right Panel: Properties & Styles -->
-      <div class="panel panel-right">
-        <div class="panel-tabs">
+      <aside class="panel panel-right" aria-label="Properties and styles">
+        <div class="panel-tabs" role="tablist" aria-label="Property tabs">
           <button
             class="panel-tab"
             class:active={rightPanelTab === 'properties'}
             onclick={() => rightPanelTab = 'properties'}
+            role="tab"
+            aria-selected={rightPanelTab === 'properties'}
+            aria-controls="properties-panel"
+            id="properties-tab"
           >
             Properties
           </button>
@@ -421,11 +569,20 @@
             class="panel-tab"
             class:active={rightPanelTab === 'styles'}
             onclick={() => rightPanelTab = 'styles'}
+            role="tab"
+            aria-selected={rightPanelTab === 'styles'}
+            aria-controls="styles-panel"
+            id="styles-tab"
           >
             Styles
           </button>
         </div>
-        <div class="panel-content properties-panel">
+        <div
+          class="panel-content properties-panel"
+          role="tabpanel"
+          id="properties-panel"
+          aria-labelledby={rightPanelTab === 'properties' ? 'properties-tab' : 'styles-tab'}
+        >
           {#if rightPanelTab === 'properties'}
             <PropertyEditor
               node={_selectedNode}
@@ -438,7 +595,7 @@
             />
           {/if}
         </div>
-      </div>
+      </aside>
     </div>
   {/if}
 
@@ -456,7 +613,21 @@
     bind:isOpen={importModalOpen}
     on:imported={handleImported}
   />
+
+  <!-- Save as Template Dialog -->
+  <SaveAsTemplateDialog
+    isOpen={saveAsTemplateModalOpen}
+    currentForm={store.form}
+    onSave={handleTemplateSave}
+    onClose={() => saveAsTemplateModalOpen = false}
+  />
 </div>
+
+  <!-- Undo History Panel -->
+  <UndoHistoryPanel
+    bind:isOpen={historyPanelOpen}
+    onClose={() => historyPanelOpen = false}
+  />
 
 <style>
   .form-designer {
@@ -761,6 +932,27 @@
     padding: 0.5rem 1rem;
     background: var(--info-bg, #e7f3ff);
     border-radius: 4px;
+  }
+
+  /* Screen reader only text */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Focus styles for accessibility */
+  .btn:focus-visible,
+  .form-name-input:focus-visible,
+  .panel-tab:focus-visible {
+    outline: 2px solid var(--primary-color, #007bff);
+    outline-offset: 2px;
   }
 
   /* Responsive adjustments */

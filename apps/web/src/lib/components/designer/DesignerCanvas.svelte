@@ -13,9 +13,10 @@
     layout: LayoutNode[];
     selectedNodeId: string | null;
     onSelectNode: (nodeId: string | null) => void;
+    isLoading?: boolean;
   }
 
-  let { layout, selectedNodeId, onSelectNode }: Props = $props();
+  let { layout, selectedNodeId, onSelectNode, isLoading = false }: Props = $props();
 
   // Handle drop event - create new node from palette
   function handleDrop(parentId: string, index: number, event: DragEvent) {
@@ -122,7 +123,13 @@
   role="region"
   aria-label="Form canvas"
 >
-  {#if layout.length === 0}
+  {#if isLoading}
+    <!-- Loading state -->
+    <div class="canvas-loading">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Loading form...</p>
+    </div>
+  {:else if layout.length === 0}
     <!-- Empty canvas state -->
     <div
       class="empty-canvas"
@@ -230,5 +237,33 @@
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     min-height: 400px;
+  }
+
+  .canvas-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    height: 100%;
+  }
+
+  .loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--border-color, #ddd);
+    border-top-color: var(--primary-color, #007bff);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  .loading-text {
+    margin-top: 16px;
+    font-size: 0.875rem;
+    color: var(--text-secondary, #757575);
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
   }
 </style>

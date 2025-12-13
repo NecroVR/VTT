@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { LayoutNode } from '@vtt/shared';
   import TreeNode from './TreeNode.svelte';
+  import { formDesignerStore } from '$lib/stores/formDesigner';
 
   interface Props {
     layout: LayoutNode[];
@@ -12,6 +13,9 @@
 
   // Track expanded nodes
   let expandedNodes = $state(new Set<string>());
+
+  // Reference to tree view content for focus management
+  let treeViewContent: HTMLDivElement | undefined = $state();
 
   function handleToggleExpand(nodeId: string) {
     if (expandedNodes.has(nodeId)) {
@@ -25,6 +29,92 @@
 
   function handleSelectNode(nodeId: string) {
     onSelectNode?.(nodeId);
+  }
+
+  // Keyboard navigation handler
+  function handleKeyDown(event: KeyboardEvent) {
+    if (!selectedNodeId) return;
+
+    let nextNodeId: string | null = null;
+    let shouldExpand = false;
+    let shouldCollapse = false;
+
+    switch (event.key) {
+      case 'ArrowDown':
+        // Select next visible node
+        nextNodeId = formDesignerStore.getNextVisibleNode(selectedNodeId, expandedNodes);
+        if (nextNodeId) {
+          event.preventDefault();
+        }
+        break;
+
+      case 'ArrowUp':
+        // Select previous visible node
+        nextNodeId = formDesignerStore.getPrevVisibleNode(selectedNodeId, expandedNodes);
+        if (nextNodeId) {
+          event.preventDefault();
+        }
+        break;
+
+      case 'ArrowRight':
+        event.preventDefault();
+        // If collapsed, expand
+        if (formDesignerStore.hasChildren(selectedNodeId) && !expandedNodes.has(selectedNodeId)) {
+          handleToggleExpand(selectedNodeId);
+        } else {
+          // If already expanded, select first child
+          const firstChildId = formDesignerStore.getFirstChildId(selectedNodeId);
+          if (firstChildId) {
+            nextNodeId = firstChildId;
+          }
+        }
+        break;
+
+      case 'ArrowLeft':
+        event.preventDefault();
+        // If expanded, collapse
+        if (expandedNodes.has(selectedNodeId)) {
+          handleToggleExpand(selectedNodeId);
+        } else {
+          // If collapsed, select parent
+          const parentId = formDesignerStore.getParentNodeId(selectedNodeId);
+          if (parentId) {
+            nextNodeId = parentId;
+          }
+        }
+        break;
+
+      case 'Home':
+        // Select first node
+        nextNodeId = formDesignerStore.getFirstNode();
+        if (nextNodeId) {
+          event.preventDefault();
+        }
+        break;
+
+      case 'End':
+        // Select last visible node
+        nextNodeId = formDesignerStore.getLastVisibleNode(expandedNodes);
+        if (nextNodeId) {
+          event.preventDefault();
+        }
+        break;
+    }
+
+    // Apply selection change
+    if (nextNodeId && nextNodeId !== selectedNodeId) {
+      handleSelectNode(nextNodeId);
+
+      // Scroll selected node into view
+      $effect(() => {
+        if (treeViewContent) {
+          const selectedElement = treeViewContent.querySelector(`[data-node-id="${nextNodeId}"]`);
+          if (selectedElement) {
+            selectedElement.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+          }
+        }
+      });
+    }
   }
 
   // Auto-expand parent nodes when a node is selected
@@ -82,7 +172,14 @@
     {/if}
   </div>
 
-  <div class="tree-view-content">
+  <div
+    class="tree-view-content"
+    bind:this={treeViewContent}
+    tabindex="0"
+    onkeydown={handleKeyDown}
+    role="tree"
+    aria-label="Form structure tree"
+  >
     {#if layout.length === 0}
       <div class="empty-message">
         <p>No components yet</p>
@@ -138,6 +235,16 @@
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
+  }
+
+  .tree-view-content:focus {
+    outline: 2px solid var(--primary-color, #007bff);
+    outline-offset: -2px;
+  }
+
+  .tree-view-content:focus-visible {
+    outline: 2px solid var(--primary-color, #007bff);
+    outline-offset: -2px;
   }
 
   .empty-message {

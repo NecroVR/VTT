@@ -20,12 +20,33 @@
   let sectionCollapsed = $state<boolean>(false);
   let activeTabId = $state<string | undefined>(undefined);
 
+  // Track which tabs have been visited (for lazy rendering optimization)
+  let visitedTabs = $state<Set<string>>(new Set());
+
+  // Virtual scrolling state for repeaters
+  let repeaterScrollTop = $state<number>(0);
+  const VIRTUAL_SCROLL_THRESHOLD = 20; // Enable virtual scrolling for arrays > 20 items
+  const ITEM_HEIGHT = 80; // Estimated height of repeater item in pixels
+  const BUFFER_SIZE = 5; // Number of items to render above/below viewport
+
   // Initialize state based on node type
   $effect(() => {
     if (node.type === 'section') {
       sectionCollapsed = node.defaultCollapsed || false;
     } else if (node.type === 'tabs') {
-      activeTabId = node.defaultTab || node.tabs[0]?.id;
+      const initialTab = node.defaultTab || node.tabs[0]?.id;
+      activeTabId = initialTab;
+      // Mark initial tab as visited
+      if (initialTab) {
+        visitedTabs = new Set([initialTab]);
+      }
+    }
+  });
+
+  // Track active tab changes for lazy rendering
+  $effect(() => {
+    if (activeTabId && node.type === 'tabs') {
+      visitedTabs = new Set([...visitedTabs, activeTabId]);
     }
   });
 
@@ -100,6 +121,28 @@
     const [movedItem] = newArray.splice(fromIndex, 1);
     newArray.splice(toIndex, 0, movedItem);
     onChange(path, newArray);
+  }
+
+  // Calculate visible range for virtual scrolling
+  function getVisibleRange(totalItems: number, scrollTop: number): { start: number; end: number } {
+    if (totalItems <= VIRTUAL_SCROLL_THRESHOLD) {
+      // Don't use virtual scrolling for small lists
+      return { start: 0, end: totalItems };
+    }
+
+    const visibleStart = Math.floor(scrollTop / ITEM_HEIGHT);
+    const visibleEnd = Math.ceil((scrollTop + 600) / ITEM_HEIGHT); // Assume 600px viewport height
+
+    // Add buffer
+    const start = Math.max(0, visibleStart - BUFFER_SIZE);
+    const end = Math.min(totalItems, visibleEnd + BUFFER_SIZE);
+
+    return { start, end };
+  }
+
+  function handleRepeaterScroll(event: Event): void {
+    const target = event.target as HTMLElement;
+    repeaterScrollTop = target.scrollTop;
   }
 
   // Substitute fragment parameters in node tree
@@ -331,18 +374,21 @@
       </div>
       <div class="tab-content">
         {#each node.tabs as tab}
-          {#if activeTabId === tab.id}
-            {#each tab.children as child}
-              <svelte:self
-                node={child}
-                {entity}
-                {mode}
-                {fragments}
-                {computedFields}
-                {onChange}
-                {repeaterContext}
-              />
-            {/each}
+          <!-- Lazy rendering: Only render visited tabs, hide non-active ones -->
+          {#if visitedTabs.has(tab.id)}
+            <div class="tab-panel" class:active={activeTabId === tab.id} style:display={activeTabId === tab.id ? 'block' : 'none'}>
+              {#each tab.children as child}
+                <svelte:self
+                  node={child}
+                  {entity}
+                  {mode}
+                  {fragments}
+                  {computedFields}
+                  {onChange}
+                  {repeaterContext}
+                />
+              {/each}
+            </div>
           {/if}
         {/each}
       </div>
@@ -390,60 +436,132 @@
     />
   {:else if node.type === 'repeater'}
     {@const items = (getValueByPath(entity, node.binding) as unknown[]) || []}
-    <div class="layout-repeater">
+    {@const useVirtualScrolling = items.length > VIRTUAL_SCROLL_THRESHOLD}
+    {@const visibleRange = useVirtualScrolling ? getVisibleRange(items.length, repeaterScrollTop) : { start: 0, end: items.length }}
+    {@const totalHeight = useVirtualScrolling ? items.length * ITEM_HEIGHT : 'auto'}
+    {@const offsetY = useVirtualScrolling ? visibleRange.start * ITEM_HEIGHT : 0}
+
+    <div class="layout-repeater" class:virtual-scroll={useVirtualScrolling}>
       {#if items.length === 0 && node.emptyMessage}
         <div class="repeater-empty">{node.emptyMessage}</div>
       {:else}
-        {#each items as item, index}
-          <div class="repeater-item">
-            <div class="repeater-item-content">
-              {#each node.itemTemplate as templateNode}
-                <svelte:self
-                  node={templateNode}
-                  {entity}
-                  {mode}
-                  {fragments}
-                  {computedFields}
-                  {onChange}
-                  repeaterContext={{ index, item }}
-                />
-              {/each}
-            </div>
-            {#if mode === 'edit' && node.allowDelete !== false}
-              <div class="repeater-item-controls">
-                {#if node.allowReorder !== false && items.length > 1}
-                  <button
-                    class="repeater-control-btn move-up"
-                    type="button"
-                    disabled={index === 0}
-                    onclick={() => moveItem(node.binding, index, index - 1)}
-                    title="Move up"
-                  >
-                    ▲
-                  </button>
-                  <button
-                    class="repeater-control-btn move-down"
-                    type="button"
-                    disabled={index === items.length - 1}
-                    onclick={() => moveItem(node.binding, index, index + 1)}
-                    title="Move down"
-                  >
-                    ▼
-                  </button>
-                {/if}
-                <button
-                  class="repeater-control-btn remove"
-                  type="button"
-                  disabled={node.minItems !== undefined && items.length <= node.minItems}
-                  onclick={() => removeItem(node.binding, index)}
-                  title="Remove item"
-                >
-                  ✕
-                </button>
+        <div
+          class="repeater-container"
+          class:virtual={useVirtualScrolling}
+          style:height={useVirtualScrolling ? `${Math.min(600, totalHeight)}px` : 'auto'}
+          onscroll={useVirtualScrolling ? handleRepeaterScroll : undefined}
+        >
+          {#if useVirtualScrolling}
+            <!-- Spacer for virtual scrolling -->
+            <div style:height="{totalHeight}px" style:position="relative">
+              <div style:position="absolute" style:top="{offsetY}px" style:left="0" style:right="0">
+                {#each items.slice(visibleRange.start, visibleRange.end) as item, relativeIndex}
+                  {@const index = visibleRange.start + relativeIndex}
+                  <div class="repeater-item" style:min-height="{ITEM_HEIGHT}px">
+                    <div class="repeater-item-content">
+                      {#each node.itemTemplate as templateNode}
+                        <svelte:self
+                          node={templateNode}
+                          {entity}
+                          {mode}
+                          {fragments}
+                          {computedFields}
+                          {onChange}
+                          repeaterContext={{ index, item }}
+                        />
+                      {/each}
+                    </div>
+                    {#if mode === 'edit' && node.allowDelete !== false}
+                      <div class="repeater-item-controls">
+                        {#if node.allowReorder !== false && items.length > 1}
+                          <button
+                            class="repeater-control-btn move-up"
+                            type="button"
+                            disabled={index === 0}
+                            onclick={() => moveItem(node.binding, index, index - 1)}
+                            title="Move up"
+                          >
+                            ▲
+                          </button>
+                          <button
+                            class="repeater-control-btn move-down"
+                            type="button"
+                            disabled={index === items.length - 1}
+                            onclick={() => moveItem(node.binding, index, index + 1)}
+                            title="Move down"
+                          >
+                            ▼
+                          </button>
+                        {/if}
+                        <button
+                          class="repeater-control-btn remove"
+                          type="button"
+                          disabled={node.minItems !== undefined && items.length <= node.minItems}
+                          onclick={() => removeItem(node.binding, index)}
+                          title="Remove item"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    {/if}
+                  </div>
+                {/each}
               </div>
-            {/if}
-          </div>
-        {/each}
+            </div>
+          {:else}
+            <!-- Non-virtual scrolling for small lists -->
+            {#each items as item, index}
+              <div class="repeater-item">
+                <div class="repeater-item-content">
+                  {#each node.itemTemplate as templateNode}
+                    <svelte:self
+                      node={templateNode}
+                      {entity}
+                      {mode}
+                      {fragments}
+                      {computedFields}
+                      {onChange}
+                      repeaterContext={{ index, item }}
+                    />
+                  {/each}
+                </div>
+                {#if mode === 'edit' && node.allowDelete !== false}
+                  <div class="repeater-item-controls">
+                    {#if node.allowReorder !== false && items.length > 1}
+                      <button
+                        class="repeater-control-btn move-up"
+                        type="button"
+                        disabled={index === 0}
+                        onclick={() => moveItem(node.binding, index, index - 1)}
+                        title="Move up"
+                      >
+                        ▲
+                      </button>
+                      <button
+                        class="repeater-control-btn move-down"
+                        type="button"
+                        disabled={index === items.length - 1}
+                        onclick={() => moveItem(node.binding, index, index + 1)}
+                        title="Move down"
+                      >
+                        ▼
+                      </button>
+                    {/if}
+                    <button
+                      class="repeater-control-btn remove"
+                      type="button"
+                      disabled={node.minItems !== undefined && items.length <= node.minItems}
+                      onclick={() => removeItem(node.binding, index)}
+                      title="Remove item"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                {/if}
+              </div>
+            {/each}
+          {/if}
+        </div>
       {/if}
       {#if mode === 'edit'}
         <button
@@ -569,6 +687,16 @@
 
   /* Repeater styles */
   .layout-repeater { display: flex; flex-direction: column; gap: 0.5rem; }
+  .repeater-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .repeater-container.virtual {
+    overflow-y: auto;
+    border: 1px solid var(--border-color, #ccc);
+    border-radius: 4px;
+  }
   .repeater-item {
     display: flex;
     gap: 0.5rem;
@@ -576,6 +704,17 @@
     border: 1px solid var(--border-color, #ccc);
     border-radius: 4px;
     align-items: start;
+  }
+  .repeater-container.virtual .repeater-item {
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+  }
+  .repeater-container.virtual .repeater-item:first-child {
+    border-top: none;
+  }
+  .repeater-container.virtual .repeater-item:last-child {
+    border-bottom: none;
   }
   .repeater-item-content {
     flex: 1;

@@ -61,11 +61,13 @@
   role="button"
   tabindex="0"
   title={description}
+  aria-label="{label} - {description}"
+  aria-grabbed="false"
   ondragstart={handleDragStart}
   ondragend={handleDragEnd}
   onkeydown={handleKeyDown}
 >
-  <span class="palette-item-icon">{icon}</span>
+  <span class="palette-item-icon" aria-hidden="true">{icon}</span>
   <span class="palette-item-label">{label}</span>
 </div>
 
