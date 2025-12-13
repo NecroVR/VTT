@@ -209,60 +209,63 @@ This checklist tracks the implementation of the Form Designer System across mult
 ## Phase 3: Form Designer UI
 
 ### 3.1 Designer Framework
-- [ ] Create `apps/web/src/routes/forms/designer/[formId]/+page.svelte`
-- [ ] Create `apps/web/src/lib/components/designer/FormDesigner.svelte`
-  - [ ] Three-panel layout (palette, canvas, properties)
-  - [ ] Toolbar (save, preview, undo, redo, zoom)
-  - [ ] Form metadata editing (name, description, version)
-- [ ] Create designer store `apps/web/src/lib/stores/formDesigner.ts`
-  - [ ] Form definition state
-  - [ ] Selected node tracking
-  - [ ] Clipboard (copy/paste)
-  - [ ] Undo/redo history
-  - [ ] Dirty state tracking
+- [x] Create `apps/web/src/routes/forms/designer/[formId]/+page.svelte`
+- [x] Create `apps/web/src/lib/components/designer/FormDesigner.svelte`
+  - [x] Three-panel layout (palette, canvas, properties)
+  - [x] Toolbar (save, preview, undo, redo, zoom)
+  - [x] Form metadata editing (name, description, version)
+- [x] Create designer store `apps/web/src/lib/stores/formDesigner.ts`
+  - [x] Form definition state
+  - [x] Selected node tracking
+  - [x] Clipboard (copy/paste)
+  - [x] Undo/redo history
+  - [x] Dirty state tracking
 
 ### 3.2 Component Palette
-- [ ] Create `apps/web/src/lib/components/designer/ComponentPalette.svelte`
-  - [ ] Categorized component list (Fields, Layout, Static)
-  - [ ] Search/filter
-  - [ ] Drag source for each component type
-  - [ ] Component icons and descriptions
-- [ ] Create `apps/web/src/lib/components/designer/PaletteItem.svelte`
-  - [ ] Draggable item
-  - [ ] Preview tooltip
+- [x] Create `apps/web/src/lib/components/designer/ComponentPalette.svelte`
+  - [x] Categorized component list (Fields, Layout, Static)
+  - [x] Search/filter
+  - [x] Drag source for each component type
+  - [x] Component icons and descriptions
+- [x] Create `apps/web/src/lib/components/designer/PaletteItem.svelte`
+  - [x] Draggable item
+  - [x] Preview tooltip
 
 ### 3.3 Canvas Editor
-- [ ] Create `apps/web/src/lib/components/designer/DesignerCanvas.svelte`
-  - [ ] Drop zone handling
-  - [ ] Visual selection indicator
-  - [ ] Drag-to-reorder within containers
+- [x] Create `apps/web/src/lib/components/designer/DesignerCanvas.svelte`
+  - [x] Drop zone handling
+  - [x] Visual selection indicator
+  - [x] Drag-to-reorder within containers
   - [ ] Zoom controls
   - [ ] Grid/guides overlay
-- [ ] Create `apps/web/src/lib/components/designer/CanvasNode.svelte`
-  - [ ] Wrapper for each node in design mode
-  - [ ] Selection border
-  - [ ] Drag handle
-  - [ ] Quick actions (delete, duplicate, move up/down)
-- [ ] Implement drag-and-drop system
-  - [ ] Drag from palette to canvas
-  - [ ] Drag to reorder within containers
+- [x] Create `apps/web/src/lib/components/designer/CanvasNode.svelte`
+  - [x] Wrapper for each node in design mode
+  - [x] Selection border
+  - [x] Drag handle
+  - [x] Quick actions (delete, duplicate, move up/down)
+- [x] Implement drag-and-drop system
+  - [x] Drag from palette to canvas
+  - [x] Drag to reorder within containers
   - [ ] Drag to reparent between containers
-  - [ ] Visual drop indicators
+  - [x] Visual drop indicators
 
 ### 3.4 Property Editor
-- [ ] Create `apps/web/src/lib/components/designer/PropertyEditor.svelte`
-  - [ ] Dynamic property form based on selected node type
-  - [ ] Grouped properties (Basic, Binding, Validation, Style)
-  - [ ] Live updates to canvas
-- [ ] Create property editors for each node type
-  - [ ] `FieldProperties.svelte`
-  - [ ] `ContainerProperties.svelte`
-  - [ ] `GridProperties.svelte`
-  - [ ] `TabsProperties.svelte`
-  - [ ] `SectionProperties.svelte`
-  - [ ] `RepeaterProperties.svelte`
-  - [ ] `StaticProperties.svelte`
-  - [ ] `ComputedProperties.svelte`
+- [x] Create `apps/web/src/lib/components/designer/PropertyEditor.svelte`
+  - [x] Dynamic property form based on selected node type
+  - [x] Grouped properties (Basic, Binding, Validation, Style)
+  - [x] Live updates to canvas
+- [x] Create property editors for each node type
+  - [x] `FieldProperties.svelte`
+  - [x] `ContainerProperties.svelte`
+  - [x] `GridProperties.svelte`
+  - [x] `TabsProperties.svelte`
+  - [x] `SectionProperties.svelte`
+  - [x] `RepeaterProperties.svelte`
+  - [x] `StaticProperties.svelte`
+  - [x] `ComputedProperties.svelte`
+  - [x] `FlexProperties.svelte` (added)
+  - [x] `ColumnsProperties.svelte` (added)
+  - [x] `ConditionalProperties.svelte` (added)
 
 ### 3.5 Property Binding Picker
 - [ ] Create `apps/web/src/lib/components/designer/BindingPicker.svelte`
@@ -281,10 +284,10 @@ This checklist tracks the implementation of the Form Designer System across mult
   - [ ] Preview of condition in plain English
 
 ### 3.7 Tree View Navigation
-- [ ] Create `apps/web/src/lib/components/designer/TreeView.svelte`
-  - [ ] Hierarchical tree of form structure
-  - [ ] Expand/collapse nodes
-  - [ ] Click to select
+- [x] Create `apps/web/src/lib/components/designer/TreeView.svelte`
+  - [x] Hierarchical tree of form structure
+  - [x] Expand/collapse nodes
+  - [x] Click to select
   - [ ] Drag to reorder/reparent
   - [ ] Context menu (delete, duplicate, wrap in container)
 
@@ -636,6 +639,7 @@ Use this section to track progress across sessions.
 | 2025-12-12 | 0079-0082 | Phase 1 | Database schema, TypeScript types, API endpoints, Form loader, Basic renderer | Phase 1 complete |
 | 2025-12-12 | 0083 | Phase 2 | Fragment system, Property interpolation, Columns layout, Repeater controls | Core Phase 2 features |
 | 2025-12-12 | 0084 | Phase 2 | Regression testing, Documentation, Checklist updates | Phase 2 complete |
+| 2025-12-12 | 0085 | Phase 3 | Designer framework, Component palette, Canvas editor, Property editor, Tree view | Core Phase 3 UI complete |
 
 ### Current Blockers
 
@@ -662,10 +666,12 @@ _None currently - see proposal for resolved decisions_
 |-------|--------|---------|-----------|
 | Phase 1: Foundation | Complete | 2025-12-12 | 2025-12-12 |
 | Phase 2: Layout System | Complete | 2025-12-12 | 2025-12-12 |
-| Phase 3: Form Designer UI | Not Started | | |
+| Phase 3: Form Designer UI | In Progress | 2025-12-12 | |
 | Phase 4: Advanced Features | Not Started | | |
 | Phase 5: Marketplace | Not Started | | |
 | Phase 6: Polish | Not Started | | |
 | Default Forms | In Progress | 2025-12-12 | |
 
-**Overall Progress**: ~30%
+**Phase 3 Progress**: Core UI complete (3.1-3.4, 3.7). Remaining: Binding picker (3.5), Condition builder (3.6), Fragment library (3.8), Preview panel (3.9), JSON view (3.10), Testing (3.11)
+
+**Overall Progress**: ~50%

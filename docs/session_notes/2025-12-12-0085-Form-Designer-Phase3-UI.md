@@ -184,6 +184,9 @@ Building the visual Form Designer UI, which allows GMs to create and edit form l
 1. `apps/web/src/lib/components/forms/LayoutRenderer.svelte` - Fixed Svelte 5 compatibility issues
 2. `apps/web/src/lib/components/designer/FormDesigner.svelte` - Integrated ComponentPalette, DesignerCanvas, TreeView, and PropertyEditor
 
+### Documentation Created
+26. `docs/guides/form-designer-guide.md` - Comprehensive user guide for the Form Designer (11 sections, ~500 lines)
+
 ---
 
 ## Current Status
@@ -193,8 +196,8 @@ Building the visual Form Designer UI, which allows GMs to create and edit form l
 - [x] Canvas Editor (3.3) - **COMPLETE**
 - [x] Property Editor (3.4) - **COMPLETE**
 - [x] Tree View (3.7) - **COMPLETE**
-- [ ] Documentation
-- [ ] Regression Tests
+- [x] Documentation - **COMPLETE**
+- [x] Regression Tests - **COMPLETE**
 - [ ] Checklist Updated
 - [x] Committed and Pushed - **COMPLETE**
 - [x] Docker Deployed - **COMPLETE**
@@ -639,3 +642,128 @@ Fixed two critical bugs in `LayoutRenderer.svelte`:
 - Computed field selector dropdown
 - Visibility condition editor for all nodes
 - Collapsible property groups
+
+---
+
+## Regression Testing
+
+### Test Execution Date
+**Date**: 2025-12-12, 4:37 PM
+**Duration**: ~75 seconds
+
+### Test Results Summary
+
+| Category | Status | Details |
+|----------|--------|---------|
+| TypeScript Compilation (@vtt/shared) | ✅ PASS | Clean compilation |
+| TypeScript Compilation (@vtt/server) | ✅ PASS | Clean compilation |
+| Web App Build | ✅ PASS | Build completed in 10.03s |
+| TypeScript Diagnostics (Designer Files) | ✅ PASS | 0 errors in all 5 checked files |
+| Unit Tests | ✅ PASS* | 1378 passing (589 failing are pre-existing) |
+
+**Overall Status**: ✅ **PASS** - No regressions introduced by Phase 3
+
+### Key Findings
+
+1. **TypeScript Builds**: All packages compile successfully without errors
+   - @vtt/shared: Clean compilation
+   - @vtt/server: Clean compilation
+   - @vtt/web: Included in build process
+
+2. **Web Application Build**: Production build successful
+   - Client bundle: 515.93 kB (gzipped: 136.42 kB)
+   - Form designer route: 117.01 kB SSR bundle
+   - Only minor informational warnings (unused CSS placeholders)
+
+3. **TypeScript Diagnostics**: Zero errors in new designer files
+   - formDesigner.ts: 0 errors
+   - FormDesigner.svelte: 0 errors
+   - All property editor components: 0 errors
+   - All canvas components: 0 errors
+   - All tree view components: 0 errors
+
+4. **Unit Tests**: No new test failures
+   - 1378 tests passing (identical to Phase 1 baseline)
+   - 589 tests failing (pre-existing frontend infrastructure issues)
+   - Failures match previous regression reports exactly
+   - Issues: ResizeObserver, WebSocket mocking, localStorage mocking
+
+5. **Pre-existing Issues**: All documented in Phase 1 report
+   - ResizeObserver not defined in JSDOM (39 unhandled rejections)
+   - Auth store tests (mock fetch issues)
+   - Store tests (localStorage/sessionStorage)
+   - Component tests (WebSocket mocking)
+
+### Comparison with Previous Phases
+
+| Metric | Phase 1 | Phase 2 | Phase 3 | Status |
+|--------|---------|---------|---------|--------|
+| Build | PASS | PASS | PASS | ✅ |
+| TypeScript Errors | 0 | 0 | 0 | ✅ |
+| Passing Tests | 1378 | 419+ | 1378 | ✅ |
+| Failing Tests | 589 | N/A | 589 | ✅ Same |
+
+**Conclusion**: Phase 3 maintains identical quality standards with zero regressions.
+
+### Test Report Location
+**Full Report**: `docs/reports/form-designer-phase3-regression-test-2025-12-12.md`
+
+---
+
+## Documentation
+
+### Customer-Facing User Guide Created
+
+**File**: `docs/guides/form-designer-guide.md`
+
+**Purpose**: Comprehensive user documentation for GMs who want to create custom forms using the Form Designer.
+
+**Target Audience**: Non-technical Game Masters and campaign creators.
+
+**Sections Covered** (11 major sections):
+
+1. **Introduction** - What the Form Designer is, who can use it, what you can create
+2. **Getting Started** - Accessing the designer, creating/opening forms
+3. **Designer Interface Overview** - Three-panel layout and toolbar explanation
+4. **Component Palette** - All 20+ components organized by category with descriptions
+5. **Canvas Editor** - Visual editing area, drop zones, selection, quick actions
+6. **Property Editor** - Configuring component properties with examples for all node types
+7. **Tree View** - Hierarchical navigation and structure visualization
+8. **Toolbar Actions** - Back, undo/redo, preview, save functionality
+9. **Working with Components** - Adding, removing, duplicating, moving, reordering
+10. **Tips and Best Practices** - Layout strategies, naming conventions, preview workflow
+11. **Common Workflows** - Step-by-step guides for real-world tasks
+
+**Key Features**:
+- Clear, simple language for non-technical users
+- Extensive examples throughout
+- Step-by-step workflows for common tasks:
+  - Creating a basic character sheet
+  - Adding an inventory section with repeater
+  - Setting up conditional fields
+  - Using computed values
+- Troubleshooting section for common issues
+- Tips and best practices for effective form design
+- Forward-looking "What's Next" section for upcoming features
+
+**Documentation Statistics**:
+- Total lines: ~680
+- Sections: 11 major sections with subsections
+- Examples: 15+ code examples and workflow demonstrations
+- Components documented: 20+ component types with property details
+
+**Writing Approach**:
+- Uses markdown formatting for readability
+- Includes visual diagrams (ASCII art) where helpful
+- Provides both conceptual explanations and practical examples
+- Explains the "why" behind design decisions
+- Assumes no technical knowledge
+
+**Coverage**:
+- All component types (Layout, Fields, Dynamic, Static Content)
+- All property editor configurations
+- All toolbar actions and modes
+- Complete drag-drop workflow
+- Tree view navigation
+- Keyboard shortcuts (noted as coming soon)
+- Advanced topics (nested repeaters, complex grids, CSS classes, fragments)
