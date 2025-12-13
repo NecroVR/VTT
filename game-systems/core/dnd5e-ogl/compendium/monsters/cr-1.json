@@ -7,7 +7,7 @@
     {
       "id": "animated-armor",
       "name": "Animated Armor",
-      "img": "icons/creatures/magical/animated-armor.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/armor-vest.svg",
       "description": "This empty steel shell clamors as it moves, heavy plates banging and grinding against one another.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -66,7 +66,7 @@
     {
       "id": "death-dog",
       "name": "Death Dog",
-      "img": "icons/creatures/beasts/death-dog.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/deathcab.svg",
       "description": "A death dog is an ugly two-headed hound that roams plains, deserts, and the Underworld. Hate-filled and nasty, it attacks and kills for sheer malevolence.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -95,7 +95,7 @@
     {
       "id": "dire-wolf",
       "name": "Dire Wolf",
-      "img": "icons/creatures/mammals/wolf-dire.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/direwolf.svg",
       "description": "Monstrous wolves the size of horses, dire wolves are fearsome predators.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -182,7 +182,7 @@
     {
       "id": "giant-eagle",
       "name": "Giant Eagle",
-      "img": "icons/creatures/birds/eagle-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/giant.svg",
       "description": "A giant eagle is a noble creature that speaks its own language and understands speech in the Common tongue.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -211,7 +211,7 @@
     {
       "id": "giant-hyena",
       "name": "Giant Hyena",
-      "img": "icons/creatures/mammals/hyena-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/giant.svg",
       "description": "Giant hyenas are pack hunters infamous for their cunning and their unnerving vocalizations.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -240,7 +240,7 @@
     {
       "id": "giant-spider",
       "name": "Giant Spider",
-      "img": "icons/creatures/invertebrates/spider-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/giant.svg",
       "description": "To snare its prey, a giant spider spins elaborate webs or shoots sticky strands of webbing from its abdomen.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -269,7 +269,7 @@
     {
       "id": "giant-toad",
       "name": "Giant Toad",
-      "img": "icons/creatures/amphibians/toad-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/giant.svg",
       "description": "A giant toad will eat anything, and it doesn't care whether it is alive or dead.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -297,7 +297,7 @@
     {
       "id": "giant-vulture",
       "name": "Giant Vulture",
-      "img": "icons/creatures/birds/vulture-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/vulture.svg",
       "description": "A giant vulture has advanced intelligence and a malevolent bent. Unlike its smaller kin, it will attack a wounded creature to hasten its end.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -326,7 +326,7 @@
     {
       "id": "goblin-boss",
       "name": "Goblin Boss",
-      "img": "icons/creatures/humanoids/goblin-boss.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/caro-asercion/goblin.svg",
       "description": "A goblin boss is a goblin that has bullied and badgered its way to the top of the pack.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -356,7 +356,7 @@
     {
       "id": "half-ogre",
       "name": "Half-Ogre",
-      "img": "icons/creatures/humanoids/half-ogre.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/ogre.svg",
       "description": "When an ogre mates with a human, hobgoblin, bugbear, or orc, the result is always a half-ogre.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -383,7 +383,7 @@
     {
       "id": "harpy",
       "name": "Harpy",
-      "img": "icons/creatures/monstrosities/harpy.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/harpy.svg",
       "description": "A harpy combines the body, legs, and wings of a vulture with the torso, arms, and head of a human female.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -439,7 +439,7 @@
     {
       "id": "imp",
       "name": "Imp",
-      "img": "icons/creatures/fiends/imp.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/imp.svg",
       "description": "Imps are found throughout the Lower Planes, either running errands for their infernal masters, spying on rivals, or misleading and waylaying mortals.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -534,7 +534,7 @@
     {
       "id": "spy",
       "name": "Spy",
-      "img": "icons/creatures/humanoids/spy.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/spy.svg",
       "description": "Rulers, nobles, merchants, guild masters, and other wealthy individuals use spies to gain the upper hand in a world of cutthroat politics.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",

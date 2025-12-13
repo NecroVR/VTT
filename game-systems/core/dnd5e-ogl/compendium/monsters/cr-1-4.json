@@ -7,7 +7,7 @@
     {
       "id": "bandit",
       "name": "Bandit",
-      "img": "icons/creatures/humanoids/bandit.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bandit.svg",
       "description": "Bandits are outlaws and highway robbers who prey on travelers and isolated settlements.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -34,7 +34,7 @@
     {
       "id": "blood-hawk",
       "name": "Blood Hawk",
-      "img": "icons/creatures/birds/hawk-blood.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/skoll/blood.svg",
       "description": "Blood hawks flock together, attacking as a pack to take down prey.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -63,7 +63,7 @@
     {
       "id": "camel",
       "name": "Camel",
-      "img": "icons/creatures/mammals/camel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/camel.svg",
       "description": "A sturdy desert mount capable of going long distances without water.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -90,7 +90,7 @@
     {
       "id": "cultist",
       "name": "Cultist",
-      "img": "icons/creatures/humanoids/cultist.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/skoll/cultist.svg",
       "description": "Cultists swear allegiance to dark powers such as demon lords or archdevils.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -119,7 +119,7 @@
     {
       "id": "flying-snake",
       "name": "Flying Snake",
-      "img": "icons/creatures/reptiles/snake-flying.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/snake.svg",
       "description": "A flying snake is a brightly colored viper with feathered wings.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -147,7 +147,7 @@
     {
       "id": "giant-crab",
       "name": "Giant Crab",
-      "img": "icons/creatures/invertebrates/crab-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/crab.svg",
       "description": "A massive crustacean with powerful claws.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -176,7 +176,7 @@
     {
       "id": "giant-rat",
       "name": "Giant Rat",
-      "img": "icons/creatures/mammals/rat-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/rat.svg",
       "description": "A disease-ridden rodent the size of a small dog.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -204,7 +204,7 @@
     {
       "id": "giant-weasel",
       "name": "Giant Weasel",
-      "img": "icons/creatures/mammals/weasel-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/giant.svg",
       "description": "An enlarged version of the common weasel, as aggressive as its smaller cousin.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -233,7 +233,7 @@
     {
       "id": "guard",
       "name": "Guard",
-      "img": "icons/creatures/humanoids/guard.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/guards.svg",
       "description": "Guards include members of a city watch, sentries in a citadel, and bodyguards of merchants.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -261,7 +261,7 @@
     {
       "id": "kobold",
       "name": "Kobold",
-      "img": "icons/creatures/humanoids/kobold.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bo.svg",
       "description": "Kobolds are craven reptilian humanoids that worship evil dragons as demigods.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -434,7 +434,7 @@
     {
       "id": "poisonous-snake",
       "name": "Poisonous Snake",
-      "img": "icons/creatures/reptiles/snake-poisonous.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/snake.svg",
       "description": "A venomous serpent.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -488,7 +488,7 @@
     {
       "id": "stirge",
       "name": "Stirge",
-      "img": "icons/creatures/aberrations/stirge.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/rat.svg",
       "description": "A stirge attacks by landing on a victim, finding a vulnerable spot, and plunging its proboscis into the flesh.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -515,7 +515,7 @@
     {
       "id": "tribal-warrior",
       "name": "Tribal Warrior",
-      "img": "icons/creatures/humanoids/tribal-warrior.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/tribal-gear.svg",
       "description": "Tribal warriors live beyond civilization, following ancestral traditions.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -572,7 +572,7 @@
     {
       "id": "axe-beak",
       "name": "Axe Beak",
-      "img": "icons/creatures/birds/axe-beak.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/nest-birds.svg",
       "description": "An axe beak is a tall flightless bird with a sharp wedge-shaped beak.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -599,7 +599,7 @@
     {
       "id": "blink-dog",
       "name": "Blink Dog",
-      "img": "icons/creatures/mammals/dog-blink.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/hot-dog.svg",
       "description": "A blink dog is an intelligent canine that has a limited teleportation ability.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -628,7 +628,7 @@
     {
       "id": "boar",
       "name": "Boar",
-      "img": "icons/creatures/mammals/boar.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/caro-asercion/boar.svg",
       "description": "A wild pig with sharp tusks.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -656,7 +656,7 @@
     {
       "id": "constrictor-snake",
       "name": "Constrictor Snake",
-      "img": "icons/creatures/reptiles/snake-constrictor.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/snake.svg",
       "description": "A large snake that crushes its prey.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -683,7 +683,7 @@
     {
       "id": "draft-horse",
       "name": "Draft Horse",
-      "img": "icons/creatures/mammals/horse-draft.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/seahorse.svg",
       "description": "A large, strong horse used for pulling heavy loads.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -740,7 +740,7 @@
     {
       "id": "drow",
       "name": "Drow",
-      "img": "icons/creatures/humanoids/drow.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/drowning.svg",
       "description": "Drow are dark elves that dwell in the Underdark.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -797,7 +797,7 @@
     {
       "id": "flying-sword",
       "name": "Flying Sword",
-      "img": "icons/weapons/swords/sword-flying.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "A flying sword is an animated weapon created by magic.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -828,7 +828,7 @@
     {
       "id": "giant-badger",
       "name": "Giant Badger",
-      "img": "icons/creatures/mammals/badger-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/caro-asercion/badger.svg",
       "description": "An enlarged and more aggressive version of a normal badger.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -856,7 +856,7 @@
     {
       "id": "giant-bat",
       "name": "Giant Bat",
-      "img": "icons/creatures/mammals/bat-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/skoll/bat.svg",
       "description": "A bat the size of a human with a massive wingspan.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -884,7 +884,7 @@
     {
       "id": "giant-centipede",
       "name": "Giant Centipede",
-      "img": "icons/creatures/invertebrates/centipede-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/centipede.svg",
       "description": "A giant centipede with a venomous bite.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -911,7 +911,7 @@
     {
       "id": "giant-frog",
       "name": "Giant Frog",
-      "img": "icons/creatures/amphibians/frog-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/frog.svg",
       "description": "An oversized amphibian with a long sticky tongue.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -940,7 +940,7 @@
     {
       "id": "giant-lizard",
       "name": "Giant Lizard",
-      "img": "icons/creatures/reptiles/lizard-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/giant.svg",
       "description": "A large reptile sometimes used as a mount.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -967,7 +967,7 @@
     {
       "id": "giant-owl",
       "name": "Giant Owl",
-      "img": "icons/creatures/birds/owl-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/owl.svg",
       "description": "Giant owls are as intelligent as humans and often serve as mounts for good-aligned beings.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -996,7 +996,7 @@
     {
       "id": "giant-poisonous-snake",
       "name": "Giant Poisonous Snake",
-      "img": "icons/creatures/reptiles/snake-poisonous-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/snake.svg",
       "description": "A massive serpent with deadly venom.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -1024,7 +1024,7 @@
     {
       "id": "giant-wolf-spider",
       "name": "Giant Wolf Spider",
-      "img": "icons/creatures/invertebrates/spider-wolf-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/giant.svg",
       "description": "A large hunting spider.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -1053,7 +1053,7 @@
     {
       "id": "goblin",
       "name": "Goblin",
-      "img": "icons/creatures/humanoids/goblin.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/caro-asercion/goblin.svg",
       "description": "Goblins are small, black-hearted, selfish humanoids that dwell in caves, abandoned mines, despoiled dungeons, and other dismal settings.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -1144,7 +1144,7 @@
     {
       "id": "panther",
       "name": "Panther",
-      "img": "icons/creatures/mammals/panther.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/ant.svg",
       "description": "A sleek and powerful feline predator.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -1203,7 +1203,7 @@
     {
       "id": "pseudodragon",
       "name": "Pseudodragon",
-      "img": "icons/creatures/dragons/pseudodragon.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/dragon-shield.svg",
       "description": "A tiny dragon-like creature that can serve as a familiar.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -1232,7 +1232,7 @@
     {
       "id": "riding-horse",
       "name": "Riding Horse",
-      "img": "icons/creatures/mammals/horse-riding.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/seahorse.svg",
       "description": "A common mount for travelers and adventurers.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -1259,7 +1259,7 @@
     {
       "id": "skeleton",
       "name": "Skeleton",
-      "img": "icons/creatures/undead/skeleton.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/skoll/skeleton.svg",
       "description": "The animated bones of a dead creature.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -1289,7 +1289,7 @@
     {
       "id": "smoke-mephit",
       "name": "Smoke Mephit",
-      "img": "icons/creatures/elementals/mephit-smoke.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/darkzaitzev/smoke-bomb.svg",
       "description": "A mischievous creature formed from elemental smoke.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -1349,7 +1349,7 @@
     {
       "id": "steam-mephit",
       "name": "Steam Mephit",
-      "img": "icons/creatures/elementals/mephit-steam.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/steam.svg",
       "description": "A mischievous creature formed from elemental steam.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -1380,7 +1380,7 @@
     {
       "id": "swarm-of-bats",
       "name": "Swarm of Bats",
-      "img": "icons/creatures/mammals/bats-swarm.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/skoll/bat.svg",
       "description": "A writhing mass of bats that attacks as one.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -1410,7 +1410,7 @@
     {
       "id": "swarm-of-rats",
       "name": "Swarm of Rats",
-      "img": "icons/creatures/mammals/rats-swarm.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/rat.svg",
       "description": "A writhing mass of diseased rodents.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -1440,7 +1440,7 @@
     {
       "id": "swarm-of-ravens",
       "name": "Swarm of Ravens",
-      "img": "icons/creatures/birds/ravens-swarm.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/nest-birds.svg",
       "description": "A flock of ravens acting in unison.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -1471,7 +1471,7 @@
     {
       "id": "violet-fungus",
       "name": "Violet Fungus",
-      "img": "icons/creatures/plants/fungus-violet.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/ant.svg",
       "description": "A subterranean fungus with rotting tendrils.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -1500,7 +1500,7 @@
     {
       "id": "wolf",
       "name": "Wolf",
-      "img": "icons/creatures/mammals/wolf.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/direwolf.svg",
       "description": "A pack hunter with keen senses.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -1529,7 +1529,7 @@
     {
       "id": "zombie",
       "name": "Zombie",
-      "img": "icons/creatures/undead/zombie.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/skoll/raise-zombie.svg",
       "description": "A corpse reanimated through necromancy.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",

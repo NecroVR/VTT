@@ -7,7 +7,7 @@
     {
       "id": "adult-gold-dragon",
       "name": "Adult Gold Dragon",
-      "img": "icons/creatures/dragons/dragon-scaled-gold-yellow.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "The most powerful and noble of metallic dragons, paragons of good and wisdom.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -41,7 +41,7 @@
     {
       "id": "adult-red-dragon",
       "name": "Adult Red Dragon",
-      "img": "icons/creatures/dragons/dragon-scaled-red.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "The most powerful and arrogant of chromatic dragons, wielding devastating fire.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -77,7 +77,7 @@
     {
       "id": "androsphinx",
       "name": "Androsphinx",
-      "img": "icons/creatures/magical/sphinx-lion-man-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/lion.svg",
       "description": "A sphinx with a male humanoid head, powerful guardian of ancient secrets and sacred places.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -114,7 +114,7 @@
     {
       "id": "death-knight",
       "name": "Death Knight",
-      "img": "icons/magic/death/undead-skeleton-armor-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/skoll/skeleton.svg",
       "description": "A fallen paladin condemned to undeath, retaining martial prowess and unholy power.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -147,7 +147,7 @@
     {
       "id": "dragon-turtle",
       "name": "Dragon Turtle",
-      "img": "icons/creatures/reptiles/turtle-dragon-horned-green.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/turtle.svg",
       "description": "A massive sea creature combining the features of a dragon and a giant turtle.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -178,7 +178,7 @@
     {
       "id": "goristro",
       "name": "Goristro",
-      "img": "icons/creatures/unholy/demon-horned-minotaur-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/minotaur.svg",
       "description": "A colossal demon resembling a minotaur, a siege engine of destruction.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -212,7 +212,7 @@
     {
       "id": "demilich",
       "name": "Demilich",
-      "img": "icons/magic/death/skull-horned-worn-fire-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/fire.svg",
       "description": "The remains of a lich that has grown bored with existence, a floating skull of immense power.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -248,7 +248,7 @@
     {
       "id": "balor",
       "name": "Balor",
-      "img": "icons/creatures/unholy/demon-horned-winged-fire-red.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/fire.svg",
       "description": "A mighty demon general wreathed in flame, wielding a flaming whip and longsword.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -281,7 +281,7 @@
     {
       "id": "ancient-brass-dragon",
       "name": "Ancient Brass Dragon",
-      "img": "icons/creatures/dragons/dragon-scaled-brass-brown.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "An ancient metallic dragon that loves conversation and dwells in hot, arid regions.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -315,7 +315,7 @@
     {
       "id": "ancient-white-dragon",
       "name": "Ancient White Dragon",
-      "img": "icons/creatures/dragons/dragon-scaled-white-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "An ancient chromatic dragon that dwells in icy wastes, the most feral of dragons.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -351,7 +351,7 @@
     {
       "id": "pit-fiend",
       "name": "Pit Fiend",
-      "img": "icons/creatures/unholy/demon-horned-winged-fire-red.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/fire.svg",
       "description": "The most powerful of devils, generals of the Nine Hells wreathed in flame and fury.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",

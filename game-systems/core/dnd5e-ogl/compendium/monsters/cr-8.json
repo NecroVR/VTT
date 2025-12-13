@@ -7,7 +7,7 @@
     {
       "id": "assassin",
       "name": "Assassin",
-      "img": "icons/equipment/chest/breastplate-leather-black.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/chest.svg",
       "description": "A deadly killer for hire trained in the art of murder.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -66,7 +66,7 @@
     {
       "id": "chain-devil",
       "name": "Chain Devil",
-      "img": "icons/creatures/unholy/devil-horned-chains-red.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/devil-mask.svg",
       "description": "A fiend bound in animated chains that torture its victims.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -128,7 +128,7 @@
     {
       "id": "cloaker",
       "name": "Cloaker",
-      "img": "icons/creatures/aberrations/cloaker-manta-black.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/rat.svg",
       "description": "A predatory creature that resembles a leather cloak.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -193,7 +193,7 @@
     {
       "id": "drow-mage",
       "name": "Drow Mage",
-      "img": "icons/equipment/chest/robe-layered-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/chest.svg",
       "description": "An elite drow spellcaster wielding arcane power.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -250,7 +250,7 @@
     {
       "id": "fomorian",
       "name": "Fomorian",
-      "img": "icons/creatures/magical/humanoid-giant-deformed.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/giant.svg",
       "description": "A deformed giant cursed by the fey.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -297,7 +297,7 @@
     {
       "id": "frost-giant",
       "name": "Frost Giant",
-      "img": "icons/creatures/magical/humanoid-giant-frost-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/giant.svg",
       "description": "A massive giant adapted to frozen wastelands.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -342,7 +342,7 @@
     {
       "id": "green-slaad",
       "name": "Green Slaad",
-      "img": "icons/creatures/amphibians/frog-slaad-green.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/frog.svg",
       "description": "A slaad capable of powerful spellcasting.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -408,7 +408,7 @@
     {
       "id": "hezrou",
       "name": "Hezrou",
-      "img": "icons/creatures/unholy/demon-toad-green.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/toad-teeth.svg",
       "description": "A massive, toad-like demon that exudes a poisonous stench.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -464,7 +464,7 @@
     {
       "id": "hydra",
       "name": "Hydra",
-      "img": "icons/creatures/reptiles/hydra-five-heads-green.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/hydra.svg",
       "description": "A multi-headed reptilian monstrosity that regenerates severed heads.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -521,7 +521,7 @@
     {
       "id": "spirit-naga",
       "name": "Spirit Naga",
-      "img": "icons/creatures/reptiles/snake-naga-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/snake.svg",
       "description": "An intelligent serpent with powerful spellcasting abilities.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -568,7 +568,7 @@
     {
       "id": "tyrannosaurus-rex",
       "name": "Tyrannosaurus Rex",
-      "img": "icons/creatures/reptiles/dinosaur-trex-green.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/dinosaur-egg.svg",
       "description": "A massive apex predator from prehistoric times.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -611,7 +611,7 @@
     {
       "id": "young-bronze-dragon",
       "name": "Young Bronze Dragon",
-      "img": "icons/creatures/reptiles/dragon-young-bronze.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "A young metallic dragon dwelling near coastal waters.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -666,7 +666,7 @@
     {
       "id": "young-green-dragon",
       "name": "Young Green Dragon",
-      "img": "icons/creatures/reptiles/dragon-young-green.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "A young chromatic dragon dwelling in forests.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",

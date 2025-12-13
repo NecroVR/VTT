@@ -7,7 +7,7 @@
     {
       "id": "chimera",
       "name": "Chimera",
-      "img": "icons/creatures/monstrosities/chimera.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/tie.svg",
       "description": "With the head of a lion, the body of a goat, and the wings and tail of a dragon, a chimera is a savage amalgam of several different creatures.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -35,7 +35,7 @@
     {
       "id": "cyclops",
       "name": "Cyclops",
-      "img": "icons/creatures/giants/cyclops.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/cyclops.svg",
       "description": "Cyclopes are one-eyed giants that eke out a meager existence in wild lands. Isolationists by nature, they avoid contact with other races and try to drive away strangers in their territory.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -63,7 +63,7 @@
     {
       "id": "invisible-stalker",
       "name": "Invisible Stalker",
-      "img": "icons/creatures/elementals/invisible-stalker.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/invisible.svg",
       "description": "An invisible stalker is an air elemental that has been summoned from its home plane and transformed by powerful magic.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -95,7 +95,7 @@
     {
       "id": "mage",
       "name": "Mage",
-      "img": "icons/creatures/humanoids/mage.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/quoting/damaged-house.svg",
       "description": "Mages spend their lives in the study and practice of magic. Good-aligned mages offer counsel to nobles and others in power, while evil mages dwell in isolated sites to perform unspeakable experiments without interference.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -125,7 +125,7 @@
     {
       "id": "mammoth",
       "name": "Mammoth",
-      "img": "icons/creatures/mammals/mammoth.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/mammoth.svg",
       "description": "A mammoth is an elephantine creature with thick fur and long tusks. Stockier and fiercer than normal elephants, mammoths inhabit a wide range of climes, from subarctic to subtropical.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -153,7 +153,7 @@
     {
       "id": "medusa",
       "name": "Medusa",
-      "img": "icons/creatures/monstrosities/medusa.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/tie.svg",
       "description": "As deadly as they are ravishing, the serpent-haired medusas suffer an immortal curse brought on by their vanity.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -182,7 +182,7 @@
     {
       "id": "wyvern",
       "name": "Wyvern",
-      "img": "icons/creatures/dragons/wyvern.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/wyvern.svg",
       "description": "A wyvern is a dragon with a scorpion's stinger at the tip of its tail. Although it lacks the intelligence of its draconic kin, a wyvern is nonetheless a dangerous predator.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -210,7 +210,7 @@
     {
       "id": "young-white-dragon",
       "name": "Young White Dragon",
-      "img": "icons/creatures/dragons/dragon-white-young.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "The smallest and weakest of the chromatic dragons, white dragons are nonetheless ferocious predators driven by hunger and greed.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -241,7 +241,7 @@
     {
       "id": "young-black-dragon",
       "name": "Young Black Dragon",
-      "img": "icons/creatures/dragons/dragon-black-young.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "The most evil-tempered and vile of the chromatic dragons, black dragons collect the wreckage and treasures of fallen peoples.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -272,7 +272,7 @@
     {
       "id": "young-green-dragon",
       "name": "Young Green Dragon",
-      "img": "icons/creatures/dragons/dragon-green-young.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "The most cunning and treacherous of true dragons, green dragons use misdirection and trickery to get the upper hand against their enemies.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -304,7 +304,7 @@
     {
       "id": "young-blue-dragon",
       "name": "Young Blue Dragon",
-      "img": "icons/creatures/dragons/dragon-blue-young.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "Vain and territorial, blue dragons soar through the skies above deserts, preying on caravans and plundering herds and settlements.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -334,7 +334,7 @@
     {
       "id": "young-red-dragon",
       "name": "Young Red Dragon",
-      "img": "icons/creatures/dragons/dragon-red-young.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "The most covetous of the true dragons, red dragons tirelessly seek to increase their treasure hoards.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -364,7 +364,7 @@
     {
       "id": "stone-giant",
       "name": "Stone Giant",
-      "img": "icons/creatures/giants/stone-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/giant.svg",
       "description": "Stone giants are reclusive, quiet, and peaceful as long as they are left alone. Their granite-gray skin, gaunt features, and black, sunken eyes endow stone giants with a stern countenance.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -395,7 +395,7 @@
     {
       "id": "frost-giant",
       "name": "Frost Giant",
-      "img": "icons/creatures/giants/frost-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/giant.svg",
       "description": "Frost giants are creatures of ice and snow. Their hair can be light blue or dirty yellow, and they have pale blue or dirty white skin.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -425,7 +425,7 @@
     {
       "id": "fire-giant",
       "name": "Fire Giant",
-      "img": "icons/creatures/giants/fire-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/fire.svg",
       "description": "Fire giants are master craftsmen and organized warriors. They dwell in volcanic mountains, forging armor and weapons to battle their enemies.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -455,7 +455,7 @@
     {
       "id": "cloud-giant",
       "name": "Cloud Giant",
-      "img": "icons/creatures/giants/cloud-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/giant.svg",
       "description": "Cloud giants live extravagant lives high above the world, showing little concern for the plights of other races except as amusement.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",

@@ -27,7 +27,7 @@
     {
       "id": "crossbow-hand",
       "name": "Crossbow, hand",
-      "img": "icons/weapons/crossbows/crossbow-hand.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/carl-olsen/crossbow.svg",
       "description": "A small crossbow that can be wielded in one hand.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -48,7 +48,7 @@
     {
       "id": "crossbow-heavy",
       "name": "Crossbow, heavy",
-      "img": "icons/weapons/crossbows/crossbow-heavy.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/carl-olsen/crossbow.svg",
       "description": "A powerful crossbow that requires two hands to use.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -70,7 +70,7 @@
     {
       "id": "longbow",
       "name": "Longbow",
-      "img": "icons/weapons/bows/bow-longbow-leather.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/leather-armor.svg",
       "description": "A tall bow that fires arrows with great power.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -91,7 +91,7 @@
     {
       "id": "net",
       "name": "Net",
-      "img": "icons/weapons/thrown/net-weighted.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/thrown-knife.svg",
       "description": "A Large or smaller creature hit by a net is restrained until it is freed. A net has no effect on creatures that are formless, or creatures that are Huge or larger. A creature can use its action to make a DC 10 Strength check, freeing itself or another creature within its reach on a success. Dealing 5 slashing damage to the net (AC 10) also frees the creature without harming it, ending the effect and destroying the net.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",

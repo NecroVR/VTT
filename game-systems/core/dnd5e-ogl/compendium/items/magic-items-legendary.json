@@ -7,7 +7,7 @@
     {
       "id": "apparatus-of-the-crab",
       "name": "Apparatus of the Crab",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "This item first appears to be a sealed iron barrel weighing 500 pounds. The barrel has a hidden catch, which can be found with a successful DC 20 Intelligence (Investigation) check. Releasing the catch unlocks a hatch at one end of the barrel, allowing two Medium or smaller creatures to crawl inside. Ten levers are set in a row at the far end, each in a neutral position, able to move up or down. When certain levers are used, the apparatus transforms to resemble a giant lobster.\n\nThe *Apparatus of the Crab* is a Large object with the following statistics: AC 20; HP 200; Speed 30 ft., Swim 30 ft. (or 0 ft. for both if the legs aren't extended); Immunity to Poison and Psychic damage.\n\nTo be used as a vehicle, the apparatus requires one pilot. While the apparatus's hatch is closed, the compartment is airtight and watertight. The compartment holds enough air for 10 hours of breathing, divided by the number of breathing creatures inside.\n\nThe apparatus floats on water. It can also go underwater to a depth of 900 feet. Below that, the vehicle takes 2d6 Bludgeoning damage each minute from pressure.\n\nA creature in the compartment can take a Utilize action to move as many as two of the apparatus's levers up or down. After each use, a lever goes back to its neutral position. Each lever, from left to right, functions as shown in the Apparatus of the Crab Levers table.\n\nTable: Apparatus of the Crab Levers\n\n| Lever | Up                                                     | Down                                       |\n|-------|--------------------------------------------------------|--------------------------------------------|\n| 1     | Legs extend, allowing the apparatus to walk and swim.  | Legs retract, reducing the apparatus's Speed and Swim Speed to 0 and making it unable to benefit from bonuses to speed. |\n| 2     | Forward window shutter opens.                          | Forward window shutter closes.             |\n| 3     | Side window shutters open (two per side).              | Side window shutters close (two per side). |\n| 4     | Two claws extend from the front side of the apparatus. | The claws retract.                         |\n| 5     | Each extended claw makes the following melee attack: +8 to hit, reach 5 ft. *Hit:* 7 (2d6) Bludgeoning damage. | Each extended claw makes the following melee attack: +8 to hit, reach 5 ft. *Hit:* The target has the Grappled condition (escape DC 15). |\n| 6     | The apparatus walks or swims forward provided its legs are extended. | The apparatus walks or swims backward provided its legs are extended. |\n| 7     | The apparatus turns 90 degrees counterclockwise provided its legs are extended. | The apparatus turns 90 degrees clockwise provided its legs are extended. |\n| 8     | Eyelike fixtures emit Bright Light in a 30-foot radius and Dim Light for an additional 30 feet. | The light turns off. \n| 9     | The apparatus sinks up to 20 feet if it's in liquid.   | The apparatus rises up to 20 feet if it's in liquid. |\n| 10    | The rear hatch unseals and opens.                      | The rear hatch closes and seals.           |",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -23,7 +23,7 @@
     {
       "id": "armor-of-invulnerability",
       "name": "Armor of Invulnerability",
-      "img": "icons/equipment/chest/breastplate-cuirass-steel-grey.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/chest.svg",
       "description": "You have Resistance to Bludgeoning, Piercing, and Slashing damage while you wear this armor. Metal Shell. You can take a Magic action to give yourself Immunity to Bludgeoning, Piercing, and Slashing damage for 10 minutes or until you are no longer wearing the armor. Once this property is used, it can't be used again until the next dawn.",
       "templateId": "dnd5e-armor",
       "source": "SRD 5.1",
@@ -39,7 +39,7 @@
     {
       "id": "belt-of-giant-strength-cloud",
       "name": "Belt of Giant Strength (Cloud)",
-      "img": "icons/equipment/waist/belt-studded-leather-brown.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lucasms/belt.svg",
       "description": "While wearing this belt, your Strength changes to a score granted by the belt. The type of giant determines the score (see the table below). The item has no effect on you if your Strength without the belt is equal to or greater than the belt's score.\n\n| Belt                                    | Str. | Rarity    |\n|-----------------------------------------|------|-----------|\n| Belt of Giant Strength (hill)           | 21   | Rare      |\n| Belt of Giant Strength (frost or stone) | 23   | Very Rare |\n| Belt of Giant Strength (fire)           | 25   | Very Rare |\n| Belt of Giant Strength (cloud)          | 27   | Legendary |\n| Belt of Giant Strength (storm)          | 29   | Legendary |",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -55,7 +55,7 @@
     {
       "id": "belt-of-giant-strength-storm",
       "name": "Belt of Giant Strength (Storm)",
-      "img": "icons/equipment/waist/belt-studded-leather-brown.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lucasms/belt.svg",
       "description": "While wearing this belt, your Strength changes to a score granted by the belt. The type of giant determines the score (see the table below). The item has no effect on you if your Strength without the belt is equal to or greater than the belt's score.\n\n| Belt                                    | Str. | Rarity    |\n|-----------------------------------------|------|-----------|\n| Belt of Giant Strength (hill)           | 21   | Rare      |\n| Belt of Giant Strength (frost or stone) | 23   | Very Rare |\n| Belt of Giant Strength (fire)           | 25   | Very Rare |\n| Belt of Giant Strength (cloud)          | 27   | Legendary |\n| Belt of Giant Strength (storm)          | 29   | Legendary |",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -71,7 +71,7 @@
     {
       "id": "crystal-ball-of-mind-reading",
       "name": "Crystal Ball of Mind Reading",
-      "img": "icons/commodities/gems/pearl-natural-white.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/gems.svg",
       "description": "While touching this crystal orb, you can cast Scrying (save DC 17) with it. In addition, you can cast Detect Thoughts (save DC 17) targeting creatures you can see within 30 feet of the spell's sensor. You don't need to concentrate on this Detect Thoughts spell to maintain it during its duration, but it ends if the Scrying spell ends.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -87,7 +87,7 @@
     {
       "id": "crystal-ball-of-telepathy",
       "name": "Crystal Ball of Telepathy",
-      "img": "icons/commodities/gems/pearl-natural-white.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/gems.svg",
       "description": "While touching this crystal orb, you can cast Scrying (save DC 17) with it. In addition, you can communicate telepathically with creatures you can see within 30 feet of the spell's sensor. You can also cast Suggestion (save DC 17) through the sensor on one of those creatures. You don't need to concentrate on this Suggestion to maintain it during its duration, but it ends if Scrying ends. You can't cast Suggestion in this way again until the next dawn.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -103,7 +103,7 @@
     {
       "id": "crystal-ball-of-true-seeing",
       "name": "Crystal Ball of True Seeing",
-      "img": "icons/commodities/gems/pearl-natural-white.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/gems.svg",
       "description": "While touching this crystal orb, you can cast Scrying (save DC 17) with it. In addition, you have Truesight with a range of 120 feet centered on the spell's sensor.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -119,7 +119,7 @@
     {
       "id": "cubic-gate",
       "name": "Cubic Gate",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "This cube is 3 inches across and radiates palpable magical energy. The six sides of the cube are each keyed to a different plane of existence, one of which is the Material Plane. The other sides are linked to planes determined by the GM. The cube has 3 charges and regains 1d3 expended charges daily at dawn. As a Magic action, you can expend 1 of the cube's charges to cast one of the following spells using the cube. Gate. Pressing one side of the cube, you cast Gate, opening a portal to the plane of existence keyed to that side. Plane Shift. Pressing one side of the cube twice, you cast Plane Shift, transporting the targets to the plane of existence keyed to that side.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -135,7 +135,7 @@
     {
       "id": "defender",
       "name": "Defender",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. The first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -151,7 +151,7 @@
     {
       "id": "defender-battleaxe",
       "name": "Defender (Battleaxe)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -167,7 +167,7 @@
     {
       "id": "defender-blowgun",
       "name": "Defender (Blowgun)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -183,7 +183,7 @@
     {
       "id": "defender-club",
       "name": "Defender (Club)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -199,7 +199,7 @@
     {
       "id": "defender-dagger",
       "name": "Defender (Dagger)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -215,7 +215,7 @@
     {
       "id": "defender-dart",
       "name": "Defender (Dart)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -231,7 +231,7 @@
     {
       "id": "defender-flail",
       "name": "Defender (Flail)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -247,7 +247,7 @@
     {
       "id": "defender-glaive",
       "name": "Defender (Glaive)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -263,7 +263,7 @@
     {
       "id": "defender-greataxe",
       "name": "Defender (Greataxe)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -279,7 +279,7 @@
     {
       "id": "defender-greatclub",
       "name": "Defender (Greatclub)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -295,7 +295,7 @@
     {
       "id": "defender-greatsword",
       "name": "Defender (Greatsword)",
-      "img": "icons/weapons/swords/sword-longsword-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -311,7 +311,7 @@
     {
       "id": "defender-halberd",
       "name": "Defender (Halberd)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -327,7 +327,7 @@
     {
       "id": "defender-hand-crossbow",
       "name": "Defender (Hand Crossbow)",
-      "img": "icons/weapons/bows/bow-recurve-wood.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bo.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -343,7 +343,7 @@
     {
       "id": "defender-handaxe",
       "name": "Defender (Handaxe)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -359,7 +359,7 @@
     {
       "id": "defender-heavy-crossbow",
       "name": "Defender (Heavy Crossbow)",
-      "img": "icons/weapons/bows/bow-recurve-wood.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bo.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -375,7 +375,7 @@
     {
       "id": "defender-javelin",
       "name": "Defender (Javelin)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -391,7 +391,7 @@
     {
       "id": "defender-lance",
       "name": "Defender (Lance)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -407,7 +407,7 @@
     {
       "id": "defender-light-crossbow",
       "name": "Defender (Light Crossbow)",
-      "img": "icons/weapons/bows/bow-recurve-wood.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bo.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -423,7 +423,7 @@
     {
       "id": "defender-light-hammer",
       "name": "Defender (Light Hammer)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -439,7 +439,7 @@
     {
       "id": "defender-longbow",
       "name": "Defender (Longbow)",
-      "img": "icons/weapons/bows/bow-recurve-wood.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bo.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -455,7 +455,7 @@
     {
       "id": "defender-longsword",
       "name": "Defender (Longsword)",
-      "img": "icons/weapons/swords/sword-longsword-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -471,7 +471,7 @@
     {
       "id": "defender-mace",
       "name": "Defender (Mace)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -487,7 +487,7 @@
     {
       "id": "defender-maul",
       "name": "Defender (Maul)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -503,7 +503,7 @@
     {
       "id": "defender-morningstar",
       "name": "Defender (Morningstar)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -519,7 +519,7 @@
     {
       "id": "defender-musket",
       "name": "Defender (Musket)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -535,7 +535,7 @@
     {
       "id": "defender-pike",
       "name": "Defender (Pike)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -551,7 +551,7 @@
     {
       "id": "defender-pistol",
       "name": "Defender (Pistol)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -567,7 +567,7 @@
     {
       "id": "defender-quarterstaff",
       "name": "Defender (Quarterstaff)",
-      "img": "icons/weapons/staves/staff-ornate-jeweled-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/wizard-staff.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -583,7 +583,7 @@
     {
       "id": "defender-rapier",
       "name": "Defender (Rapier)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -599,7 +599,7 @@
     {
       "id": "defender-scimitar",
       "name": "Defender (Scimitar)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -615,7 +615,7 @@
     {
       "id": "defender-shortbow",
       "name": "Defender (Shortbow)",
-      "img": "icons/weapons/bows/bow-recurve-wood.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bo.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -631,7 +631,7 @@
     {
       "id": "defender-shortsword",
       "name": "Defender (Shortsword)",
-      "img": "icons/weapons/swords/sword-longsword-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -647,7 +647,7 @@
     {
       "id": "defender-sickle",
       "name": "Defender (Sickle)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -663,7 +663,7 @@
     {
       "id": "defender-sling",
       "name": "Defender (Sling)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -679,7 +679,7 @@
     {
       "id": "defender-spear",
       "name": "Defender (Spear)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -695,7 +695,7 @@
     {
       "id": "defender-trident",
       "name": "Defender (Trident)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -711,7 +711,7 @@
     {
       "id": "defender-war-pick",
       "name": "Defender (War Pick)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -727,7 +727,7 @@
     {
       "id": "defender-warhammer",
       "name": "Defender (Warhammer)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -743,7 +743,7 @@
     {
       "id": "defender-whip",
       "name": "Defender (Whip)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon.\n\nThe first time you attack with the weapon on each of your turns, you can transfer some or all of the weapon's bonus to your Armor Class. For example, you could reduce the bonus to your attack rolls and damage rolls to +1 and gain a +2 bonus to Armor Class. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the weapon to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -759,7 +759,7 @@
     {
       "id": "half-plate-armor-of-etherealness",
       "name": "Half Plate Armor of Etherealness",
-      "img": "icons/equipment/chest/breastplate-cuirass-steel-grey.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/chest.svg",
       "description": "While you're wearing this armor, you can take a Magic action and use a command word to gain the effect of the Etherealness spell. The spell ends immediately if you remove the armor or take a Magic action to repeat the command word. This property of the armor can't be used again until the next dawn.",
       "templateId": "dnd5e-armor",
       "source": "SRD 5.1",
@@ -775,7 +775,7 @@
     {
       "id": "hammer-of-thunderbolts-maul",
       "name": "Hammer of Thunderbolts (Maul)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +1 bonus to attack rolls and damage rolls made with this magic weapon. The weapon has 5 charges. You can expend 1 charge and make a ranged attack with the weapon, hurling it as if it had the Thrown property with a normal range of 20 feet and a long range of 60 feet. If the attack hits, the weapon unleashes a thunderclap audible out to 300 feet. The target and every creature within 30 feet of it other than you must succeed on a DC 17 Constitution saving throw or have the Stunned condition until the end of your next turn. Immediately after hitting or missing, the weapon flies back to your hand. The weapon regains 1d4 + 1 expended charges daily at dawn. Giant's Bane. While you are attuned to the weapon and wearing either a Belt of Giant Strength or Gauntlets of Ogre Power to which you are also attuned, you gain the following benefits: Giants' Bane. When you roll a 20 on the d20 for an attack roll made with this weapon against a Giant, the creature must succeed on a DC 17 Constitution saving throw or die. Might of Giants. The Strength score bestowed by your Belt of Giant Strength or Gauntlets of Ogre Power increases by 4, to a maximum of 30.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -791,7 +791,7 @@
     {
       "id": "hammer-of-thunderbolts-warhammer",
       "name": "Hammer of Thunderbolts (Warhammer)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +1 bonus to attack rolls and damage rolls made with this magic weapon. The weapon has 5 charges. You can expend 1 charge and make a ranged attack with the weapon, hurling it as if it had the Thrown property with a normal range of 20 feet and a long range of 60 feet. If the attack hits, the weapon unleashes a thunderclap audible out to 300 feet. The target and every creature within 30 feet of it other than you must succeed on a DC 17 Constitution saving throw or have the Stunned condition until the end of your next turn. Immediately after hitting or missing, the weapon flies back to your hand. The weapon regains 1d4 + 1 expended charges daily at dawn. Giant's Bane. While you are attuned to the weapon and wearing either a Belt of Giant Strength or Gauntlets of Ogre Power to which you are also attuned, you gain the following benefits: Giants' Bane. When you roll a 20 on the d20 for an attack roll made with this weapon against a Giant, the creature must succeed on a DC 17 Constitution saving throw or die. Might of Giants. The Strength score bestowed by your Belt of Giant Strength or Gauntlets of Ogre Power increases by 4, to a maximum of 30.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -807,7 +807,7 @@
     {
       "id": "holy-avenger",
       "name": "Holy Avenger",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage. While you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -824,7 +824,7 @@
     {
       "id": "holy-avenger-battleaxe",
       "name": "Holy Avenger (Battleaxe)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -840,7 +840,7 @@
     {
       "id": "holy-avenger-blowgun",
       "name": "Holy Avenger (Blowgun)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -856,7 +856,7 @@
     {
       "id": "holy-avenger-club",
       "name": "Holy Avenger (Club)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -872,7 +872,7 @@
     {
       "id": "holy-avenger-dagger",
       "name": "Holy Avenger (Dagger)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -888,7 +888,7 @@
     {
       "id": "holy-avenger-dart",
       "name": "Holy Avenger (Dart)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -904,7 +904,7 @@
     {
       "id": "holy-avenger-flail",
       "name": "Holy Avenger (Flail)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -920,7 +920,7 @@
     {
       "id": "holy-avenger-glaive",
       "name": "Holy Avenger (Glaive)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -936,7 +936,7 @@
     {
       "id": "holy-avenger-greataxe",
       "name": "Holy Avenger (Greataxe)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -952,7 +952,7 @@
     {
       "id": "holy-avenger-greatclub",
       "name": "Holy Avenger (Greatclub)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -968,7 +968,7 @@
     {
       "id": "holy-avenger-greatsword",
       "name": "Holy Avenger (Greatsword)",
-      "img": "icons/weapons/swords/sword-longsword-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -984,7 +984,7 @@
     {
       "id": "holy-avenger-halberd",
       "name": "Holy Avenger (Halberd)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1000,7 +1000,7 @@
     {
       "id": "holy-avenger-hand-crossbow",
       "name": "Holy Avenger (Hand Crossbow)",
-      "img": "icons/weapons/bows/bow-recurve-wood.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bo.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1016,7 +1016,7 @@
     {
       "id": "holy-avenger-handaxe",
       "name": "Holy Avenger (Handaxe)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1032,7 +1032,7 @@
     {
       "id": "holy-avenger-heavy-crossbow",
       "name": "Holy Avenger (Heavy Crossbow)",
-      "img": "icons/weapons/bows/bow-recurve-wood.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bo.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1048,7 +1048,7 @@
     {
       "id": "holy-avenger-javelin",
       "name": "Holy Avenger (Javelin)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1064,7 +1064,7 @@
     {
       "id": "holy-avenger-lance",
       "name": "Holy Avenger (Lance)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1080,7 +1080,7 @@
     {
       "id": "holy-avenger-light-crossbow",
       "name": "Holy Avenger (Light Crossbow)",
-      "img": "icons/weapons/bows/bow-recurve-wood.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bo.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1096,7 +1096,7 @@
     {
       "id": "holy-avenger-light-hammer",
       "name": "Holy Avenger (Light Hammer)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1112,7 +1112,7 @@
     {
       "id": "holy-avenger-longbow",
       "name": "Holy Avenger (Longbow)",
-      "img": "icons/weapons/bows/bow-recurve-wood.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bo.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1128,7 +1128,7 @@
     {
       "id": "holy-avenger-longsword",
       "name": "Holy Avenger (Longsword)",
-      "img": "icons/weapons/swords/sword-longsword-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1144,7 +1144,7 @@
     {
       "id": "holy-avenger-mace",
       "name": "Holy Avenger (Mace)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1160,7 +1160,7 @@
     {
       "id": "holy-avenger-maul",
       "name": "Holy Avenger (Maul)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1176,7 +1176,7 @@
     {
       "id": "holy-avenger-morningstar",
       "name": "Holy Avenger (Morningstar)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1192,7 +1192,7 @@
     {
       "id": "holy-avenger-musket",
       "name": "Holy Avenger (Musket)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1208,7 +1208,7 @@
     {
       "id": "holy-avenger-pike",
       "name": "Holy Avenger (Pike)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1224,7 +1224,7 @@
     {
       "id": "holy-avenger-pistol",
       "name": "Holy Avenger (Pistol)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1240,7 +1240,7 @@
     {
       "id": "holy-avenger-quarterstaff",
       "name": "Holy Avenger (Quarterstaff)",
-      "img": "icons/weapons/staves/staff-ornate-jeweled-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/wizard-staff.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1256,7 +1256,7 @@
     {
       "id": "holy-avenger-rapier",
       "name": "Holy Avenger (Rapier)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1272,7 +1272,7 @@
     {
       "id": "holy-avenger-scimitar",
       "name": "Holy Avenger (Scimitar)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1288,7 +1288,7 @@
     {
       "id": "holy-avenger-shortbow",
       "name": "Holy Avenger (Shortbow)",
-      "img": "icons/weapons/bows/bow-recurve-wood.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bo.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1304,7 +1304,7 @@
     {
       "id": "holy-avenger-shortsword",
       "name": "Holy Avenger (Shortsword)",
-      "img": "icons/weapons/swords/sword-longsword-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1320,7 +1320,7 @@
     {
       "id": "holy-avenger-sickle",
       "name": "Holy Avenger (Sickle)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1336,7 +1336,7 @@
     {
       "id": "holy-avenger-sling",
       "name": "Holy Avenger (Sling)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1352,7 +1352,7 @@
     {
       "id": "holy-avenger-spear",
       "name": "Holy Avenger (Spear)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1368,7 +1368,7 @@
     {
       "id": "holy-avenger-trident",
       "name": "Holy Avenger (Trident)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1384,7 +1384,7 @@
     {
       "id": "holy-avenger-war-pick",
       "name": "Holy Avenger (War Pick)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1400,7 +1400,7 @@
     {
       "id": "holy-avenger-warhammer",
       "name": "Holy Avenger (Warhammer)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1416,7 +1416,7 @@
     {
       "id": "holy-avenger-whip",
       "name": "Holy Avenger (Whip)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. When you hit a Fiend or an Undead with it, that creature takes an extra 2d10 Radiant damage.\n\nWhile you hold the drawn weapon, it creates a 10-foot Emanation originating from you. You and all creatures Friendly to you in the Emanation have Advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the Paladin class, the size of the Emanation increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1432,7 +1432,7 @@
     {
       "id": "horn-of-valhalla",
       "name": "Horn of Valhalla",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You can take a Magic action to blow this horn. In response, warrior spirits from the plane of Ysgard appear in unoccupied spaces within 60 feet of you. Each spirit uses the **Berserker** stat block and returns to Ysgard after 1 hour or when it drops to 0 Hit Points. The spirits look like living, breathing warriors, and they have Immunity to the Charmed and Frightened conditions. Once you use the horn, it can't be used again until 7 days have passed.\n\nFour types of *Horn of Valhalla* are known to exist, each made of a different metal. The horn's type determines how many spirits it summons, as well as the requirement for its use. The GM chooses the horn's type or determines it randomly by rolling on the following table.\n\nIf you blow the horn without meeting its requirement, the summoned spirits attack you. If you meet the requirement, they are Friendly to you and your allies and follow your commands.\n\n| 1d100 | Horn Type | Spirits | Requirement                          |\n|-------|-----------|---------|--------------------------------------|\n| 01–40 | Silver    | 2       | None                                 |\n| 41–75 | Brass     | 3       | Proficiency with all Simple weapons  |\n| 76–90 | Bronze    | 4       | Training with all Medium armor       |\n| 91–00 | Iron      | 5       | Proficiency with all Martial weapons |",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -1448,7 +1448,7 @@
     {
       "id": "iron-flask",
       "name": "Iron Flask",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "While holding this brass-stoppered iron flask, you can take a Magic action to target a creature that you can see within 60 feet of yourself. If the flask is empty and the target is native to a plane of existence other than the one you're on, the target must succeed on a DC 17 Wisdom saving throw or be trapped in the flask. If the target has been trapped by the flask before, it has Advantage on the save. Once trapped, a creature remains in the flask until released. The flask can hold only one creature at a time. A creature trapped in the flask doesn't age and doesn't need to breathe, eat, or drink. You can take a Magic action to remove the flask's stopper and release the creature in the flask. The creature then obeys your commands for 1 hour, understanding those commands even if it doesn't know the language in which the commands are given. If you issue no commands or give the creature a command that is likely to result in its death or imprisonment, it defends itself but otherwise takes no actions. At the end of the duration, the creature acts in accordance with its normal disposition and alignment. An Identify spell reveals if the flask contains a creature, but the only way to determine the type of creature is to open the flask. A newly discovered Iron Flask might already contain a creature chosen by the GM.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -1464,7 +1464,7 @@
     {
       "id": "luck-blade-glaive",
       "name": "Luck Blade (Glaive)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +1 bonus to attack rolls and damage rolls made with this magic weapon. While the weapon is on your person, you also gain a +1 bonus to saving throws. Luck. If the weapon is on your person, you can call on its luck (no action required) to reroll one failed D20 Test if you don't have the Incapacitated condition. You must use the second roll. Once used, this property can't be used again until the next dawn. Wish. The weapon has 1d3 charges. While holding it, you can expend 1 charge and cast Wish from it. Once used, this property can't be used again until the next dawn. The weapon loses this property if it has no charges.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1480,7 +1480,7 @@
     {
       "id": "luck-blade-greatsword",
       "name": "Luck Blade (Greatsword)",
-      "img": "icons/weapons/swords/sword-longsword-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "You gain a +1 bonus to attack rolls and damage rolls made with this magic weapon. While the weapon is on your person, you also gain a +1 bonus to saving throws. Luck. If the weapon is on your person, you can call on its luck (no action required) to reroll one failed D20 Test if you don't have the Incapacitated condition. You must use the second roll. Once used, this property can't be used again until the next dawn. Wish. The weapon has 1d3 charges. While holding it, you can expend 1 charge and cast Wish from it. Once used, this property can't be used again until the next dawn. The weapon loses this property if it has no charges.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1496,7 +1496,7 @@
     {
       "id": "luck-blade-longsword",
       "name": "Luck Blade (Longsword)",
-      "img": "icons/weapons/swords/sword-longsword-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "You gain a +1 bonus to attack rolls and damage rolls made with this magic weapon. While the weapon is on your person, you also gain a +1 bonus to saving throws. Luck. If the weapon is on your person, you can call on its luck (no action required) to reroll one failed D20 Test if you don't have the Incapacitated condition. You must use the second roll. Once used, this property can't be used again until the next dawn. Wish. The weapon has 1d3 charges. While holding it, you can expend 1 charge and cast Wish from it. Once used, this property can't be used again until the next dawn. The weapon loses this property if it has no charges.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1512,7 +1512,7 @@
     {
       "id": "luck-blade-rapier",
       "name": "Luck Blade (Rapier)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +1 bonus to attack rolls and damage rolls made with this magic weapon. While the weapon is on your person, you also gain a +1 bonus to saving throws. Luck. If the weapon is on your person, you can call on its luck (no action required) to reroll one failed D20 Test if you don't have the Incapacitated condition. You must use the second roll. Once used, this property can't be used again until the next dawn. Wish. The weapon has 1d3 charges. While holding it, you can expend 1 charge and cast Wish from it. Once used, this property can't be used again until the next dawn. The weapon loses this property if it has no charges.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1528,7 +1528,7 @@
     {
       "id": "luck-blade-scimitar",
       "name": "Luck Blade (Scimitar)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +1 bonus to attack rolls and damage rolls made with this magic weapon. While the weapon is on your person, you also gain a +1 bonus to saving throws. Luck. If the weapon is on your person, you can call on its luck (no action required) to reroll one failed D20 Test if you don't have the Incapacitated condition. You must use the second roll. Once used, this property can't be used again until the next dawn. Wish. The weapon has 1d3 charges. While holding it, you can expend 1 charge and cast Wish from it. Once used, this property can't be used again until the next dawn. The weapon loses this property if it has no charges.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1544,7 +1544,7 @@
     {
       "id": "luck-blade-shortsword",
       "name": "Luck Blade (Shortsword)",
-      "img": "icons/weapons/swords/sword-longsword-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "You gain a +1 bonus to attack rolls and damage rolls made with this magic weapon. While the weapon is on your person, you also gain a +1 bonus to saving throws. Luck. If the weapon is on your person, you can call on its luck (no action required) to reroll one failed D20 Test if you don't have the Incapacitated condition. You must use the second roll. Once used, this property can't be used again until the next dawn. Wish. The weapon has 1d3 charges. While holding it, you can expend 1 charge and cast Wish from it. Once used, this property can't be used again until the next dawn. The weapon loses this property if it has no charges.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1560,7 +1560,7 @@
     {
       "id": "luck-blade-sickle",
       "name": "Luck Blade (Sickle)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +1 bonus to attack rolls and damage rolls made with this magic weapon. While the weapon is on your person, you also gain a +1 bonus to saving throws. Luck. If the weapon is on your person, you can call on its luck (no action required) to reroll one failed D20 Test if you don't have the Incapacitated condition. You must use the second roll. Once used, this property can't be used again until the next dawn. Wish. The weapon has 1d3 charges. While holding it, you can expend 1 charge and cast Wish from it. Once used, this property can't be used again until the next dawn. The weapon loses this property if it has no charges.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1576,7 +1576,7 @@
     {
       "id": "mysterious-deck",
       "name": "Mysterious Deck",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "Usually found in a box or pouch, this deck contains a number of cards made of ivory or vellum. Most (75 percent) of these decks have thirteen cards, but some have twenty-two. Use the appropriate column of the Mysterious Deck table when randomly determining cards drawn from the deck.\n\nBefore you draw a card, you must declare how many cards you intend to draw and then draw them randomly. Any cards drawn in excess of this number have no effect. Otherwise, as soon as you draw a card from the deck, its magic takes effect. You must draw each card no more than 1 hour after the previous draw. If you fail to draw the chosen number, the remaining number of cards fly from the deck on their own and take effect all at once.\n\nOnce a card is drawn, it disappears. Unless the card is the Fool or Jester, the card reappears in the deck, making it possible to draw the same card twice. (Once the Fool or Jester has left the deck, reroll on the table if that card comes up again.)\n\nTable: Mysterious Deck\n\n| 1d100 (13-Card Deck) | 1d100 (22-Card Deck) | Card    |\n|----------------------|----------------------|---------|\n| —                    | 01–05                | Balance |\n| —                    | 06–10                | Comet   |\n| —                    | 11–14                | Donjon  |\n| 01–08                | 15–18                | Euryale |\n| —                    | 19–23                | Fates   |\n| 09–16                | 24–27                | Flames  |\n| —                    | 28–31                | Fool    |\n| —                    | 32–36                | Gem     |\n| 17–24                | 37–41                | Jester  |\n| 25–32                | 42–46                | Key     |\n| 33–40                | 47–51                | Knight  |\n| 41–48                | 52–56                | Moon    |\n| —                    | 57–60                | Puzzle  |\n| 49–56                | 61–64                | Rogue   |\n| 57–64                | 65–68                | Ruin    |\n| —                    | 69–73                | Sage    |\n| 65–72                | 74–77                | Skull   |\n| 73–80                | 78–82                | Star    |\n| 81–88                | 83–87                | Sun     |\n| —                    | 88–91                | Talons  |\n| 89–96                | 92–96                | Throne  |\n| 97–00                | 97–00                | Void    |\n\nEach card's effect is described below.\n\n**_Balance._** You can increase one of your ability scores by 2, to a maximum of 22, provided you also decrease another one of your ability scores by 2. You can't decrease an ability that has a score of 5 or lower. Alternatively, you can choose not to adjust your ability scores, in which case this card has no effect.\n\n**_Comet._** The next time you enter combat against one or more Hostile creatures, you can select one of them as your foe when you roll Initiative. If you reduce your foe to 0 Hit Points during that combat, you have Advantage on Death Saving Throws for 1 year. If someone else reduces your chosen foe to 0 Hit Points or you don't choose a foe, this card has no effect.\n\n**_Euryale._** The card's medusa-like visage curses you. You take a −2 penalty to saving throws while cursed in this way. Only a god or the magic of the Fates card can end this curse.\n\n**_Fates._** Reality's fabric unravels and spins anew, allowing you to avoid or erase one event as if it never happened. You can use the card's magic as soon as you draw the card or at any other time before you die.\n\n**_Flames._** A powerful devil becomes your enemy. The devil seeks your ruin and torments you, savoring your suffering before attempting to slay you. This enmity lasts until either you or the devil dies.\n\n**_Fool._** You have Disadvantage on D20 Tests for the next 72 hours. Draw another card; this draw doesn't count as one of your declared draws.\n\n**_Gem._** Twenty-five pieces of jewelry worth 2,000 GP each or fifty gems worth 1,000 GP each appear at your feet.\n\n**_Jester._** You have Advantage on D20 Tests for the next 72 hours, or you can draw two additional cards beyond your declared draws.\n\n**_Key._** A Rare or rarer magic weapon with which you are proficient appears on your person. The GM chooses the weapon.\n\n**_Knight._** You gain the service of a **Knight**, who magically appears in an unoccupied space you choose within 30 feet of yourself. The knight has the same alignment as you and serves you loyally until death, believing the two of you have been drawn together by fate. Work with your GM to create a name and backstory for this NPC. The GM can use a different stat block to represent the knight, as desired.\n\n**_Moon._** You gain the ability to cast *Wish* 1d3 times.\n\n**_Puzzle._** Permanently reduce your Intelligence or Wisdom by 1d4 + 1 (to a minimum score of 1). You can draw one additional card beyond your declared draws.\n\n**_Rogue._** An NPC of the GM's choice becomes Hostile toward you. You don't know the identity of this NPC until they or someone else reveals it. Nothing less than a *Wish* spell or divine intervention can end the NPC's hostility toward you.\n\n**_Ruin._** All forms of wealth that you carry or own, other than magic items, are lost to you. Portable property vanishes. Businesses, buildings, and land you own are lost in a way that alters reality the least. Any documentation that proves you should own something lost to this card also disappears.\n\n**_Sage._** At any time you choose within one year of drawing this card, you can ask a question in meditation and mentally receive a truthful answer to that question.\n\n**_Skull._** An **Avatar of Death** (see the accompanying stat block) appears in an unoccupied space as close\n\nto you as possible. The avatar targets only you with its attacks, appearing as a ghostly skeleton clad in a tattered black robe and carrying a spectral scythe. The avatar disappears when it drops to 0 Hit Points or you die. If an ally of yours deals damage to the avatar, that ally summons another **Avatar of Death**. The new avatar appears in an unoccupied space as close to that ally as possible and targets only that ally with its attacks. You and your allies can each summon only one avatar as a consequence of this draw. A creature slain by an avatar can't be restored to life.\n\n**_Star._** Increase one of your ability scores by 2, to a maximum of 24.\n\n**_Sun._** A magic item (chosen by the GM) appears on your person. In addition, you gain 10 Temporary Hit Points daily at dawn until you die.\n\n**_Talons._** Every magic item you wear or carry disintegrates. Artifacts in your possession vanish instead.\n\n**_Throne._** You gain proficiency and Expertise in your choice of History, Insight, Intimidation, or Persuasion. In addition, you gain rightful ownership of a small keep somewhere in the world. However, the keep is currently home to one or more monsters, which must be cleared out before you can claim the keep as yours.\n\n**_Void._** Your soul is drawn from your body and contained in an object in a place of the GM's choice. One or more powerful beings guard the place. While your soul is trapped in this way, your body is inert, ceases aging, and requires no food, air, or water. A *Wish* spell can't return your soul to your body, but the spell reveals the location of the object that holds your soul. You draw no more cards.\n\n> #### Avatar of Death\n> \n> *Medium Undead, Neutral evil*\n> \n> **AC** 20 \n>\n> **Initiative** +3 (13) \n>\n> **HP** Half the HP maximum of its summoner \n>\n> **Speed** 60 ft., Fly 60 ft. (hover)\n>\n> | Attribute | Score | Mod | Save |\n> |-----------|-------|-----|------|\n> | Str       | 16    | +3  | +3   |\n> | Dex       | 16    | +3  | +3   |\n> | Con       | 16    | +3  | +3   |\n> | Int       | 16    | +3  | +3   |\n> | Wis       | 16    | +3  | +3   |\n> | Cha       | 16    | +3  | +3   |\n> \n>\n> **Immunities** Necrotic, Poison; Charmed, Exhaustion, Frightened, Paralyzed, Petrified, Poisoned, Unconscious \n>\n> **Senses** Truesight 60 ft., Passive Perception 13 \n>\n> **Languages** All languages known to its summoner \n>\n> **CR** None (XP 0; PB equals its summoner's)\n>\n> ##### Traits\n>\n> **_Incorporeal Movement._** The avatar can move through other creatures and objects as if they were Difficult Terrain. It takes 5 (1d10) Force damage if it ends its turn inside an object.\n>\n> ##### Actions\n>\n> **_Multiattack._** The avatar makes a number of Reaping Scythe attacks equal to half the summoner's Proficiency Bonus (rounded up).\n>\n> **_Reaping Scythe. Melee Attack Roll:_** Automatic hit, reach 5 ft. *Hit:* 7 (1d8 + 3) Slashing damage plus 4 (1d8) Necrotic damage.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -1592,7 +1592,7 @@
     {
       "id": "plate-armor-of-etherealness",
       "name": "Plate Armor of Etherealness",
-      "img": "icons/equipment/chest/breastplate-cuirass-steel-grey.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/chest.svg",
       "description": "While you're wearing this armor, you can take a Magic action and use a command word to gain the effect of the Etherealness spell. The spell ends immediately if you remove the armor or take a Magic action to repeat the command word. This property of the armor can't be used again until the next dawn.",
       "templateId": "dnd5e-armor",
       "source": "SRD 5.1",
@@ -1608,7 +1608,7 @@
     {
       "id": "ring-of-djinni-summoning",
       "name": "Ring of Djinni Summoning",
-      "img": "icons/equipment/finger/ring-cabochon-gold-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/ring.svg",
       "description": "While wearing this ring, you can take a Magic action to summon a particular Djinni from the Elemental Plane of Air. The djinni appears in an unoccupied space you choose within 120 feet of yourself. It remains as long as you maintain Concentration, to a maximum of 1 hour, or until it drops to 0 Hit Points. While summoned, the djinni is Friendly to you and your allies, and it obeys your commands. If you fail to command it, the djinni defends itself against attackers but takes no other actions. After the djinni departs, it can't be summoned again for 24 hours, and the ring becomes nonmagical if the djinni dies. Rings of Djinni Summoning are often created by the djinn they summon and given to mortals as gifts of friendship or tokens of esteem.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -1624,7 +1624,7 @@
     {
       "id": "ring-of-elemental-command",
       "name": "Ring of Elemental Command",
-      "img": "icons/equipment/finger/ring-cabochon-gold-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/ring.svg",
       "description": "Each *Ring of Elemental Command* is linked to one of the four Elemental Planes. The GM chooses or randomly determines the linked plane. For example, a *Ring of Elemental Command* (air) is linked to the Elemental Plane of Air.\n\nEvery *Ring of Elemental Command* has the following two properties:\n\n**_Elemental Bane._** While wearing the ring, you have Advantage on attack rolls against Elementals and they have Disadvantage on attack rolls against you.\n\n**_Elemental Compulsion._** While wearing the ring, you can take a Magic action to try to compel an Elemental you see within 60 feet of yourself. The Elemental makes a DC 18 Wisdom saving throw. On a failed save, the Elemental has the Charmed condition until the start your next turn, and you determine what it does with its move and action on its next turn.\n\n**_Elemental Focus._** While wearing the ring, you benefit from additional properties corresponding to the ring's linked Elemental Plane:\n\n**Air.** You know Auran, you have Resistance to Lightning damage, and you have a Fly Speed equal to your Speed and can hover.\n\n**Earth.** You know Terran, and you have Resistance to Acid damage. Terrain composed of rubble, rocks, or dirt isn't Difficult Terrain for you. In addition, you can move through solid earth or rock as if those areas were Difficult Terrain without disturbing the matter through which you pass. If you end your turn in solid earth or rock, you are shunted out to the nearest unoccupied space you last occupied.\n\n**Fire.** You know Ignan, and you have Immunity to Fire damage.\n\n**Water.** You know Aquan, you gain a Swim Speed of 60 feet, and you can breathe underwater.\n\n**_Spellcasting._** The ring has 5 charges and regains 1d4 + 1 expended charges daily at dawn. While wearing the ring, you can cast a spell from it. Choose the spell from the list of available spells based on the Elemental Plane the ring is linked to, as shown in the following table. The table indicates how many charges you must expend to cast the spell, which has a save DC of 18.\n\n| Plane | Spells (Charges)                                                                                                                |\n|-------|---------------------------------------------------------------------------------------------------------------------------------|\n| Air   | Chain Lightning (3 charges), Feather Fall (0 charges), Gust of Wind (2 charges), Wind Wall (1 charge)                           |\n| Earth | Earthquake (5 charges), Stone Shape (2 charges), Stoneskin (3 charges), Wall of Stone (3 charges)                               |\n| Fire  | Burning Hands (1 charge), Fireball (2 charges), Fire Storm (4 charges), Wall of Fire (3 charges)                                |\n| Water | Create or Destroy Water (1 charge), Ice Storm (2 charges), Tsunami (5 charges), Wall of Ice (3 charges), Water Walk (2 charges) |",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -1640,7 +1640,7 @@
     {
       "id": "ring-of-invisibility",
       "name": "Ring of Invisibility",
-      "img": "icons/equipment/finger/ring-cabochon-gold-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/ring.svg",
       "description": "While wearing this ring, you can take a Magic action to give yourself the Invisible condition. You remain Invisible until the ring is removed or until you take a Bonus Action to become visible again.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -1656,7 +1656,7 @@
     {
       "id": "ring-of-spell-turning",
       "name": "Ring of Spell Turning",
-      "img": "icons/equipment/finger/ring-cabochon-gold-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/ring.svg",
       "description": "While wearing this ring, you have Advantage on saving throws against spells. If you succeed on the save for a spell of level 7 or lower, the spell has no effect on you. If that spell targeted only you and didn't create an area of effect, you can take a Reaction to deflect the spell back at the spell's caster; the caster must make a saving throw against the spell using their own spell save DC.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -1672,7 +1672,7 @@
     {
       "id": "ring-of-three-wishes",
       "name": "Ring of Three Wishes",
-      "img": "icons/equipment/finger/ring-cabochon-gold-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/ring.svg",
       "description": "While wearing this ring, you can expend 1 of its 3 charges to cast Wish from it. The ring becomes nonmagical when you use the last charge.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -1688,7 +1688,7 @@
     {
       "id": "robe-of-the-archmagi",
       "name": "Robe of the Archmagi",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "This elegant garment is made from exquisite cloth and adorned with runes. You gain these benefits while wearing the robe. Armor. If you aren't wearing armor, your base Armor Class is 15 plus your Dexterity modifier. Magic Resistance. You have Advantage on saving throws against spells and other magical effects. War Mage. Your spell save DC and spell attack bonus each increase by 2.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -1705,7 +1705,7 @@
     {
       "id": "rod-of-lordly-might",
       "name": "Rod of Lordly Might",
-      "img": "icons/weapons/wands/rod-ornate-jeweled-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/dimetrodon.svg",
       "description": "This rod has a flanged head, and it functions as a magic Mace that grants a +3 bonus to attack rolls and damage rolls made with it. The rod has properties associated with six different buttons that are set in a row along the haft. It has three other properties as well, detailed below. Buttons. You can press one of the following buttons as a Bonus Action; a button's effect lasts until you push a different button or until you push the same button again, which causes the rod to revert to its normal form: Button 1. A fiery blade sprouts from the end opposite the rod's flanged head. The flames shed Bright Light in a 40-foot radius and Dim Light for an additional 40 feet, and the blade functions as a magic Longsword or Shortsword (your choice) that deals an extra 2d6 Fire damage on a hit. Button 2. The rod's flanged head folds down and two crescent-shaped blades spring out, transforming the rod into a magic Battleaxe that grants a +3 bonus to attack rolls and damage rolls made with it. Button 3. The rod's flanged head folds down, a spear point springs from the rod's tip, and the rod's handle lengthens into a 6-foot haft, transforming the rod into a magic Spear that grants a +3 bonus to attack rolls and damage rolls made with it. Button 4. The rod transforms into a climbing pole up to 50 feet long (you specify the length), though the rod's buttons remain within your reach. In surfaces as hard as granite, a spike at the bottom and three hooks at the top anchor the pole. Horizontal bars 3 inches long fold out from the sides, 1 foot apart, forming a ladder. The pole can bear up to 4,000 pounds. More weight or lack of solid anchoring causes the rod to revert to its normal form. Button 5. The rod transforms into a handheld battering ram and grants its user a +10 bonus to Strength (Athletics) checks made to break through doors, barricades, and other barriers. Button 6. The rod assumes or remains in its normal form and indicates magnetic north. (Nothing happens if this function of the rod is used in a location that has no magnetic north.) The rod also gives you knowledge of your approximate depth beneath the ground or your height above it. Drain Life. When you hit a creature with a melee attack using the rod, you can force the target to make a DC 17 Constitution saving throw. On a failed save, the target takes an extra 4d6 Necrotic damage, and you regain a number of Hit Points equal to half that Necrotic damage. Once used, this property can't be used again until the next dawn. Paralyze. When you hit a creature with a melee attack using the rod, you can force the target to make a DC 17 Constitution saving throw. On a failed save, the target has the Paralyzed condition for 1 minute. The target repeats the save at the end of each of its turns, ending the effect on a success. Once used, this property can't be used again until the next dawn. Terrify. While holding the rod, you can take a Magic action to force each creature you can see within 30 feet of yourself to make a DC 17 Wisdom saving throw. On a failed save, a target has the Frightened condition for 1 minute. A Frightened target repeats the save at the end of each of its turns, ending the effect on itself on a success. Once used, this property can't be used again until the next dawn.",
       "templateId": "dnd5e-consumable",
       "source": "SRD 5.1",
@@ -1722,7 +1722,7 @@
     {
       "id": "scarab-of-protection",
       "name": "Scarab of Protection",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "This beetle-shaped medallion provides three benefits while it is on your person. Defense. You gain a +1 bonus to Armor Class. Preservation. The scarab has 12 charges. If you fail a saving throw against a Necromancy spell or a harmful effect originating from an Undead, you can take a Reaction to expend 1 charge and turn the failed save into a successful one. The scarab crumbles into powder and is destroyed when its last charge is expended. Spell Resistance. You have Advantage on saving throws against spells.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -1738,7 +1738,7 @@
     {
       "id": "sovereign-glue",
       "name": "Sovereign Glue",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "This viscous, milky-white substance can form a permanent adhesive bond between any two objects. It must be stored in a jar or flask that has been coated inside with Oil of Slipperiness. When found, a container contains 1d6 + 1 ounces. One ounce of the glue can cover a 1-foot square surface. Applying an ounce of Sovereign Glue takes a Utilize action, and the applied glue takes 1 minute to set. Once it has done so, the bond it creates can be broken only by the application of Universal Solvent or Oil of Etherealness, or with a Wish spell.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -1754,7 +1754,7 @@
     {
       "id": "sphere-of-annihilation",
       "name": "Sphere of Annihilation",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "This 2-foot-diameter black sphere is a hole in the multiverse, hovering in space and stabilized by a magical field surrounding it.\n\nThe sphere obliterates all matter it passes through and all matter that passes through it. Artifacts are the exception. Unless an Artifact is susceptible to damage from a *Sphere of Annihilation*, it passes through the sphere unscathed. Anything else that touches the sphere but isn't wholly engulfed and obliterated by it takes 8d10 Force damage.\n\n**_Controlling the Sphere._** A *Sphere of Annihilation* is stationary until someone takes control of it. If you are within 60 feet of a sphere, you can take a Magic action to make a DC 25 Intelligence (Arcana) check. On a successful check, you control the sphere until the start of your next turn, and if it was under another creature's control, that creature loses control of the sphere. On a failed check, the sphere moves 10 feet toward you in a straight line.\n\nWhile in control of the sphere, you can take a Bonus Action to cause it to move in one direction of your choice, up to a number of feet equal to 5 times your Intelligence modifier (minimum 5 feet). Any creature whose space the sphere enters must succeed on a DC 19 Dexterity saving throw or be touched by it, taking 8d10 Force damage. A creature reduced to 0 Hit Points by this damage is obliterated, leaving its possessions behind but no other physical remains.\n\n**_Sphere Interactions._** If the sphere comes into contact with a planar portal (such as that created by the *Gate* spell) or an extradimensional space (such as that within a *Portable Hole*), the GM determines randomly what happens using the following table.\n\n| 1d100 | Result                                                                                                                     |\n|-------|----------------------------------------------------------------------------------------------------------------------------|\n| 01–50 | The sphere is destroyed.                                                                                                   |\n| 51–85 | The sphere moves through the portal or into the extradimensional space.                                                    |\n| 86–00 | A spatial rift sends the sphere and each creature and object within 180 feet of the sphere to a random plane of existence. |",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -1770,7 +1770,7 @@
     {
       "id": "staff-of-the-magi",
       "name": "Staff of the Magi",
-      "img": "icons/weapons/staves/staff-ornate-jeweled-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/wizard-staff.svg",
       "description": "This staff has 50 charges and can be wielded as a magic Quarterstaff that grants a +2 bonus to attack rolls and damage rolls made with it. While you hold it, you gain a +2 bonus to spell attack rolls.\n\n**_Spell Absorption._** While holding the staff, you have Advantage on saving throws against spells. In addition, you can take a Reaction when another creature casts a spell that targets only you. If you do, the staff absorbs the magic of the spell, canceling its effect and gaining a number of charges equal to the absorbed spell's level. However, if doing so brings the staff's total number of charges above 50, the staff explodes as if you activated its Retributive Strike (see below).\n\n**_Spells._** While holding the staff, you can cast one of the spells on the following table from it, using your spell save DC. The table indicates how many charges you must expend to cast the spell.\n\n| Spell                            | Charge Cost |\n|----------------------------------|-------------|\n| Arcane Lock                      | 0           |\n| Conjure Elemental                | 7           |\n| Detect Magic                     | 0           |\n| Dispel Magic                     | 3           |\n| Enlarge/Reduce                   | 0           |\n| Fireball (level 7 version)       | 7           |\n| Flaming Sphere                   | 2           |\n| Ice Storm                        | 4           |\n| Invisibility                     | 2           |\n| Knock                            | 2           |\n| Light                            | 0           |\n| Lightning Bolt (level 7 version) | 7           |\n| Mage Hand                        | 0           |\n| Passwall                         | 5           |\n| Plane Shift                      | 7           |\n| Protection from Evil and Good    | 0           |\n| Telekinesis                      | 5           |\n| Wall of Fire                     | 4           |\n| Web                              | 2           |\n\n**_Regaining Charges._** The staff regains 4d6 + 2 expended charges daily at dawn. If you expend the last charge, roll 1d20. On a 20, the staff regains 1d12 + 1 charges.\n\n**_Retributive Strike._** You can take a Magic action to break the staff over your knee or against a solid surface. The staff is destroyed and releases its magic in an explosion that fills a 30-foot Emanation originating from itself. You have a 50 percent chance to instantly travel to a random plane of existence, avoiding the explosion. If you fail to avoid the effect, you take Force damage equal to 16 times the number of charges in the staff. Each other creature in the area makes a DC 17 Dexterity saving throw. On a failed save, a creature takes Force damage equal to 6 times the number of charges in the staff. On a successful save, a creature takes half as much damage.",
       "templateId": "dnd5e-consumable",
       "source": "SRD 5.1",
@@ -1788,7 +1788,7 @@
     {
       "id": "talisman-of-pure-good",
       "name": "Talisman of Pure Good",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "This talisman is a mighty symbol of goodness. A Fiend or an Undead that touches the talisman takes 8d6 Radiant damage and takes the damage again each time it ends its turn holding or carrying the talisman. Holy Symbol. You can use the talisman as a Holy Symbol. You gain a +2 bonus to spell attack rolls while you wear or hold it. Pure Rebuke. The talisman has 7 charges. While wearing or holding the talisman, you can take a Magic action to expend 1 charge and target one creature you can see on the ground within 120 feet of yourself. A flaming fissure opens under the target, and the target makes a DC 20 Dexterity saving throw. If the target is a Fiend or an Undead, it has Disadvantage on the save. On a failed save, the target falls into the fissure and is destroyed, leaving no remains. On a successful save, the target isn't cast into the fissure but takes 4d6 Psychic damage from the ordeal. In either case, the fissure then closes, leaving no trace of its existence. When you expend the last charge, the talisman disperses into motes of golden light and is destroyed.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -1805,7 +1805,7 @@
     {
       "id": "talisman-of-the-sphere",
       "name": "Talisman of the Sphere",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "While holding or wearing this talisman, you have Advantage on any Intelligence (Arcana) check you make to control a Sphere of Annihilation. In addition, when you start your turn in control of a Sphere of Annihilation, you can take a Magic action to move it 10 feet plus a number of additional feet equal to 10 times your Intelligence modifier. This movement doesn't have to be in a straight line.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -1821,7 +1821,7 @@
     {
       "id": "talisman-of-ultimate-evil",
       "name": "Talisman of Ultimate Evil",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "This item symbolizes unrepentant evil. A creature that isn't a Fiend or an Undead that touches the talisman takes 8d6 Necrotic damage and takes the damage again each time it ends its turn holding or carrying the talisman. Holy Symbol. You can use the talisman as a Holy Symbol. You gain a +2 bonus to spell attack rolls while you wear or hold it. Ultimate End. The talisman has 6 charges. While wearing or holding the talisman, you can take a Magic action to expend 1 charge and target one creature you can see on the ground within 120 feet of yourself. A flaming fissure opens under the target, and the target makes a DC 20 Dexterity saving throw. If the target is a Celestial, it has Disadvantage on the save. On a failed save, the target falls into the fissure and is destroyed, leaving no remains. On a successful save, the target isn't cast into the fissure but takes 4d6 Psychic damage from the ordeal. In either case, the fissure then closes, leaving no trace of its existence. When you expend the last charge, the talisman dissolves into foul-smelling slime and is destroyed.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -1837,7 +1837,7 @@
     {
       "id": "universal-solvent",
       "name": "Universal Solvent",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "This tube holds milky liquid with a strong alcohol smell. When found, a tube contains 1d6 + 1 ounces. You can take a Utilize action to pour 1 or more ounces of solvent from the tube onto a surface within reach. Each ounce instantly dissolves up to 1 square foot of adhesive it touches, including Sovereign Glue.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -1853,7 +1853,7 @@
     {
       "id": "vorpal-glaive",
       "name": "Vorpal Glaive",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. In addition, the weapon ignores Resistance to Slashing damage.\n\nWhen you use this weapon to attack a creature that has at least one head and roll a 20 on the d20 for the attack roll, you cut off one of the creature's heads. The creature dies if it can't survive without the lost head. A creature is immune to this effect if it has Immunity to Slashing damage, if it doesn't have or need a head, or if the GM decides that the creature is too big for its head to be cut off with this weapon. Such a creature instead takes an extra 30 Slashing damage from the hit. If the creature has Legendary Resistance, it can expend one daily use of that trait to avoid losing its head, taking the extra damage instead.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1869,7 +1869,7 @@
     {
       "id": "vorpal-greatsword",
       "name": "Vorpal Greatsword",
-      "img": "icons/weapons/swords/sword-longsword-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. In addition, the weapon ignores Resistance to Slashing damage.\n\nWhen you use this weapon to attack a creature that has at least one head and roll a 20 on the d20 for the attack roll, you cut off one of the creature's heads. The creature dies if it can't survive without the lost head. A creature is immune to this effect if it has Immunity to Slashing damage, if it doesn't have or need a head, or if the GM decides that the creature is too big for its head to be cut off with this weapon. Such a creature instead takes an extra 30 Slashing damage from the hit. If the creature has Legendary Resistance, it can expend one daily use of that trait to avoid losing its head, taking the extra damage instead.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1885,7 +1885,7 @@
     {
       "id": "vorpal-longsword",
       "name": "Vorpal Longsword",
-      "img": "icons/weapons/swords/sword-longsword-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. In addition, the weapon ignores Resistance to Slashing damage.\n\nWhen you use this weapon to attack a creature that has at least one head and roll a 20 on the d20 for the attack roll, you cut off one of the creature's heads. The creature dies if it can't survive without the lost head. A creature is immune to this effect if it has Immunity to Slashing damage, if it doesn't have or need a head, or if the GM decides that the creature is too big for its head to be cut off with this weapon. Such a creature instead takes an extra 30 Slashing damage from the hit. If the creature has Legendary Resistance, it can expend one daily use of that trait to avoid losing its head, taking the extra damage instead.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1901,7 +1901,7 @@
     {
       "id": "vorpal-scimitar",
       "name": "Vorpal Scimitar",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack rolls and damage rolls made with this magic weapon. In addition, the weapon ignores Resistance to Slashing damage.\n\nWhen you use this weapon to attack a creature that has at least one head and roll a 20 on the d20 for the attack roll, you cut off one of the creature's heads. The creature dies if it can't survive without the lost head. A creature is immune to this effect if it has Immunity to Slashing damage, if it doesn't have or need a head, or if the GM decides that the creature is too big for its head to be cut off with this weapon. Such a creature instead takes an extra 30 Slashing damage from the hit. If the creature has Legendary Resistance, it can expend one daily use of that trait to avoid losing its head, taking the extra damage instead.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -1917,7 +1917,7 @@
     {
       "id": "well-of-many-worlds",
       "name": "Well of Many Worlds",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "This fine black cloth, soft as silk, is folded up to the dimensions of a handkerchief. It unfolds into a circular sheet 6 feet in diameter. You can take a Magic action to unfold the Well of Many Worlds and place it on a solid surface, whereupon it forms a two-way, 6-foot-diameter, circular portal to another world or plane of existence. Each time the item opens a portal, the GM decides where it leads. The portal remains open until a creature within 5 feet of it takes a Magic action to close it by taking hold of the edges of the cloth and folding it up. Once the Well of Many Worlds has opened a portal, it can't do so again for 1d8 hours.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -1933,7 +1933,7 @@
     {
       "id": "apparatus-of-the-crab",
       "name": "Apparatus of the Crab",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "This item first appears to be a Large sealed iron barrel weighing 500 pounds. The barrel has a hidden catch, which can be found with a successful DC 20 Intelligence (Investigation) check. Releasing the catch unlocks a hatch at one end of the barrel, allowing two Medium or smaller creatures to crawl inside. Ten levers are set in a row at the far end, each in a neutral position, able to move either up or down. When certain levers are used, the apparatus transforms to resemble a giant lobster.\r\n\r\nThe apparatus of the Crab is a Large object with the following statistics:\r\n\r\n**Armor Class:** 20\r\n\r\n**Hit Points:** 200\r\n\r\n**Speed:** 30 ft., swim 30 ft. (or 0 ft. for both if the legs and tail aren't extended)\r\n\r\n**Damage Immunities:** poison, psychic\r\n\r\nTo be used as a vehicle, the apparatus requires one pilot. While the apparatus's hatch is closed, the compartment is airtight and watertight. The compartment holds enough air for 10 hours of breathing, divided by the number of breathing creatures inside.\r\n\r\nThe apparatus floats on water. It can also go underwater to a depth of 900 feet. Below that, the vehicle takes 2d6 bludgeoning damage per minute from pressure.\r\n\r\nA creature in the compartment can use an action to move as many as two of the apparatus's levers up or down. After each use, a lever goes back to its neutral position. Each lever, from left to right, functions as shown in the Apparatus of the Crab Levers table.\r\n\r\n**Apparatus of the Crab Levers (table)**\r\n\r\n| Lever | Up                                                                                                                               | Down                                                                                                                                        |\r\n|-------|----------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|\r\n| 1     | Legs and tail extend, allowing the apparatus to walk and swim.                                                                   | Legs and tail retract, reducing the apparatus's speed to 0 and making it unable to benefit from bonuses to speed.                           |\r\n| 2     | Forward window shutter opens.                                                                                                    | Forward window shutter closes.                                                                                                              |\r\n| 3     | Side window shutters open (two per side).                                                                                        | Side window shutters close (two per side).                                                                                                  |\r\n| 4     | Two claws extend from the front sides of the apparatus.                                                                          | The claws retract.                                                                                                                          |\r\n| 5     | Each extended claw makes the following melee weapon attack: +8 to hit, reach 5 ft., one target. Hit: 7 (2d6) bludgeoning damage. | Each extended claw makes the following melee weapon attack: +8 to hit, reach 5 ft., one target. Hit: The target is grappled (escape DC 15). |\r\n| 6     | The apparatus walks or swims forward.                                                                                            | The apparatus walks or swims backward.                                                                                                      |\r\n| 7     | The apparatus turns 90 degrees left.                                                                                             | The apparatus turns 90 degrees right.                                                                                                       |\r\n| 8     | Eyelike fixtures emit bright light in a 30-foot radius and dim light for an additional 30 feet.                                  | The light turns off.                                                                                                                        |\r\n| 9     | The apparatus sinks as much as 20 feet in liquid.                                                                                | The apparatus rises up to 20 feet in liquid.                                                                                                |\r\n| 10    | The rear hatch unseals and opens.                                                                                                | The rear hatch closes and seals.                                                                                                            |",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -1949,7 +1949,7 @@
     {
       "id": "armor-of-invulnerability",
       "name": "Armor of Invulnerability",
-      "img": "icons/equipment/chest/breastplate-cuirass-steel-grey.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/chest.svg",
       "description": "You have resistance to nonmagical damage while you wear this armor. Additionally, you can use an action to make yourself immune to nonmagical damage for 10 minutes or until you are no longer wearing the armor. Once this special action is used, it can't be used again until the next dawn.",
       "templateId": "dnd5e-armor",
       "source": "SRD 5.1",
@@ -1965,7 +1965,7 @@
     {
       "id": "belt-of-cloud-giant-strength",
       "name": "Belt of Cloud Giant Strength",
-      "img": "icons/equipment/waist/belt-studded-leather-brown.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lucasms/belt.svg",
       "description": "While wearing this belt, your Strength score changes to a score granted by the belt. If your Strength is already equal to or greater than the belt's score, the item has no effect on you.\\n\\nSix varieties of this belt exist, corresponding with and having rarity according to the six kinds of true giants. The _belt of stone giant strength_ and the _belt of frost giant strength_ look different, but they have the same effect.\\n\\n| Type              | Strength | Rarity    |\\n|-------------------|----------|-----------|\\n| Hill giant        | 21       | Rare      |\\n| Stone/frost giant | 23       | Very rare |\\n| Fire giant        | 25       | Very rare |\\n| Cloud giant       | 27       | Legendary |\\n| Storm giant       | 29       | Legendary |\"",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -1981,7 +1981,7 @@
     {
       "id": "belt-of-storm-giant-strength",
       "name": "Belt of Storm Giant Strength",
-      "img": "icons/equipment/waist/belt-studded-leather-brown.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lucasms/belt.svg",
       "description": "While wearing this belt, your Strength score changes to a score granted by the belt. If your Strength is already equal to or greater than the belt's score, the item has no effect on you.\\n\\nSix varieties of this belt exist, corresponding with and having rarity according to the six kinds of true giants. The _belt of stone giant strength_ and the _belt of frost giant strength_ look different, but they have the same effect.\\n\\n| Type              | Strength | Rarity    |\\n|-------------------|----------|-----------|\\n| Hill giant        | 21       | Rare      |\\n| Stone/frost giant | 23       | Very rare |\\n| Fire giant        | 25       | Very rare |\\n| Cloud giant       | 27       | Legendary |\\n| Storm giant       | 29       | Legendary |\"",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -1997,7 +1997,7 @@
     {
       "id": "crystal-ball-of-mind-reading",
       "name": "Crystal Ball of Mind Reading",
-      "img": "icons/commodities/gems/pearl-natural-white.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/gems.svg",
       "description": "The typical crystal ball, a very rare item, is about 6 inches in diameter. While touching it, you can cast the scrying spell (save DC 17) with it.\r\n\r\nYou can use an action to cast the detect thoughts spell (save DC 17) while you are scrying with the crystal ball, targeting creatures you can see within 30 feet of the spell's sensor. You don't need to concentrate on this detect thoughts to maintain it during its duration, but it ends if scrying ends.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -2013,7 +2013,7 @@
     {
       "id": "crystal-ball-of-telepathy",
       "name": "Crystal Ball of Telepathy",
-      "img": "icons/commodities/gems/pearl-natural-white.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/gems.svg",
       "description": "The typical crystal ball, a very rare item, is about 6 inches in diameter. While touching it, you can cast the scrying spell (save DC 17) with it.\r\n\r\nThe following crystal ball variants are legendary items and have additional properties.\r\n\r\nWhile scrying with the crystal ball, you can communicate telepathically with creatures you can see within 30 feet of the spell's sensor. You can also use an action to cast the suggestion spell (save DC 17) through the sensor on one of those creatures. You don't need to concentrate on this suggestion to maintain it during its duration, but it ends if scrying ends. Once used, the suggestion power of the crystal ball can't be used again until the next dawn.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -2029,7 +2029,7 @@
     {
       "id": "crystal-ball-of-true-seeing",
       "name": "Crystal Ball of True Seeing",
-      "img": "icons/commodities/gems/pearl-natural-white.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/gems.svg",
       "description": "The typical crystal ball, a very rare item, is about 6 inches in diameter. While touching it, you can cast the scrying spell (save DC 17) with it.\r\n\r\nWhile scrying with the crystal ball, you have truesight with a radius of 120 feet centered on the spell's sensor.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -2045,7 +2045,7 @@
     {
       "id": "cubic-gate",
       "name": "Cubic Gate",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "This cube is 3 inches across and radiates palpable magical energy. The six sides of the cube are each keyed to a different plane of existence, one of which is the Material Plane. The other sides are linked to planes determined by the GM.\r\n\r\nYou can use an action to press one side of the cube to cast the _gate_ spell with it, opening a portal to the plane keyed to that side. Alternatively, if you use an action to press one side twice, you can cast the _plane shift_ spell (save DC 17) with the cube and transport the targets to the plane keyed to that side.\r\n\r\nThe cube has 3 charges. Each use of the cube expends 1 charge. The cube regains 1d3 expended charges daily at dawn.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -2061,7 +2061,7 @@
     {
       "id": "deck-of-many-things",
       "name": "Deck of Many Things",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "Usually found in a box or pouch, this deck contains a number of cards made of ivory or vellum. Most (75 percent) of these decks have only thirteen cards, but the rest have twenty-two.\r\n\r\nBefore you draw a card, you must declare how many cards you intend to draw and then draw them randomly (you can use an altered deck of playing cards to simulate the deck). Any cards drawn in excess of this number have no effect. Otherwise, as soon as you draw a card from the deck, its magic takes effect. You must draw each card no more than 1 hour after the previous draw. If you fail to draw the chosen number, the remaining number of cards fly from the deck on their own and take effect all at once.\r\n\r\nOnce a card is drawn, it fades from existence. Unless the card is the Fool or the Jester, the card reappears in the deck, making it possible to draw the same card twice.\r\n\r\n| Playing Card       | Card        |\r\n|--------------------|-------------|\r\n| Ace of diamonds    | Vizier\\*    |\r\n| King of diamonds   | Sun         |\r\n| Queen of diamonds  | Moon        |\r\n| Jack of diamonds   | Star        |\r\n| Two of diamonds    | Comet\\*     |\r\n| Ace of hearts      | The Fates\\* |\r\n| King of hearts     | Throne      |\r\n| Queen of hearts    | Key         |\r\n| Jack of hearts     | Knight      |\r\n| Two of hearts      | Gem\\*       |\r\n| Ace of clubs       | Talons\\*    |\r\n| King of clubs      | The Void    |\r\n| Queen of clubs     | Flames      |\r\n| Jack of clubs      | Skull       |\r\n| Two of clubs       | Idiot\\*     |\r\n| Ace of spades      | Donjon\\*    |\r\n| King of spades     | Ruin        |\r\n| Queen of spades    | Euryale     |\r\n| Jack of spades     | Rogue       |\r\n| Two of spades      | Balance\\*   |\r\n| Joker (with TM)    | Fool\\*      |\r\n| Joker (without TM) | Jester      |\r\n\r\n\\*Found only in a deck with twenty-two cards\r\n\r\n**_Balance_**. Your mind suffers a wrenching alteration, causing your alignment to change. Lawful becomes chaotic, good becomes evil, and vice versa. If you are true neutral or unaligned, this card has no effect on you.\r\n\r\n**_Comet_**. If you single-handedly defeat the next hostile monster or group of monsters you encounter, you gain experience points enough to gain one level. Otherwise, this card has no effect.\r\n\r\n**_Donjon_**. You disappear and become entombed in a state of suspended animation in an extradimensional sphere. Everything you were wearing and carrying stays behind in the space you occupied when you disappeared. You remain imprisoned until you are found and removed from the sphere. You can't be located by any divination magic, but a _wish_ spell can reveal the location of your prison. You draw no more cards.\r\n\r\n**_Euryale_**. The card's medusa-like visage curses you. You take a -2 penalty on saving throws while cursed in this way. Only a god or the magic of The Fates card can end this curse.\r\n\r\n**_The Fates_**. Reality's fabric unravels and spins anew, allowing you to avoid or erase one event as if it never happened. You can use the card's magic as soon as you draw the card or at any other time before you die.\r\n\r\n**_Flames_**. A powerful devil becomes your enemy. The devil seeks your ruin and plagues your life, savoring your suffering before attempting to slay you. This enmity lasts until either you or the devil dies.\r\n\r\n**_Fool_**. You lose 10,000 XP, discard this card, and draw from the deck again, counting both draws as one of your declared draws. If losing that much XP would cause you to lose a level, you instead lose an amount that leaves you with just enough XP to keep your level.\r\n\r\n**_Gem_**. Twenty-five pieces of jewelry worth 2,000 gp each or fifty gems worth 1,000 gp each appear at your feet.\r\n\r\n**_Idiot_**. Permanently reduce your Intelligence by 1d4 + 1 (to a minimum score of 1). You can draw one additional card beyond your declared draws.\r\n\r\n**_Jester_**. You gain 10,000 XP, or you can draw two additional cards beyond your declared draws.\r\n\r\n**_Key_**. A rare or rarer magic weapon with which you are proficient appears in your hands. The GM chooses the weapon.\r\n\r\n**_Knight_**. You gain the service of a 4th-level fighter who appears in a space you choose within 30 feet of you. The fighter is of the same race as you and serves you loyally until death, believing the fates have drawn him or her to you. You control this character.\r\n\r\n**_Moon_**. You are granted the ability to cast the _wish_ spell 1d3 times.\r\n\r\n**_Rogue_**. A nonplayer character of the GM's choice becomes hostile toward you. The identity of your new enemy isn't known until the NPC or someone else reveals it. Nothing less than a _wish_ spell or divine intervention can end the NPC's hostility toward you.\r\n\r\n**_Ruin_**. All forms of wealth that you carry or own, other than magic items, are lost to you. Portable property vanishes. Businesses, buildings, and land you own are lost in a way that alters reality the least. Any documentation that proves you should own something lost to this card also disappears.\r\n\r\n**_Skull_**. You summon an avatar of death-a ghostly humanoid skeleton clad in a tattered black robe and carrying a spectral scythe. It appears in a space of the GM's choice within 10 feet of you and attacks you, warning all others that you must win the battle alone. The avatar fights until you die or it drops to 0 hit points, whereupon it disappears. If anyone tries to help you, the helper summons its own avatar of death. A creature slain by an avatar of death can't be restored to life.\r\n\r\n#",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -2077,7 +2077,7 @@
     {
       "id": "defender-greatsword",
       "name": "Defender (Greatsword)",
-      "img": "icons/weapons/swords/sword-longsword-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "You gain a +3 bonus to attack and damage rolls made with this magic weapon.\n\nThe first time you attack with the sword on each of your turns, you can transfer some or all of the sword's bonus to your Armor Class, instead of using the bonus on any attacks that turn. For example, you could reduce the bonus to your attack and damage rolls to +1 and gain a +2 bonus to AC. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the sword to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -2093,7 +2093,7 @@
     {
       "id": "defender-longsword",
       "name": "Defender (Longsword)",
-      "img": "icons/weapons/swords/sword-longsword-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "You gain a +3 bonus to attack and damage rolls made with this magic weapon.\n\nThe first time you attack with the sword on each of your turns, you can transfer some or all of the sword's bonus to your Armor Class, instead of using the bonus on any attacks that turn. For example, you could reduce the bonus to your attack and damage rolls to +1 and gain a +2 bonus to AC. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the sword to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -2109,7 +2109,7 @@
     {
       "id": "defender-rapier",
       "name": "Defender (Rapier)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack and damage rolls made with this magic weapon.\n\nThe first time you attack with the sword on each of your turns, you can transfer some or all of the sword's bonus to your Armor Class, instead of using the bonus on any attacks that turn. For example, you could reduce the bonus to your attack and damage rolls to +1 and gain a +2 bonus to AC. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the sword to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -2125,7 +2125,7 @@
     {
       "id": "defender-shortsword",
       "name": "Defender (Shortsword)",
-      "img": "icons/weapons/swords/sword-longsword-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "You gain a +3 bonus to attack and damage rolls made with this magic weapon.\n\nThe first time you attack with the sword on each of your turns, you can transfer some or all of the sword's bonus to your Armor Class, instead of using the bonus on any attacks that turn. For example, you could reduce the bonus to your attack and damage rolls to +1 and gain a +2 bonus to AC. The adjusted bonuses remain in effect until the start of your next turn, although you must hold the sword to gain a bonus to AC from it.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -2141,7 +2141,7 @@
     {
       "id": "hammer-of-thunderbolts",
       "name": "Hammer of Thunderbolts",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +1 bonus to attack and damage rolls made with this magic weapon.\n\n**_Giant's Bane (Requires Attunement)_**. You must be wearing a _belt of giant strength_ (any variety) and _gauntlets of ogre power_ to attune to this weapon. The attunement ends if you take off either of those items. While you are attuned to this weapon and holding it, your Strength score increases by 4 and can exceed 20, but not 30. When you roll a 20 on an attack roll made with this weapon against a giant, the giant must succeed on a DC 17 Constitution saving throw or die.\n\nThe hammer also has 5 charges. While attuned to it, you can expend 1 charge and make a ranged weapon attack with the hammer, hurling it as if it had the thrown property with a normal range of 20 feet and a long range of 60 feet. If the attack hits, the hammer unleashes a thunderclap audible out to 300 feet. The target and every creature within 30 feet of it must succeed on a DC 17 Constitution saving throw or be stunned until the end of your next turn. The hammer regains 1d4 + 1 expended charges daily at dawn.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -2157,7 +2157,7 @@
     {
       "id": "holy-avenger-greatsword",
       "name": "Holy Avenger (Greatsword)",
-      "img": "icons/weapons/swords/sword-longsword-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "You gain a +3 bonus to attack and damage rolls made with this magic weapon. When you hit a fiend or an undead with it, that creature takes an extra 2d10 radiant damage.\n\nWhile you hold the drawn sword, it creates an aura in a 10-foot radius around you. You and all creatures friendly to you in the aura have advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the paladin class, the radius of the aura increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -2174,7 +2174,7 @@
     {
       "id": "holy-avenger-longsword",
       "name": "Holy Avenger (Longsword)",
-      "img": "icons/weapons/swords/sword-longsword-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "You gain a +3 bonus to attack and damage rolls made with this magic weapon. When you hit a fiend or an undead with it, that creature takes an extra 2d10 radiant damage.\n\nWhile you hold the drawn sword, it creates an aura in a 10-foot radius around you. You and all creatures friendly to you in the aura have advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the paladin class, the radius of the aura increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -2191,7 +2191,7 @@
     {
       "id": "holy-avenger-rapier",
       "name": "Holy Avenger (Rapier)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +3 bonus to attack and damage rolls made with this magic weapon. When you hit a fiend or an undead with it, that creature takes an extra 2d10 radiant damage.\n\nWhile you hold the drawn sword, it creates an aura in a 10-foot radius around you. You and all creatures friendly to you in the aura have advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the paladin class, the radius of the aura increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -2208,7 +2208,7 @@
     {
       "id": "holy-avenger-shortsword",
       "name": "Holy Avenger (Shortsword)",
-      "img": "icons/weapons/swords/sword-longsword-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "You gain a +3 bonus to attack and damage rolls made with this magic weapon. When you hit a fiend or an undead with it, that creature takes an extra 2d10 radiant damage.\n\nWhile you hold the drawn sword, it creates an aura in a 10-foot radius around you. You and all creatures friendly to you in the aura have advantage on saving throws against spells and other magical effects. If you have 17 or more levels in the paladin class, the radius of the aura increases to 30 feet.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -2225,7 +2225,7 @@
     {
       "id": "horn-of-valhalla-iron",
       "name": "Horn of Valhalla (Iron)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You can use an action to blow this horn. In response, warrior spirits from the Valhalla appear within 60 feet of you. They use the statistics of a berserker. They return to Valhalla after 1 hour or when they drop to 0 hit points. Once you use the horn, it can't be used again until 7 days have passed.\\n\\nFour types of _horn of Valhalla_ are known to exist, each made of a different metal. The horn's type determines how many berserkers answer its summons, as well as the requirement for its use. The GM chooses the horn's type or determines it randomly.\\n\\n| d100   | Horn Type | Berserkers Summoned | Requirement                          |\\n|--------|-----------|---------------------|--------------------------------------|\\n| 01-40  | Silver    | 2d4 + 2             | None                                 |\\n| 41-75  | Brass     | 3d4 + 3             | Proficiency with all simple weapons  |\\n| 76-90  | Bronze    | 4d4 + 4             | Proficiency with all medium armor    |\\n| 91-00  | Iron      | 5d4 + 5             | Proficiency with all martial weapons |\\n\\nIf you blow the horn without meeting its requirement, the summoned berserkers attack you. If you meet the requirement, they are friendly to you and your companions and follow your commands.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -2241,7 +2241,7 @@
     {
       "id": "ioun-stone-greater-absorption",
       "name": "Ioun Stone (Greater Absorption)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "An Ioun stone is named after Ioun, a god of knowledge and prophecy revered on some worlds. Many types of Ioun stone exist, each type a distinct combination of shape and color.\\n\\nWhen you use an action to toss one of these stones into the air, the stone orbits your head at a distance of 1d3 feet and confers a benefit to you. Thereafter, another creature must use an action to grasp or net the stone to separate it from you, either by making a successful attack roll against AC 24 or a successful DC 24 Dexterity (Acrobatics) check. You can use an action to seize and stow the stone, ending its effect.\\n\\nA stone has AC 24, 10 hit points, and resistance to all damage. It is considered to be an object that is being worn while it orbits your head.\\n\\n**_Greater Absorption (Legendary)._** While this marbled lavender and green ellipsoid orbits your head, you can use your reaction to cancel a spell of 8th level or lower cast by a creature you can see and targeting only you.\\n\\nOnce the stone has canceled 50 levels of spells, it burns out and turns dull gray, losing its magic. If you are targeted by a spell whose level is higher than the number of spell levels the stone has left, the stone can't cancel it.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -2257,7 +2257,7 @@
     {
       "id": "ioun-stone-mastery",
       "name": "Ioun Stone (Mastery)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "An Ioun stone is named after Ioun, a god of knowledge and prophecy revered on some worlds. Many types of Ioun stone exist, each type a distinct combination of shape and color.\\n\\nWhen you use an action to toss one of these stones into the air, the stone orbits your head at a distance of 1d3 feet and confers a benefit to you. Thereafter, another creature must use an action to grasp or net the stone to separate it from you, either by making a successful attack roll against AC 24 or a successful DC 24 Dexterity (Acrobatics) check. You can use an action to seize and stow the stone, ending its effect.\\n\\nA stone has AC 24, 10 hit points, and resistance to all damage. It is considered to be an object that is being worn while it orbits your head.\\n\\n**_Mastery (Legendary)._** Your proficiency bonus increases by 1 while this pale green prism orbits your head.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -2273,7 +2273,7 @@
     {
       "id": "ioun-stone-regeneration",
       "name": "Ioun Stone (Regeneration)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "An Ioun stone is named after Ioun, a god of knowledge and prophecy revered on some worlds. Many types of Ioun stone exist, each type a distinct combination of shape and color.\\n\\nWhen you use an action to toss one of these stones into the air, the stone orbits your head at a distance of 1d3 feet and confers a benefit to you. Thereafter, another creature must use an action to grasp or net the stone to separate it from you, either by making a successful attack roll against AC 24 or a successful DC 24 Dexterity (Acrobatics) check. You can use an action to seize and stow the stone, ending its effect.\\n\\nA stone has AC 24, 10 hit points, and resistance to all damage. It is considered to be an object that is being worn while it orbits your head.\\n\\n**_Regeneration (Legendary)_**. You regain 15 hit points at the end of each hour this pearly white spindle orbits your head, provided that you have at least 1 hit point.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -2289,7 +2289,7 @@
     {
       "id": "iron-flask",
       "name": "Iron Flask",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "This iron bottle has a brass stopper. You can use an action to speak the flask's command word, targeting a creature that you can see within 60 feet of you. If the target is native to a plane of existence other than the one you're on, the target must succeed on a DC 17 Wisdom saving throw or be trapped in the flask. If the target has been trapped by the flask before, it has advantage on the saving throw. Once trapped, a creature remains in the flask until released. The flask can hold only one creature at a time. A creature trapped in the flask doesn't need to breathe, eat, or drink and doesn't age.\r\n\r\nYou can use an action to remove the flask's stopper and release the creature the flask contains. The creature is friendly to you and your companions for 1 hour and obeys your commands for that duration. If you give no commands or give it a command that is likely to result in its death, it defends itself but otherwise takes no actions. At the end of the duration, the creature acts in accordance with its normal disposition and alignment.\r\n\r\nAn _identify_ spell reveals that a creature is inside the flask, but the only way to determine the type of creature is to open the flask. A newly discovered bottle might already contain a creature chosen by the GM or determined randomly.\r\n\r\n| d100  | Contents          |\r\n|-------|-------------------|\r\n| 1-50  | Empty             |\r\n| 51-54 | Demon (type 1)    |\r\n| 55-58 | Demon (type 2)    |\r\n| 59-62 | Demon (type 3)    |\r\n| 63-64 | Demon (type 4)    |\r\n| 65    | Demon (type 5)    |\r\n| 66    | Demon (type 6)    |\r\n| 67    | Deva              |\r\n| 68-69 | Devil (greater)   |\r\n| 70-73 | Devil (lesser)    |\r\n| 74-75 | Djinni            |\r\n| 76-77 | Efreeti           |\r\n| 78-83 | Elemental (any)   |\r\n| 84-86 | Invisible stalker |\r\n| 87-90 | Night hag         |\r\n| 91    | Planetar          |\r\n| 92-95 | Salamander        |\r\n| 96    | Solar             |\r\n| 97-99 | Succubus/incubus  |\r\n| 100   | Xorn              |",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -2305,7 +2305,7 @@
     {
       "id": "luck-blade-greatsword",
       "name": "Luck Blade (Greatsword)",
-      "img": "icons/weapons/swords/sword-longsword-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "You gain a +1 bonus to attack and damage rolls made with this magic weapon. While the sword is on your person, you also gain a +1 bonus to saving throws.\n\n**_Luck_**. If the sword is on your person, you can call on its luck (no action required) to reroll one attack roll, ability check, or saving throw you dislike. You must use the second roll. This property can't be used again until the next dawn.\n\n**_Wish_**. The sword has 1d4 - 1 charges. While holding it, you can use an action to expend 1 charge and cast the _wish_ spell from it. This property can't be used again until the next dawn. The sword loses this property if it has no charges.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -2321,7 +2321,7 @@
     {
       "id": "luck-blade-longsword",
       "name": "Luck Blade (Longsword)",
-      "img": "icons/weapons/swords/sword-longsword-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "You gain a +1 bonus to attack and damage rolls made with this magic weapon. While the sword is on your person, you also gain a +1 bonus to saving throws.\n\n**_Luck_**. If the sword is on your person, you can call on its luck (no action required) to reroll one attack roll, ability check, or saving throw you dislike. You must use the second roll. This property can't be used again until the next dawn.\n\n**_Wish_**. The sword has 1d4 - 1 charges. While holding it, you can use an action to expend 1 charge and cast the _wish_ spell from it. This property can't be used again until the next dawn. The sword loses this property if it has no charges.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -2337,7 +2337,7 @@
     {
       "id": "luck-blade-rapier",
       "name": "Luck Blade (Rapier)",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "You gain a +1 bonus to attack and damage rolls made with this magic weapon. While the sword is on your person, you also gain a +1 bonus to saving throws.\n\n**_Luck_**. If the sword is on your person, you can call on its luck (no action required) to reroll one attack roll, ability check, or saving throw you dislike. You must use the second roll. This property can't be used again until the next dawn.\n\n**_Wish_**. The sword has 1d4 - 1 charges. While holding it, you can use an action to expend 1 charge and cast the _wish_ spell from it. This property can't be used again until the next dawn. The sword loses this property if it has no charges.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -2353,7 +2353,7 @@
     {
       "id": "luck-blade-shortsword",
       "name": "Luck Blade (Shortsword)",
-      "img": "icons/weapons/swords/sword-longsword-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "You gain a +1 bonus to attack and damage rolls made with this magic weapon. While the sword is on your person, you also gain a +1 bonus to saving throws.\n\n**_Luck_**. If the sword is on your person, you can call on its luck (no action required) to reroll one attack roll, ability check, or saving throw you dislike. You must use the second roll. This property can't be used again until the next dawn.\n\n**_Wish_**. The sword has 1d4 - 1 charges. While holding it, you can use an action to expend 1 charge and cast the _wish_ spell from it. This property can't be used again until the next dawn. The sword loses this property if it has no charges.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -2369,7 +2369,7 @@
     {
       "id": "plate-armor-of-etherealness",
       "name": "Plate Armor of Etherealness",
-      "img": "icons/equipment/chest/breastplate-cuirass-steel-grey.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/chest.svg",
       "description": "While you're wearing this armor, you can speak its command word as an action to gain the effect of the _etherealness_ spell, which last for 10 minutes or until you remove the armor or use an action to speak the command word again. This property of the armor can't be used again until the next dawn.",
       "templateId": "dnd5e-armor",
       "source": "SRD 5.1",
@@ -2385,7 +2385,7 @@
     {
       "id": "potion-of-storm-giant-strength",
       "name": "Potion of Storm Giant Strength",
-      "img": "icons/consumables/potions/potion-bottle-corked-glowing-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/potion-ball.svg",
       "description": "When you drink this potion, your Strength score changes for 1 hour. The type of giant determines the score (see the table below). The potion has no effect on you if your Strength is equal to or greater than that score.\\n\\nThis potion's transparent liquid has floating in it a sliver of fingernail from a giant of the appropriate type. The _potion of frost giant strength_ and the _potion of stone giant strength_ have the same effect.\\n\\n| Type of Giant     | Strength | Rarity    |\\n|-------------------|----------|-----------|\\n| Hill giant        | 21       | Uncommon  |\\n| Frost/stone giant | 23       | Rare      |\\n| Fire giant        | 25       | Rare      |\\n| Cloud giant       | 27       | Very rare |\\n| Storm giant       | 29       | Legendary |",
       "templateId": "dnd5e-consumable",
       "source": "SRD 5.1",
@@ -2402,7 +2402,7 @@
     {
       "id": "ring-of-djinni-summoning",
       "name": "Ring of Djinni Summoning",
-      "img": "icons/equipment/finger/ring-cabochon-gold-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/ring.svg",
       "description": "While wearing this ring, you can speak its command word as an action to summon a particular djinni from the Elemental Plane of Air. The djinni appears in an unoccupied space you choose within 120 feet of you. It remains as long as you concentrate (as if concentrating on a spell), to a maximum of 1 hour, or until it drops to 0 hit points. It then returns to its home plane.\n\nWhile summoned, the djinni is friendly to you and your companions. It obeys any commands you give it, no matter what language you use. If you fail to command it, the djinni defends itself against attackers but takes no other actions.\n\nAfter the djinni departs, it can't be summoned again for 24 hours, and the ring becomes nonmagical if the djinni dies.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -2418,7 +2418,7 @@
     {
       "id": "ring-of-elemental-command",
       "name": "Ring of Elemental Command",
-      "img": "icons/equipment/finger/ring-cabochon-gold-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/ring.svg",
       "description": "This ring is linked to one of the four Elemental Planes. The GM chooses or randomly determines the linked plane.\n\nWhile wearing this ring, you have advantage on attack rolls against elementals from the linked plane, and they have disadvantage on attack rolls against you. In addition, you have access to properties based on the linked plane.\n\nThe ring has 5 charges. It regains 1d4 + 1 expended charges daily at dawn. Spells cast from the ring have a save DC of 17.\n\n**_Ring of Air Elemental Command_**. You can expend 2 of the ring's charges to cast _dominate monster_ on an air elemental. In addition, when you fall, you descend 60 feet per round and take no damage from falling. You can also speak and understand Auran.\n\nIf you help slay an air elemental while attuned to the ring, you gain access to the following additional properties:\n\n* You have resistance to lightning damage.\n* You have a flying speed equal to your walking speed and can hover.\n* You can cast the following spells from the ring, expending the necessary number of charges: _chain lightning_ (3 charges), _gust of wind_ (2 charges), or _wind wall_ (1 charge).\n\n**_Ring of Earth Elemental Command_**. You can expend 2 of the ring's charges to cast _dominate monster_ on an earth elemental. In addition, you can move in difficult terrain that is composed of rubble, rocks, or dirt as if it were normal terrain. You can also speak and understand Terran.\n\nIf you help slay an earth elemental while attuned to the ring, you gain access to the following additional properties:\n\n* You have resistance to acid damage.\n* You can move through solid earth or rock as if those areas were difficult terrain. If you end your turn there, you are shunted out to the nearest unoccupied space you last occupied.\n* You can cast the following spells from the ring, expending the necessary number of charges: _stone shape_ (2 charges), _stoneskin_ (3 charges), or _wall of stone_ (3 charges).\n\n**_Ring of Fire Elemental Command_**. You can expend 2 of the ring's charges to cast _dominate monster_ on a fire elemental. In addition, you have resistance to fire damage. You can also speak and understand Ignan.\n\nIf you help slay a fire elemental while attuned to the ring, you gain access to the following additional properties:\n\n* You are immune to fire damage.\n* You can cast the following spells from the ring, expending the necessary number of charges: _burning hands_ (1 charge), _fireball_ (2 charges), and _wall of fire_ (3 charges).\n\n**_Ring of Water Elemental Command_**. You can expend 2 of the ring's charges to cast _dominate monster_ on a water elemental. In addition, you can stand on and walk across liquid surfaces as if they were solid ground. You can also speak and understand Aquan.\n\nIf you help slay a water elemental while attuned to the ring, you gain access to the following additional properties:\n\n* You can breathe underwater and have a swimming speed equal to your walking speed.\n* You can cast the following spells from the ring, expending the necessary number of charges: _create or destroy water_ (1 charge), _control water_ (3 charges), _ice storm_ (2 charges), or _wall of ice_ (3 charges).",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -2434,7 +2434,7 @@
     {
       "id": "ring-of-invisibility",
       "name": "Ring of Invisibility",
-      "img": "icons/equipment/finger/ring-cabochon-gold-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/ring.svg",
       "description": "While wearing this ring, you can turn invisible as an action. Anything you are wearing or carrying is invisible with you. You remain invisible until the ring is removed, until you attack or cast a spell, or until you use a bonus action to become visible again.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -2450,7 +2450,7 @@
     {
       "id": "ring-of-spell-turning",
       "name": "Ring of Spell Turning",
-      "img": "icons/equipment/finger/ring-cabochon-gold-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/ring.svg",
       "description": "While wearing this ring, you have advantage on saving throws against any spell that targets only you (not in an area of effect). In addition, if you roll a 20 for the save and the spell is 7th level or lower, the spell has no effect on you and instead targets the caster, using the slot level, spell save DC, attack bonus, and spellcasting ability of the caster.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -2466,7 +2466,7 @@
     {
       "id": "ring-of-three-wishes",
       "name": "Ring of Three Wishes",
-      "img": "icons/equipment/finger/ring-cabochon-gold-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/ring.svg",
       "description": "While wearing this ring, you can use an action to expend 1 of its 3 charges to cast the _wish_ spell from it. The ring becomes nonmagical when you use the last charge.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -2482,7 +2482,7 @@
     {
       "id": "robe-of-the-archmagi",
       "name": "Robe of the Archmagi",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "This elegant garment is made from exquisite cloth of white, gray, or black and adorned with silvery runes. The robe's color corresponds to the alignment for which the item was created. A white robe was made for good, gray for neutral, and black for evil. You can't attune to a _robe of the archmagi_ that doesn't correspond to your alignment.\r\n\r\nYou gain these benefits while wearing the robe:\r\n\r\n* If you aren't wearing armor, your base Armor Class is 15 + your Dexterity modifier.\r\n* You have advantage on saving throws against spells and other magical effects.\r\n* Your spell save DC and spell attack bonus each increase by 2.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -2499,7 +2499,7 @@
     {
       "id": "rod-of-lordly-might",
       "name": "Rod of Lordly Might",
-      "img": "icons/weapons/wands/rod-ornate-jeweled-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/dimetrodon.svg",
       "description": "This rod has a flanged head, and it functions as a magic mace that grants a +3 bonus to attack and damage rolls made with it. The rod has properties associated with six different buttons that are set in a row along the haft. It has three other properties as well, detailed below.\n\n**_Six Buttons_**. You can press one of the rod's six buttons as a bonus action. A button's effect lasts until you push a different button or until you push the same button again, which causes the rod to revert to its normal form.\n\nIf you press **button 1**, the rod becomes a _flame tongue_, as a fiery blade sprouts from the end opposite the rod's flanged head.\n\nIf you press **button 2**, the rod's flanged head folds down and two crescent-shaped blades spring out, transforming the rod into a magic battleaxe that grants a +3 bonus to attack and damage rolls made with it.\n\nIf you press **button 3**, the rod's flanged head folds down, a spear point springs from the rod's tip, and the rod's handle lengthens into a 6-foot haft, transforming the rod into a magic spear that grants a +3 bonus to attack and damage rolls made with it.\n\nIf you press **button 4**, the rod transforms into a climbing pole up to 50 feet long, as you specify. In surfaces as hard as granite, a spike at the bottom and three hooks at the top anchor the pole. Horizontal bars 3 inches long fold out from the sides, 1 foot apart, forming a ladder. The pole can bear up to 4,000 pounds. More weight or lack of solid anchoring causes the rod to revert to its normal form.\n\nIf you press **button 5**, the rod transforms into a handheld battering ram and grants its user a +10 bonus to Strength checks made to break through doors, barricades, and other barriers.\n\nIf you press **button 6**, the rod assumes or remains in its normal form and indicates magnetic north. (Nothing happens if this function of the rod is used in a location that has no magnetic north.) The rod also gives you knowledge of your approximate depth beneath the ground or your height above it.\n\n**_Drain Life_**. When you hit a creature with a melee attack using the rod, you can force the target to make a DC 17 Constitution saving throw. On a failure, the target takes an extra 4d6 necrotic damage, and you regain a number of hit points equal to half that necrotic damage. This property can't be used again until the next dawn.\n\n**_Paralyze_**. When you hit a creature with a melee attack using the rod, you can force the target to make a DC 17 Strength saving throw. On a failure, the target is paralyzed for 1 minute. The target can repeat the saving throw at the end of each of its turns, ending the effect on a success. This property can't be used again until the next dawn.\n\n**_Terrify_**. While holding the rod, you can use an action to force each creature you can see within 30 feet of you to make a DC 17 Wisdom saving throw. On a failure, a target is frightened of you for 1 minute. A frightened target can repeat the saving throw at the end of each of its turns, ending the effect on itself on a success. This property can't be used again until the next dawn.",
       "templateId": "dnd5e-consumable",
       "source": "SRD 5.1",
@@ -2516,7 +2516,7 @@
     {
       "id": "scarab-of-protection",
       "name": "Scarab of Protection",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "If you hold this beetle-shaped medallion in your hand for 1 round, an inscription appears on its surface revealing its magical nature. It provides two benefits while it is on your person:\r\n\r\n* You have advantage on saving throws against spells.\r\n* The scarab has 12 charges. If you fail a saving throw against a necromancy spell or a harmful effect originating from an undead creature, you can use your reaction to expend 1 charge and turn the failed save into a successful one. The scarab crumbles into powder and is destroyed when its last charge is expended.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -2532,7 +2532,7 @@
     {
       "id": "sovereign-glue",
       "name": "Sovereign Glue",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "This viscous, milky-white substance can form a permanent adhesive bond between any two objects. It must be stored in a jar or flask that has been coated inside with _oil of slipperiness._ When found, a container contains 1d6 + 1 ounces.\r\n\r\nOne ounce of the glue can cover a 1-foot square surface. The glue takes 1 minute to set. Once it has done so, the bond it creates can be broken only by the application of _universal solvent_ or _oil of etherealness_, or with a _wish_ spell.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -2548,7 +2548,7 @@
     {
       "id": "spell-scroll-9th-level",
       "name": "Spell Scroll (9th Level)",
-      "img": "icons/sundries/scrolls/scroll-rolled-bound-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "A _spell scroll_ bears the words of a single spell, written in a mystical cipher. If the spell is on your class's spell list, you can use an action to read the scroll and cast its spell without having to provide any of the spell's components. Otherwise, the scroll is unintelligible.\\n\\nIf the spell is on your class's spell list but of a higher level than you can normally cast, you must make an ability check using your spellcasting ability to determine whether you cast it successfully. The DC equals 10 + the spell's level. On a failed check, the spell disappears from the scroll with no other effect. Once the spell is cast, the words on the scroll fade, and the scroll itself crumbles to dust.\\n\\nThe level of the spell on the scroll determines the spell's saving throw DC and attack bonus, as well as the scroll's rarity, as shown in the Spell Scroll table.\\n\\n**Spell Scroll (table)**\\n\\n| Spell Level | Rarity    | Save DC | Attack Bonus |\\n|-------------|-----------|---------|--------------|\\n| Cantrip     | Common    | 13      | +5           |\\n| 1st         | Common    | 13      | +5           |\\n| 2nd         | Uncommon  | 13      | +5           |\\n| 3rd         | Uncommon  | 15      | +7           |\\n| 4th         | Rare      | 15      | +7           |\\n| 5th         | Rare      | 17      | +9           |\\n| 6th         | Very rare | 17      | +9           |\\n| 7th         | Very rare | 18      | +10          |\\n| 8th         | Very rare | 18      | +10          |\\n| 9th         | Legendary | 19      | +11          |\\n\\nA wizard spell on a _spell scroll_ can be copied just as spells in spellbooks can be copied. When a spell is copied from a the copier must succeed on an Intelligence (Arcana) check with a DC equal to 10 + the spell's level. If the check succeeds, the spell is successfully copied. Whether the check succeeds or fails, the _spell scroll_ is destroyed.",
       "templateId": "dnd5e-consumable",
       "source": "SRD 5.1",
@@ -2565,7 +2565,7 @@
     {
       "id": "sphere-of-annihilation",
       "name": "Sphere of Annihilation",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "This 2-foot-diameter black sphere is a hole in the multiverse, hovering in space and stabilized by a magical field surrounding it.\r\n\r\nThe sphere obliterates all matter it passes through and all matter that passes through it. Artifacts are the exception. Unless an artifact is susceptible to damage from a _sphere of annihilation_, it passes through the sphere unscathed. Anything else that touches the sphere but isn't wholly engulfed and obliterated by it takes 4d10 force damage.\r\n\r\nThe sphere is stationary until someone controls it. If you are within 60 feet of an uncontrolled sphere, you can use an action to make a DC 25 Intelligence (Arcana) check. On a success, the sphere levitates in one direction of your choice, up to a number of feet equal to 5 × your Intelligence modifier (minimum 5 feet). On a failure, the sphere moves 10 feet toward you. A creature whose space the sphere enters must succeed on a DC 13 Dexterity saving throw or be touched by it, taking 4d10 force damage.\r\n\r\nIf you attempt to control a sphere that is under another creature's control, you make an Intelligence (Arcana) check contested by the other creature's Intelligence (Arcana) check. The winner of the contest gains control of the sphere and can levitate it as normal.\r\n\r\nIf the sphere comes into contact with a planar portal, such as that created by the _gate_ spell, or an extradimensional space, such as that within a _portable hole_, the GM determines randomly what happens, using the following table.\r\n\r\n| d100   | Result                                                                                                                             |\r\n|--------|------------------------------------------------------------------------------------------------------------------------------------|\r\n| 01-50  | The sphere is destroyed.                                                                                                           |\r\n| 51-85  | The sphere moves through the portal or into the extradimensional space.                                                            |\r\n| 86-00  | A spatial rift sends each creature and object within 180 feet of the sphere, including the sphere, to a random plane of existence. |",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -2581,7 +2581,7 @@
     {
       "id": "staff-of-the-magi",
       "name": "Staff of the Magi",
-      "img": "icons/weapons/staves/staff-ornate-jeweled-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/wizard-staff.svg",
       "description": "This staff can be wielded as a magic quarterstaff that grants a +2 bonus to attack and damage rolls made with it. While you hold it, you gain a +2 bonus to spell attack rolls.\n\nThe staff has 50 charges for the following properties. It regains 4d6 + 2 expended charges daily at dawn. If you expend the last charge, roll a d20. On a 20, the staff regains 1d12 + 1 charges.\n\n**_Spell Absorption_**. While holding the staff, you have advantage on saving throws against spells. In addition, you can use your reaction when another creature casts a spell that targets only you. If you do, the staff absorbs the magic of the spell, canceling its effect and gaining a number of charges equal to the absorbed spell's level. However, if doing so brings the staff's total number of charges above 50, the staff explodes as if you activated its retributive strike (see below).\n\n**_Spells_**. While holding the staff, you can use an action to expend some of its charges to cast one of the following spells from it, using your spell save DC and spellcasting ability: _conjure elemental_ (7 charges), _dispel magic_ (3 charges), _fireball_ (7th-level version, 7 charges), _flaming sphere_ (2 charges), _ice storm_ (4 charges), _invisibility_ (2 charges), _knock_ (2 charges), _lightning bolt_ (7th-level version, 7 charges), _passwall_ (5 charges), _plane shift_ (7 charges), _telekinesis_ (5 charges), _wall of fire_ (4 charges), or _web_ (2 charges).\n\nYou can also use an action to cast one of the following spells from the staff without using any charges: _arcane lock_, _detect magic_, _enlarge/reduce_, _light_, _mage hand_, or _protection from evil and good._\n\n**_Retributive Strike_**. You can use an action to break the staff over your knee or against a solid surface, performing a retributive strike. The staff is destroyed and releases its remaining magic in an explosion that expands to fill a 30-foot-radius sphere centered on it.\n\nYou have a 50 percent chance to instantly travel to a random plane of existence, avoiding the explosion. If you fail to avoid the effect, you take force damage equal to 16 × the number of charges in the staff. Every other creature in the area must make a DC 17 Dexterity saving throw. On a failed save, a creature takes an amount of damage based on how far away it is from the point of origin, as shown in the following table. On a successful save, a creature takes half as much damage.\n\n| Distance from Origin  | Damage                                 |\n|-----------------------|----------------------------------------|\n| 10 ft. away or closer | 8 × the number of charges in the staff |\n| 11 to 20 ft. away     | 6 × the number of charges in the staff |\n| 21 to 30 ft. away     | 4 × the number of charges in the staff |",
       "templateId": "dnd5e-consumable",
       "source": "SRD 5.1",
@@ -2599,7 +2599,7 @@
     {
       "id": "talisman-of-pure-good",
       "name": "Talisman of Pure Good",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "This talisman is a mighty symbol of goodness. A creature that is neither good nor evil in alignment takes 6d6 radiant damage upon touching the talisman. An evil creature takes 8d6 radiant damage upon touching the talisman. Either sort of creature takes the damage again each time it ends its turn holding or carrying the talisman.\r\n\r\nIf you are a good cleric or paladin, you can use the talisman as a holy symbol, and you gain a +2 bonus to spell attack rolls while you wear or hold it.\r\n\r\nThe talisman has 7 charges. If you are wearing or holding it, you can use an action to expend 1 charge from it and choose one creature you can see on the ground within 120 feet of you. If the target is of evil alignment, a flaming fissure opens under it. The target must succeed on a DC 20 Dexterity saving throw or fall into the fissure and be destroyed, leaving no remains. The fissure then closes, leaving no trace of its existence. When you expend the last charge, the talisman disperses into motes of golden light and is destroyed.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -2616,7 +2616,7 @@
     {
       "id": "talisman-of-the-sphere",
       "name": "Talisman of the Sphere",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "When you make an Intelligence (Arcana) check to control a _sphere of annihilation_ while you are holding this talisman, you double your proficiency bonus on the check. In addition, when you start your turn with control over a _sphere of annihilation_, you can use an action to levitate it 10 feet plus a number of additional feet equal to 10 × your Intelligence modifier.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -2632,7 +2632,7 @@
     {
       "id": "talisman-of-ultimate-evil",
       "name": "Talisman of Ultimate Evil",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "This item symbolizes unrepentant evil. A creature that is neither good nor evil in alignment takes 6d6 necrotic damage upon touching the talisman. A good creature takes 8d6 necrotic damage upon touching the talisman. Either sort of creature takes the damage again each time it ends its turn holding or carrying the talisman.\r\n\r\nIf you are an evil cleric or paladin, you can use the talisman as a holy symbol, and you gain a +2 bonus to spell attack rolls while you wear or hold it.\r\n\r\nThe talisman has 6 charges. If you are wearing or holding it, you can use an action to expend 1 charge from the talisman and choose one creature you can see on the ground within 120 feet of you. If the target is of good alignment, a flaming fissure opens under it. The target must succeed on a DC 20 Dexterity saving throw or fall into the fissure and be destroyed, leaving no remains. The fissure then closes, leaving no trace of its existence. When you expend the last charge, the talisman dissolves into foul-smelling slime and is destroyed.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -2649,7 +2649,7 @@
     {
       "id": "universal-solvent",
       "name": "Universal Solvent",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "This tube holds milky liquid with a strong alcohol smell. You can use an action to pour the contents of the tube onto a surface within reach. The liquid instantly dissolves up to 1 square foot of adhesive it touches, including _sovereign glue._",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",
@@ -2665,7 +2665,7 @@
     {
       "id": "vorpal-sword-greatsword",
       "name": "Vorpal Sword (Greatsword)",
-      "img": "icons/weapons/swords/sword-longsword-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "You gain a +3 bonus to attack and damage rolls made with this magic weapon. In addition, the weapon ignores resistance to slashing damage.\n\nWhen you attack a creature that has at least one head with this weapon and roll a 20 on the attack roll, you cut off one of the creature's heads. The creature dies if it can't survive without the lost head. A creature is immune to this effect if it is immune to slashing damage, doesn't have or need a head, has legendary actions, or the GM decides that the creature is too big for its head to be cut off with this weapon. Such a creature instead takes an extra 6d8 slashing damage from the hit.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -2681,7 +2681,7 @@
     {
       "id": "vorpal-sword-longsword",
       "name": "Vorpal Sword (Longsword)",
-      "img": "icons/weapons/swords/sword-longsword-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "You gain a +3 bonus to attack and damage rolls made with this magic weapon. In addition, the weapon ignores resistance to slashing damage.\n\nWhen you attack a creature that has at least one head with this weapon and roll a 20 on the attack roll, you cut off one of the creature's heads. The creature dies if it can't survive without the lost head. A creature is immune to this effect if it is immune to slashing damage, doesn't have or need a head, has legendary actions, or the GM decides that the creature is too big for its head to be cut off with this weapon. Such a creature instead takes an extra 6d8 slashing damage from the hit.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -2697,7 +2697,7 @@
     {
       "id": "vorpal-sword-scimitar",
       "name": "Vorpal Sword (Scimitar)",
-      "img": "icons/weapons/swords/sword-longsword-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "You gain a +3 bonus to attack and damage rolls made with this magic weapon. In addition, the weapon ignores resistance to slashing damage.\n\nWhen you attack a creature that has at least one head with this weapon and roll a 20 on the attack roll, you cut off one of the creature's heads. The creature dies if it can't survive without the lost head. A creature is immune to this effect if it is immune to slashing damage, doesn't have or need a head, has legendary actions, or the GM decides that the creature is too big for its head to be cut off with this weapon. Such a creature instead takes an extra 6d8 slashing damage from the hit.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -2713,7 +2713,7 @@
     {
       "id": "vorpal-sword-shortsword",
       "name": "Vorpal Sword (Shortsword)",
-      "img": "icons/weapons/swords/sword-longsword-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "You gain a +3 bonus to attack and damage rolls made with this magic weapon. In addition, the weapon ignores resistance to slashing damage.\n\nWhen you attack a creature that has at least one head with this weapon and roll a 20 on the attack roll, you cut off one of the creature's heads. The creature dies if it can't survive without the lost head. A creature is immune to this effect if it is immune to slashing damage, doesn't have or need a head, has legendary actions, or the GM decides that the creature is too big for its head to be cut off with this weapon. Such a creature instead takes an extra 6d8 slashing damage from the hit.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -2729,7 +2729,7 @@
     {
       "id": "well-of-many-worlds",
       "name": "Well of Many Worlds",
-      "img": "icons/sundries/misc/treasure-magic-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "This fine black cloth, soft as silk, is folded up to the dimensions of a handkerchief. It unfolds into a circular sheet 6 feet in diameter.\r\n\r\nYou can use an action to unfold and place the _well of many worlds_ on a solid surface, whereupon it creates a two-way portal to another world or plane of existence. Each time the item opens a portal, the GM decides where it leads. You can use an action to close an open portal by taking hold of the edges of the cloth and folding it up. Once _well of many worlds_ has opened a portal, it can't do so again for 1d8 hours.",
       "templateId": "dnd5e-loot",
       "source": "SRD 5.1",

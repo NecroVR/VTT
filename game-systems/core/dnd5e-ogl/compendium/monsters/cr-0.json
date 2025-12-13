@@ -7,7 +7,7 @@
     {
       "id": "awakened-shrub",
       "name": "Awakened Shrub",
-      "img": "icons/creatures/plants/shrub-awakened.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/ant.svg",
       "description": "An awakened shrub is an ordinary shrub given sentience and mobility by the awaken spell or similar magic.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -37,7 +37,7 @@
     {
       "id": "baboon",
       "name": "Baboon",
-      "img": "icons/creatures/mammals/baboon.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bo.svg",
       "description": "Baboons are aggressive primates that gather in troops.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -65,7 +65,7 @@
     {
       "id": "badger",
       "name": "Badger",
-      "img": "icons/creatures/mammals/badger.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/caro-asercion/badger.svg",
       "description": "A badger is a burrowing mammal with a fierce disposition.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -93,7 +93,7 @@
     {
       "id": "bat",
       "name": "Bat",
-      "img": "icons/creatures/mammals/bat.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/skoll/bat.svg",
       "description": "A bat is a small flying mammal that uses echolocation to navigate.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -121,7 +121,7 @@
     {
       "id": "cat",
       "name": "Cat",
-      "img": "icons/creatures/mammals/cat.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/cat.svg",
       "description": "A small domesticated feline.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -177,7 +177,7 @@
     {
       "id": "crab",
       "name": "Crab",
-      "img": "icons/creatures/invertebrates/crab.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/crab.svg",
       "description": "A small crustacean with pincers.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -206,7 +206,7 @@
     {
       "id": "deer",
       "name": "Deer",
-      "img": "icons/creatures/mammals/deer.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/caro-asercion/deer.svg",
       "description": "A graceful herbivore commonly found in forests and plains.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -233,7 +233,7 @@
     {
       "id": "eagle",
       "name": "Eagle",
-      "img": "icons/creatures/birds/eagle.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/nest-birds.svg",
       "description": "A bird of prey with keen eyesight.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -262,7 +262,7 @@
     {
       "id": "frog",
       "name": "Frog",
-      "img": "icons/creatures/amphibians/frog.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/frog.svg",
       "description": "A small amphibian that can leap great distances.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -291,7 +291,7 @@
     {
       "id": "giant-fire-beetle",
       "name": "Giant Fire Beetle",
-      "img": "icons/creatures/invertebrates/beetle-fire-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/fire.svg",
       "description": "A giant fire beetle is a nocturnal creature that emits light from two glowing glands.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -319,7 +319,7 @@
     {
       "id": "goat",
       "name": "Goat",
-      "img": "icons/creatures/mammals/goat.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/skoll/goat.svg",
       "description": "A domesticated livestock animal with horns.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -347,7 +347,7 @@
     {
       "id": "hawk",
       "name": "Hawk",
-      "img": "icons/creatures/birds/hawk.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/nest-birds.svg",
       "description": "A small bird of prey with exceptional eyesight.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -406,7 +406,7 @@
     {
       "id": "hyena",
       "name": "Hyena",
-      "img": "icons/creatures/mammals/hyena.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/caro-asercion/hyena-head.svg",
       "description": "A scavenging predator known for its laugh-like vocalizations.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -495,7 +495,7 @@
     {
       "id": "lizard",
       "name": "Lizard",
-      "img": "icons/creatures/reptiles/lizard.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/lizardman.svg",
       "description": "A small reptile commonly found in warm climates.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -522,7 +522,7 @@
     {
       "id": "octopus",
       "name": "Octopus",
-      "img": "icons/creatures/invertebrates/octopus.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/octopus.svg",
       "description": "An intelligent cephalopod with eight tentacles.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -551,7 +551,7 @@
     {
       "id": "owl",
       "name": "Owl",
-      "img": "icons/creatures/birds/owl.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/owl.svg",
       "description": "A nocturnal bird of prey with silent flight.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -580,7 +580,7 @@
     {
       "id": "quipper",
       "name": "Quipper",
-      "img": "icons/creatures/fish/quipper.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/fishing.svg",
       "description": "A carnivorous fish with razor-sharp teeth, often found in swarms.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -608,7 +608,7 @@
     {
       "id": "rat",
       "name": "Rat",
-      "img": "icons/creatures/mammals/rat.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/rat.svg",
       "description": "A common rodent found in cities and dungeons.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -636,7 +636,7 @@
     {
       "id": "raven",
       "name": "Raven",
-      "img": "icons/creatures/birds/raven.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/raven.svg",
       "description": "A black bird known for its intelligence and ability to mimic sounds.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -665,7 +665,7 @@
     {
       "id": "scorpion",
       "name": "Scorpion",
-      "img": "icons/creatures/invertebrates/scorpion.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/scorpion.svg",
       "description": "An arachnid with a venomous stinger on its tail.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -692,7 +692,7 @@
     {
       "id": "sea-horse",
       "name": "Sea Horse",
-      "img": "icons/creatures/fish/seahorse.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/seahorse.svg",
       "description": "A small marine fish with a horse-like head.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -720,7 +720,7 @@
     {
       "id": "shrieker",
       "name": "Shrieker",
-      "img": "icons/creatures/plants/shrieker.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/ant.svg",
       "description": "A shrieker is a subterranean fungus that emits a loud shriek when disturbed.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -749,7 +749,7 @@
     {
       "id": "spider",
       "name": "Spider",
-      "img": "icons/creatures/invertebrates/spider.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/rat.svg",
       "description": "A small eight-legged arachnid that spins webs.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -778,7 +778,7 @@
     {
       "id": "vulture",
       "name": "Vulture",
-      "img": "icons/creatures/birds/vulture.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/vulture.svg",
       "description": "A scavenging bird that feeds on carrion.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -807,7 +807,7 @@
     {
       "id": "weasel",
       "name": "Weasel",
-      "img": "icons/creatures/mammals/weasel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/caro-asercion/easel.svg",
       "description": "A small, agile carnivorous mammal.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",

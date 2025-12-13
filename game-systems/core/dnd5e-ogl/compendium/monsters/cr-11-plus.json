@@ -7,7 +7,7 @@
     {
       "id": "behir",
       "name": "Behir",
-      "img": "icons/creatures/monstrosities/behir.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/tie.svg",
       "description": "The serpentine behir crawls along floors and clambers up walls to reach its prey. A behir's dozen legs are arrayed in pairs along its long, serpentine body.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -36,7 +36,7 @@
     {
       "id": "djinni",
       "name": "Djinni",
-      "img": "icons/creatures/elementals/djinni.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/djinn.svg",
       "description": "Proud, sensuous genies from the Elemental Plane of Air, the djinn are attractive, tall, well-muscled humanoids with blue skin and dark eyes.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -96,7 +96,7 @@
     {
       "id": "gynosphinx",
       "name": "Gynosphinx",
-      "img": "icons/creatures/monstrosities/gynosphinx.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/tie.svg",
       "description": "Gynosphinxes are female sphinxes who test the courage and aptitude of those who seek their knowledge or pass through their territory.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -129,7 +129,7 @@
     {
       "id": "horned-devil",
       "name": "Horned Devil",
-      "img": "icons/creatures/fiends/devil-horned.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/devil-mask.svg",
       "description": "Horned devils are lazy to a fault. They make ideal sentries and guardians, needing little motivation to stay at their posts.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -161,7 +161,7 @@
     {
       "id": "roc",
       "name": "Roc",
-      "img": "icons/creatures/beasts/roc.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/rock.svg",
       "description": "A roc is an eagle of tremendous size, able to carry off elephants and other large creatures in its talons.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -191,7 +191,7 @@
     {
       "id": "adult-white-dragon",
       "name": "Adult White Dragon",
-      "img": "icons/creatures/dragons/dragon-white-adult.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "The smallest and weakest of the chromatic dragons, white dragons are nonetheless ferocious, bestial predators.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -223,7 +223,7 @@
     {
       "id": "adult-black-dragon",
       "name": "Adult Black Dragon",
-      "img": "icons/creatures/dragons/dragon-black-adult.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "The most evil-tempered and vile of the chromatic dragons, black dragons collect the wreckage and treasures of fallen peoples.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -255,7 +255,7 @@
     {
       "id": "adult-green-dragon",
       "name": "Adult Green Dragon",
-      "img": "icons/creatures/dragons/dragon-green-adult.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "The most cunning and treacherous of true dragons, green dragons use misdirection and trickery to get the upper hand against their enemies.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -288,7 +288,7 @@
     {
       "id": "adult-blue-dragon",
       "name": "Adult Blue Dragon",
-      "img": "icons/creatures/dragons/dragon-blue-adult.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "Vain and territorial, blue dragons soar through the skies above deserts, preying on caravans and plundering herds and settlements.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -320,7 +320,7 @@
     {
       "id": "adult-red-dragon",
       "name": "Adult Red Dragon",
-      "img": "icons/creatures/dragons/dragon-red-adult.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "The most covetous of the true dragons, red dragons tirelessly seek to increase their treasure hoards.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -352,7 +352,7 @@
     {
       "id": "storm-giant",
       "name": "Storm Giant",
-      "img": "icons/creatures/giants/storm-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/giant.svg",
       "description": "Storm giants are contemplative seers that live in places far removed from mortal civilization. Most have pale purple-gray skin and hair, and glittering emerald eyes.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -384,7 +384,7 @@
     {
       "id": "vampire",
       "name": "Vampire",
-      "img": "icons/creatures/undead/vampire.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/vampire-cape.svg",
       "description": "Awakened to an endless night, vampires hunger for the life they have lost and sate that hunger by drinking the blood of the living.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -513,7 +513,7 @@
     {
       "id": "solar",
       "name": "Solar",
-      "img": "icons/creatures/celestials/solar.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/solar-time.svg",
       "description": "A solar is a godlike being, a paragon of celestial virtue and might. No task is beyond its abilities, and the solar acts with supreme confidence.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -547,7 +547,7 @@
     {
       "id": "ancient-red-dragon",
       "name": "Ancient Red Dragon",
-      "img": "icons/creatures/dragons/dragon-red-ancient.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "The most covetous of the true dragons, red dragons tirelessly seek to increase their treasure hoards. Ancient red dragons are among the most powerful creatures in existence.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -579,7 +579,7 @@
     {
       "id": "tarrasque",
       "name": "Tarrasque",
-      "img": "icons/creatures/monstrosities/tarrasque.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/tie.svg",
       "description": "The legendary tarrasque is possibly the most dreaded monster of the Material Plane. It is widely believed that only one of these creatures exists, though no one can predict where and when it will strike.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",

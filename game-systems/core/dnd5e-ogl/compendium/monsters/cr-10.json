@@ -7,7 +7,7 @@
     {
       "id": "aboleth",
       "name": "Aboleth",
-      "img": "icons/creatures/aberrations/aboleth-tentacles-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/rat.svg",
       "description": "An ancient psionic aberration dwelling in dark waters.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -83,7 +83,7 @@
     {
       "id": "death-slaad",
       "name": "Death Slaad",
-      "img": "icons/creatures/amphibians/frog-slaad-black.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/frog.svg",
       "description": "The most powerful type of slaad, capable of deadly magic.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -149,7 +149,7 @@
     {
       "id": "deva",
       "name": "Deva",
-      "img": "icons/creatures/magical/angel-winged-humanoid-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/angel-wings.svg",
       "description": "A benevolent celestial servant of good-aligned deities.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -213,7 +213,7 @@
     {
       "id": "guardian-naga",
       "name": "Guardian Naga",
-      "img": "icons/creatures/reptiles/snake-naga-gold.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/snake.svg",
       "description": "A noble serpent dedicated to protecting sacred sites.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -264,7 +264,7 @@
     {
       "id": "stone-golem",
       "name": "Stone Golem",
-      "img": "icons/creatures/magical/construct-stone-gray.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/stone-axe.svg",
       "description": "A massive construct carved from stone and animated by magic.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -322,7 +322,7 @@
     {
       "id": "yochlol",
       "name": "Yochlol",
-      "img": "icons/creatures/unholy/demon-blob-yellow.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/acid-blob.svg",
       "description": "A shapeshifting demon servant of Lolth.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -399,7 +399,7 @@
     {
       "id": "young-gold-dragon",
       "name": "Young Gold Dragon",
-      "img": "icons/creatures/reptiles/dragon-young-gold.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "A young metallic dragon known for wisdom and justice.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -454,7 +454,7 @@
     {
       "id": "young-red-dragon",
       "name": "Young Red Dragon",
-      "img": "icons/creatures/reptiles/dragon-young-red.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "A young chromatic dragon known for greed and wrath.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",

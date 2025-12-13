@@ -7,7 +7,7 @@
     {
       "id": "behir",
       "name": "Behir",
-      "img": "icons/creatures/reptiles/serpent-horned-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/snake.svg",
       "description": "A massive serpentine creature that resembles a crocodile with twelve legs, crackling with lightning.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -38,7 +38,7 @@
     {
       "id": "dao",
       "name": "Dao",
-      "img": "icons/creatures/magical/genie-djinn-earth-tan.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/djinn.svg",
       "description": "A genie from the Elemental Plane of Earth, greedy and cruel, with skin like polished stone.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -69,7 +69,7 @@
     {
       "id": "djinni",
       "name": "Djinni",
-      "img": "icons/creatures/magical/genie-djinn-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/djinn.svg",
       "description": "A genie from the Elemental Plane of Air, proud and capricious, appearing as a humanoid wreathed in wind.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -100,7 +100,7 @@
     {
       "id": "efreeti",
       "name": "Efreeti",
-      "img": "icons/creatures/magical/genie-djinn-fire-orange.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/djinn.svg",
       "description": "A genie from the Elemental Plane of Fire, cruel and tyrannical, wreathed in flames.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -131,7 +131,7 @@
     {
       "id": "gynosphinx",
       "name": "Gynosphinx",
-      "img": "icons/creatures/magical/sphinx-lion-woman-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/lion.svg",
       "description": "A sphinx with a female humanoid head, possessing great wisdom and magical power.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -166,7 +166,7 @@
     {
       "id": "horned-devil",
       "name": "Horned Devil",
-      "img": "icons/creatures/unholy/demon-horned-wings-red.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/horned-helm.svg",
       "description": "A powerful devil covered in spines and wielding a deadly spiked chain and flaming fork.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -199,7 +199,7 @@
     {
       "id": "marid",
       "name": "Marid",
-      "img": "icons/creatures/magical/genie-djinn-water-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/djinn.svg",
       "description": "A genie from the Elemental Plane of Water, powerful and temperamental like the ocean itself.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -230,7 +230,7 @@
     {
       "id": "remorhaz",
       "name": "Remorhaz",
-      "img": "icons/creatures/invertebrates/worm-wyrm-fire-orange.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/fire.svg",
       "description": "A massive arctic worm that generates intense heat along its back, melting through ice and snow.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -260,7 +260,7 @@
     {
       "id": "roc",
       "name": "Roc",
-      "img": "icons/creatures/birds/bird-prey-eagle-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/giant.svg",
       "description": "A gargantuan bird of prey, large enough to carry off elephants in its talons.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -291,7 +291,7 @@
     {
       "id": "arcanaloth",
       "name": "Arcanaloth",
-      "img": "icons/creatures/magical/humanoid-fox-mage-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/caro-asercion/fox.svg",
       "description": "A cunning yugoloth that resembles a jackal-headed humanoid, master of arcane lore and contracts.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -325,7 +325,7 @@
     {
       "id": "archmage",
       "name": "Archmage",
-      "img": "icons/magic/perception/eye-ringed-glow-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/egg-eye.svg",
       "description": "A master wizard who has achieved the pinnacle of arcane power and knowledge.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -357,7 +357,7 @@
     {
       "id": "erinyes",
       "name": "Erinyes",
-      "img": "icons/creatures/unholy/angel-horned-devil-winged.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/angel-wings.svg",
       "description": "A fallen angel in service to the Nine Hells, beautiful yet terrifying with black wings and deadly weapons.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -391,7 +391,7 @@
     {
       "id": "adult-brass-dragon",
       "name": "Adult Brass Dragon",
-      "img": "icons/creatures/dragons/dragon-scaled-brass-brown.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "A good-natured metallic dragon that loves conversation and inhabits hot, arid regions.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -425,7 +425,7 @@
     {
       "id": "adult-white-dragon",
       "name": "Adult White Dragon",
-      "img": "icons/creatures/dragons/dragon-scaled-white-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "A vicious chromatic dragon that dwells in icy wastes, the smallest and most feral of dragons.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -461,7 +461,7 @@
     {
       "id": "beholder",
       "name": "Beholder",
-      "img": "icons/creatures/eyes/orb-single-blue-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/crystal-ball.svg",
       "description": "A floating orb dominated by a central eye and gaping maw, with ten eyestalks that fire deadly rays.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -497,7 +497,7 @@
     {
       "id": "nalfeshnee",
       "name": "Nalfeshnee",
-      "img": "icons/creatures/unholy/demon-boar-horned-red.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/caro-asercion/boar.svg",
       "description": "A grotesque demon resembling a cross between a boar and an ape, keeper of secrets and purveyor of despair.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -530,7 +530,7 @@
     {
       "id": "rakshasa",
       "name": "Rakshasa",
-      "img": "icons/creatures/magical/humanoid-tiger-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/tiger.svg",
       "description": "A fiend that appears as a feline humanoid with hands that bend backwards, master of deception and illusion.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -562,7 +562,7 @@
     {
       "id": "storm-giant",
       "name": "Storm Giant",
-      "img": "icons/creatures/magical/humanoid-giant-lightning-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/giant.svg",
       "description": "The most powerful of the giant-kin, masters of wind and storm who dwell in mountain peaks and undersea fortresses.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -595,7 +595,7 @@
     {
       "id": "ultroloth",
       "name": "Ultroloth",
-      "img": "icons/creatures/magical/humanoid-silhouette-evil-gray.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/fire-silhouette.svg",
       "description": "The elite commanders of the yugoloth mercenary forces, mysterious and inscrutable fiends.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -628,7 +628,7 @@
     {
       "id": "vampire",
       "name": "Vampire",
-      "img": "icons/magic/unholy/orb-beam-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/crystal-ball.svg",
       "description": "An undead creature that feeds on the blood of the living, possessed of supernatural strength and cunning.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -664,7 +664,7 @@
     {
       "id": "young-red-shadow-dragon",
       "name": "Young Red Shadow Dragon",
-      "img": "icons/creatures/dragons/dragon-horned-shadow-black.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "A red dragon corrupted by the Shadowfell, wreathed in darkness and shadow.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",

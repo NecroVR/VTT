@@ -7,7 +7,7 @@
     {
       "id": "abominable-yeti",
       "name": "Abominable Yeti",
-      "img": "icons/creatures/magical/yeti-white-snow.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/willdabeast/white-book.svg",
       "description": "A massive, fearsome creature of frozen mountains.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -69,7 +69,7 @@
     {
       "id": "bone-devil",
       "name": "Bone Devil",
-      "img": "icons/creatures/unholy/devil-horned-skeleton-white.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/skoll/skeleton.svg",
       "description": "A skeletal fiend that serves as Hell's inquisitor.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -126,7 +126,7 @@
     {
       "id": "clay-golem",
       "name": "Clay Golem",
-      "img": "icons/creatures/magical/construct-clay-stone-brown.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/clay-brick.svg",
       "description": "A humanoid construct molded from clay and animated by magic.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -192,7 +192,7 @@
     {
       "id": "cloud-giant",
       "name": "Cloud Giant",
-      "img": "icons/creatures/magical/humanoid-giant-cloud-white.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/giant.svg",
       "description": "A noble giant dwelling in castles atop clouds.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -246,7 +246,7 @@
     {
       "id": "fire-giant",
       "name": "Fire Giant",
-      "img": "icons/creatures/magical/humanoid-giant-fire-orange.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/giant.svg",
       "description": "A massive giant attuned to elemental fire.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -291,7 +291,7 @@
     {
       "id": "glabrezu",
       "name": "Glabrezu",
-      "img": "icons/creatures/unholy/demon-horned-four-arms-red.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/horned-helm.svg",
       "description": "A powerful demon with four arms and a talent for deception.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -347,7 +347,7 @@
     {
       "id": "gray-slaad",
       "name": "Gray Slaad",
-      "img": "icons/creatures/amphibians/frog-slaad-gray.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/frog.svg",
       "description": "A powerful slaad capable of shapeshifting and magic.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -413,7 +413,7 @@
     {
       "id": "nycaloth",
       "name": "Nycaloth",
-      "img": "icons/creatures/unholy/demon-winged-green.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/winged-leg.svg",
       "description": "A winged yugoloth mercenary from the Lower Planes.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -477,7 +477,7 @@
     {
       "id": "treant",
       "name": "Treant",
-      "img": "icons/creatures/plants/treant-walking-tree-green.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/ant.svg",
       "description": "An ancient tree animated to serve as guardian of the forest.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -535,7 +535,7 @@
     {
       "id": "young-blue-dragon",
       "name": "Young Blue Dragon",
-      "img": "icons/creatures/reptiles/dragon-young-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "A young chromatic dragon dwelling in deserts.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -584,7 +584,7 @@
     {
       "id": "young-silver-dragon",
       "name": "Young Silver Dragon",
-      "img": "icons/creatures/reptiles/dragon-young-silver.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "A young metallic dragon known for its kindness.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",

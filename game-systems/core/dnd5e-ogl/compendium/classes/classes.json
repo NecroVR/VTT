@@ -7,7 +7,7 @@
     {
       "id": "barbarian",
       "name": "Barbarian",
-      "img": "icons/skills/melee/weapons-crossed-axes-red.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/skills.svg",
       "description": "A fierce warrior of primitive background who can enter a battle rage.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -52,7 +52,7 @@
     {
       "id": "bard",
       "name": "Bard",
-      "img": "icons/skills/trades/music-singing-voice-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/skills.svg",
       "description": "An inspiring magician whose power echoes the music of creation.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -105,7 +105,7 @@
     {
       "id": "cleric",
       "name": "Cleric",
-      "img": "icons/magic/holy/prayers-light-hands-gold.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/cathelineau/holy-oak.svg",
       "description": "A priestly champion who wields divine magic in service of a higher power.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -166,7 +166,7 @@
     {
       "id": "druid",
       "name": "Druid",
-      "img": "icons/magic/nature/leaf-glow-triple-green.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/oak-leaf.svg",
       "description": "A priest of the Old Faith, wielding the powers of nature and adopting animal forms.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -276,7 +276,7 @@
     {
       "id": "fighter",
       "name": "Fighter",
-      "img": "icons/skills/melee/weapons-crossed-swords-yellow.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/skills.svg",
       "description": "A master of martial combat, skilled with a variety of weapons and armor.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -322,7 +322,7 @@
     {
       "id": "monk",
       "name": "Monk",
-      "img": "icons/skills/melee/unarmed-punch-fist-yellow.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/skills.svg",
       "description": "A master of martial arts, harnessing the power of the body in pursuit of physical and spiritual perfection.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -381,7 +381,7 @@
     {
       "id": "paladin",
       "name": "Paladin",
-      "img": "icons/magic/holy/angel-winged-humanoid-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/cathelineau/holy-oak.svg",
       "description": "A holy warrior bound to a sacred oath.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -444,7 +444,7 @@
     {
       "id": "ranger",
       "name": "Ranger",
-      "img": "icons/skills/ranged/arrow-flying-broadhead-green.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/skills.svg",
       "description": "A warrior who uses martial prowess and nature magic to combat threats on the edges of civilization.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -498,7 +498,7 @@
     {
       "id": "rogue",
       "name": "Rogue",
-      "img": "icons/skills/melee/strike-dagger-backstab-brown.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/skills.svg",
       "description": "A scoundrel who uses stealth and trickery to overcome obstacles and enemies.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -555,7 +555,7 @@
     {
       "id": "sorcerer",
       "name": "Sorcerer",
-      "img": "icons/magic/fire/explosion-fireball-large-red.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/fire.svg",
       "description": "A spellcaster who draws on inherent magic from a gift or bloodline.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -611,7 +611,7 @@
     {
       "id": "warlock",
       "name": "Warlock",
-      "img": "icons/magic/unholy/strike-body-explode-disintegrate.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/disintegrate.svg",
       "description": "A wielder of magic that is derived from a bargain with an extraplanar entity.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -684,7 +684,7 @@
     {
       "id": "wizard",
       "name": "Wizard",
-      "img": "icons/magic/symbols/runes-star-pentagon-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bo.svg",
       "description": "A scholarly magic-user capable of manipulating the structures of reality.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",

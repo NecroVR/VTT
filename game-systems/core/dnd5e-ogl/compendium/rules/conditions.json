@@ -19,7 +19,7 @@
     {
       "id": "charmed",
       "name": "Charmed",
-      "img": "icons/conditions/charmed.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/arm.svg",
       "description": "A charmed creature cant attack the charmer or target the charmer with harmful abilities or magical effects.\nThe charmer has advantage on any ability check to interact socially with the creature.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -67,7 +67,7 @@
     {
       "id": "grappled",
       "name": "Grappled",
-      "img": "icons/conditions/grappled.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/led.svg",
       "description": "A grappled creatures speed becomes 0, and it cant benefit from any bonus to its speed. \nThe condition ends if the grappler is incapacitated (see the condition).\nThe condition also ends if an effect removes the grappled creature from the reach of the grappler or grappling effect, such as when a creature is hurled away by the *thunder-wave* spell.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -91,7 +91,7 @@
     {
       "id": "invisible",
       "name": "Invisible",
-      "img": "icons/conditions/invisible.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/invisible.svg",
       "description": "An invisible creature is impossible to see without the aid of magic or a special sense. For the purpose of hiding, the creature is heavily obscured. The creatures location can be detected by any noise it makes or any tracks it leaves.\nAttack rolls against the creature have disadvantage, and the creatures attack rolls have advantage.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -127,7 +127,7 @@
     {
       "id": "poisoned",
       "name": "Poisoned",
-      "img": "icons/conditions/poisoned.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/poison.svg",
       "description": "A poisoned creature has disadvantage on attack rolls and ability checks.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",

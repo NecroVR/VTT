@@ -7,7 +7,7 @@
     {
       "id": "crossbow-light",
       "name": "Crossbow, light",
-      "img": "icons/weapons/crossbows/crossbow-light-brown.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/carl-olsen/crossbow.svg",
       "description": "A small mechanical crossbow.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -28,7 +28,7 @@
     {
       "id": "dart",
       "name": "Dart",
-      "img": "icons/weapons/thrown/dart-flight-metal.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/dart.svg",
       "description": "A small thrown projectile.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -48,7 +48,7 @@
     {
       "id": "shortbow",
       "name": "Shortbow",
-      "img": "icons/weapons/bows/bow-short-recurve-wood.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bo.svg",
       "description": "A compact bow for ranged attacks.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -68,7 +68,7 @@
     {
       "id": "sling",
       "name": "Sling",
-      "img": "icons/weapons/thrown/sling-leather.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/sling.svg",
       "description": "A cord or leather strap for hurling stones.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",

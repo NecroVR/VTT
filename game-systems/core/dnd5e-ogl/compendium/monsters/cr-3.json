@@ -35,7 +35,7 @@
     {
       "id": "bearded-devil",
       "name": "Bearded Devil",
-      "img": "icons/creatures/fiends/devil-bearded.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/devil-mask.svg",
       "description": "Bearded devils are the frontline troops in the infernal legions, disciplined soldiers who know how to use terrain and numbers to their advantage.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -96,7 +96,7 @@
     {
       "id": "displacer-beast",
       "name": "Displacer Beast",
-      "img": "icons/creatures/monstrosities/displacer-beast.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/claw.svg",
       "description": "This large, panther-like creature has a body covered in midnight blue or black fur, and its shoulders are adorned by a pair of powerful tentacles.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -124,7 +124,7 @@
     {
       "id": "doppelganger",
       "name": "Doppelganger",
-      "img": "icons/creatures/monstrosities/doppelganger.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/tie.svg",
       "description": "Doppelgangers are devious shapeshifters that take on the appearance of other humanoids, throwing off pursuit or luring victims to their doom.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -154,7 +154,7 @@
     {
       "id": "green-hag",
       "name": "Green Hag",
-      "img": "icons/creatures/fey/green-hag.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/green-power.svg",
       "description": "The wretched and hateful green hags dwell in dying forests, lonely swamps, and misty moors, making their homes in caves.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -183,7 +183,7 @@
     {
       "id": "hell-hound",
       "name": "Hell Hound",
-      "img": "icons/creatures/fiends/hell-hound.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/hound.svg",
       "description": "Monstrous, fire-breathing fiends that take the form of powerful dogs, hell hounds are found on the battlefields of Acheron and throughout the Lower Planes.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -213,7 +213,7 @@
     {
       "id": "killer-whale",
       "name": "Killer Whale",
-      "img": "icons/creatures/mammals/whale-killer.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/whale-tail.svg",
       "description": "Killer whales, also called orcas, are apex marine predators that hunt in coordinated packs.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -242,7 +242,7 @@
     {
       "id": "knight",
       "name": "Knight",
-      "img": "icons/creatures/humanoids/knight.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/skoll/chess-knight.svg",
       "description": "Knights are warriors who pledge service to rulers, religious orders, and noble causes.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -272,7 +272,7 @@
     {
       "id": "manticore",
       "name": "Manticore",
-      "img": "icons/creatures/monstrosities/manticore.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/tie.svg",
       "description": "A manticore has a vaguely humanoid head, the body of a lion, and the wings of a dragon. Its tail bristles with long spikes.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -300,7 +300,7 @@
     {
       "id": "minotaur",
       "name": "Minotaur",
-      "img": "icons/creatures/monstrosities/minotaur.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/minotaur.svg",
       "description": "A minotaur's roar is a savage battle cry that most civilized creatures fear.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -329,7 +329,7 @@
     {
       "id": "mummy",
       "name": "Mummy",
-      "img": "icons/creatures/undead/mummy.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/mummy-head.svg",
       "description": "Raised by dark funerary rituals, a mummy shambles from the shrouded stillness of a time-lost temple or tomb.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -361,7 +361,7 @@
     {
       "id": "owlbear",
       "name": "Owlbear",
-      "img": "icons/creatures/monstrosities/owlbear.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/tie.svg",
       "description": "An owlbear's screech echoes through dark valleys and benighted forests, piercing the quiet night to announce the death of its prey.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -390,7 +390,7 @@
     {
       "id": "phase-spider",
       "name": "Phase Spider",
-      "img": "icons/creatures/monstrosities/phase-spider.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/tie.svg",
       "description": "A phase spider possesses the magical ability to phase in and out of the Ethereal Plane. It seems to appear out of nowhere and always attacks with surprise.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -447,7 +447,7 @@
     {
       "id": "werewolf",
       "name": "Werewolf",
-      "img": "icons/creatures/lycanthropes/werewolf.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/werewolf.svg",
       "description": "A werewolf is a savage predator that can take the form of a wolf, a humanoid, or a hybrid of both.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -509,7 +509,7 @@
     {
       "id": "winter-wolf",
       "name": "Winter Wolf",
-      "img": "icons/creatures/beasts/wolf-winter.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/direwolf.svg",
       "description": "The arctic-dwelling winter wolf is as large as a dire wolf but has snow-white fur and pale blue eyes. Frost giants use these evil creatures as guards and hunting companions.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",

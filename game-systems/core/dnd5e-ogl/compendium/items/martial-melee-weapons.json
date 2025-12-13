@@ -7,7 +7,7 @@
     {
       "id": "battleaxe",
       "name": "Battleaxe",
-      "img": "icons/weapons/axes/axe-battle-worn.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/axe-sword.svg",
       "description": "A versatile axe for one-handed or two-handed combat.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -26,7 +26,7 @@
     {
       "id": "flail",
       "name": "Flail",
-      "img": "icons/weapons/maces/flail-ball-chain.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/flail.svg",
       "description": "A weighted striking weapon with a hinged or chained head.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -42,7 +42,7 @@
     {
       "id": "glaive",
       "name": "Glaive",
-      "img": "icons/weapons/polearms/glaive-blade-curved.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/glaive.svg",
       "description": "A polearm with a single-edged blade on the end.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -62,7 +62,7 @@
     {
       "id": "greataxe",
       "name": "Greataxe",
-      "img": "icons/weapons/axes/axe-double-engraved.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/axe-sword.svg",
       "description": "A massive two-handed axe.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -81,7 +81,7 @@
     {
       "id": "greatsword",
       "name": "Greatsword",
-      "img": "icons/weapons/swords/sword-greatsword-crossguard.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/two-handed-sword.svg",
       "description": "A massive two-handed sword.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -100,7 +100,7 @@
     {
       "id": "halberd",
       "name": "Halberd",
-      "img": "icons/weapons/polearms/halberd-crescent.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/halberd.svg",
       "description": "A polearm combining an axe blade with a spike.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -120,7 +120,7 @@
     {
       "id": "lance",
       "name": "Lance",
-      "img": "icons/weapons/polearms/lance-jousting.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/arm.svg",
       "description": "A long cavalry weapon. You have disadvantage when you use a lance to attack a target within 5 feet of you. Also, a lance requires two hands to wield when you aren't mounted.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -139,7 +139,7 @@
     {
       "id": "longsword",
       "name": "Longsword",
-      "img": "icons/weapons/swords/sword-longsword.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "A versatile sword favored by knights.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -158,7 +158,7 @@
     {
       "id": "maul",
       "name": "Maul",
-      "img": "icons/weapons/hammers/hammer-maul-great.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/hammer-sickle.svg",
       "description": "A massive two-handed hammer.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -177,7 +177,7 @@
     {
       "id": "morningstar",
       "name": "Morningstar",
-      "img": "icons/weapons/maces/morningstar-spiked.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/ace.svg",
       "description": "A spiked mace.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -193,7 +193,7 @@
     {
       "id": "pike",
       "name": "Pike",
-      "img": "icons/weapons/polearms/spear-pike-long.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/arm.svg",
       "description": "A very long thrusting polearm.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -213,7 +213,7 @@
     {
       "id": "rapier",
       "name": "Rapier",
-      "img": "icons/weapons/swords/sword-rapier-jeweled.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "A slender, sharply pointed sword.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -231,7 +231,7 @@
     {
       "id": "scimitar",
       "name": "Scimitar",
-      "img": "icons/weapons/swords/scimitar-curved.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "A curved, single-edged sword.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -250,7 +250,7 @@
     {
       "id": "shortsword",
       "name": "Shortsword",
-      "img": "icons/weapons/swords/sword-short-guard.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sword-spin.svg",
       "description": "A short blade ideal for quick strikes.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -269,7 +269,7 @@
     {
       "id": "trident",
       "name": "Trident",
-      "img": "icons/weapons/polearms/trident-three-pronged.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/trident.svg",
       "description": "A three-pronged spear.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -290,7 +290,7 @@
     {
       "id": "war-pick",
       "name": "War pick",
-      "img": "icons/weapons/hammers/pick-war-spiked.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/hammer-sickle.svg",
       "description": "A pick designed for war.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -306,7 +306,7 @@
     {
       "id": "warhammer",
       "name": "Warhammer",
-      "img": "icons/weapons/hammers/hammer-war-runes.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/hammer-sickle.svg",
       "description": "A versatile hammer for combat.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",
@@ -325,7 +325,7 @@
     {
       "id": "whip",
       "name": "Whip",
-      "img": "icons/weapons/whips/whip-leather-coiled.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/whip.svg",
       "description": "A flexible striking weapon with reach.",
       "templateId": "dnd5e-weapon",
       "source": "SRD 5.1",

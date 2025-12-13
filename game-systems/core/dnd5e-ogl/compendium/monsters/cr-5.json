@@ -7,7 +7,7 @@
     {
       "id": "air-elemental",
       "name": "Air Elemental",
-      "img": "icons/creatures/elementals/elemental-air-sky.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/fairy.svg",
       "description": "A living vortex of wind and air.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -57,7 +57,7 @@
     {
       "id": "barbed-devil",
       "name": "Barbed Devil",
-      "img": "icons/creatures/unholy/devil-horned-winged-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/devil-mask.svg",
       "description": "A hulking, humanoid devil covered in sharp barbs.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -122,7 +122,7 @@
     {
       "id": "beholder-zombie",
       "name": "Beholder Zombie",
-      "img": "icons/creatures/unholy/beholder-undead-eye-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/behold.svg",
       "description": "An undead beholder animated by necromantic energy.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -169,7 +169,7 @@
     {
       "id": "bulette",
       "name": "Bulette",
-      "img": "icons/creatures/mammals/bulette-land-shark-brown.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/island.svg",
       "description": "A massive burrowing predator known as a land shark.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -214,7 +214,7 @@
     {
       "id": "earth-elemental",
       "name": "Earth Elemental",
-      "img": "icons/creatures/elementals/elemental-earth-stone.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/cathelineau/earth-worm.svg",
       "description": "A living mass of earth and stone.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -266,7 +266,7 @@
     {
       "id": "fire-elemental",
       "name": "Fire Elemental",
-      "img": "icons/creatures/elementals/elemental-fire-orange.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/fire.svg",
       "description": "A roaring inferno given form and will.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -320,7 +320,7 @@
     {
       "id": "flesh-golem",
       "name": "Flesh Golem",
-      "img": "icons/creatures/unholy/golem-flesh-stitched.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/ice-golem.svg",
       "description": "A construct of stitched-together body parts animated by magic.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -385,7 +385,7 @@
     {
       "id": "giant-crocodile",
       "name": "Giant Crocodile",
-      "img": "icons/creatures/reptiles/crocodile-jaw-green.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/jawbone.svg",
       "description": "A massive reptilian predator with powerful jaws.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -434,7 +434,7 @@
     {
       "id": "giant-shark",
       "name": "Giant Shark",
-      "img": "icons/creatures/fish/shark-great-white.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/fishing.svg",
       "description": "An enormous predatory fish of the deep.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -479,7 +479,7 @@
     {
       "id": "gladiator",
       "name": "Gladiator",
-      "img": "icons/equipment/chest/breastplate-layered-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/chest.svg",
       "description": "A seasoned arena fighter trained in deadly combat.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -539,7 +539,7 @@
     {
       "id": "gorgon",
       "name": "Gorgon",
-      "img": "icons/creatures/magical/bull-horns-glowing-orange.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/bull.svg",
       "description": "A massive iron-scaled bull that breathes petrifying gas.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -589,7 +589,7 @@
     {
       "id": "half-red-dragon-veteran",
       "name": "Half-Red Dragon Veteran",
-      "img": "icons/creatures/magical/dragon-hybrid-warrior-red.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "A veteran warrior infused with the blood of a red dragon.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -641,7 +641,7 @@
     {
       "id": "hill-giant",
       "name": "Hill Giant",
-      "img": "icons/creatures/magical/humanoid-giant-forest.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/giant.svg",
       "description": "A massive, dim-witted brute that lives in hills and mountains.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -684,7 +684,7 @@
     {
       "id": "mezzoloth",
       "name": "Mezzoloth",
-      "img": "icons/creatures/unholy/demon-horned-humanoid-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/horned-helm.svg",
       "description": "A fiendish warrior from the Lower Planes.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -748,7 +748,7 @@
     {
       "id": "night-hag",
       "name": "Night Hag",
-      "img": "icons/creatures/unholy/hag-witch-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/sarcophagus.svg",
       "description": "A fiendish hag that invades dreams and devours souls.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -807,7 +807,7 @@
     {
       "id": "otyugh",
       "name": "Otyugh",
-      "img": "icons/creatures/aberrations/otyugh-tentacles-brown.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/rat.svg",
       "description": "A filth-eating aberration with tentacles and a huge maw.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -860,7 +860,7 @@
     {
       "id": "red-slaad",
       "name": "Red Slaad",
-      "img": "icons/creatures/amphibians/frog-slaad-red.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/frog.svg",
       "description": "A chaotic frog-like creature from the plane of Limbo.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -914,7 +914,7 @@
     {
       "id": "revenant",
       "name": "Revenant",
-      "img": "icons/creatures/unholy/undead-ghost-scream-teal.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/ghost.svg",
       "description": "An undead warrior driven by a single-minded desire for vengeance.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -978,7 +978,7 @@
     {
       "id": "roper",
       "name": "Roper",
-      "img": "icons/creatures/aberrations/roper-tentacles-stone.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/rat.svg",
       "description": "A cave-dwelling predator that resembles a stalagmite.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -1039,7 +1039,7 @@
     {
       "id": "salamander",
       "name": "Salamander",
-      "img": "icons/creatures/reptiles/salamander-fire-orange.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/salamander.svg",
       "description": "A serpentine elemental creature wreathed in flames.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -1094,7 +1094,7 @@
     {
       "id": "sahuagin-baron",
       "name": "Sahuagin Baron",
-      "img": "icons/creatures/fish/fish-man-green-spear.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/fishing.svg",
       "description": "A powerful leader of the shark-worshipping sahuagin.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -1156,7 +1156,7 @@
     {
       "id": "shambling-mound",
       "name": "Shambling Mound",
-      "img": "icons/creatures/plants/plant-monster-swamp-green.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/swamp.svg",
       "description": "A massive heap of rotting vegetation animated by dark magic.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -1208,7 +1208,7 @@
     {
       "id": "troll",
       "name": "Troll",
-      "img": "icons/creatures/magical/troll-forest-green.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/skoll/troll.svg",
       "description": "A voracious regenerating humanoid with a seemingly endless hunger.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -1261,7 +1261,7 @@
     {
       "id": "unicorn",
       "name": "Unicorn",
-      "img": "icons/creatures/magical/unicorn-white-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/unicorn.svg",
       "description": "A noble and pure celestial horse with a spiraling horn.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -1344,7 +1344,7 @@
     {
       "id": "vampire-spawn",
       "name": "Vampire Spawn",
-      "img": "icons/creatures/unholy/vampire-male-red.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/male.svg",
       "description": "A lesser vampire created by a true vampire's bite.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -1403,7 +1403,7 @@
     {
       "id": "water-elemental",
       "name": "Water Elemental",
-      "img": "icons/creatures/elementals/elemental-water-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/water-gun.svg",
       "description": "A living wave of water with a malevolent will.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -1458,7 +1458,7 @@
     {
       "id": "werebear",
       "name": "Werebear",
-      "img": "icons/creatures/mammals/bear-werebear-hybrid-brown.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/beard.svg",
       "description": "A lycanthrope that can transform into a bear or bear-humanoid hybrid.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -1516,7 +1516,7 @@
     {
       "id": "wraith",
       "name": "Wraith",
-      "img": "icons/creatures/unholy/ghost-wraith-scythe-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/ghost.svg",
       "description": "A malevolent undead spirit that drains life force.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -1566,7 +1566,7 @@
     {
       "id": "xorn",
       "name": "Xorn",
-      "img": "icons/creatures/magical/construct-stone-earth-brown.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/stone-axe.svg",
       "description": "A bizarre creature from the Elemental Plane of Earth that feeds on minerals.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -1624,7 +1624,7 @@
     {
       "id": "young-remorhaz",
       "name": "Young Remorhaz",
-      "img": "icons/creatures/magical/worm-insect-fire-orange.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/fire.svg",
       "description": "A young but still dangerous arctic predator with a superheated body.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",

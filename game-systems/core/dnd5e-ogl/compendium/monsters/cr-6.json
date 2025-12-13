@@ -7,7 +7,7 @@
     {
       "id": "chimera",
       "name": "Chimera",
-      "img": "icons/creatures/magical/chimera-lion-dragon-goat.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/lion.svg",
       "description": "A monstrous hybrid with the heads of a lion, goat, and dragon.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -58,7 +58,7 @@
     {
       "id": "cyclops",
       "name": "Cyclops",
-      "img": "icons/creatures/magical/humanoid-giant-one-eye.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/giant.svg",
       "description": "A massive one-eyed giant of limited intelligence.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -106,7 +106,7 @@
     {
       "id": "drider",
       "name": "Drider",
-      "img": "icons/creatures/magical/spider-drider-black.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/carl-olsen/spider-alt.svg",
       "description": "A cursed drow transformed into a spider-centaur hybrid.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -175,7 +175,7 @@
     {
       "id": "galeb-duhr",
       "name": "Galeb Duhr",
-      "img": "icons/creatures/magical/construct-stone-earth-gray.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/stone-axe.svg",
       "description": "An intelligent boulder animated by elemental earth magic.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -226,7 +226,7 @@
     {
       "id": "githzerai-zerth",
       "name": "Githzerai Zerth",
-      "img": "icons/creatures/humanoids/humanoid-monk-robes.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/monkey.svg",
       "description": "A disciplined psychic warrior from the Plane of Limbo.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -275,7 +275,7 @@
     {
       "id": "hobgoblin-warlord",
       "name": "Hobgoblin Warlord",
-      "img": "icons/creatures/humanoids/hobgoblin-armored-red.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/caro-asercion/goblin.svg",
       "description": "A master tactician and military leader of hobgoblin armies.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -338,7 +338,7 @@
     {
       "id": "invisible-stalker",
       "name": "Invisible Stalker",
-      "img": "icons/creatures/elementals/elemental-air-invisible.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/invisible.svg",
       "description": "An air elemental summoned to serve as a relentless tracker and assassin.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -389,7 +389,7 @@
     {
       "id": "kuo-toa-archpriest",
       "name": "Kuo-toa Archpriest",
-      "img": "icons/creatures/fish/fish-man-blue-cleric.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/fishing.svg",
       "description": "A powerful religious leader of the fish-like kuo-toa.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -449,7 +449,7 @@
     {
       "id": "mage",
       "name": "Mage",
-      "img": "icons/equipment/chest/robe-white-red.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/chest.svg",
       "description": "A master of the arcane arts wielding powerful spells.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -491,7 +491,7 @@
     {
       "id": "mammoth",
       "name": "Mammoth",
-      "img": "icons/creatures/mammals/elephant-wooly-mammoth.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/elephant.svg",
       "description": "A massive prehistoric elephant with long curved tusks.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -535,7 +535,7 @@
     {
       "id": "medusa",
       "name": "Medusa",
-      "img": "icons/creatures/magical/humanoid-snakes-hair-green.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/snake.svg",
       "description": "A cursed creature with serpents for hair and a petrifying gaze.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -588,7 +588,7 @@
     {
       "id": "vrock",
       "name": "Vrock",
-      "img": "icons/creatures/unholy/demon-vulture-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/vulture.svg",
       "description": "A vulture-like demon that revels in carnage and destruction.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -648,7 +648,7 @@
     {
       "id": "wyvern",
       "name": "Wyvern",
-      "img": "icons/creatures/reptiles/wyvern-dragon-green.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/wyvern.svg",
       "description": "A lesser dragon-like creature with a venomous stinger.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -695,7 +695,7 @@
     {
       "id": "young-brass-dragon",
       "name": "Young Brass Dragon",
-      "img": "icons/creatures/reptiles/dragon-young-brass.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "A young metallic dragon that dwells in hot, arid regions.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -744,7 +744,7 @@
     {
       "id": "young-white-dragon",
       "name": "Young White Dragon",
-      "img": "icons/creatures/reptiles/dragon-young-white.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "A young chromatic dragon adapted to arctic environments.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",

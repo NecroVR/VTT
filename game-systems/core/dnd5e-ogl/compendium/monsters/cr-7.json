@@ -7,7 +7,7 @@
     {
       "id": "blue-slaad",
       "name": "Blue Slaad",
-      "img": "icons/creatures/amphibians/frog-slaad-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/frog.svg",
       "description": "A more powerful slaad capable of creating spawn.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -61,7 +61,7 @@
     {
       "id": "giant-ape",
       "name": "Giant Ape",
-      "img": "icons/creatures/mammals/ape-gorilla-brown.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/gorilla.svg",
       "description": "A massive, intelligent primate of tremendous strength.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -103,7 +103,7 @@
     {
       "id": "grick-alpha",
       "name": "Grick Alpha",
-      "img": "icons/creatures/aberrations/grick-tentacles-stone.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/rat.svg",
       "description": "A larger, more dangerous variant of the common grick.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -152,7 +152,7 @@
     {
       "id": "mind-flayer",
       "name": "Mind Flayer",
-      "img": "icons/creatures/aberrations/mind-flayer-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/rat.svg",
       "description": "An illithid, a psionic aberration that feeds on brains.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -206,7 +206,7 @@
     {
       "id": "oni",
       "name": "Oni",
-      "img": "icons/creatures/magical/demon-horned-blue-large.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/horned-helm.svg",
       "description": "A shapeshifting ogre mage with innate magical powers.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -268,7 +268,7 @@
     {
       "id": "shield-guardian",
       "name": "Shield Guardian",
-      "img": "icons/creatures/magical/construct-iron-stone-gray.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/tire-iron.svg",
       "description": "A magically created construct bound to protect its master.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -328,7 +328,7 @@
     {
       "id": "stone-giant",
       "name": "Stone Giant",
-      "img": "icons/creatures/magical/humanoid-giant-stone.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/giant.svg",
       "description": "A reclusive giant that dwells in mountains and caverns.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -384,7 +384,7 @@
     {
       "id": "young-black-dragon",
       "name": "Young Black Dragon",
-      "img": "icons/creatures/reptiles/dragon-young-black.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "A young chromatic dragon dwelling in swamps and marshes.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -439,7 +439,7 @@
     {
       "id": "young-copper-dragon",
       "name": "Young Copper Dragon",
-      "img": "icons/creatures/reptiles/dragon-young-copper.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "A young metallic dragon known for its wit and pranks.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -488,7 +488,7 @@
     {
       "id": "yuan-ti-abomination",
       "name": "Yuan-ti Abomination",
-      "img": "icons/creatures/reptiles/snake-humanoid-green.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/snake.svg",
       "description": "A powerful yuan-ti transformed into a monstrous serpent form.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",

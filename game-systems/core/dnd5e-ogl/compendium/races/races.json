@@ -7,7 +7,7 @@
     {
       "id": "dwarf",
       "name": "Dwarf",
-      "img": "icons/creatures/humanoids/dwarf-warrior.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/dwarf-face.svg",
       "description": "Bold and hardy, dwarves are known as skilled warriors, miners, and workers of stone and metal. Though they stand well under 5 feet tall, dwarves are so broad and compact that they can weigh as much as a human standing nearly two feet taller. Their courage and endurance are also easily a match for any of the larger folk.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -28,7 +28,7 @@
     {
       "id": "hill-dwarf",
       "name": "Hill Dwarf",
-      "img": "icons/creatures/humanoids/dwarf-warrior-hill.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/dwarf-face.svg",
       "description": "As a hill dwarf, you have keen senses, deep intuition, and remarkable resilience. The gold dwarves of Faerûn in their mighty southern kingdom are hill dwarves, as are the exiled Neidar and the debased Klar of Krynn in the Dragonlance setting.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -49,7 +49,7 @@
     {
       "id": "elf",
       "name": "Elf",
-      "img": "icons/creatures/humanoids/elf-archer.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/archer.svg",
       "description": "Elves are a magical people of otherworldly grace, living in the world but not entirely part of it. They live in places of ethereal beauty, in the midst of ancient forests or in silvery spires glittering with faerie light, where soft music drifts through the air and gentle fragrances waft on the breeze. Elves love nature and magic, art and artistry, music and poetry, and the good things of the world.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -70,7 +70,7 @@
     {
       "id": "high-elf",
       "name": "High Elf",
-      "img": "icons/creatures/humanoids/elf-mage.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/elf-ear.svg",
       "description": "As a high elf, you have a keen mind and a mastery of at least the basics of magic. In many fantasy gaming worlds, there are two kinds of high elves. One type is haughty and reclusive, believing themselves to be superior to non-elves and even other elves. The other type is more common and more friendly, and often encountered among humans and other races.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -91,7 +91,7 @@
     {
       "id": "halfling",
       "name": "Halfling",
-      "img": "icons/creatures/humanoids/halfling-rogue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/rogue.svg",
       "description": "The diminutive halflings survive in a world full of larger creatures by avoiding notice or, barring that, avoiding offense. Standing about 3 feet tall, they appear relatively harmless and so have managed to survive for centuries in the shadow of empires and on the edges of wars and political strife. They are inclined to be stout, weighing between 40 and 45 pounds.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -133,7 +133,7 @@
     {
       "id": "human",
       "name": "Human",
-      "img": "icons/creatures/humanoids/human-warrior.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/human-ear.svg",
       "description": "Humans are the most adaptable and ambitious people among the common races. They have widely varying tastes, morals, and customs in the many different lands where they have settled. When they settle, though, they stay: they build cities to last for the ages, and great kingdoms that can persist for long centuries. An individual human might have a relatively short life span, but a human nation or culture preserves traditions with origins far beyond the reach of any single human's memory.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -153,7 +153,7 @@
     {
       "id": "dragonborn",
       "name": "Dragonborn",
-      "img": "icons/creatures/humanoids/dragonborn-warrior.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bo.svg",
       "description": "Born of dragons, as their name proclaims, the dragonborn walk proudly through a world that greets them with fearful incomprehension. Shaped by draconic gods or the dragons themselves, dragonborn originally hatched from dragon eggs as a unique race, combining the best attributes of dragons and humanoids. Some dragonborn are faithful servants to true dragons, others form the ranks of soldiers in great wars, and still others find themselves adrift, with no clear calling in life.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -173,7 +173,7 @@
     {
       "id": "gnome",
       "name": "Gnome",
-      "img": "icons/creatures/humanoids/gnome-tinkerer.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/cathelineau/bad-gnome.svg",
       "description": "A constant hum of busy activity pervades the warrens and neighborhoods where gnomes form their close-knit communities. Louder sounds punctuate the hum: a crunch of grinding gears here, a minor explosion there, a yelp of surprise or triumph, and especially bursts of laughter. Gnomes take delight in life, enjoying every moment of invention, exploration, investigation, creation, and play.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -194,7 +194,7 @@
     {
       "id": "rock-gnome",
       "name": "Rock Gnome",
-      "img": "icons/creatures/humanoids/gnome-rock.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/rock.svg",
       "description": "As a rock gnome, you have a natural inventiveness and hardiness beyond that of other gnomes. Most gnomes in the worlds of D&D are rock gnomes, including the tinker gnomes of the Dragonlance setting.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -215,7 +215,7 @@
     {
       "id": "half-elf",
       "name": "Half-Elf",
-      "img": "icons/creatures/humanoids/half-elf-bard.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/half-log.svg",
       "description": "Walking in two worlds but truly belonging to neither, half-elves combine what some say are the best qualities of their elf and human parents: human curiosity, inventiveness, and ambition tempered by the refined senses, love of nature, and artistic tastes of the elves. Some half-elves live among humans, set apart by their emotional and physical differences, watching friends and loved ones age while time barely touches them. Others live with the elves, growing restless as they reach adulthood in the timeless elven realms, while their peers continue to live as children. Many half-elves, unable to fit into either society, choose lives of solitary wandering or join with other misfits and outcasts in the adventuring life.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -235,7 +235,7 @@
     {
       "id": "half-orc",
       "name": "Half-Orc",
-      "img": "icons/creatures/humanoids/half-orc-barbarian.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/barbarian.svg",
       "description": "Whether united under the leadership of a mighty warlock or having fought to a standstill after years of conflict, orc and human tribes sometimes form alliances, joining forces into a larger horde to the terror of civilized lands nearby. When these alliances are sealed by marriages, half-orcs are born. Some half-orcs rise to become proud chiefs of orc tribes, their human blood giving them an edge over their full-blooded orc rivals. Some venture into the world to prove their worth among humans and other more civilized races. Many of these become adventurers, achieving greatness for their mighty deeds and notoriety for their barbaric customs and savage fury.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -255,7 +255,7 @@
     {
       "id": "tiefling",
       "name": "Tiefling",
-      "img": "icons/creatures/humanoids/tiefling-warlock.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/tie.svg",
       "description": "To be greeted with stares and whispers, to suffer violence and insult on the street, to see mistrust and fear in every eye: this is the lot of the tiefling. And to twist the knife, tieflings know that this is because a pact struck generations ago infused the essence of Asmodeus—overlord of the Nine Hells—into their bloodline. Their appearance and their nature are not their fault but the result of an ancient sin, for which they and their children and their children's children will always be held accountable.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",

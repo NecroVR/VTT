@@ -39,7 +39,7 @@
     {
       "id": "black-pudding",
       "name": "Black Pudding",
-      "img": "icons/creatures/slimes/black-pudding.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/slime.svg",
       "description": "A black pudding resembles a heaping mound of sticky black sludge. It can slither and climb on vertical surfaces and ceilings.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -70,7 +70,7 @@
     {
       "id": "chuul",
       "name": "Chuul",
-      "img": "icons/creatures/aberrations/chuul.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/rat.svg",
       "description": "Chuuls are crustacean monstrosities with a large, armored shell and razor-sharp claws. They lurk in freshwater lakes and rivers.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -101,7 +101,7 @@
     {
       "id": "elephant",
       "name": "Elephant",
-      "img": "icons/creatures/mammals/elephant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/elephant.svg",
       "description": "An elephant is a massive herbivore with thick, leathery skin and a long trunk it uses to manipulate objects.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -129,7 +129,7 @@
     {
       "id": "ettin",
       "name": "Ettin",
-      "img": "icons/creatures/giants/ettin.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/ant.svg",
       "description": "An ettin is a foul, two-headed giant with the crude characteristics of an orc. It never bathes if it can help it, and its thick skin is usually encrusted with a thick layer of dirt and grime beneath the stinking hides it wears.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -158,7 +158,7 @@
     {
       "id": "flameskull",
       "name": "Flameskull",
-      "img": "icons/creatures/undead/flameskull.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/carl-olsen/flame.svg",
       "description": "Blazing green flames and mad, echoing laughter follow a disembodied skull as it patrols its demesne. When the undead flameskull discovers trespassers, it blasts the intruders with fiery rays from its eyes and dreadful spells called up from the dark recesses of its mind.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -190,7 +190,7 @@
     {
       "id": "ghost",
       "name": "Ghost",
-      "img": "icons/creatures/undead/ghost.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/ghost.svg",
       "description": "A ghost is the soul of a once-living creature, bound to haunt a specific location, creature, or object that held significance to it in its life.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -252,7 +252,7 @@
     {
       "id": "gorgon",
       "name": "Gorgon",
-      "img": "icons/creatures/monstrosities/gorgon.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/tie.svg",
       "description": "A gorgon is a bull-like creature covered with scales of iron. It has a powerful build and can exhale a noxious gas that turns creatures to stone.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -282,7 +282,7 @@
     {
       "id": "hill-giant",
       "name": "Hill Giant",
-      "img": "icons/creatures/giants/hill-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/giant.svg",
       "description": "Hill giants are selfish, dimwitted brutes that hunt, forage, and raid in constant search of food.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -310,7 +310,7 @@
     {
       "id": "night-hag",
       "name": "Night Hag",
-      "img": "icons/creatures/fiends/night-hag.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/night-sky.svg",
       "description": "Night hags are fiendish creatures that sow sorrow and blight wherever they go. They lurk in the Ethereal Plane, invading dreams and corrupting mortals.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -341,7 +341,7 @@
     {
       "id": "otyugh",
       "name": "Otyugh",
-      "img": "icons/creatures/aberrations/otyugh.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/rat.svg",
       "description": "An otyugh is a grotesque, squid-headed scavenger that inhabits subterranean lairs and feeds on offal and carrion.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -370,7 +370,7 @@
     {
       "id": "roper",
       "name": "Roper",
-      "img": "icons/creatures/monstrosities/roper.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/tie.svg",
       "description": "A roper is a solitary predator that dwells in caves. It resembles a stalagmite, blending in perfectly with its rocky surroundings.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -399,7 +399,7 @@
     {
       "id": "salamander",
       "name": "Salamander",
-      "img": "icons/creatures/elementals/salamander.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/salamander.svg",
       "description": "Salamanders are native to the Elemental Plane of Fire. They have the lower bodies of serpents and the upper bodies of muscular humanoids.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -430,7 +430,7 @@
     {
       "id": "shambling-mound",
       "name": "Shambling Mound",
-      "img": "icons/creatures/plants/shambling-mound.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/ant.svg",
       "description": "A shambling mound is a mass of rotting vegetation that walks on two stumpy legs. It has a roughly humanoid shape, with two arm-like appendages that end in root-like tendrils.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -462,7 +462,7 @@
     {
       "id": "triceratops",
       "name": "Triceratops",
-      "img": "icons/creatures/reptiles/triceratops.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/rat.svg",
       "description": "One of the most aggressive of the herbivorous dinosaurs, a triceratops has a skull that flares out to form a protective frill with three long horns.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -490,7 +490,7 @@
     {
       "id": "troll",
       "name": "Troll",
-      "img": "icons/creatures/giants/troll.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/skoll/troll.svg",
       "description": "Born with horrific appetites, trolls eat anything they can catch and devour. They have no society to speak of, but they do serve as mercenaries to orcs, ogres, ettins, hags, and giants.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -519,7 +519,7 @@
     {
       "id": "unicorn",
       "name": "Unicorn",
-      "img": "icons/creatures/celestials/unicorn.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/unicorn.svg",
       "description": "Unicorns dwell in enchanted forests. Undefiled by greed, they are creatures of great beauty and magic.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",

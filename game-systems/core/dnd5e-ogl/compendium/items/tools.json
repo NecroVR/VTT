@@ -7,7 +7,7 @@
     {
       "id": "alchemists-supplies",
       "name": "Alchemist's Supplies",
-      "img": "icons/tools/laboratory/alembic-glass.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bo.svg",
       "description": "Alchemist's supplies include two glass beakers, a metal frame to hold a beaker in place over an open flame, a glass stirring rod, a small mortar and pestle, and a pouch of common alchemical ingredients, including salt, powdered iron, and purified water.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -23,7 +23,7 @@
     {
       "id": "brewers-supplies",
       "name": "Brewer's Supplies",
-      "img": "icons/tools/cooking/barrel-cork-brown.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/barrel.svg",
       "description": "Brewer's supplies include a large glass jug, a quantity of hops, a siphon, and several feet of tubing.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -39,7 +39,7 @@
     {
       "id": "calligraphers-supplies",
       "name": "Calligrapher's Supplies",
-      "img": "icons/tools/scripting/quill-ink-pink.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/quill.svg",
       "description": "Calligrapher's supplies include ink, a dozen sheets of parchment, and three quills.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -55,7 +55,7 @@
     {
       "id": "carpenters-tools",
       "name": "Carpenter's Tools",
-      "img": "icons/tools/hand/saw-brown.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/hand.svg",
       "description": "Carpenter's tools include a saw, a hammer, nails, a hatchet, a square, a ruler, an adze, a plane, and a chisel.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -71,7 +71,7 @@
     {
       "id": "cartographers-tools",
       "name": "Cartographer's Tools",
-      "img": "icons/tools/navigation/map-scroll-brown.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/maple-leaf.svg",
       "description": "Cartographer's tools consist of a quill, ink, parchment, a pair of compasses, calipers, and a ruler.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -87,7 +87,7 @@
     {
       "id": "cobblers-tools",
       "name": "Cobbler's Tools",
-      "img": "icons/tools/hand/awl-gray.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/hand.svg",
       "description": "Cobbler's tools consist of a hammer, an awl, a knife, a shoe stand, a cutter, spare leather, and thread.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -103,7 +103,7 @@
     {
       "id": "cooks-utensils",
       "name": "Cook's Utensils",
-      "img": "icons/tools/cooking/pot-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/cook.svg",
       "description": "Cook's utensils include a metal pot, knives, forks, a stirring spoon, and a ladle.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -119,7 +119,7 @@
     {
       "id": "glassblowers-tools",
       "name": "Glassblower's Tools",
-      "img": "icons/tools/laboratory/glass-ball-pink.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bo.svg",
       "description": "Glassblower's tools include a blowpipe, a small marver, blocks, and tweezers. You need a source of heat to work glass.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -135,7 +135,7 @@
     {
       "id": "jewelers-tools",
       "name": "Jeweler's Tools",
-      "img": "icons/tools/hand/magnifying-glass-steel-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/hand.svg",
       "description": "Jeweler's tools consist of a small saw and hammer, files, pliers, and tweezers.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -151,7 +151,7 @@
     {
       "id": "leatherworkers-tools",
       "name": "Leatherworker's Tools",
-      "img": "icons/tools/hand/awl-brown.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/hand.svg",
       "description": "Leatherworker's tools include a knife, a small mallet, an edger, a hole punch, thread, and leather scraps.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -167,7 +167,7 @@
     {
       "id": "masons-tools",
       "name": "Mason's Tools",
-      "img": "icons/tools/hand/hammer-and-chisel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/hand.svg",
       "description": "Mason's tools consist of a trowel, a hammer, a chisel, brushes, and a square.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -183,7 +183,7 @@
     {
       "id": "painters-supplies",
       "name": "Painter's Supplies",
-      "img": "icons/tools/hand/brush-paint-brown.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/hand.svg",
       "description": "Painter's supplies include an easel, canvas, paints, brushes, charcoal sticks, and a palette.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -199,7 +199,7 @@
     {
       "id": "potters-tools",
       "name": "Potter's Tools",
-      "img": "icons/tools/hand/pottery-clay-brown.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/hand.svg",
       "description": "Potter's tools include potter's needles, ribs, scrapers, a knife, and calipers.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -215,7 +215,7 @@
     {
       "id": "smiths-tools",
       "name": "Smith's Tools",
-      "img": "icons/tools/smithing/anvil.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/anvil.svg",
       "description": "Smith's tools include hammers, tongs, charcoal, rags, and a whetstone.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -231,7 +231,7 @@
     {
       "id": "tinkers-tools",
       "name": "Tinker's Tools",
-      "img": "icons/tools/hand/wrench-steel-grey.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/hand.svg",
       "description": "Tinker's tools include a variety of hand tools, thread, needles, a whetstone, scraps of cloth and leather, and a small pot of glue.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -247,7 +247,7 @@
     {
       "id": "weavers-tools",
       "name": "Weaver's Tools",
-      "img": "icons/tools/hand/loom-weaving.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/hand.svg",
       "description": "Weaver's tools include thread, needles, and scraps of cloth. You know how to work a loom, but such equipment is too large to transport.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -263,7 +263,7 @@
     {
       "id": "woodcarvers-tools",
       "name": "Woodcarver's Tools",
-      "img": "icons/tools/hand/chisel-steel-brown.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/hand.svg",
       "description": "Woodcarver's tools consist of a knife, a gouge, and a small saw.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -279,7 +279,7 @@
     {
       "id": "dice-set",
       "name": "Dice Set",
-      "img": "icons/sundries/gaming/dice-d6-white.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "A set of gaming dice used for various games of chance.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -295,7 +295,7 @@
     {
       "id": "dragonchess-set",
       "name": "Dragonchess Set",
-      "img": "icons/sundries/gaming/chess-board.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "A three-dimensional chess variant with three levels representing the sky, ground, and underground. The pieces include dragons, griffons, paladins, and more.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -311,7 +311,7 @@
     {
       "id": "playing-card-set",
       "name": "Playing Card Set",
-      "img": "icons/sundries/gaming/playing-cards.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sun.svg",
       "description": "A deck of illustrated cards used for various card games.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -327,7 +327,7 @@
     {
       "id": "three-dragon-ante-set",
       "name": "Three-Dragon Ante Set",
-      "img": "icons/sundries/gaming/playing-cards-dragon.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "A popular fantasy card game involving dragons and gambling. The set includes a specialized deck of cards.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -343,7 +343,7 @@
     {
       "id": "bagpipes",
       "name": "Bagpipes",
-      "img": "icons/tools/music/bagpipes.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bagpipes.svg",
       "description": "A wind instrument with reeds and a bag, producing a distinctive droning sound.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -359,7 +359,7 @@
     {
       "id": "drum",
       "name": "Drum",
-      "img": "icons/tools/music/drum.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/drum.svg",
       "description": "A percussion instrument with a membrane stretched over a frame, struck to produce rhythm.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -375,7 +375,7 @@
     {
       "id": "dulcimer",
       "name": "Dulcimer",
-      "img": "icons/tools/music/dulcimer.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/music-spell.svg",
       "description": "A stringed instrument played by striking the strings with small hammers.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -391,7 +391,7 @@
     {
       "id": "flute",
       "name": "Flute",
-      "img": "icons/tools/music/flute.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/flute.svg",
       "description": "A wind instrument played by blowing across a hole and fingering holes along its length.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -407,7 +407,7 @@
     {
       "id": "lute",
       "name": "Lute",
-      "img": "icons/tools/music/lute.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/music-spell.svg",
       "description": "A stringed instrument with a rounded body and a fretted neck, played by plucking.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -423,7 +423,7 @@
     {
       "id": "lyre",
       "name": "Lyre",
-      "img": "icons/tools/music/lyre.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/lyre.svg",
       "description": "A small stringed instrument with a U-shaped frame, played by plucking or strumming.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -439,7 +439,7 @@
     {
       "id": "horn",
       "name": "Horn",
-      "img": "icons/tools/music/horn.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/music-spell.svg",
       "description": "A brass wind instrument producing bold, resonant tones.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -455,7 +455,7 @@
     {
       "id": "pan-flute",
       "name": "Pan Flute",
-      "img": "icons/tools/music/pan-flute.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/flute.svg",
       "description": "A wind instrument made of multiple pipes of increasing length, played by blowing across the tops.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -471,7 +471,7 @@
     {
       "id": "shawm",
       "name": "Shawm",
-      "img": "icons/tools/music/shawm.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/music-spell.svg",
       "description": "A double-reed wind instrument with a loud, piercing tone.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -487,7 +487,7 @@
     {
       "id": "viol",
       "name": "Viol",
-      "img": "icons/tools/music/viol.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/music-spell.svg",
       "description": "A bowed stringed instrument held between the knees, producing rich, warm tones.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -503,7 +503,7 @@
     {
       "id": "disguise-kit",
       "name": "Disguise Kit",
-      "img": "icons/tools/hand/mask-carnival.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/hand.svg",
       "description": "This pouch of cosmetics, hair dye, and small props lets you create disguises that change your physical appearance.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -519,7 +519,7 @@
     {
       "id": "forgery-kit",
       "name": "Forgery Kit",
-      "img": "icons/tools/scripting/document-sealed.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/led.svg",
       "description": "This small box contains a variety of papers and parchments, pens and inks, seals and sealing wax, gold and silver leaf, and other supplies necessary to create convincing forgeries of physical documents.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -535,7 +535,7 @@
     {
       "id": "herbalism-kit",
       "name": "Herbalism Kit",
-      "img": "icons/tools/laboratory/mortar-pestle.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/mortar.svg",
       "description": "This kit contains a variety of instruments such as clippers, mortar and pestle, and pouches and vials used by herbalists to create remedies and potions.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -551,7 +551,7 @@
     {
       "id": "navigators-tools",
       "name": "Navigator's Tools",
-      "img": "icons/tools/navigation/compass-brass.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/compass.svg",
       "description": "This set of instruments is used for navigation at sea. It includes a sextant, a compass, calipers, a ruler, parchment, ink, and a quill.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -567,7 +567,7 @@
     {
       "id": "poisoners-kit",
       "name": "Poisoner's Kit",
-      "img": "icons/tools/laboratory/vial-poison-green.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/vial.svg",
       "description": "A poisoner's kit includes the vials, chemicals, and other equipment necessary for the creation of poisons.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -583,7 +583,7 @@
     {
       "id": "thieves-tools",
       "name": "Thieves' Tools",
-      "img": "icons/tools/hand/lockpicks-steel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/hand.svg",
       "description": "This set of tools includes a small file, a set of lock picks, a small mirror mounted on a metal handle, a set of narrow-bladed scissors, and a pair of pliers.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -599,7 +599,7 @@
     {
       "id": "vehicles-land",
       "name": "Vehicles (Land)",
-      "img": "icons/tools/hand/reins-leather.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/hand.svg",
       "description": "Proficiency with land vehicles covers a wide range of options, from chariots and howdahs to wagons and carts. This represents knowledge of how to drive and maintain ground-based vehicles.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",
@@ -615,7 +615,7 @@
     {
       "id": "vehicles-water",
       "name": "Vehicles (Water)",
-      "img": "icons/tools/navigation/ship-wheel.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/ship-bow.svg",
       "description": "Proficiency with water vehicles covers anything that navigates waterways, from rowboats and sailboats to warships. This represents knowledge of how to handle and maintain watercraft.",
       "templateId": "dnd5e-tool",
       "source": "SRD 5.1",

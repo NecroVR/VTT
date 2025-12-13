@@ -7,7 +7,7 @@
     {
       "id": "ape",
       "name": "Ape",
-      "img": "icons/creatures/mammals/ape.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/cape.svg",
       "description": "A large primate with great strength and agility.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -36,7 +36,7 @@
     {
       "id": "black-bear",
       "name": "Black Bear",
-      "img": "icons/creatures/mammals/bear-black.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/beard.svg",
       "description": "A forest-dwelling bear with a keen sense of smell.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -121,7 +121,7 @@
     {
       "id": "darkmantle",
       "name": "Darkmantle",
-      "img": "icons/creatures/aberrations/darkmantle.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/rat.svg",
       "description": "A subterranean predator that resembles a stalactite.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -150,7 +150,7 @@
     {
       "id": "dust-mephit",
       "name": "Dust Mephit",
-      "img": "icons/creatures/elementals/mephit-dust.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/dust-cloud.svg",
       "description": "A mischievous creature formed from elemental dust.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -183,7 +183,7 @@
     {
       "id": "gas-spore",
       "name": "Gas Spore",
-      "img": "icons/creatures/aberrations/gas-spore.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/rat.svg",
       "description": "A floating fungal creature that resembles a beholder.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -213,7 +213,7 @@
     {
       "id": "giant-goat",
       "name": "Giant Goat",
-      "img": "icons/creatures/mammals/goat-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/skoll/goat.svg",
       "description": "An oversized goat with powerful horns.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -241,7 +241,7 @@
     {
       "id": "giant-sea-horse",
       "name": "Giant Sea Horse",
-      "img": "icons/creatures/fish/seahorse-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/seahorse.svg",
       "description": "A large aquatic creature sometimes used as a mount by underwater races.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -269,7 +269,7 @@
     {
       "id": "giant-wasp",
       "name": "Giant Wasp",
-      "img": "icons/creatures/invertebrates/wasp-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/giant.svg",
       "description": "A massive insect with a deadly stinger.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -324,7 +324,7 @@
     {
       "id": "gray-ooze",
       "name": "Gray Ooze",
-      "img": "icons/creatures/oozes/ooze-gray.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/booze.svg",
       "description": "A blob of living stone that dissolves metal and wood.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -355,7 +355,7 @@
     {
       "id": "hobgoblin",
       "name": "Hobgoblin",
-      "img": "icons/creatures/humanoids/hobgoblin.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/caro-asercion/goblin.svg",
       "description": "A disciplined and warlike goblinoid.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -383,7 +383,7 @@
     {
       "id": "ice-mephit",
       "name": "Ice Mephit",
-      "img": "icons/creatures/elementals/mephit-ice.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/biceps.svg",
       "description": "A mischievous creature formed from elemental ice.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -538,7 +538,7 @@
     {
       "id": "orc",
       "name": "Orc",
-      "img": "icons/creatures/humanoids/orc.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/brute.svg",
       "description": "A savage humanoid that lives to conquer and kill.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -567,7 +567,7 @@
     {
       "id": "piercer",
       "name": "Piercer",
-      "img": "icons/creatures/aberrations/piercer.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/rat.svg",
       "description": "A subterranean creature that resembles a stalactite and drops on prey.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -596,7 +596,7 @@
     {
       "id": "reef-shark",
       "name": "Reef Shark",
-      "img": "icons/creatures/fish/shark-reef.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/fishing.svg",
       "description": "A predatory fish that patrols shallow waters.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -625,7 +625,7 @@
     {
       "id": "rust-monster",
       "name": "Rust Monster",
-      "img": "icons/creatures/aberrations/rust-monster.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/rat.svg",
       "description": "A creature that feeds on metal, causing it to rust and crumble.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -711,7 +711,7 @@
     {
       "id": "scout",
       "name": "Scout",
-      "img": "icons/creatures/humanoids/scout.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/scout-ship.svg",
       "description": "A skilled tracker and wilderness expert.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -740,7 +740,7 @@
     {
       "id": "shadow",
       "name": "Shadow",
-      "img": "icons/creatures/undead/shadow.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/two-shadows.svg",
       "description": "An undead creature born in darkness that drains the strength of the living.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -773,7 +773,7 @@
     {
       "id": "swarm-of-insects",
       "name": "Swarm of Insects",
-      "img": "icons/creatures/invertebrates/insects-swarm.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/rat.svg",
       "description": "A cloud of biting and stinging insects.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -832,7 +832,7 @@
     {
       "id": "warhorse",
       "name": "Warhorse",
-      "img": "icons/creatures/mammals/horse-war.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/seahorse.svg",
       "description": "A powerful horse trained for battle.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",

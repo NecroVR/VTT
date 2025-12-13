@@ -7,7 +7,7 @@
     {
       "id": "adult-black-dragon",
       "name": "Adult Black Dragon",
-      "img": "icons/creatures/dragons/dragon-scaled-black.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "A vicious chromatic dragon that dwells in swamps and marshes, delighting in cruelty.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -43,7 +43,7 @@
     {
       "id": "adult-copper-dragon",
       "name": "Adult Copper Dragon",
-      "img": "icons/creatures/dragons/dragon-scaled-copper-brown.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "A playful metallic dragon with a love of jokes and riddles, dwelling in rocky hills.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -77,7 +77,7 @@
     {
       "id": "death-tyrant",
       "name": "Death Tyrant",
-      "img": "icons/creatures/eyes/orb-single-purple-pink.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/crystal-ball.svg",
       "description": "An undead beholder that has embraced lichdom, seeking to conquer death itself.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -112,7 +112,7 @@
     {
       "id": "ice-devil",
       "name": "Ice Devil",
-      "img": "icons/creatures/unholy/demon-horned-blue-white.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/horned-helm.svg",
       "description": "A cunning devil covered in icy spines, wielding a deadly spear and commanding cold.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -145,7 +145,7 @@
     {
       "id": "adult-bronze-dragon",
       "name": "Adult Bronze Dragon",
-      "img": "icons/creatures/dragons/dragon-scaled-bronze-green.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "A noble metallic dragon that dwells near coastlines, protector of the innocent.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -179,7 +179,7 @@
     {
       "id": "adult-green-dragon",
       "name": "Adult Green Dragon",
-      "img": "icons/creatures/dragons/dragon-scaled-green.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "A scheming chromatic dragon that dwells in ancient forests, master of manipulation and deceit.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -216,7 +216,7 @@
     {
       "id": "mummy-lord",
       "name": "Mummy Lord",
-      "img": "icons/magic/death/undead-mummy-king-gold.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/king.svg",
       "description": "An ancient undead ruler wrapped in funeral shrouds, retaining their arcane power and commanding presence.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -255,7 +255,7 @@
     {
       "id": "purple-worm",
       "name": "Purple Worm",
-      "img": "icons/creatures/invertebrates/worm-wyrm-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/rat.svg",
       "description": "A colossal burrowing monstrosity that terrorizes the Underdark, capable of swallowing prey whole.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -285,7 +285,7 @@
     {
       "id": "adult-blue-dragon",
       "name": "Adult Blue Dragon",
-      "img": "icons/creatures/dragons/dragon-scaled-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "A vain chromatic dragon that dwells in deserts, wielding devastating lightning.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -321,7 +321,7 @@
     {
       "id": "adult-silver-dragon",
       "name": "Adult Silver Dragon",
-      "img": "icons/creatures/dragons/dragon-scaled-silver-white.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/sea-dragon.svg",
       "description": "A noble metallic dragon that champions good causes and protects the innocent.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -355,7 +355,7 @@
     {
       "id": "iron-golem",
       "name": "Iron Golem",
-      "img": "icons/commodities/metal/golem-full-body-iron.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/tie.svg",
       "description": "A massive construct forged from iron, nearly unstoppable and immune to most magic.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -386,7 +386,7 @@
     {
       "id": "marilith",
       "name": "Marilith",
-      "img": "icons/creatures/unholy/demon-horned-woman-snake-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/snake.svg",
       "description": "A powerful demon with six arms and a serpentine lower body, a tactical genius of the Abyss.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -420,7 +420,7 @@
     {
       "id": "planetar",
       "name": "Planetar",
-      "img": "icons/magic/holy/angel-winged-humanoid-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/cathelineau/holy-oak.svg",
       "description": "A powerful angel that serves as a general in celestial armies, wielding divine magic and a greatsword.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",

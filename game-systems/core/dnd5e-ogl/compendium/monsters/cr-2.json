@@ -7,7 +7,7 @@
     {
       "id": "ankheg",
       "name": "Ankheg",
-      "img": "icons/creatures/monstrosities/ankheg.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/tie.svg",
       "description": "An ankheg resembles an enormous many-legged insect, its long antennae twitching in response to any movement around it.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -34,7 +34,7 @@
     {
       "id": "bandit-captain",
       "name": "Bandit Captain",
-      "img": "icons/creatures/humanoids/bandit-captain.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bandit.svg",
       "description": "It takes a strong personality, ruthless cunning, and a silver tongue to keep a gang of bandits in line.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -92,7 +92,7 @@
     {
       "id": "ettercap",
       "name": "Ettercap",
-      "img": "icons/creatures/monstrosities/ettercap.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/tie.svg",
       "description": "Ettercaps are humanoid spiders that tend, feed, and watch over spiders the way a shepherd oversees a flock of sheep.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -121,7 +121,7 @@
     {
       "id": "gargoyle",
       "name": "Gargoyle",
-      "img": "icons/creatures/magical/gargoyle.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/gargoyle.svg",
       "description": "The inanimate gargoyles that perch atop great buildings are inspired by these malevolent creatures of elemental earth.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -152,7 +152,7 @@
     {
       "id": "gelatinous-cube",
       "name": "Gelatinous Cube",
-      "img": "icons/creatures/slimes/gelatinous-cube.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/cube.svg",
       "description": "Gelatinous cubes scour dungeon passages in silent, predictable patterns, leaving perfectly clean paths in their wake.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -212,7 +212,7 @@
     {
       "id": "giant-boar",
       "name": "Giant Boar",
-      "img": "icons/creatures/mammals/boar-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/caro-asercion/boar.svg",
       "description": "Giant boars are ill-tempered omnivores and will attack anything that approaches them.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -240,7 +240,7 @@
     {
       "id": "giant-constrictor-snake",
       "name": "Giant Constrictor Snake",
-      "img": "icons/creatures/reptiles/snake-constrictor-giant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/snake.svg",
       "description": "Giant constrictor snakes are primeval reptiles that can grow to enormous size.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -325,7 +325,7 @@
     {
       "id": "mimic",
       "name": "Mimic",
-      "img": "icons/creatures/aberrations/mimic.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/rat.svg",
       "description": "Mimics are shapeshifting predators able to take on the form of inanimate objects to lure creatures to their doom.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -356,7 +356,7 @@
     {
       "id": "ochre-jelly",
       "name": "Ochre Jelly",
-      "img": "icons/creatures/slimes/ochre-jelly.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/jelly.svg",
       "description": "Ochre jellies are yellowish blobs that can slip through narrow cracks in pursuit of creatures to devour.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -388,7 +388,7 @@
     {
       "id": "ogre",
       "name": "Ogre",
-      "img": "icons/creatures/giants/ogre.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/ogre.svg",
       "description": "Ogres are hulking giants notorious for their quick tempers. When its rage is incited, an ogre lashes out in a frustrated tantrum until it runs out of objects or creatures to smash.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -415,7 +415,7 @@
     {
       "id": "pegasus",
       "name": "Pegasus",
-      "img": "icons/creatures/beasts/pegasus.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/skoll/pegasus.svg",
       "description": "The pegasus is a majestic winged horse that strikes from the air with the speed and fury of a thunderbolt.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -444,7 +444,7 @@
     {
       "id": "polar-bear",
       "name": "Polar Bear",
-      "img": "icons/creatures/mammals/bear-polar.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/beard.svg",
       "description": "Polar bears are enormous white bears that live in arctic climates and hunt seals.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -473,7 +473,7 @@
     {
       "id": "priest",
       "name": "Priest",
-      "img": "icons/creatures/humanoids/priest.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/sun-priest.svg",
       "description": "Priests bring the teachings of their gods to the common folk. They are the spiritual leaders of temples and shrines.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -502,7 +502,7 @@
     {
       "id": "rhinoceros",
       "name": "Rhinoceros",
-      "img": "icons/creatures/mammals/rhinoceros.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/rhinoceros-horn.svg",
       "description": "A rhinoceros is a heavily built plant-eater with one or two thick horns on its snout.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -530,7 +530,7 @@
     {
       "id": "rug-of-smothering",
       "name": "Rug of Smothering",
-      "img": "icons/creatures/magical/rug-smothering.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/shrug.svg",
       "description": "Would-be thieves and careless heroes arrive at the doorsteps of an enemy's abode, eyes and minds on the treasures within, only to be tripped up and strangled by the rugs that lie in wait.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -560,7 +560,7 @@
     {
       "id": "saber-toothed-tiger",
       "name": "Saber-Toothed Tiger",
-      "img": "icons/creatures/mammals/tiger-saber-toothed.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/tiger.svg",
       "description": "A saber-toothed tiger is a powerful cat with two huge canine teeth that hang down like daggers.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -589,7 +589,7 @@
     {
       "id": "sea-hag",
       "name": "Sea Hag",
-      "img": "icons/creatures/fey/sea-hag.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/at-sea.svg",
       "description": "Sea hags live in dismal and polluted underwater lairs, surrounded by merrow and other aquatic monsters.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",
@@ -617,7 +617,7 @@
     {
       "id": "will-o-wisp",
       "name": "Will-o'-Wisp",
-      "img": "icons/creatures/undead/will-o-wisp.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/caro-asercion/willow-tree.svg",
       "description": "Will-o'-wisps are malevolent, wispy balls of light that haunt lonely places and battlefields, bound by dark fate or dark magic to feed on fear and despair.",
       "templateId": "dnd5e-monster",
       "source": "SRD 5.1",

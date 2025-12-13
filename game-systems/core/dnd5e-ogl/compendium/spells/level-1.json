@@ -7,7 +7,7 @@
     {
       "id": "alarm",
       "name": "Alarm",
-      "img": "icons/magic/defensive/shield-barrier-glowing-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/shield.svg",
       "description": "You set an alarm against unwanted intrusion. Choose a door, a window, or an area within range that is no larger than a 20-foot cube. Until the spell ends, an alarm alerts you whenever a Tiny or larger creature touches or enters the warded area. \n\nWhen you cast the spell, you can designate creatures that won't set off the alarm. You also choose whether the alarm is mental or audible. A mental alarm alerts you with a ping in your mind if you are within 1 mile of the warded area. This ping awakens you if you are sleeping. An audible alarm produces the sound of a hand bell for 10 seconds within 60 feet.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -35,7 +35,7 @@
     {
       "id": "animal-friendship",
       "name": "Animal Friendship",
-      "img": "icons/magic/control/debuff-chains-pink.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/control-tower.svg",
       "description": "This spell lets you convince a beast that you mean it no harm. Choose a beast that you can see within range. It must see and hear you. If the beast's Intelligence is 4 or higher, the spell fails. Otherwise, the beast must succeed on a Wisdom saving throw or be charmed by you for the spell's duration. If you or one of your companions harms the target, the spells ends.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -65,7 +65,7 @@
     {
       "id": "bane",
       "name": "Bane",
-      "img": "icons/magic/control/debuff-chains-pink.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/control-tower.svg",
       "description": "Up to three creatures of your choice that you can see within range must make charisma saving throws. Whenever a target that fails this saving throw makes an attack roll or a saving throw before the spell ends, the target must roll a d4 and subtract the number rolled from the attack roll or saving throw.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -94,7 +94,7 @@
     {
       "id": "bless",
       "name": "Bless",
-      "img": "icons/magic/control/debuff-chains-pink.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/control-tower.svg",
       "description": "You bless up to three creatures of your choice within range. Whenever a target makes an attack roll or a saving throw before the spell ends, the target can roll a d4 and add the number rolled to the attack roll or saving throw.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -121,7 +121,7 @@
     {
       "id": "burning-hands",
       "name": "Burning Hands",
-      "img": "icons/magic/fire/flame-burning-orange.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/fire.svg",
       "description": "As you hold your hands with thumbs touching and fingers spread, a thin sheet of flames shoots forth from your outstretched fingertips. Each creature in a 15-foot cone must make a dexterity saving throw. A creature takes 3d6 fire damage on a failed save, or half as much damage on a successful one. The fire ignites any flammable objects in the area that aren't being worn or carried.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -153,7 +153,7 @@
     {
       "id": "charm-person",
       "name": "Charm Person",
-      "img": "icons/magic/control/debuff-chains-pink.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/control-tower.svg",
       "description": "You attempt to charm a humanoid you can see within range. It must make a wisdom saving throw, and does so with advantage if you or your companions are fighting it. If it fails the saving throw, it is charmed by you until the spell ends or until you or your companions do anything harmful to it. The charmed creature regards you as a friendly acquaintance. When the spell ends, the creature knows it was charmed by you.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -184,7 +184,7 @@
     {
       "id": "color-spray",
       "name": "Color Spray",
-      "img": "icons/magic/perception/mask-face-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bat-mask.svg",
       "description": "A dazzling array of flashing, colored light springs from your hand. Roll 6d10; the total is how many hit points of creatures this spell can effect. Creatures in a 15-foot cone originating from you are affected in ascending order of their current hit points (ignoring unconscious creatures and creatures that can't see). Starting with the creature that has the lowest current hit points, each creature affected by this spell is blinded until the spell ends. Subtract each creature's hit points from the total before moving on to the creature with the next lowest hit points. A creature's hit points must be equal to or less than the remaining total for that creature to be affected.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -213,7 +213,7 @@
     {
       "id": "command",
       "name": "Command",
-      "img": "icons/magic/control/debuff-chains-pink.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/control-tower.svg",
       "description": "You speak a one-word command to a creature you can see within range. The target must succeed on a wisdom saving throw or follow the command on its next turn. The spell has no effect if the target is undead, if it doesn't understand your language, or if your command is directly harmful to it. Some typical commands and their effects follow. You might issue a command other than one described here. If you do so, the DM determines how the target behaves. If the target can't follow your command, the spell ends\n\n **Approach.** The target moves toward you by the shortest and most direct route, ending its turn if it moves within 5 feet of you.\n\n**Drop** The target drops whatever it is holding and then ends its turn.\n\n**Flee.** The target spends its turn moving away from you by the fastest available means.\n\n**Grovel.** The target falls prone and then ends its turn.\n\n**Halt.** The target doesn't move and takes no actions. A flying creature stays aloft, provided that it is able to do so. If it must move to stay aloft, it flies the minimum distance needed to remain in the air.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -239,7 +239,7 @@
     {
       "id": "comprehend-languages",
       "name": "Comprehend Languages",
-      "img": "icons/magic/perception/eye-ringed-glow-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/egg-eye.svg",
       "description": "For the duration, you understand the literal meaning of any spoken language that you hear. You also understand any written language that you see, but you must be touching the surface on which the words are written. It takes about 1 minute to read one page of text. This spell doesn't decode secret messages in a text or a glyph, such as an arcane sigil, that isn't part of a written language.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -268,7 +268,7 @@
     {
       "id": "create-or-destroy-water",
       "name": "Create or Destroy Water",
-      "img": "icons/magic/symbols/runes-triangle-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bo.svg",
       "description": "You either create or destroy water.\n\n**Create Water.** You create up to 10 gallons of clean water within range in an open container. Alternatively, the water falls as rain in a 30-foot cube within range\n\n **Destroy Water.** You destroy up to 10 gallons of water in an open container within range. Alternatively, you destroy fog in a 30-foot cube within range.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -297,7 +297,7 @@
     {
       "id": "cure-wounds",
       "name": "Cure Wounds",
-      "img": "icons/magic/light/explosion-star-orange.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/orange.svg",
       "description": "A creature you touch regains a number of hit points equal to 1d8 + your spellcasting ability modifier. This spell has no effect on undead or constructs.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -326,7 +326,7 @@
     {
       "id": "detect-evil-and-good",
       "name": "Detect Evil and Good",
-      "img": "icons/magic/perception/eye-ringed-glow-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/egg-eye.svg",
       "description": "For the duration, you know if there is an aberration, celestial, elemental, fey, fiend, or undead within 30 feet of you, as well as where the creature is located. Similarly, you know if there is a place or object within 30 feet of you that has been magically consecrated or desecrated. The spell can penetrate most barriers, but it is blocked by 1 foot of stone, 1 inch of common metal, a thin sheet of lead, or 3 feet of wood or dirt.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -350,7 +350,7 @@
     {
       "id": "detect-magic",
       "name": "Detect Magic",
-      "img": "icons/magic/perception/eye-ringed-glow-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/egg-eye.svg",
       "description": "For the duration, you sense the presence of magic within 30 feet of you. If you sense magic in this way, you can use your action to see a faint aura around any visible creature or object in the area that bears magic, and you learn its school of magic, if any. The spell can penetrate most barriers, but it is blocked by 1 foot of stone, 1 inch of common metal, a thin sheet of lead, or 3 feet of wood or dirt.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -379,7 +379,7 @@
     {
       "id": "detect-poison-and-disease",
       "name": "Detect Poison and Disease",
-      "img": "icons/magic/perception/eye-ringed-glow-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/egg-eye.svg",
       "description": "For the duration, you can sense the presence and location of poisons, poisonous creatures, and diseases within 30 feet of you. You also identify the kind of poison, poisonous creature, or disease in each case. The spell can penetrate most barriers, but it is blocked by 1 foot of stone, 1 inch of common metal, a thin sheet of lead, or 3 feet of wood or dirt.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -407,7 +407,7 @@
     {
       "id": "disguise-self",
       "name": "Disguise Self",
-      "img": "icons/magic/perception/mask-face-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bat-mask.svg",
       "description": "You make yourself - including your clothing, armor, weapons, and other belongings on your person - look different until the spell ends or until you use your action to dismiss it. You can seem 1 foot shorter or taller and can appear thin, fat, or in between. You can't change your body type, so you must adopt a form that has the same basic arrangement of limbs. Otherwise, the extent of the illusion is up to you. The changes wrought by this spell fail to hold up to physical inspection. For example, if you use this spell to add a hat to your outfit, objects pass through the hat, and anyone who touches it would feel nothing or would feel your head and hair. If you use this spell to appear thinner than you are, the hand of someone who reaches out to touch you would bump into you while it was seemingly still in midair. To discern that you are disguised, a creature can use its action to inspect your apperance and must succeed on an Intelligence (Investigation) check against your spell save DC.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -434,7 +434,7 @@
     {
       "id": "divine-favor",
       "name": "Divine Favor",
-      "img": "icons/magic/holy/light-ray-yellow.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/cathelineau/holy-oak.svg",
       "description": "Your prayer empowers you with divine radiance. Until the spell ends, your weapon attacks deal an extra 1d4 radiant damage on a hit.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -460,7 +460,7 @@
     {
       "id": "entangle",
       "name": "Entangle",
-      "img": "icons/magic/symbols/runes-circle-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/circle.svg",
       "description": "Grasping weeds and vines sprout from the ground in a 20-foot square starting form a point within range. For the duration, these plants turn the ground in the area into difficult terrain. A creature in the area when you cast the spell must succeed on a strength saving throw or be restrained by the entangling plants until the spell ends. A creature restrained by the plants can use its action to make a Strength check against your spell save DC. On a success, it frees itself. When the spell ends, the conjured plants wilt away.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -485,7 +485,7 @@
     {
       "id": "expeditious-retreat",
       "name": "Expeditious Retreat",
-      "img": "icons/magic/symbols/runes-triangle-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bo.svg",
       "description": "This spell allows you to move at an incredible pace. When you cast this spell, and then as a bonus action on each of your turns until the spell ends, you can take the Dash action.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -511,7 +511,7 @@
     {
       "id": "faerie-fire",
       "name": "Faerie Fire",
-      "img": "icons/magic/light/explosion-star-orange.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/orange.svg",
       "description": "Each object in a 20-foot cube within range is outlined in blue, green, or violet light (your choice). Any creature in the area when the spell is cast is also outlined in light if it fails a dexterity saving throw. For the duration, objects and affected creatures shed dim light in a 10-foot radius. Any attack roll against an affected creature or object has advantage if the attacker can see it, and the affected creature or object can't benefit from being invisible.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -539,7 +539,7 @@
     {
       "id": "false-life",
       "name": "False Life",
-      "img": "icons/magic/death/skull-horned-worn-brown.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/deathcab.svg",
       "description": "Bolstering yourself with a necromantic facsimile of life, you gain 1d4 + 4 temporary hit points for the duration.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -567,7 +567,7 @@
     {
       "id": "feather-fall",
       "name": "Feather Fall",
-      "img": "icons/magic/symbols/runes-triangle-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bo.svg",
       "description": "Choose up to five falling creatures within range. A falling creature's rate of descent slows to 60 feet per round until the spell ends. If the creature lands before the spell ends, it takes no falling damage and can land on its feet, and the spell ends for that creature.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -594,7 +594,7 @@
     {
       "id": "find-familiar",
       "name": "Find Familiar",
-      "img": "icons/magic/symbols/runes-circle-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/circle.svg",
       "description": "You gain the service of a familiar, a spirit that takes an animal form you choose: bat, cat, crab, frog (toad), hawk, lizard, octopus, owl, poisonous snake, fish (quipper), rat, raven, sea horse, spider, or weasel. Appearing in an unoccupied space within range, the familiar has the statistics of the chosen form, though it is a celestial, fey, or fiend (your choice) instead of a beast. Your familiar acts independently of you, but it always obeys your commands. In combat, it rolls its own initiative and acts on its own turn. A familiar can't attack, but it can take other actions as normal. When the familiar drops to 0 hit points, it disappears, leaving behind no physical form. It reappears after you cast this spell again. While your familiar is within 100 feet of you, you can communicate with it telepathically. Additionally, as an action, you can see through your familiar's eyes and hear what it hears until the start of your next turn, gaining the benefits of any special senses that the familiar has. During this time, you are deaf and blind with regard to your own senses. As an action, you can temporarily dismiss your familiar. It disappears into a pocket dimension where it awaits your summons. Alternatively, you can dismiss it forever. As an action while it is temporarily dismissed, you can cause it to reappear in any unoccupied space within 30 feet of you. You can't have more than one familiar at a time. If you cast this spell while you already have a familiar, you instead cause it to adopt a new form. Choose one of the forms from the above list. Your familiar transforms into the chosen creature. Finally, when you cast a spell with a range of touch, your familiar can deliver the spell as if it had cast the spell. Your familiar must be within 100 feet of you, and it must use its reaction to deliver the spell when you cast it. If the spell requires an attack roll, you use your attack modifier for the roll.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -620,7 +620,7 @@
     {
       "id": "floating-disk",
       "name": "Floating Disk",
-      "img": "icons/magic/symbols/runes-circle-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/circle.svg",
       "description": "This spell creates a circular, horizontal plane of force, 3 feet in diameter and 1 inch thick, that floats 3 feet above the ground in an unoccupied space of your choice that you can see within range. The disk remains for the duration, and can hold up to 500 pounds. If more weight is placed on it, the spell ends, and everything on the disk falls to the ground. The disk is immobile while you are within 20 feet of it. If you move more than 20 feet away from it, the disk follows you so that it remains within 20 feet of you. If can move across uneven terrain, up or down stairs, slopes and the like, but it can't cross an elevation change of 10 feet or more. For example, the disk can't move across a 10-foot-deep pit, nor could it leave such a pit if it was created at the bottom. If you move more than 100 feet away from the disk (typically because it can't move around an obstacle to follow you), the spell ends.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -646,7 +646,7 @@
     {
       "id": "fog-cloud",
       "name": "Fog Cloud",
-      "img": "icons/magic/symbols/runes-circle-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/circle.svg",
       "description": "You create a 20-foot-radius sphere of fog centered on a point within range. The sphere spreads around corners, and its area is heavily obscured. It lasts for the duration or until a wind of moderate or greater speed (at least 10 miles per hour) disperses it.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -675,7 +675,7 @@
     {
       "id": "goodberry",
       "name": "Goodberry",
-      "img": "icons/magic/symbols/runes-triangle-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bo.svg",
       "description": "Up to ten berries appear in your hand and are infused with magic for the duration. A creature can use its action to eat one berry. Eating a berry restores 1 hit point, and the berry provides enough nourishment to sustain a creature for one day. The berries lose their potency if they have not been consumed within 24 hours of the casting of this spell.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -702,7 +702,7 @@
     {
       "id": "grease",
       "name": "Grease",
-      "img": "icons/magic/symbols/runes-circle-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/circle.svg",
       "description": "Slick grease covers the ground in a 10-foot square centered on a point within range and turns it into difficult terrain for the duration. When the grease appears, each creature standing in its area must succeed on a dexterity saving throw or fall prone. A creature that enters the area or ends its turn there must also succeed on a dexterity saving throw or fall prone.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -729,7 +729,7 @@
     {
       "id": "guiding-bolt",
       "name": "Guiding Bolt",
-      "img": "icons/magic/holy/light-ray-yellow.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/cathelineau/holy-oak.svg",
       "description": "A flash of light streaks toward a creature of your choice within range. Make a ranged spell attack against the target. On a hit, the target takes 4d6 radiant damage, and the next attack roll made against this target before the end of your next turn has advantage, thanks to the mystical dim light glittering on the target until then.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -757,7 +757,7 @@
     {
       "id": "healing-word",
       "name": "Healing Word",
-      "img": "icons/magic/light/explosion-star-orange.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/orange.svg",
       "description": "A creature of your choice that you can see within range regains hit points equal to 1d4 + your spellcasting ability modifier. This spell has no effect on undead or constructs.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -784,7 +784,7 @@
     {
       "id": "hellish-rebuke",
       "name": "Hellish Rebuke",
-      "img": "icons/magic/fire/flame-burning-orange.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/fire.svg",
       "description": "You point your finger, and the creature that damaged you is momentarily surrounded by hellish flames. The creature must make a Dexterity saving throw. It takes 2d10 fire damage on a failed save, or half as much damage on a successful one.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -812,7 +812,7 @@
     {
       "id": "heroism",
       "name": "Heroism",
-      "img": "icons/magic/control/debuff-chains-pink.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/control-tower.svg",
       "description": "A willing creature you touch is imbued with bravery. Until the spell ends, the creature is immune to being frightened and gains temporary hit points equal to your spellcasting ability modifier at the start of each of its turns. When the spell ends, the target loses any remaining temporary hit points from this spell.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -836,7 +836,7 @@
     {
       "id": "hideous-laughter",
       "name": "Hideous Laughter",
-      "img": "icons/magic/control/debuff-chains-pink.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/control-tower.svg",
       "description": "A creature of your choice that you can see within range perceives everything as hilariously funny and falls into fits of laughter if this spell affects it. The target must succeed on a wisdom saving throw or fall prone, becoming incapacitated and unable to stand up for the duration. A creature with an Intelligence score of 4 or less isn't affected. At the end of each of its turns, and each time it takes damage, the target can make another wisdom saving throw. The target had advantage on the saving throw if it's triggered by damage. On a success, the spell ends.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -865,7 +865,7 @@
     {
       "id": "hunters-mark",
       "name": "Hunter's Mark",
-      "img": "icons/magic/perception/eye-ringed-glow-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/egg-eye.svg",
       "description": "You choose a creature you can see within range and mystically mark it as your quarry. Until the spell ends, you deal an extra 1d6 damage to the target whenever you hit it with a weapon attack, and you have advantage on any Wisdom (Perception) or Wisdom (Survival) check you make to find it. If the target drops to 0 hit points before this spell ends, you can use a bonus action on a subsequent turn of yours to mark a new creature.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -889,7 +889,7 @@
     {
       "id": "identify",
       "name": "Identify",
-      "img": "icons/magic/perception/eye-ringed-glow-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/egg-eye.svg",
       "description": "You choose one object that you must touch throughout the casting of the spell. If it is a magic item or some other magic-imbued object, you learn its properties and how to use them, whether it requires attunement to use, and how many charges it has, if any. You learn whether any spells are affecting the item and what they are. If the item was created by a spell, you learn which spell created it. If you instead touch a creature throughout the casting, you learn what spells, if any, are currently affecting it.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -917,7 +917,7 @@
     {
       "id": "illusory-script",
       "name": "Illusory Script",
-      "img": "icons/magic/perception/mask-face-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bat-mask.svg",
       "description": "You write on parchment, paper, or some other suitable writing material and imbue it with a potent illusion that lasts for the duration. To you and any creatures you designate when you cast the spell, the writing appears normal, written in your hand, and conveys whatever meaning you intended when you wrote the text. To all others, the writing appears as if it were written in an unknown or magical script that is unintelligible. Alternatively, you can cause the writing to appear to be an entirely different message, written in a different hand and language, though the language must be one you know. Should the spell be dispelled, the original script and the illusion both disappear. A creature with truesight can read the hidden message.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -944,7 +944,7 @@
     {
       "id": "inflict-wounds",
       "name": "Inflict Wounds",
-      "img": "icons/magic/death/skull-energy-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/lorc/deathcab.svg",
       "description": "Make a melee spell attack against a creature you can reach. On a hit, the target takes 3d10 necrotic damage.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -972,7 +972,7 @@
     {
       "id": "jump",
       "name": "Jump",
-      "img": "icons/magic/symbols/runes-triangle-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bo.svg",
       "description": "You touch a creature. The creature's jump distance is tripled until the spell ends.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -1001,7 +1001,7 @@
     {
       "id": "longstrider",
       "name": "Longstrider",
-      "img": "icons/magic/symbols/runes-triangle-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bo.svg",
       "description": "You touch a creature. The target's speed increases by 10 feet until the spell ends.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -1031,7 +1031,7 @@
     {
       "id": "mage-armor",
       "name": "Mage Armor",
-      "img": "icons/magic/defensive/shield-barrier-glowing-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/shield.svg",
       "description": "You touch a willing creature who isn't wearing armor, and a protective magical force surrounds it until the spell ends. The target's base AC becomes 13 + its Dexterity modifier. The spell ends if the target dons armor or if you dismiss the spell as an action.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -1058,7 +1058,7 @@
     {
       "id": "magic-missile",
       "name": "Magic Missile",
-      "img": "icons/magic/light/projectiles-star-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/lighter.svg",
       "description": "You create three glowing darts of magical force. Each dart hits a creature of your choice that you can see within range. A dart deals 1d4 + 1 force damage to its target. The darts all strike simultaneously, and you can direct them to hit one creature or several.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -1086,7 +1086,7 @@
     {
       "id": "protection-from-evil-and-good",
       "name": "Protection from Evil and Good",
-      "img": "icons/magic/defensive/shield-barrier-glowing-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/shield.svg",
       "description": "Until the spell ends, one willing creature you touch is protected against certain types of creatures: aberrations, celestials, elementals, fey, fiends, and undead. The protection grants several benefits. Creatures of those types have disadvantage on attack rolls against the target. The target also can't be charmed, frightened, or possessed by them. If the target is already charmed, frightened, or possessed by such a creature, the target has advantage on any new saving throw against the relevant effect.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -1114,7 +1114,7 @@
     {
       "id": "purify-food-and-drink",
       "name": "Purify Food and Drink",
-      "img": "icons/magic/symbols/runes-triangle-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bo.svg",
       "description": "All nonmagical food and drink within a 5-foot radius sphere centered on a point of your choice within range is purified and rendered free of poison and disease.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -1140,7 +1140,7 @@
     {
       "id": "sanctuary",
       "name": "Sanctuary",
-      "img": "icons/magic/defensive/shield-barrier-glowing-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/shield.svg",
       "description": "You ward a creature within range against attack. Until the spell ends, any creature who targets the warded creature with an attack or a harmful spell must first make a wisdom saving throw. On a failed save, the creature must choose a new target or lose the attack or spell. This spell doesn't protect the warded creature from area effects, such as the explosion of a fireball. If the warded creature makes an attack or casts a spell that affects an enemy creature, this spell ends.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -1167,7 +1167,7 @@
     {
       "id": "shield",
       "name": "Shield",
-      "img": "icons/magic/defensive/shield-barrier-glowing-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/shield.svg",
       "description": "An invisible barrier of magical force appears and protects you. Until the start of your next turn, you have a +5 bonus to AC, including against the triggering attack, and you take no damage from magic missile.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -1192,7 +1192,7 @@
     {
       "id": "shield-of-faith",
       "name": "Shield of Faith",
-      "img": "icons/magic/defensive/shield-barrier-glowing-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/shield.svg",
       "description": "A shimmering field appears and surrounds a creature of your choice within range, granting it a +2 bonus to AC for the duration.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -1218,7 +1218,7 @@
     {
       "id": "silent-image",
       "name": "Silent Image",
-      "img": "icons/magic/perception/mask-face-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/bat-mask.svg",
       "description": "You create the image of an object, a creature, or some other visible phenomenon that is no larger than a 15-foot cube. The image appears at a spot within range and lasts for the duration. The image is purely visual; it isn't accompanied by sound, smell, or other sensory effects. You can use your action to cause the image to move to any spot within range. As the image changes location, you can alter its appearance so that its movements appear natural for the image. For example, if you create an image of a creature and move it, you can alter the image so that it appears to be walking. Physical interaction with the image reveals it to be an illusion, because things can pass through it. A creature that uses its action to examine the image can determine that it is an illusion with a successful Intelligence (Investigation) check against your spell save DC. If a creature discerns the illusion for what it is, the creature can see through the image.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -1247,7 +1247,7 @@
     {
       "id": "sleep",
       "name": "Sleep",
-      "img": "icons/magic/control/debuff-chains-pink.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/control-tower.svg",
       "description": "This spell sends creatures into a magical slumber. Roll 5d8; the total is how many hit points of creatures this spell can affect. Creatures within 20 feet of a point you choose within range are affected in ascending order of their current hit points (ignoring unconscious creatures). Starting with the creature that has the lowest current hit points, each creature affected by this spell falls unconscious until the spell ends, the sleeper takes damage, or someone uses an action to shake or slap the sleeper awake. Subtract each creature's hit points from the total before moving on to the creature with the next lowest hit points. A creature's hit points must be equal to or less than the remaining total for that creature to be affected. Undead and creatures immune to being charmed aren't affected by this spell.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -1277,7 +1277,7 @@
     {
       "id": "speak-with-animals",
       "name": "Speak with Animals",
-      "img": "icons/magic/perception/eye-ringed-glow-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/egg-eye.svg",
       "description": "You gain the ability to comprehend and verbally communicate with beasts for the duration. The knowledge and awareness of many beasts is limited by their intelligence, but at a minimum, beasts can give you information about nearby locations and monsters, including whatever they can perceive or have perceived within the past day. You might be able to persuade a beast to perform a small favor for you, at the DM's discretion.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -1304,7 +1304,7 @@
     {
       "id": "thunderwave",
       "name": "Thunderwave",
-      "img": "icons/magic/sonic/explosion-shock-wave-blue.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/oni.svg",
       "description": "A wave of thunderous force sweeps out from you. Each creature in a 15-foot cube originating from you must make a constitution saving throw. On a failed save, a creature takes 2d8 thunder damage and is pushed 10 feet away from you. On a successful save, the creature takes half as much damage and isn't pushed. In addition, unsecured objects that are completely within the area of effect are automatically pushed 10 feet away from you by the spell's effect, and the spell emits a thunderous boom audible out to 300 feet.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",
@@ -1337,7 +1337,7 @@
     {
       "id": "unseen-servant",
       "name": "Unseen Servant",
-      "img": "icons/magic/symbols/runes-circle-purple.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/circle.svg",
       "description": "This spell creates an invisible, mindless, shapeless force that performs simple tasks at your command until the spell ends. The servant springs into existence in an unoccupied space on the ground within range. It has AC 10, 1 hit point, and a Strength of 2, and it can't attack. If it drops to 0 hit points, the spell ends. Once on each of your turns as a bonus action, you can mentally command the servant to move up to 15 feet and interact with an object. The servant can perform simple tasks that a human servant could do, such as fetching things, cleaning, mending, folding clothes, lighting fires, serving food, and pouring wind. Once you give the command, the servant performs the task to the best of its ability until it completes the task, then waits for your next command. If you command the servant to perform a task that would move it more than 60 feet away from you, the spell ends.",
       "templateId": "dnd5e-spell",
       "source": "SRD 5.1",

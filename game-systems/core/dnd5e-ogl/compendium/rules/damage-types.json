@@ -7,7 +7,7 @@
     {
       "id": "acid",
       "name": "Acid",
-      "img": "icons/damage/acid.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/acid.svg",
       "description": "The corrosive spray of a black dragons breath and the dissolving enzymes secreted by a black pudding deal acid damage.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -19,7 +19,7 @@
     {
       "id": "bludgeoning",
       "name": "Bludgeoning",
-      "img": "icons/damage/bludgeoning.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/dam.svg",
       "description": "Blunt force attacks - hammers, falling, constriction, and the like - deal bludgeoning damage.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -31,7 +31,7 @@
     {
       "id": "cold",
       "name": "Cold",
-      "img": "icons/damage/cold.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/dam.svg",
       "description": "The infernal chill radiating from an ice devils spear and the frigid blast of a white dragons breath deal cold damage.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -43,7 +43,7 @@
     {
       "id": "fire",
       "name": "Fire",
-      "img": "icons/damage/fire.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/fire.svg",
       "description": "Red dragons breathe fire, and many spells conjure flames to deal fire damage.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -55,7 +55,7 @@
     {
       "id": "force",
       "name": "Force",
-      "img": "icons/damage/force.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/dam.svg",
       "description": "Force is pure magical energy focused into a damaging form. Most effects that deal force damage are spells, including magic missile and spiritual weapon.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -67,7 +67,7 @@
     {
       "id": "lightning",
       "name": "Lightning",
-      "img": "icons/damage/lightning.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/electric.svg",
       "description": "A *lightning bolt* spell and a blue dragons breath deal lightning damage.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -79,7 +79,7 @@
     {
       "id": "necrotic",
       "name": "Necrotic",
-      "img": "icons/damage/necrotic.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/dam.svg",
       "description": "Necrotic damage, dealt by certain undead and a spell such as chill touch, withers matter and even the soul.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -91,7 +91,7 @@
     {
       "id": "piercing",
       "name": "Piercing",
-      "img": "icons/damage/piercing.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/dam.svg",
       "description": "Puncturing and impaling attacks, including spears and monsters bites, deal piercing damage.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -103,7 +103,7 @@
     {
       "id": "poison",
       "name": "Poison",
-      "img": "icons/damage/poison.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/sbed/poison.svg",
       "description": "Venomous stings and the toxic gas of a green dragons breath deal poison damage.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -115,7 +115,7 @@
     {
       "id": "psychic",
       "name": "Psychic",
-      "img": "icons/damage/psychic.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/dam.svg",
       "description": "Mental abilities such as a mind flayers psionic blast deal psychic damage.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -127,7 +127,7 @@
     {
       "id": "radiant",
       "name": "Radiant",
-      "img": "icons/damage/radiant.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/dam.svg",
       "description": "Radiant damage, dealt by a clerics *flame strike* spell or an angels smiting weapon, sears the flesh like fire and overloads the spirit with power.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -139,7 +139,7 @@
     {
       "id": "slashing",
       "name": "Slashing",
-      "img": "icons/damage/slashing.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/dam.svg",
       "description": "Swords, axes, and monsters claws deal slashing damage.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
@@ -151,7 +151,7 @@
     {
       "id": "thunder",
       "name": "Thunder",
-      "img": "icons/damage/thunder.webp",
+      "img": "/game-systems/dnd5e-ogl/assets/icons/delapouite/dam.svg",
       "description": "A concussive burst of sound, such as the effect of the *thunderwave* spell, deals thunder damage.",
       "templateId": "dnd5e-feature",
       "source": "SRD 5.1",
