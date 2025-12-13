@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { FormDefinition, FormFragment } from '@vtt/shared';
+  import type { FormDefinition, FormFragment, FormStyles } from '@vtt/shared';
   import { formDesignerStore, canUndo, canRedo, isSaving, selectedNode, hasClipboard, designerFeedback } from '$lib/stores/formDesigner';
   import { formsStore } from '$lib/stores/forms';
   import { goto } from '$app/navigation';
@@ -16,6 +16,7 @@
   import ImportFormModal from './ImportFormModal.svelte';
   import UndoHistoryPanel from './UndoHistoryPanel.svelte';
   import SaveAsTemplateDialog from './SaveAsTemplateDialog.svelte';
+  import KeyboardShortcutsHelp from './KeyboardShortcutsHelp.svelte';
 
   // Props
   interface Props {
@@ -47,6 +48,9 @@
   // History panel state
   let historyPanelOpen = $state(false);
 
+  // Keyboard shortcuts help state
+  let shortcutsHelpOpen = $state(false);
+
   // Initialize the store with the form
   $effect(() => {
     formDesignerStore.initializeForm(formDefinition);
@@ -56,6 +60,17 @@
   $effect(() => {
     if (store.form) {
       formName = store.form.name;
+    }
+  });
+
+  // Auto-dismiss feedback messages after 3 seconds
+  $effect(() => {
+    if (_feedback.message) {
+      const timer = setTimeout(() => {
+        formDesignerStore.clearFeedback();
+      }, 3000);
+
+      return () => clearTimeout(timer);
     }
   });
 
@@ -248,7 +263,22 @@
 
   // Handle keyboard shortcuts
   function handleKeydown(event: KeyboardEvent) {
-    // Only handle shortcuts in design mode
+    // Check for help shortcut (? or F1) - works in any mode
+    if (event.key === '?' || event.key === 'F1') {
+      const target = event.target as HTMLElement;
+      const isTyping = target.tagName === 'INPUT' ||
+                       target.tagName === 'TEXTAREA' ||
+                       target.isContentEditable;
+
+      // Only show help if not typing in an input field
+      if (!isTyping) {
+        event.preventDefault();
+        shortcutsHelpOpen = true;
+        return;
+      }
+    }
+
+    // Only handle other shortcuts in design mode
     if (store.mode !== 'design') return;
 
     // Skip if user is typing in an input field
@@ -272,6 +302,33 @@
       if (_canRedo) {
         handleRedo();
       }
+      return;
+    }
+
+    // Check for copy (Ctrl/Cmd + C)
+    if ((event.ctrlKey || event.metaKey) && event.key === 'c' && !isTyping) {
+      if (_selectedNode) {
+        event.preventDefault();
+        formDesignerStore.copyNode(_selectedNode.id);
+      }
+      return;
+    }
+
+    // Check for cut (Ctrl/Cmd + X)
+    if ((event.ctrlKey || event.metaKey) && event.key === 'x' && !isTyping) {
+      if (_selectedNode) {
+        event.preventDefault();
+        formDesignerStore.cutNode(_selectedNode.id);
+      }
+      return;
+    }
+
+    // Check for paste (Ctrl/Cmd + V)
+    if ((event.ctrlKey || event.metaKey) && event.key === 'v' && !isTyping) {
+      event.preventDefault();
+      // If a node is selected, paste as child; otherwise paste to root
+      const parentId = _selectedNode ? _selectedNode.id : 'root';
+      formDesignerStore.pasteNode(parentId);
       return;
     }
 
@@ -448,6 +505,16 @@
       </button>
       <button
         type="button"
+        class="btn btn-icon"
+        onclick={() => shortcutsHelpOpen = true}
+        title="Keyboard shortcuts (? or F1)"
+        aria-label="Show keyboard shortcuts help"
+        aria-keyshortcuts="? F1"
+      >
+        ?
+      </button>
+      <button
+        type="button"
         class="btn btn-primary"
         onclick={handleSave}
         disabled={!store.isDirty || _isSaving}
@@ -621,12 +688,37 @@
     onSave={handleTemplateSave}
     onClose={() => saveAsTemplateModalOpen = false}
   />
+
+  <!-- Toast Notification -->
+  {#if _feedback.message}
+    <div
+      class="toast-notification toast-{_feedback.type}"
+      role="alert"
+      aria-live="polite"
+    >
+      <span>{_feedback.message}</span>
+      <button
+        type="button"
+        class="toast-close"
+        onclick={() => formDesignerStore.clearFeedback()}
+        aria-label="Dismiss notification"
+      >
+        ✕
+      </button>
+    </div>
+  {/if}
 </div>
 
   <!-- Undo History Panel -->
   <UndoHistoryPanel
     bind:isOpen={historyPanelOpen}
     onClose={() => historyPanelOpen = false}
+  />
+
+  <!-- Keyboard Shortcuts Help -->
+  <KeyboardShortcutsHelp
+    isOpen={shortcutsHelpOpen}
+    onClose={() => shortcutsHelpOpen = false}
   />
 
 <style>
@@ -989,5 +1081,71 @@
       border-right: none;
       border-bottom: 1px solid var(--border-color, #ddd);
     }
+  }
+
+  /* Toast Notification */
+  .toast-notification {
+    position: fixed;
+    top: 4rem;
+    right: 1rem;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    min-width: 250px;
+    max-width: 400px;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    animation: toast-slide-in 0.3s ease-out;
+    font-size: 0.875rem;
+  }
+
+  @keyframes toast-slide-in {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  .toast-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+
+  .toast-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+  }
+
+  .toast-info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+  }
+
+  .toast-notification span {
+    flex: 1;
+  }
+
+  .toast-close {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0 0.25rem;
+    color: inherit;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+
+  .toast-close:hover {
+    opacity: 1;
   }
 </style>

