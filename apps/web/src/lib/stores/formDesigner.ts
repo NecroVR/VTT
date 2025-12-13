@@ -573,7 +573,13 @@ function createFormDesignerStore() {
         let clipboard = state.clipboard;
         if (!clipboard) {
           clipboard = loadClipboardFromStorage();
-          if (!clipboard) return state;
+          if (!clipboard) {
+            return {
+              ...state,
+              feedbackMessage: 'Clipboard is empty',
+              feedbackType: 'error'
+            };
+          }
         }
 
         const newState = pushToUndo(state);

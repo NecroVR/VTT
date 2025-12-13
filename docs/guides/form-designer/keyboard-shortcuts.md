@@ -47,6 +47,25 @@ These shortcuts work globally when you're in design mode:
 - **Ctrl+Y** (or **Cmd+Y** on Mac) - Redo the last undone change
 - **Ctrl+Shift+Z** (or **Cmd+Shift+Z** on Mac) - Alternative redo shortcut
 
+### Clipboard Operations
+
+- **Ctrl+C** (or **Cmd+C** on Mac) - Copy the selected node to clipboard
+  - Copies the entire node tree (including all children)
+  - Shows a success notification when copied
+  - Clipboard persists across forms (stored in localStorage)
+
+- **Ctrl+X** (or **Cmd+X** on Mac) - Cut the selected node to clipboard
+  - Copies the node and removes it from the layout
+  - Can be undone with Ctrl+Z
+  - Shows a success notification when cut
+
+- **Ctrl+V** (or **Cmd+V** on Mac) - Paste from clipboard
+  - If a node is selected, pastes as a child of the selected node
+  - If no node is selected, pastes to the root level
+  - Generates new unique IDs for all pasted nodes
+  - Shows a notification when pasted
+  - Can paste the same node multiple times
+
 ## Form Field Navigation (Preview Mode)
 
 When previewing or editing a form in the form renderer:
@@ -82,6 +101,32 @@ This follows standard HTML form navigation behavior.
 - To expand a collapsed container: Select it and press Right Arrow
 - To collapse an expanded container: Select it and press Left Arrow
 - To navigate into a container: Press Right Arrow twice (once to expand, once to select first child)
+
+### Using Copy/Paste Efficiently
+
+Clipboard operations allow you to quickly duplicate form components:
+
+**Duplicate a component within the same form:**
+1. Select the node you want to copy
+2. Press Ctrl+C to copy
+3. Select the parent where you want to paste
+4. Press Ctrl+V to paste
+
+**Move a component:**
+1. Select the node you want to move
+2. Press Ctrl+X to cut
+3. Select the destination parent
+4. Press Ctrl+V to paste
+
+**Copy components between forms:**
+1. Open the first form, select and copy a component (Ctrl+C)
+2. Open a different form
+3. Press Ctrl+V to paste - the clipboard persists across forms!
+
+**Create variations:**
+- Copy a component, paste it, then modify the copy
+- This is great for creating similar fields with slight differences
+- The system automatically generates new unique IDs for all pasted nodes
 
 ## Accessibility
 
@@ -129,6 +174,10 @@ The Delete key includes protection against accidental data loss:
 | Ctrl+Z | Undo |
 | Ctrl+Y | Redo |
 | Ctrl+Shift+Z | Redo (alt) |
+| **Clipboard** |
+| Ctrl+C | Copy node |
+| Ctrl+X | Cut node |
+| Ctrl+V | Paste node |
 
 ---
 
