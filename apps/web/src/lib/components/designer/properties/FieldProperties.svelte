@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { FieldNode, FormFieldType } from '@vtt/shared';
+  import BindingPicker from '../BindingPicker.svelte';
 
   interface Props {
     node: FieldNode;
@@ -7,6 +8,8 @@
   }
 
   let { node, onUpdate }: Props = $props();
+
+  let showPicker = $state(false);
 
   const fieldTypes: FormFieldType[] = [
     'text',
@@ -116,7 +119,7 @@
             oninput={(e) => onUpdate({ binding: (e.target as HTMLInputElement).value })}
             placeholder="attributes.strength.value"
           />
-          <button type="button" class="btn-picker" title="Pick property">
+          <button type="button" class="btn-picker" title="Browse properties" onclick={() => showPicker = true}>
             📋
           </button>
         </div>
@@ -211,6 +214,16 @@
     </div>
   </div>
 </div>
+
+<BindingPicker
+  open={showPicker}
+  currentBinding={node.binding || ''}
+  onSelect={(path) => {
+    onUpdate({ binding: path });
+    showPicker = false;
+  }}
+  onClose={() => showPicker = false}
+/>
 
 <style>
   .property-group {

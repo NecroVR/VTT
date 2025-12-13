@@ -356,6 +356,7 @@ All field components share these common properties:
 
 #### Repeater Properties
 - **Binding** - Array property to repeat over (e.g., "inventory", "spells")
+  - Type manually or click the 📋 button to browse array properties
 - **Add Label** - Text for the "add new item" button
 - **Empty Message** - Message shown when array is empty
 - **Min Items** - Minimum number of items (optional)

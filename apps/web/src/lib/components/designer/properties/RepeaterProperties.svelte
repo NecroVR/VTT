@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { RepeaterNode } from '@vtt/shared';
+  import BindingPicker from '../BindingPicker.svelte';
 
   interface Props {
     node: RepeaterNode;
@@ -7,6 +8,8 @@
   }
 
   let { node, onUpdate }: Props = $props();
+
+  let showPicker = $state(false);
 </script>
 
 <div class="repeater-properties">
@@ -24,7 +27,7 @@
             oninput={(e) => onUpdate({ binding: (e.target as HTMLInputElement).value })}
             placeholder="items"
           />
-          <button type="button" class="btn-picker" title="Pick property">
+          <button type="button" class="btn-picker" title="Browse properties" onclick={() => showPicker = true}>
             📋
           </button>
         </div>
@@ -120,6 +123,17 @@
     </div>
   </div>
 </div>
+
+<BindingPicker
+  open={showPicker}
+  currentBinding={node.binding}
+  arrayOnly={true}
+  onSelect={(path) => {
+    onUpdate({ binding: path });
+    showPicker = false;
+  }}
+  onClose={() => showPicker = false}
+/>
 
 <style>
   .property-group {
