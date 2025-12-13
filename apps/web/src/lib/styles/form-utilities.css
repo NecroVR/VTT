@@ -1,0 +1,625 @@
+/**
+ * Form Utility Classes
+ * Based on FoundryVTT patterns and best practices
+ *
+ * This file provides reusable CSS utility classes for building forms
+ * that work across light and dark themes with responsive layouts.
+ */
+
+/* ============================================
+   CSS VARIABLES - Form-specific extensions
+   ============================================ */
+:root {
+  /* Form spacing */
+  --form-spacing-xs: 0.25rem;
+  --form-spacing-sm: 0.5rem;
+  --form-spacing-md: 1rem;
+  --form-spacing-lg: 1.5rem;
+  --form-spacing-xl: 2rem;
+
+  /* Form colors - dark theme defaults */
+  --form-label-color: #b0b0b0;
+  --form-input-bg: #2d2d2d;
+  --form-input-border: #404040;
+  --form-input-text: #ffffff;
+  --form-input-placeholder: #666666;
+  --form-help-color: #888888;
+  --form-error-color: #ff6b6b;
+  --form-success-color: #51cf66;
+  --form-warning-color: #ffd93d;
+
+  /* Form dimensions */
+  --form-input-height: 2.5rem;
+  --form-input-height-sm: 2rem;
+  --form-input-height-lg: 3rem;
+
+  /* Form borders */
+  --form-border-color: #404040;
+  --form-border-radius: 0.25rem;
+
+  /* Form focus */
+  --form-focus-color: #4a9eff;
+  --form-focus-shadow: 0 0 0 3px rgba(74, 158, 255, 0.25);
+}
+
+/* Light theme overrides */
+@media (prefers-color-scheme: light) {
+  :root {
+    --form-label-color: #666666;
+    --form-input-bg: #ffffff;
+    --form-input-border: #e0e0e0;
+    --form-input-text: #1a1a1a;
+    --form-input-placeholder: #999999;
+    --form-help-color: #666666;
+    --form-border-color: #e0e0e0;
+  }
+}
+
+/* ============================================
+   FORM CONTAINER
+   ============================================ */
+
+/**
+ * .standard-form
+ * Main form container with scrollable content area
+ * Use this as the wrapper for complete forms
+ */
+.standard-form {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+/* ============================================
+   FORM GROUP - Label + Input + Help Container
+   ============================================ */
+
+/**
+ * .form-group
+ * Container for a label, input field, and optional help text
+ * Default layout is vertical (stacked)
+ */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--form-spacing-sm);
+  margin-bottom: var(--form-spacing-md);
+}
+
+/**
+ * .form-group.stacked
+ * Explicit vertical layout (label above input)
+ * This is the default, but can be used for clarity
+ */
+.form-group.stacked {
+  flex-direction: column;
+}
+
+/**
+ * .form-group.inline
+ * Horizontal layout (label beside input)
+ * Useful for checkboxes, toggles, or compact forms
+ */
+.form-group.inline {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--form-spacing-md);
+}
+
+.form-group.inline .form-label {
+  flex: 0 0 auto;
+  margin-bottom: 0;
+}
+
+.form-group.inline .form-fields {
+  flex: 1 1 auto;
+}
+
+/**
+ * .form-group.slim
+ * Compact spacing variant for dense forms
+ */
+.form-group.slim {
+  gap: var(--form-spacing-xs);
+  margin-bottom: var(--form-spacing-sm);
+}
+
+/* ============================================
+   FORM FIELDS CONTAINER
+   ============================================ */
+
+/**
+ * .form-fields
+ * Container for multiple input elements in a row
+ * Creates a horizontal layout with consistent spacing
+ */
+.form-fields {
+  display: flex;
+  gap: var(--form-spacing-sm);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.form-fields > * {
+  flex: 1 1 0;
+  min-width: 0; /* Allow flex items to shrink below content size */
+}
+
+/* ============================================
+   LABELS
+   ============================================ */
+
+/**
+ * .form-label
+ * Standard label styling for form fields
+ */
+.form-label {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--form-label-color);
+  margin-bottom: var(--form-spacing-xs);
+  line-height: 1.4;
+}
+
+/**
+ * .form-label.required
+ * Adds a red asterisk (*) after required field labels
+ */
+.form-label.required::after {
+  content: ' *';
+  color: var(--form-error-color);
+  font-weight: bold;
+}
+
+/* ============================================
+   HELP TEXT
+   ============================================ */
+
+/**
+ * .form-help
+ * Help text displayed below input fields
+ * Provides additional context or instructions
+ */
+.form-help {
+  display: block;
+  font-size: var(--font-size-sm);
+  color: var(--form-help-color);
+  line-height: 1.4;
+  margin-top: var(--form-spacing-xs);
+}
+
+/**
+ * .form-hint
+ * Alias for .form-help (same styling)
+ */
+.form-hint {
+  display: block;
+  font-size: var(--font-size-sm);
+  color: var(--form-help-color);
+  line-height: 1.4;
+  margin-top: var(--form-spacing-xs);
+}
+
+/* Help text variants */
+.form-help.error,
+.form-hint.error {
+  color: var(--form-error-color);
+}
+
+.form-help.success,
+.form-hint.success {
+  color: var(--form-success-color);
+}
+
+.form-help.warning,
+.form-hint.warning {
+  color: var(--form-warning-color);
+}
+
+/* ============================================
+   GRID UTILITIES
+   ============================================ */
+
+/**
+ * .form-grid-2
+ * 2-column responsive grid layout
+ * Stacks to single column on mobile (< 768px)
+ */
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--form-spacing-md);
+}
+
+/**
+ * .form-grid-3
+ * 3-column responsive grid layout
+ * Stacks to 2 columns on tablet, single column on mobile
+ */
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--form-spacing-md);
+}
+
+/**
+ * .form-grid-4
+ * 4-column responsive grid layout
+ * Stacks to 2 columns on tablet, single column on mobile
+ */
+.form-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--form-spacing-md);
+}
+
+/* Responsive breakpoints for grids */
+@media (max-width: 1024px) {
+  .form-grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .form-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .form-grid-2,
+  .form-grid-3,
+  .form-grid-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   FORM SECTIONS
+   ============================================ */
+
+/**
+ * .form-header
+ * Header section for form title and actions
+ * Fixed at top of form, does not scroll
+ */
+.form-header {
+  flex: 0 0 auto;
+  padding: var(--form-spacing-md) var(--form-spacing-lg);
+  border-bottom: 1px solid var(--form-border-color);
+  background: var(--color-bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--form-spacing-md);
+}
+
+.form-header h1,
+.form-header h2,
+.form-header h3 {
+  margin: 0;
+  font-weight: 600;
+}
+
+/**
+ * .form-content
+ * Main scrollable content area
+ * Contains the actual form fields and layout
+ */
+.form-content {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--form-spacing-lg);
+}
+
+/**
+ * .form-footer
+ * Footer section for action buttons
+ * Fixed at bottom of form, does not scroll
+ */
+.form-footer {
+  flex: 0 0 auto;
+  padding: var(--form-spacing-md) var(--form-spacing-lg);
+  border-top: 1px solid var(--form-border-color);
+  background: var(--color-bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--form-spacing-sm);
+}
+
+/* ============================================
+   FIELDSET
+   ============================================ */
+
+/**
+ * .form-fieldset
+ * Styled fieldset with legend
+ * Groups related form fields with a border and title
+ */
+.form-fieldset {
+  border: 1px solid var(--form-border-color);
+  border-radius: var(--border-radius-md);
+  padding: var(--form-spacing-md);
+  margin-bottom: var(--form-spacing-lg);
+}
+
+.form-fieldset legend {
+  padding: 0 var(--form-spacing-sm);
+  font-weight: 600;
+  font-size: var(--font-size-md);
+  color: var(--color-text-primary);
+}
+
+.form-fieldset .form-group:last-child {
+  margin-bottom: 0;
+}
+
+/* Fieldset variants */
+.form-fieldset.collapsed {
+  padding: var(--form-spacing-sm) var(--form-spacing-md);
+}
+
+.form-fieldset.collapsed > *:not(legend) {
+  display: none;
+}
+
+/* ============================================
+   INPUT STYLING (Base styles for consistency)
+   ============================================ */
+
+/**
+ * Base input styles that work with utility classes
+ * Applied to input, select, textarea elements
+ */
+.form-control,
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+input[type="url"],
+input[type="search"],
+input[type="tel"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+select,
+textarea {
+  width: 100%;
+  height: var(--form-input-height);
+  padding: var(--form-spacing-sm) var(--form-spacing-md);
+  font-size: var(--font-size-md);
+  font-family: inherit;
+  line-height: 1.5;
+  color: var(--form-input-text);
+  background-color: var(--form-input-bg);
+  border: 1px solid var(--form-input-border);
+  border-radius: var(--form-border-radius);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+textarea {
+  height: auto;
+  min-height: 5rem;
+  resize: vertical;
+}
+
+/* Focus states */
+.form-control:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--form-focus-color);
+  box-shadow: var(--form-focus-shadow);
+}
+
+/* Placeholder styling */
+.form-control::placeholder,
+input::placeholder,
+textarea::placeholder {
+  color: var(--form-input-placeholder);
+  opacity: 1;
+}
+
+/* Disabled state */
+.form-control:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--color-bg-secondary);
+}
+
+/* Error state */
+.form-control.error,
+input.error,
+select.error,
+textarea.error {
+  border-color: var(--form-error-color);
+}
+
+.form-control.error:focus,
+input.error:focus,
+select.error:focus,
+textarea.error:focus {
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.25);
+}
+
+/* Success state */
+.form-control.success,
+input.success,
+select.success,
+textarea.success {
+  border-color: var(--form-success-color);
+}
+
+/* ============================================
+   SIZE VARIANTS
+   ============================================ */
+
+.form-control-sm,
+input.sm,
+select.sm {
+  height: var(--form-input-height-sm);
+  font-size: var(--font-size-sm);
+  padding: var(--form-spacing-xs) var(--form-spacing-sm);
+}
+
+.form-control-lg,
+input.lg,
+select.lg {
+  height: var(--form-input-height-lg);
+  font-size: var(--font-size-lg);
+  padding: var(--form-spacing-md) var(--form-spacing-lg);
+}
+
+/* ============================================
+   CHECKBOX AND RADIO STYLING
+   ============================================ */
+
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: var(--form-spacing-sm);
+  margin-bottom: var(--form-spacing-sm);
+}
+
+.form-check input[type="checkbox"],
+.form-check input[type="radio"] {
+  width: auto;
+  height: auto;
+  margin: 0;
+  cursor: pointer;
+}
+
+.form-check label {
+  margin: 0;
+  cursor: pointer;
+  font-weight: normal;
+  color: var(--color-text-primary);
+}
+
+/* ============================================
+   RESPONSIVE UTILITIES
+   ============================================ */
+
+/* Hide on mobile */
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+
+  .form-group.inline {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Hide on tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .hide-tablet {
+    display: none !important;
+  }
+}
+
+/* Hide on desktop */
+@media (min-width: 1025px) {
+  .hide-desktop {
+    display: none !important;
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY ENHANCEMENTS
+   ============================================ */
+
+/* Screen reader only content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Focus visible for keyboard navigation */
+.form-control:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--form-focus-color);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   FORM VALIDATION FEEDBACK
+   ============================================ */
+
+.form-feedback {
+  display: block;
+  font-size: var(--font-size-sm);
+  margin-top: var(--form-spacing-xs);
+  line-height: 1.4;
+}
+
+.form-feedback.error {
+  color: var(--form-error-color);
+}
+
+.form-feedback.success {
+  color: var(--form-success-color);
+}
+
+.form-feedback.warning {
+  color: var(--form-warning-color);
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+/* Spacing utilities specific to forms */
+.mb-form-xs { margin-bottom: var(--form-spacing-xs); }
+.mb-form-sm { margin-bottom: var(--form-spacing-sm); }
+.mb-form-md { margin-bottom: var(--form-spacing-md); }
+.mb-form-lg { margin-bottom: var(--form-spacing-lg); }
+.mb-form-xl { margin-bottom: var(--form-spacing-xl); }
+
+.mt-form-xs { margin-top: var(--form-spacing-xs); }
+.mt-form-sm { margin-top: var(--form-spacing-sm); }
+.mt-form-md { margin-top: var(--form-spacing-md); }
+.mt-form-lg { margin-top: var(--form-spacing-lg); }
+.mt-form-xl { margin-top: var(--form-spacing-xl); }
+
+/* Full width utility */
+.w-full {
+  width: 100%;
+}
+
+/* Auto width utility */
+.w-auto {
+  width: auto;
+}
+
+/* Flex utilities for form layouts */
+.flex-1 {
+  flex: 1 1 0%;
+}
+
+.flex-auto {
+  flex: 1 1 auto;
+}
+
+.flex-none {
+  flex: none;
+}
