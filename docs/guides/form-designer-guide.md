@@ -39,27 +39,68 @@ The Form Designer is a **Game Master (GM) only** feature. Players cannot create 
 
 ## Getting Started
 
-### Accessing the Form Designer
+### Accessing the Forms Management Console
 
-1. Navigate to the **Forms** section from the main menu
-2. You'll see a list of existing forms in your campaign
-3. Click the **"New Form"** button to create a new form, or click the **Edit** button next to an existing form
+1. **From the Home Page**: After logging in, click the **"Manage Forms"** card on the home page
+2. **Direct URL**: Navigate to `/forms` in your browser
+3. You'll see the **Forms Management Console** with all available forms
+
+### The Forms Management Console
+
+The Forms Management Console displays all forms in a card grid:
+
+**Each Form Card Shows:**
+- Form name and description
+- Game System badge (e.g., "D&D 5e OGL")
+- Entity Type badge (e.g., "character", "item")
+- Version number
+- Last updated date
+- "Default" indicator for system default forms
+
+**Card Actions:**
+- **Preview** (eye icon) - Preview the form with sample data
+- **Edit** (pencil icon) - Open in the Form Designer
+- **Duplicate** (copy icon) - Create a copy with a new name
+- **Delete** (trash icon) - Remove the form (with confirmation)
+
+**Filtering and Search:**
+- Use the search box to find forms by name or description
+- Filter by Game System using the dropdown
+- Filter by Entity Type using the dropdown
 
 ### Creating a New Form
 
-When you create a new form:
-1. Click **"New Form"** from the forms list
-2. The designer opens with an empty canvas
-3. Give your form a name by editing the text in the center of the toolbar
+1. Click the **"Create New Form"** button in the top-right corner
+2. The Form Designer opens with an empty canvas
+3. Give your form a name by editing the text in the toolbar
 4. Start adding components from the palette
+5. Click **Save** when finished
+
+### Duplicating a Form
+
+To create a copy of an existing form:
+1. Find the form you want to copy in the list
+2. Click the **Duplicate** button (copy icon)
+3. Enter a name for the new form (defaults to "Copy of [original name]")
+4. Click OK to create the copy
+5. The new form appears in the list ready to edit
 
 ### Opening an Existing Form
 
 To edit an existing form:
-1. Find the form in the forms list
+1. Find the form in the Forms Management Console
 2. Click the **Edit** button (pencil icon)
-3. The designer opens with the current form layout
+3. The Form Designer opens with the current form layout
 4. Make your changes and click **Save**
+
+### Previewing a Form
+
+To preview how a form will look without editing:
+1. Find the form in the list
+2. Click the **Preview** button (eye icon)
+3. A preview modal opens showing the form rendered
+4. Use the entity selector to test with different sample data
+5. Click outside the modal or press Escape to close
 
 ---
 
