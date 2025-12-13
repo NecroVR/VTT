@@ -5,7 +5,8 @@
   import DOMPurify from 'isomorphic-dompurify';
   import CodeEditor from './CodeEditor.svelte';
   import RichTextEditorWrapper from './RichTextEditorWrapper.svelte';
-  import { contextMenu, type ContextMenuEntry } from '$lib/actions/contextMenu';
+  import { contextMenu } from '$lib/actions/contextMenu';
+  import type { ContextMenuEntry } from '$lib/types/contextMenu';
 
   interface Props {
     node: FieldNode;
@@ -193,18 +194,6 @@
         icon: '✕',
         action: () => {
           handleChange(null);
-        }
-      });
-    }
-
-    // Reset to default option (if field has a default value)
-    if (node.defaultValue !== undefined && value !== node.defaultValue) {
-      items.push({
-        id: 'reset',
-        label: 'Reset to Default',
-        icon: '↺',
-        action: () => {
-          handleChange(node.defaultValue);
         }
       });
     }

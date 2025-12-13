@@ -1,20 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-
-  export interface ContextMenuItem {
-    id: string;
-    label: string;
-    icon?: string;
-    disabled?: boolean;
-    danger?: boolean;
-    action: () => void;
-  }
-
-  export interface ContextMenuDivider {
-    type: 'divider';
-  }
-
-  export type ContextMenuEntry = ContextMenuItem | ContextMenuDivider;
+  import type { ContextMenuEntry, ContextMenuItem } from '$lib/types/contextMenu';
 
   interface Props {
     items: ContextMenuEntry[];

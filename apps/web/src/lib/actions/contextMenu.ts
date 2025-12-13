@@ -10,7 +10,7 @@
  * ```
  */
 
-import type { ContextMenuEntry } from '$lib/components/ui/ContextMenu.svelte';
+import type { ContextMenuEntry } from '$lib/types/contextMenu';
 
 export interface ContextMenuConfig {
   items: ContextMenuEntry[] | (() => ContextMenuEntry[]);

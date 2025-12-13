@@ -6,7 +6,8 @@
   import FieldRenderer from './FieldRenderer.svelte';
   import ComputedRenderer from './ComputedRenderer.svelte';
   import DOMPurify from 'isomorphic-dompurify';
-  import { contextMenu, type ContextMenuEntry } from '$lib/actions/contextMenu';
+  import { contextMenu } from '$lib/actions/contextMenu';
+  import type { ContextMenuEntry } from '$lib/types/contextMenu';
 
   interface Props {
     node: LayoutNode;
