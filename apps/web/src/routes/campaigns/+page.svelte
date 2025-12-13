@@ -151,9 +151,19 @@
         Documentation
       </a>
     </div>
-    <button class="btn btn-primary" on:click={createNewCampaign}>
-      Create New Campaign
-    </button>
+    <div class="header-actions">
+      <a href="/import/foundry" class="btn btn-secondary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="17 8 12 3 7 8" />
+          <line x1="12" y1="3" x2="12" y2="15" />
+        </svg>
+        Import from Foundry
+      </a>
+      <button class="btn btn-primary" on:click={createNewCampaign}>
+        Create New Campaign
+      </button>
+    </div>
   </div>
 
   {#if error}
@@ -269,6 +279,42 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: var(--spacing-xl);
+  }
+
+  .header-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    align-items: center;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    text-decoration: none;
+  }
+
+  .btn-secondary {
+    background-color: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+  }
+
+  .btn-secondary:hover {
+    background-color: var(--color-bg-primary);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  .btn-secondary svg {
+    flex-shrink: 0;
   }
 
   .header-left {
