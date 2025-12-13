@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@vtt/shared": "workspace:*",
+    "isomorphic-dompurify": "^2.34.0",
     "marked": "^17.0.1",
     "visibility-polygon": "^1.1.0"
   },
