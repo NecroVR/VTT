@@ -325,7 +325,7 @@
             {#if tab.icon}
               <span class="tab-icon">{tab.icon}</span>
             {/if}
-            {tab.label}
+            {localeResolver.resolve(tab.label)}
           </button>
         {/each}
       </div>
@@ -348,7 +348,8 @@
       </div>
     </div>
   {:else if node.type === 'static'}
-    {@const interpolated = interpolateContent(node.content)}
+    {@const resolvedContent = localeResolver.resolve(node.content)}
+    {@const interpolated = interpolateContent(resolvedContent)}
     <div
       class="layout-static static-{node.contentType || 'text'}"
       style={node.style ? Object.entries(node.style).map(([k, v]) => `${k}: ${v}`).join(';') : ''}

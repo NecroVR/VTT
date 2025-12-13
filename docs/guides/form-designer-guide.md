@@ -2323,3 +2323,258 @@ Planned localization features:
 - Translation coverage reporting
 
 ---
+
+## Form Import & Export
+
+The Form Designer includes powerful import/export capabilities that allow you to backup forms, share them with other users, and transfer forms between game systems.
+
+### Exporting Forms
+
+#### How to Export
+
+1. Open a form in the Form Designer
+2. Click the **Export** button in the toolbar
+3. A JSON file will be downloaded to your computer
+
+**File naming format**: `form-{name}-v{version}-{date}.json`
+
+Example: `form-character-sheet-v3-2025-12-12.json`
+
+#### What's Included in the Export
+
+The exported JSON file contains:
+
+- **Complete Form Data**:
+  - All layout nodes and their configuration
+  - All reusable fragments
+  - Computed field definitions
+  - Style settings
+  - Scripts (if any)
+
+- **Metadata**:
+  - Export version (currently "1.0")
+  - Export timestamp
+  - Exported by (username/email)
+  - Original form version
+  - Game system ID
+  - License information
+
+#### Export Format
+
+```json
+{
+  "exportVersion": "1.0",
+  "exportedAt": "2025-12-12T10:30:00.000Z",
+  "form": {
+    "name": "Character Sheet",
+    "description": "Player character sheet",
+    "entityType": "actor",
+    "gameSystemId": "dnd5e",
+    "version": 3,
+    "layout": [...],
+    "fragments": [...],
+    "computedFields": [...],
+    "styles": {...}
+  },
+  "metadata": {
+    "exportedBy": "gamemaster@example.com",
+    "sourceUrl": "http://localhost/forms/abc123",
+    "license": "free",
+    "notes": "Exported from VTT Platform on 12/12/2025"
+  }
+}
+```
+
+### Importing Forms
+
+#### How to Import
+
+1. Navigate to the Form Designer
+2. Click the **Import** button in the toolbar
+3. Select a JSON file from your computer
+4. Review the form details and configure conflict resolution
+5. Click **Import Form**
+
+#### Import Preview
+
+Before importing, you'll see:
+
+- **Form Name** - The name of the form being imported
+- **Entity Type** - What type of entity this form is for
+- **Version** - The version number of the form
+- **Description** - Form description (if available)
+- **Export Date** - When the form was exported
+
+#### Conflict Resolution
+
+The import system intelligently handles conflicts:
+
+##### Name Conflicts
+
+If a form with the same name already exists in the target game system:
+
+- **Rename (Recommended)**: Adds " (Imported)" to the form name
+  - Example: "Character Sheet" becomes "Character Sheet (Imported)"
+  - Safe option that preserves both forms
+
+- **Replace**: Deletes the existing form and creates the new one
+  - Use with caution - the original form cannot be recovered
+  - Useful when intentionally updating a form
+
+##### Fragment ID Conflicts
+
+Fragments may have conflicting IDs:
+
+- **Regenerate (Recommended)**: Creates new unique IDs for all fragments
+  - Automatically updates all fragment references in the layout
+  - Prevents conflicts with existing fragments
+  - Safe for most use cases
+
+- **Keep Original**: Uses the fragment IDs from the export file
+  - May cause conflicts if fragments with these IDs exist
+  - Use only when you're certain no conflicts will occur
+
+#### Game System Compatibility
+
+Forms can be imported across different game systems:
+
+- **Same Game System**: Import works seamlessly
+- **Different Game System**: A warning is displayed
+  - The form will still import
+  - May require adjustments to match the target system's data structure
+  - Custom bindings might need to be updated
+
+**Warning Example**:
+```
+⚠️ This form was created for game system 'dnd5e' but importing to 'pf2e'
+```
+
+#### Validation Feedback
+
+During import, you'll receive feedback:
+
+**Warnings** (Yellow):
+- Game system mismatch
+- Optional fields missing
+- Non-critical issues
+
+**Errors** (Red):
+- Invalid JSON format
+- Missing required fields
+- Unsupported export version
+- Critical validation failures
+
+Import proceeds with warnings but is blocked by errors.
+
+### Use Cases
+
+#### Backup and Restore
+
+**Scenario**: Backup your forms before making major changes
+
+1. Export all important forms
+2. Store the JSON files safely
+3. Make your changes
+4. If needed, import the backup files to restore
+
+#### Sharing Forms
+
+**Scenario**: Share a custom character sheet with other GMs
+
+1. Create and refine your form
+2. Export it
+3. Send the JSON file to others
+4. They import it into their VTT instance
+
+#### Cross-System Transfer
+
+**Scenario**: Adapt a form from one game system to another
+
+1. Export the form from the original system
+2. Import it into the new game system
+3. Adjust bindings and computations for the new system
+4. Save the updated form
+
+#### Version Control
+
+**Scenario**: Maintain different versions of a form
+
+1. Export your form at each major version
+2. Store exports with version numbers in filenames
+3. Import specific versions when needed
+4. Compare changes between versions using diff tools
+
+### Best Practices
+
+1. **Regular Backups**: Export important forms regularly
+2. **Descriptive Names**: Use clear, descriptive form names
+3. **Version Tracking**: Include version info in form names or descriptions
+4. **Test Imports**: Test imported forms in a safe environment first
+5. **Document Changes**: Add notes in form descriptions about what changed
+6. **Use Rename**: Choose "Rename" for name conflicts unless replacing intentionally
+7. **Regenerate IDs**: Choose "Regenerate" for fragment conflicts unless you know they're safe
+
+### Troubleshooting
+
+#### "Invalid JSON file" Error
+
+**Cause**: The file is corrupted or not valid JSON
+
+**Solution**:
+- Verify the file wasn't modified after export
+- Try opening in a text editor to check format
+- Re-export the original form if available
+
+#### "Unsupported export version" Error
+
+**Cause**: Export was created with a newer/older version
+
+**Solution**:
+- Update your VTT instance to the latest version
+- Contact support if the error persists
+
+#### Import Succeeds but Form Doesn't Work
+
+**Cause**: Game system incompatibility or binding issues
+
+**Solution**:
+- Check all field bindings in the Property Editor
+- Verify computed field formulas reference correct paths
+- Test with sample entity data
+- Adjust for target game system's data structure
+
+#### Missing Fragments
+
+**Cause**: Fragment references not updated after import
+
+**Solution**:
+- This shouldn't happen with "Regenerate" option
+- If it does, manually recreate the fragments
+- Report the issue for investigation
+
+### Technical Details
+
+#### Export File Size
+
+Typical export file sizes:
+
+- **Simple Form** (10-20 fields): 5-10 KB
+- **Medium Form** (50-100 fields): 20-50 KB
+- **Complex Form** (200+ fields, many fragments): 100-200 KB
+
+Large forms (>1MB) are supported but may take longer to import.
+
+#### Export Version
+
+Current export version: **1.0**
+
+Future versions will maintain backward compatibility or provide migration tools.
+
+#### Security
+
+- Exports contain no sensitive user data
+- No authentication tokens or passwords
+- Safe to share publicly
+- License field indicates usage permissions
+
+---

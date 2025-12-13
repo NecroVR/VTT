@@ -1,5 +1,6 @@
 <script lang="ts">
-  import type { StaticNode } from '@vtt/shared';
+  import type { StaticNode, LocalizedString } from '@vtt/shared';
+  import LocaleKeyPicker from '../LocaleKeyPicker.svelte';
 
   interface Props {
     node: StaticNode;
@@ -9,6 +10,11 @@
   let { node, onUpdate }: Props = $props();
 
   const contentTypes = ['text', 'html', 'markdown', 'image', 'icon'];
+
+  // Generate locale key prefix based on node ID
+  function getLocaleKeyPrefix(property: string): string {
+    return `form.{formName}.${node.id}.${property}`;
+  }
 </script>
 
 <div class="static-properties">
@@ -30,14 +36,14 @@
       </label>
 
       {#if node.contentType === 'text' || node.contentType === 'html' || node.contentType === 'markdown'}
-        <label>
-          <span>Content</span>
-          <textarea
-            value={node.content}
-            oninput={(e) => onUpdate({ content: (e.target as HTMLTextAreaElement).value })}
+        <div class="content-wrapper">
+          <LocaleKeyPicker
+            bind:value={node.content}
+            label="Content"
             placeholder="Enter content..."
-            rows="6"
-          ></textarea>
+            suggestedPrefix={getLocaleKeyPrefix('content')}
+            onchange={(value) => onUpdate({ content: value })}
+          />
           <span class="help-text">
             {#if node.contentType === 'text'}
               Plain text content
@@ -47,17 +53,15 @@
               Markdown formatted text
             {/if}
           </span>
-        </label>
+        </div>
       {:else if node.contentType === 'image'}
-        <label>
-          <span>Image URL</span>
-          <input
-            type="text"
-            value={node.content}
-            oninput={(e) => onUpdate({ content: (e.target as HTMLInputElement).value })}
-            placeholder="https://example.com/image.png or {{binding}}"
-          />
-        </label>
+        <LocaleKeyPicker
+          bind:value={node.content}
+          label="Image URL"
+          placeholder="https://example.com/image.png or {{binding}}"
+          suggestedPrefix={getLocaleKeyPrefix('content')}
+          onchange={(value) => onUpdate({ content: value })}
+        />
 
         <label>
           <span>Alt Text</span>
@@ -91,15 +95,13 @@
           </label>
         </div>
       {:else if node.contentType === 'icon'}
-        <label>
-          <span>Icon Name</span>
-          <input
-            type="text"
-            value={node.content}
-            oninput={(e) => onUpdate({ content: (e.target as HTMLInputElement).value })}
-            placeholder="icon-name or 🎲"
-          />
-        </label>
+        <LocaleKeyPicker
+          bind:value={node.content}
+          label="Icon Name"
+          placeholder="icon-name or 🎲"
+          suggestedPrefix={getLocaleKeyPrefix('content')}
+          onchange={(value) => onUpdate({ content: value })}
+        />
 
         <label>
           <span>Size</span>
