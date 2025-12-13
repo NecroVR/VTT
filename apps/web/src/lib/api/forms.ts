@@ -9,7 +9,12 @@ import type {
   CampaignForm,
   CampaignFormsListResponse,
   AssignFormToCampaignRequest,
-  UpdateCampaignFormRequest
+  UpdateCampaignFormRequest,
+  FormExport,
+  FormExportResponse,
+  ImportFormRequest,
+  FormImportResponse,
+  FormImportValidation
 } from '@vtt/shared';
 
 const BASE_URL = `${API_BASE_URL}/api/v1`;
@@ -224,4 +229,37 @@ export async function getActiveForm(
 
   const data = await handleResponse<FormResponse>(response);
   return data.form;
+}
+
+// ============================================================================
+// Form Import/Export Operations
+// ============================================================================
+
+/**
+ * Export a form as JSON
+ */
+export async function exportForm(formId: string): Promise<FormExport> {
+  const response = await fetch(`${BASE_URL}/forms/${formId}/export`, {
+    headers: getAuthHeaders()
+  });
+
+  const data = await handleResponse<FormExportResponse>(response);
+  return data.export;
+}
+
+/**
+ * Import a form from JSON
+ */
+export async function importForm(
+  systemId: string,
+  request: ImportFormRequest
+): Promise<{ form: FormDefinition; validation: FormImportValidation }> {
+  const response = await fetch(`${BASE_URL}/game-systems/${systemId}/forms/import`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(request)
+  });
+
+  const data = await handleResponse<FormImportResponse>(response);
+  return data;
 }

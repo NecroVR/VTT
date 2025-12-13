@@ -1,5 +1,5 @@
 import { writable, derived, type Readable } from 'svelte/store';
-import type { FormDefinition, CampaignForm } from '@vtt/shared';
+import type { FormDefinition, CampaignForm, FormExport, FormImportValidation } from '@vtt/shared';
 import * as formsApi from '$lib/api/forms';
 
 // ============================================================================
@@ -321,6 +321,57 @@ function createFormsStore() {
 
         return { ...s, activeFormCache: newCache };
       });
+    },
+
+    /**
+     * Export a form
+     */
+    async exportForm(formId: string): Promise<FormExport> {
+      update(s => ({ ...s, error: null }));
+
+      try {
+        const exportData = await formsApi.exportForm(formId);
+        return exportData;
+      } catch (err) {
+        update(s => ({
+          ...s,
+          error: err instanceof Error ? err.message : 'Failed to export form'
+        }));
+        throw err;
+      }
+    },
+
+    /**
+     * Import a form
+     */
+    async importForm(
+      systemId: string,
+      request: Parameters<typeof formsApi.importForm>[1]
+    ): Promise<{ form: FormDefinition; validation: FormImportValidation }> {
+      update(s => ({ ...s, error: null }));
+
+      try {
+        const result = await formsApi.importForm(systemId, request);
+
+        update(s => {
+          const newForms = new Map(s.forms);
+          newForms.set(result.form.id, result.form);
+
+          const newFormsBySystem = new Map(s.formsBySystem);
+          const systemForms = newFormsBySystem.get(systemId) || [];
+          newFormsBySystem.set(systemId, [...systemForms, result.form.id]);
+
+          return { ...s, forms: newForms, formsBySystem: newFormsBySystem };
+        });
+
+        return result;
+      } catch (err) {
+        update(s => ({
+          ...s,
+          error: err instanceof Error ? err.message : 'Failed to import form'
+        }));
+        throw err;
+      }
     },
 
     /**
