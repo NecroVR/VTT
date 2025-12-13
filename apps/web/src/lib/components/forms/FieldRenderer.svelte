@@ -4,7 +4,7 @@
   import { sanitizeStyles } from '$lib/utils/cssSanitizer';
   import DOMPurify from 'isomorphic-dompurify';
   import CodeEditor from './CodeEditor.svelte';
-  import RichTextEditor from './RichTextEditor.svelte';
+  import RichTextEditorWrapper from './RichTextEditorWrapper.svelte';
 
   interface Props {
     node: FieldNode;
@@ -589,7 +589,7 @@
         oninput={(e) => handleChange(e.currentTarget.value)}
       />
     {:else if node.fieldType === 'richtext'}
-      <RichTextEditor
+      <RichTextEditorWrapper
         value={String(value ?? '')}
         readonly={node.readonly}
         placeholder={placeholder ?? 'Enter text...'}

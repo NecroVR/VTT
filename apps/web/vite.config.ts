@@ -31,5 +31,17 @@ export default defineConfig({
         secure: false, // Accept self-signed certificates
       }
     }
+  },
+  ssr: {
+    noExternal: ['@vtt/shared'],
+    external: ['@tiptap/core', '@tiptap/starter-kit', '@tiptap/extension-underline', '@tiptap/extension-link', '@tiptap/pm']
+  },
+  build: {
+    rollupOptions: {
+      external: ['@tiptap/core', '@tiptap/starter-kit', '@tiptap/extension-underline', '@tiptap/extension-link', '@tiptap/pm']
+    }
+  },
+  optimizeDeps: {
+    exclude: ['@tiptap/core', '@tiptap/starter-kit', '@tiptap/extension-underline', '@tiptap/extension-link']
   }
 });
