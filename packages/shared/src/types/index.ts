@@ -29,3 +29,4 @@ export * from './moduleEntities.js';
 export * from './entityProperties.js';
 export * from './validation.js';
 export * from './forms.js';
+export * from './dnd5e.js';

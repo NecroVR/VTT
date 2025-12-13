@@ -1,0 +1,286 @@
+{
+  "name": "D&D 5e Equipment",
+  "description": "Generic equipment sheet for D&D 5th Edition non-weapon, non-armor items",
+  "entityType": "equipment",
+  "version": "1.0.0",
+  "layout": [
+    {
+      "type": "section",
+      "id": "equipment-header",
+      "title": "Equipment Information",
+      "collapsible": false,
+      "children": [
+        {
+          "type": "grid",
+          "id": "header-grid",
+          "columns": 2,
+          "gap": "1rem",
+          "children": [
+            {
+              "type": "field",
+              "id": "equipment-name",
+              "fieldType": "text",
+              "binding": "name",
+              "label": "Equipment Name",
+              "required": true,
+              "options": {
+                "placeholder": "Rope, Backpack, Torch, etc."
+              }
+            },
+            {
+              "type": "field",
+              "id": "equipment-image",
+              "fieldType": "image",
+              "binding": "image",
+              "label": "Image",
+              "options": {
+                "accept": "image/*",
+                "preview": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "physical-properties",
+      "title": "Physical Properties",
+      "collapsible": false,
+      "children": [
+        {
+          "type": "grid",
+          "id": "physical-grid",
+          "columns": 3,
+          "gap": "1rem",
+          "children": [
+            {
+              "type": "field",
+              "id": "equipment-weight",
+              "fieldType": "number",
+              "binding": "data.weight",
+              "label": "Weight (lb)",
+              "options": {
+                "min": 0,
+                "step": 0.1,
+                "placeholder": "0"
+              }
+            },
+            {
+              "type": "field",
+              "id": "equipment-cost",
+              "fieldType": "number",
+              "binding": "data.cost",
+              "label": "Cost (gp)",
+              "options": {
+                "min": 0,
+                "step": 0.01,
+                "placeholder": "0"
+              }
+            },
+            {
+              "type": "field",
+              "id": "equipment-quantity",
+              "fieldType": "number",
+              "binding": "data.quantity",
+              "label": "Quantity",
+              "required": true,
+              "options": {
+                "min": 1,
+                "step": 1,
+                "placeholder": "1"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "description-section",
+      "title": "Description",
+      "collapsible": false,
+      "children": [
+        {
+          "type": "field",
+          "id": "equipment-description",
+          "fieldType": "richtext",
+          "binding": "data.description",
+          "label": "Description",
+          "options": {
+            "multiline": true,
+            "placeholder": "Enter detailed description of the equipment...",
+            "showPreview": true
+          }
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "equipment-rarity",
+      "title": "Item Rarity",
+      "collapsible": true,
+      "defaultCollapsed": true,
+      "children": [
+        {
+          "type": "field",
+          "id": "equipment-rarity-field",
+          "fieldType": "select",
+          "binding": "data.rarity",
+          "label": "Rarity",
+          "options": {
+            "options": [
+              { "value": "common", "label": { "literal": "Common" } },
+              { "value": "uncommon", "label": { "literal": "Uncommon" } },
+              { "value": "rare", "label": { "literal": "Rare" } },
+              { "value": "very_rare", "label": { "literal": "Very Rare" } },
+              { "value": "legendary", "label": { "literal": "Legendary" } },
+              { "value": "artifact", "label": { "literal": "Artifact" } }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "attunement-section",
+      "title": "Attunement (Magical Items)",
+      "collapsible": true,
+      "defaultCollapsed": true,
+      "children": [
+        {
+          "type": "field",
+          "id": "requires-attunement",
+          "fieldType": "checkbox",
+          "binding": "data.requiresAttunement",
+          "label": "Requires Attunement"
+        },
+        {
+          "type": "conditional",
+          "id": "attunement-requirements-conditional",
+          "condition": {
+            "type": "simple",
+            "field": "data.requiresAttunement",
+            "operator": "equals",
+            "value": true
+          },
+          "then": [
+            {
+              "type": "field",
+              "id": "attunement-requirements",
+              "fieldType": "text",
+              "binding": "data.attunementRequirements",
+              "label": "Attunement Requirements",
+              "options": {
+                "placeholder": "e.g., by a spellcaster, by a cleric, etc."
+              }
+            },
+            {
+              "type": "field",
+              "id": "is-attuned",
+              "fieldType": "checkbox",
+              "binding": "data.attuned",
+              "label": "Currently Attuned"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "magical-properties",
+      "title": "Magical Properties",
+      "collapsible": true,
+      "defaultCollapsed": true,
+      "children": [
+        {
+          "type": "field",
+          "id": "is-magical",
+          "fieldType": "checkbox",
+          "binding": "data.magical",
+          "label": "This is a Magical Item"
+        },
+        {
+          "type": "conditional",
+          "id": "magical-effects-conditional",
+          "condition": {
+            "type": "simple",
+            "field": "data.magical",
+            "operator": "equals",
+            "value": true
+          },
+          "then": [
+            {
+              "type": "field",
+              "id": "magical-effects",
+              "fieldType": "richtext",
+              "binding": "data.magicalEffects",
+              "label": "Magical Effects",
+              "options": {
+                "multiline": true,
+                "placeholder": "Describe the magical properties and effects...",
+                "showPreview": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "notes-section",
+      "title": "Notes",
+      "collapsible": true,
+      "defaultCollapsed": true,
+      "children": [
+        {
+          "type": "field",
+          "id": "equipment-notes",
+          "fieldType": "richtext",
+          "binding": "data.notes",
+          "label": "Notes",
+          "options": {
+            "multiline": true,
+            "placeholder": "Additional notes, special instructions, etc.",
+            "showPreview": true
+          }
+        },
+        {
+          "type": "grid",
+          "id": "metadata-grid",
+          "columns": 2,
+          "gap": "1rem",
+          "children": [
+            {
+              "type": "field",
+              "id": "equipment-source",
+              "fieldType": "text",
+              "binding": "data.source",
+              "label": "Source",
+              "options": {
+                "placeholder": "PHB, DMG, XGE, etc."
+              }
+            },
+            {
+              "type": "field",
+              "id": "equipment-identified",
+              "fieldType": "checkbox",
+              "binding": "data.identified",
+              "label": "Identified"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "fragments": [],
+  "styles": {
+    "theme": "default",
+    "variables": {
+      "--equipment-header-bg": "#f7fafc",
+      "--equipment-border-color": "#e2e8f0"
+    },
+    "customCSS": ".equipment-header { background: var(--equipment-header-bg); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; border: 1px solid var(--equipment-border-color); }"
+  },
+  "computedFields": []
+}

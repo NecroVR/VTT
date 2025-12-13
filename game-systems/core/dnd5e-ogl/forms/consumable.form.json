@@ -1,0 +1,554 @@
+{
+  "name": "D&D 5e Consumable",
+  "description": "Consumable items for D&D 5th Edition including potions, scrolls, wands, and other limited-use items",
+  "entityType": "consumable",
+  "version": "1.0.0",
+  "layout": [
+    {
+      "type": "section",
+      "id": "consumable-header",
+      "title": "Consumable Information",
+      "collapsible": false,
+      "children": [
+        {
+          "type": "grid",
+          "id": "header-grid",
+          "columns": 2,
+          "gap": "1rem",
+          "children": [
+            {
+              "type": "field",
+              "id": "consumable-name",
+              "fieldType": "text",
+              "binding": "name",
+              "label": "Item Name",
+              "required": true,
+              "options": {
+                "placeholder": "Potion of Healing, Scroll of Fireball, etc."
+              }
+            },
+            {
+              "type": "field",
+              "id": "consumable-image",
+              "fieldType": "image",
+              "binding": "image",
+              "label": "Image",
+              "options": {
+                "accept": "image/*",
+                "preview": true
+              }
+            }
+          ]
+        },
+        {
+          "type": "grid",
+          "id": "type-rarity-grid",
+          "columns": 2,
+          "gap": "1rem",
+          "children": [
+            {
+              "type": "field",
+              "id": "consumable-type",
+              "fieldType": "select",
+              "binding": "data.consumableType",
+              "label": "Consumable Type",
+              "required": true,
+              "options": {
+                "options": [
+                  { "value": "potion", "label": { "literal": "Potion" } },
+                  { "value": "scroll", "label": { "literal": "Scroll" } },
+                  { "value": "wand", "label": { "literal": "Wand" } },
+                  { "value": "rod", "label": { "literal": "Rod" } },
+                  { "value": "food", "label": { "literal": "Food" } },
+                  { "value": "ammunition", "label": { "literal": "Ammunition" } },
+                  { "value": "trinket", "label": { "literal": "Trinket" } },
+                  { "value": "other", "label": { "literal": "Other" } }
+                ]
+              }
+            },
+            {
+              "type": "field",
+              "id": "consumable-rarity",
+              "fieldType": "select",
+              "binding": "data.rarity",
+              "label": "Rarity",
+              "required": true,
+              "options": {
+                "options": [
+                  { "value": "common", "label": { "literal": "Common" } },
+                  { "value": "uncommon", "label": { "literal": "Uncommon" } },
+                  { "value": "rare", "label": { "literal": "Rare" } },
+                  { "value": "very_rare", "label": { "literal": "Very Rare" } },
+                  { "value": "legendary", "label": { "literal": "Legendary" } },
+                  { "value": "artifact", "label": { "literal": "Artifact" } }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "usage-section",
+      "title": "Usage & Charges",
+      "collapsible": false,
+      "children": [
+        {
+          "type": "grid",
+          "id": "usage-grid",
+          "columns": 2,
+          "gap": "1rem",
+          "children": [
+            {
+              "type": "field",
+              "id": "uses-current",
+              "fieldType": "number",
+              "binding": "data.uses.current",
+              "label": "Current Uses",
+              "required": true,
+              "options": {
+                "min": 0,
+                "step": 1,
+                "placeholder": "1"
+              }
+            },
+            {
+              "type": "field",
+              "id": "uses-max",
+              "fieldType": "number",
+              "binding": "data.uses.max",
+              "label": "Maximum Uses",
+              "required": true,
+              "options": {
+                "min": 1,
+                "step": 1,
+                "placeholder": "1"
+              }
+            },
+            {
+              "type": "field",
+              "id": "uses-recovery",
+              "fieldType": "select",
+              "binding": "data.uses.per",
+              "label": "Recovery Period",
+              "options": {
+                "options": [
+                  { "value": "charges", "label": { "literal": "Charges (Manual)" } },
+                  { "value": "dawn", "label": { "literal": "Daily at Dawn" } },
+                  { "value": "dusk", "label": { "literal": "Daily at Dusk" } },
+                  { "value": "short_rest", "label": { "literal": "Short Rest" } },
+                  { "value": "long_rest", "label": { "literal": "Long Rest" } },
+                  { "value": "day", "label": { "literal": "Per Day" } },
+                  { "value": "use", "label": { "literal": "Single Use (Destroyed)" } }
+                ]
+              }
+            },
+            {
+              "type": "field",
+              "id": "auto-destroy",
+              "fieldType": "checkbox",
+              "binding": "data.autoDestroy",
+              "label": "Auto-Destroy When Uses Depleted"
+            }
+          ]
+        },
+        {
+          "type": "conditional",
+          "id": "charges-recovery-conditional",
+          "condition": {
+            "type": "simple",
+            "field": "data.uses.per",
+            "operator": "equals",
+            "value": "charges"
+          },
+          "then": [
+            {
+              "type": "field",
+              "id": "charges-recovery-text",
+              "fieldType": "text",
+              "binding": "data.chargesRecovery",
+              "label": "Charges Recovery Details",
+              "options": {
+                "placeholder": "e.g., Regains 1d6+1 charges daily at dawn"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "effects-section",
+      "title": "Effects",
+      "collapsible": false,
+      "children": [
+        {
+          "type": "field",
+          "id": "effect-type",
+          "fieldType": "select",
+          "binding": "data.effect.type",
+          "label": "Effect Type",
+          "options": {
+            "options": [
+              { "value": "healing", "label": { "literal": "Healing" } },
+              { "value": "damage", "label": { "literal": "Damage" } },
+              { "value": "buff", "label": { "literal": "Buff/Enhancement" } },
+              { "value": "debuff", "label": { "literal": "Debuff/Condition" } },
+              { "value": "utility", "label": { "literal": "Utility" } },
+              { "value": "spell", "label": { "literal": "Spell Effect" } },
+              { "value": "other", "label": { "literal": "Other" } }
+            ]
+          }
+        },
+        {
+          "type": "conditional",
+          "id": "healing-conditional",
+          "condition": {
+            "type": "simple",
+            "field": "data.effect.type",
+            "operator": "equals",
+            "value": "healing"
+          },
+          "then": [
+            {
+              "type": "field",
+              "id": "healing-dice",
+              "fieldType": "text",
+              "binding": "data.effect.healing",
+              "label": "Healing Dice",
+              "options": {
+                "placeholder": "2d4+2, 4d4+4, etc."
+              }
+            }
+          ]
+        },
+        {
+          "type": "conditional",
+          "id": "damage-conditional",
+          "condition": {
+            "type": "simple",
+            "field": "data.effect.type",
+            "operator": "equals",
+            "value": "damage"
+          },
+          "then": [
+            {
+              "type": "grid",
+              "id": "damage-grid",
+              "columns": 2,
+              "gap": "1rem",
+              "children": [
+                {
+                  "type": "field",
+                  "id": "damage-dice",
+                  "fieldType": "text",
+                  "binding": "data.effect.damage.dice",
+                  "label": "Damage Dice",
+                  "options": {
+                    "placeholder": "3d6, 8d6, etc."
+                  }
+                },
+                {
+                  "type": "field",
+                  "id": "damage-type",
+                  "fieldType": "select",
+                  "binding": "data.effect.damage.type",
+                  "label": "Damage Type",
+                  "options": {
+                    "options": [
+                      { "value": "acid", "label": { "literal": "Acid" } },
+                      { "value": "bludgeoning", "label": { "literal": "Bludgeoning" } },
+                      { "value": "cold", "label": { "literal": "Cold" } },
+                      { "value": "fire", "label": { "literal": "Fire" } },
+                      { "value": "force", "label": { "literal": "Force" } },
+                      { "value": "lightning", "label": { "literal": "Lightning" } },
+                      { "value": "necrotic", "label": { "literal": "Necrotic" } },
+                      { "value": "piercing", "label": { "literal": "Piercing" } },
+                      { "value": "poison", "label": { "literal": "Poison" } },
+                      { "value": "psychic", "label": { "literal": "Psychic" } },
+                      { "value": "radiant", "label": { "literal": "Radiant" } },
+                      { "value": "slashing", "label": { "literal": "Slashing" } },
+                      { "value": "thunder", "label": { "literal": "Thunder" } }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "conditional",
+          "id": "condition-conditional",
+          "condition": {
+            "type": "simple",
+            "field": "data.effect.type",
+            "operator": "equals",
+            "value": "debuff"
+          },
+          "then": [
+            {
+              "type": "field",
+              "id": "condition-name",
+              "fieldType": "text",
+              "binding": "data.effect.condition",
+              "label": "Condition Applied",
+              "options": {
+                "placeholder": "Poisoned, Paralyzed, Charmed, etc."
+              }
+            }
+          ]
+        },
+        {
+          "type": "field",
+          "id": "effect-save",
+          "fieldType": "checkbox",
+          "binding": "data.effect.requiresSave",
+          "label": "Requires Saving Throw"
+        },
+        {
+          "type": "conditional",
+          "id": "save-conditional",
+          "condition": {
+            "type": "simple",
+            "field": "data.effect.requiresSave",
+            "operator": "equals",
+            "value": true
+          },
+          "then": [
+            {
+              "type": "grid",
+              "id": "save-grid",
+              "columns": 2,
+              "gap": "1rem",
+              "children": [
+                {
+                  "type": "field",
+                  "id": "save-ability",
+                  "fieldType": "select",
+                  "binding": "data.effect.save.ability",
+                  "label": "Save Ability",
+                  "options": {
+                    "options": [
+                      { "value": "str", "label": { "literal": "Strength" } },
+                      { "value": "dex", "label": { "literal": "Dexterity" } },
+                      { "value": "con", "label": { "literal": "Constitution" } },
+                      { "value": "int", "label": { "literal": "Intelligence" } },
+                      { "value": "wis", "label": { "literal": "Wisdom" } },
+                      { "value": "cha", "label": { "literal": "Charisma" } }
+                    ]
+                  }
+                },
+                {
+                  "type": "field",
+                  "id": "save-dc",
+                  "fieldType": "number",
+                  "binding": "data.effect.save.dc",
+                  "label": "Save DC",
+                  "options": {
+                    "min": 1,
+                    "max": 30,
+                    "step": 1,
+                    "placeholder": "15"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "description-section",
+      "title": "Description",
+      "collapsible": false,
+      "children": [
+        {
+          "type": "field",
+          "id": "consumable-description",
+          "fieldType": "richtext",
+          "binding": "data.description",
+          "label": "Description",
+          "options": {
+            "multiline": true,
+            "placeholder": "Enter detailed description of the consumable and its effects...",
+            "showPreview": true
+          }
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "physical-properties",
+      "title": "Physical Properties",
+      "collapsible": true,
+      "defaultCollapsed": false,
+      "children": [
+        {
+          "type": "grid",
+          "id": "physical-grid",
+          "columns": 3,
+          "gap": "1rem",
+          "children": [
+            {
+              "type": "field",
+              "id": "consumable-weight",
+              "fieldType": "number",
+              "binding": "data.weight",
+              "label": "Weight (lb)",
+              "options": {
+                "min": 0,
+                "step": 0.1,
+                "placeholder": "0.5"
+              }
+            },
+            {
+              "type": "field",
+              "id": "consumable-cost",
+              "fieldType": "number",
+              "binding": "data.cost",
+              "label": "Cost (gp)",
+              "options": {
+                "min": 0,
+                "step": 0.01,
+                "placeholder": "50"
+              }
+            },
+            {
+              "type": "field",
+              "id": "consumable-quantity",
+              "fieldType": "number",
+              "binding": "data.quantity",
+              "label": "Quantity",
+              "options": {
+                "min": 1,
+                "step": 1,
+                "placeholder": "1"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "attunement-section",
+      "title": "Attunement",
+      "collapsible": true,
+      "defaultCollapsed": true,
+      "children": [
+        {
+          "type": "field",
+          "id": "requires-attunement",
+          "fieldType": "checkbox",
+          "binding": "data.requiresAttunement",
+          "label": "Requires Attunement"
+        },
+        {
+          "type": "conditional",
+          "id": "attunement-requirements-conditional",
+          "condition": {
+            "type": "simple",
+            "field": "data.requiresAttunement",
+            "operator": "equals",
+            "value": true
+          },
+          "then": [
+            {
+              "type": "field",
+              "id": "attunement-requirements",
+              "fieldType": "text",
+              "binding": "data.attunementRequirements",
+              "label": "Attunement Requirements",
+              "options": {
+                "placeholder": "e.g., by a spellcaster"
+              }
+            },
+            {
+              "type": "field",
+              "id": "is-attuned",
+              "fieldType": "checkbox",
+              "binding": "data.attuned",
+              "label": "Currently Attuned"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "id": "notes-section",
+      "title": "Notes",
+      "collapsible": true,
+      "defaultCollapsed": true,
+      "children": [
+        {
+          "type": "field",
+          "id": "consumable-notes",
+          "fieldType": "richtext",
+          "binding": "data.notes",
+          "label": "Notes",
+          "options": {
+            "multiline": true,
+            "placeholder": "Additional notes, special instructions, etc.",
+            "showPreview": true
+          }
+        },
+        {
+          "type": "grid",
+          "id": "metadata-grid",
+          "columns": 2,
+          "gap": "1rem",
+          "children": [
+            {
+              "type": "field",
+              "id": "consumable-source",
+              "fieldType": "text",
+              "binding": "data.source",
+              "label": "Source",
+              "options": {
+                "placeholder": "PHB, DMG, XGE, etc."
+              }
+            },
+            {
+              "type": "field",
+              "id": "consumable-identified",
+              "fieldType": "checkbox",
+              "binding": "data.identified",
+              "label": "Identified"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "fragments": [],
+  "styles": {
+    "theme": "default",
+    "variables": {
+      "--consumable-header-bg": "#fef3e0",
+      "--consumable-border-color": "#f59e0b",
+      "--consumable-uses-color": "#10b981"
+    },
+    "customCSS": ".consumable-header { background: var(--consumable-header-bg); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; border-left: 4px solid var(--consumable-border-color); }"
+  },
+  "computedFields": [
+    {
+      "id": "uses-remaining",
+      "name": "Uses Remaining",
+      "description": "Calculated remaining uses",
+      "formula": "(@uses.current || 0)",
+      "resultType": "number",
+      "dependencies": ["data.uses.current"]
+    },
+    {
+      "id": "uses-percentage",
+      "name": "Uses Percentage",
+      "description": "Percentage of uses remaining",
+      "formula": "((@uses.current || 0) / (@uses.max || 1)) * 100",
+      "resultType": "number",
+      "dependencies": ["data.uses.current", "data.uses.max"]
+    }
+  ]
+}
